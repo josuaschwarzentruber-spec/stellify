@@ -1,0 +1,40 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user account information and career preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "firstName": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin", "schueler"], "description": "User role for pricing plans" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "cvContext": { "type": "string", "description": "Extracted CV text context" },
+        "freeGenerationsUsed": { "type": "integer", "description": "Number of free generations used" }
+      },
+      "required": ["uid", "email", "firstName"]
+    },
+    "Message": {
+      "title": "Chat Message",
+      "description": "A single message in the conversation history.",
+      "type": "object",
+      "properties": {
+        "role": { "type": "string", "enum": ["user", "ai"] },
+        "content": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["role", "content", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile collection"
+    },
+    "/users/{userId}/messages/{messageId}": {
+      "schema": "Message",
+      "description": "Conversation history subcollection"
+    }
+  }
+}
