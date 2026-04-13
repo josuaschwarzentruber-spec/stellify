@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  
+  /* Brand Colors */
+  --color-brand-dark: #1A1A18;
+  --color-brand-green: #004225;
+  --color-brand-gray-medium: #5C5C58;
+  --color-brand-gray-light: #9A9A94;
+  --color-brand-gray-text: #6B6B66; /* Darker version of light gray for better contrast */
+  --color-brand-bg: #FAFAF8;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  .markdown-body {
+    @apply text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed;
+  }
+  .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+    @apply font-serif font-medium mt-6 mb-4 text-[#004225] dark:text-[#FAFAF8];
+  }
+  .markdown-body h1 { @apply text-3xl; }
+  .markdown-body h2 { @apply text-2xl; }
+  .markdown-body h3 { @apply text-xl; }
+  .markdown-body p { @apply mb-4; }
+  .markdown-body ul, .markdown-body ol { @apply mb-4 pl-6; }
+  .markdown-body ul { @apply list-disc; }
+  .markdown-body ol { @apply list-decimal; }
+  .markdown-body li { @apply mb-2; }
+  .markdown-body strong { @apply font-medium text-[#004225] dark:text-[#FAFAF8]; }
+  .markdown-body a { @apply text-[#004225] dark:text-[#FAFAF8] underline underline-offset-4 decoration-[#004225]/20 hover:decoration-[#004225] transition-all; }
+  .markdown-body blockquote { @apply border-l-4 border-[#004225]/20 pl-4 italic text-[#4A4A45] dark:text-[#9A9A94] mb-4; }
+  .markdown-body code { @apply bg-black/5 dark:bg-white/5 px-1.5 py-0.5 rounded font-mono text-sm; }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 66, 37, 0.1);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 66, 37, 0.2);
+}

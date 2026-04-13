@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stellify – Dein KI-Karriere-Copilot für die Schweiz</title>
+    <!-- THEME INIT: Muss VOR dem React-Bundle laufen um FOUC zu verhindern -->
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('theme');
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+          } else {
+            document.documentElement.classList.remove('dark');
+          }
+        } catch(e) {}
+      })();
+    </script>
+    <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner – auf Deutsch, Französisch und Italienisch.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Stellify – Dein KI-Karriere-Copilot">
+    <meta property="og:description" content="CV-Optimierung, Interview-Coach 
+      und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="de_CH">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

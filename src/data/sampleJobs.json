@@ -1,0 +1,52 @@
+[
+  {
+    "id": "job-1",
+    "title": "Senior Full Stack Developer (Node.js & React)",
+    "company": "SwissTech Solutions AG",
+    "location": "Zürich, Schweiz",
+    "category": "IT",
+    "description": "Wir suchen einen erfahrenen Full Stack Developer zur Verstärkung unseres Teams. Fokus auf skalierbare Cloud-Architekturen und moderne Web-Technologien.",
+    "ats_keywords": ["TypeScript", "Node.js", "React", "AWS", "Docker", "Kubernetes", "CI/CD", "REST API", "Microservices", "Agile", "Scrum"],
+    "requirements": "Mindestens 5 Jahre Erfahrung in der Softwareentwicklung, Expertise in JavaScript/TypeScript Frameworks und Erfahrung mit Cloud-Infrastrukturen (AWS/Azure)."
+  },
+  {
+    "id": "job-2",
+    "title": "Digital Marketing Manager",
+    "company": "Alpine Growth Marketing",
+    "location": "Genf, Schweiz",
+    "category": "Marketing",
+    "description": "Verantwortlich für die Planung und Umsetzung von Performance-Marketing-Kampagnen zur Steigerung der Brand Awareness und Lead-Generierung.",
+    "ats_keywords": ["SEO", "SEM", "Google Ads", "Google Analytics 4", "Content Strategy", "Social Media Marketing", "CRM", "Hubspot", "A/B Testing", "KPI Tracking"],
+    "requirements": "Erfolgsbilanz im digitalen Marketing, fundierte Kenntnisse in Web-Analyse-Tools und Erfahrung in der Budgetverwaltung für Multi-Channel-Kampagnen."
+  },
+  {
+    "id": "job-3",
+    "title": "Cloud Architect (Azure/DevOps)",
+    "company": "Bern IT Consulting",
+    "location": "Bern, Schweiz",
+    "category": "IT",
+    "description": "Design und Implementierung von komplexen Cloud-Infrastrukturen für unsere Enterprise-Kunden in der Bundesverwaltung und im Finanzsektor.",
+    "ats_keywords": ["Azure", "Terraform", "Infrastructure as Code", "DevOps", "Security Compliance", "Cloud Migration", "PowerShell", "Governance", "Enterprise Architecture"],
+    "requirements": "Zertifizierter Azure Architect, Erfahrung mit IaC-Tools und tiefes Verständnis für IT-Security und Compliance-Anforderungen in der Schweiz."
+  },
+  {
+    "id": "job-4",
+    "title": "Content Marketing Specialist",
+    "company": "Basel Pharma Communications",
+    "location": "Basel, Schweiz",
+    "category": "Marketing",
+    "description": "Erstellung von hochwertigem Content für verschiedene Kanäle im Bereich Life Sciences. Fokus auf Storytelling und Zielgruppenansprache.",
+    "ats_keywords": ["Copywriting", "Content Creation", "Storytelling", "Email Marketing", "SEO Writing", "CMS", "Adobe Creative Cloud", "Brand Voice", "Inbound Marketing"],
+    "requirements": "Exzellente Schreibfähigkeiten in Deutsch und Englisch, Erfahrung im Content-Management und Leidenschaft für komplexe wissenschaftliche Themen."
+  },
+  {
+    "id": "job-5",
+    "title": "Data Scientist / Machine Learning Engineer",
+    "company": "Lemanic Data Labs",
+    "location": "Lausanne, Schweiz",
+    "category": "IT",
+    "description": "Entwicklung von prädiktiven Modellen und Datenanalysen zur Optimierung von Geschäftsprozessen in der Fertigungsindustrie.",
+    "ats_keywords": ["Python", "R", "SQL", "Machine Learning", "Deep Learning", "PyTorch", "TensorFlow", "Data Visualization", "Tableau", "Big Data", "Spark"],
+    "requirements": "Master oder PhD in Informatik/Mathematik, fundierte Kenntnisse in statistischer Modellierung und Erfahrung in der Arbeit mit grossen Datensätzen."
+  }
+]
