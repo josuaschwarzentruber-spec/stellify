@@ -4944,6 +4944,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
+            </div>
             )}
 
             {activeView === 'jobs' && (
