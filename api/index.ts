@@ -104,11 +104,18 @@ async function startServer() {
 
     try {
       const ai = new GoogleGenAI({ apiKey });
+
+      // Build contents with history if provided
+      const contents = (messages && messages.length > 0)
+        ? [...messages, { role: "user", parts: [{ text: userContent }] }]
+        : [{ role: "user", parts: [{ text: userContent }] }];
+
       const response = await ai.models.generateContent({
-        model: model || "gemini-3-flash-preview",
-        contents: userContent,
+        model: model || "gemini-2.0-flash",
+        contents,
         config: {
-          systemInstruction: systemInstruction
+          systemInstruction: systemInstruction,
+          temperature: 0.7
         }
       });
 
@@ -120,7 +127,7 @@ async function startServer() {
   });
 
   app.post("/api/process-tool", async (req, res) => {
-    const { prompt, model } = req.body;
+    const { prompt, model, useSearch } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
@@ -130,11 +137,25 @@ async function startServer() {
     try {
       const ai = new GoogleGenAI({ apiKey });
       const response = await ai.models.generateContent({
-        model: model || "gemini-3-flash-preview",
-        contents: prompt
+        model: model || "gemini-2.0-flash",
+        contents: prompt,
+        config: {
+          systemInstruction: "Du bist ein Schweizer Karriere-Experte. Nutze Schweizer Hochdeutsch (kein ß). Antworte präzise und professionell.",
+          temperature: 0.4,
+          tools: useSearch ? [{ googleSearch: {} }] : undefined
+        }
       });
 
-      res.json({ text: response.text });
+      // Extract grounding sources if search was used
+      let sources: string[] = [];
+      if (useSearch) {
+        const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+        sources = chunks
+          .filter((c: any) => c.web?.uri)
+          .map((c: any) => `[${c.web.title || c.web.uri}](${c.web.uri})`);
+      }
+
+      res.json({ text: response.text, sources });
     } catch (error: any) {
       console.error("[GEMINI TOOL ERROR]", error);
       res.status(500).json({ error: error.message || "Tool processing failed" });
@@ -239,7 +260,7 @@ async function startServer() {
 
       res.json({
         success: true,
-        checkoutUrl: session.url,
+        url: session.url,
         message: "Stripe-Session erstellt."
       });
     } catch (err: any) {
