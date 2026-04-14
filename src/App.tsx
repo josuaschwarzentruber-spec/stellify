@@ -723,8 +723,6 @@ function StellifyApp() {
     setToast({ message, type });
   };
 
-  const t = translations[language] || translations.DE;
-
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 3000);
@@ -3782,6 +3780,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       }
     }
   };
+
+  const t = translations[language] || translations.DE;
 
   const tools = [
     { 
