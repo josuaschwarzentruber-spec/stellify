@@ -1614,65 +1614,60 @@ function StellifyApp() {
     }
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        console.warn("GEMINI_API_KEY is missing.");
-        return;
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      
       const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
       const isPro = user?.role === 'pro' || isUnlimited;
       const model = isPro ? PRO_MODEL : FLASH_MODEL;
-      
+
       const systemInstruction = `
         IDENTITY: You are Stella, the exclusive AI career expert from Stellify.
-        TONE: Your style is "Rolex-inspired": Luxurious, timeless, precise, minimalistic, and absolutely trustworthy. 
+        TONE: Your style is "Rolex-inspired": Luxurious, timeless, precise, minimalistic, and absolutely trustworthy.
         You are not a "chatbot assistant", but a high-caliber career advisor for the Swiss market.
-        
+
         PREMIUM EFFICIENCY:
-        - CONCISE & ELITE: Be extremely precise. Every word must add value. 
+        - CONCISE & ELITE: Be extremely precise. Every word must add value.
         - PROFESSIONALISM: Use a brief, high-end greeting if appropriate (e.g., "Grüezi ${user?.firstName || 'User'}", "Bonjour", "Buongiorno").
         - STRUCTURE: Use a sophisticated mix of concise paragraphs and bullet points (*) for maximum clarity.
         - SWISS PRECISION: Focus on facts and strategic advice. Avoid generic filler phrases.
         - MAX LENGTH: Aim for high impact in few words. Stay under 150 words unless the complexity of the query requires more depth.
-        
+
         EXPERTISE:
         - Swiss Job Market: You know the differences between cantons (e.g., ZH vs. GE), industries (Pharma, Banking, SME), and salary benchmarks (Salarium).
         - Swiss Standards: You know that in Switzerland "ss" is used instead of "ß". You know the "work certificate code".
         - ATS Optimization: You know how Swiss recruiter software works.
-        
+        - Interview Preparation: You know exactly what Swiss recruiters ask and how to answer strategically.
+
         BEHAVIOR:
         - Be proactive: Offer the next logical step briefly.
         - Personalize: Use the context of the uploaded CV intensively.
-        
+
         LANGUAGE:
         - Respond in the user's selected language: ${language}.
         - If the language is German, use Swiss High German (no "ß", use "ss").
-        
+
         USER TIER: ${user?.role === 'unlimited' ? 'Unlimited (Highest Priority/Elite)' : user?.role === 'pro' ? 'Pro (Premium)' : 'Gratis (Standard)'}.
-        
+
         CONTEXT:
         ${cvContext ? `The candidate has uploaded a CV: ${cvContext}.` : 'The candidate has not yet uploaded a CV. Politely encourage them to do so to receive personalized tips.'}
         Candidate: ${user?.firstName || 'User'}.
       `;
 
-      const response = await ai.models.generateContent({
-        model: model,
-        contents: [
-          ...messages.slice(-10).map((h: Message) => ({
+      const chatRes = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userContent,
+          messages: messages.slice(-10).map((h: Message) => ({
             role: h.role === "ai" ? "model" : "user",
             parts: [{ text: h.content }]
           })),
-          { role: "user", parts: [{ text: userContent }] }
-        ],
-        config: {
-          systemInstruction: systemInstruction,
-          temperature: 0.7
-        }
+          systemInstruction,
+          model
+        })
       });
+      const chatData = await chatRes.json();
+      if (!chatRes.ok) throw new Error(chatData.error || 'Chat failed');
 
-      const reply = response.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : "Stella is currently thoughtful. Please try again.");
+      const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : "Stella is currently thoughtful. Please try again.");
       
       if (!user) {
         setMessages(prev => [...prev, { role: 'ai', content: reply }]);
@@ -1826,13 +1821,6 @@ function StellifyApp() {
     }
 
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        console.warn("GEMINI_API_KEY is missing.");
-        return;
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      
       const model = isPro ? PRO_MODEL : FLASH_MODEL;
 
       let prompt = `
@@ -2085,18 +2073,59 @@ function StellifyApp() {
             Füge eine Sektion "🇨🇭 Strategischer Vorteil" hinzu, die erklärt, wie diese Analyse dem Nutzer hilft, seine Position im Markt zu verstehen.
           `;
           break;
-        case 'interview':
+        case 'interview': {
+          const interviewTier = user?.role === 'unlimited' || user?.role === 'admin' ? 'unlimited' : user?.role === 'pro' ? 'pro' : 'free';
+          const scoringGrid = interviewTier === 'unlimited'
+            ? `
+BEWERTUNGSRASTER (100% – Unlimited):
+Bewerte den Kandidaten nach dem Interview in 8 Kategorien (je 0–100%):
+1. Erstkontakt & Auftreten (10%)
+2. Fachliche Kompetenz (20%)
+3. Kommunikation & Klarheit (15%)
+4. Problemlösungskompetenz (15%)
+5. Kulturelle Passung / Soft Skills (10%)
+6. Motivation & Eigeninitiative (10%)
+7. Schweizer Markt-Kenntnisse (10%)
+8. Gesprächsführung & Struktur (10%)
+→ Berechne den Gesamtscore und gib eine detaillierte Analyse + konkrete Verbesserungsvorschläge pro Kategorie.`
+            : interviewTier === 'pro'
+            ? `
+BEWERTUNGSRASTER (Pro – 5 Kategorien):
+Bewerte in 5 Kategorien (je 0–100%):
+1. Fachliche Kompetenz (25%)
+2. Kommunikation & Auftreten (25%)
+3. Motivation & Vorbereitung (20%)
+4. Problemlösung (15%)
+5. Schweizer Marktkenntnis (15%)
+→ Gesamtscore + Kernempfehlungen pro Kategorie.`
+            : `
+BEWERTUNGSRASTER (Basis):
+Bewerte in 3 Kategorien (je 0–100%):
+1. Auftreten & Kommunikation (40%)
+2. Fachliche Eignung (40%)
+3. Motivation (20%)
+→ Gesamtscore + 2 wichtigste Verbesserungshinweise.`;
+
           prompt = `
-            HANDLUNGSANWEISUNG: Simuliere ein Vorstellungsgespräch für die Position: ${toolInput.jobTitle}.
-            KONTEXT: CV des Kandidaten: ${cvContext}.
-            MODUS: Erstelle 5 hochrelevante, schwierige Fragen, die in der Schweiz (z.B. bei Banken, Pharma oder KMU) gestellt werden.
+            HANDLUNGSANWEISUNG: Simuliere ein professionelles Vorstellungsgespräch für die Position: ${toolInput.jobTitle}.
+            KONTEXT: CV des Kandidaten: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards'}.
+            SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
+
+            MODUS: Erstelle 5 hochrelevante, anspruchsvolle Fragen, die typischerweise bei Schweizer Unternehmen (Banken, Pharma, KMU, Versicherungen) gestellt werden.
+
             FÜR JEDE FRAGE:
-            - Die Frage selbst.
-            - Hintergrund: Was will der Recruiter wirklich wissen?
-            - Antwort-Strategie: Wie sollte der Kandidat reagieren?
-            - Beispiel-Antwort: Ein konkreter Formulierungsvorschlag.
+            1. Die Frage selbst (klar und präzise formuliert)
+            2. Was der Recruiter wirklich wissen will (Hintergrund)
+            3. Optimale Antwort-Strategie (STAR-Methode wenn sinnvoll)
+            4. Konkreter Formulierungsvorschlag (Musterantwort in Schweizer Hochdeutsch)
+            5. Häufige Fehler, die Kandidaten bei dieser Frage machen
+
+            ${scoringGrid}
+
+            ABSCHLUSS: Gib 3 konkrete Tipps speziell für ein Interview in der Schweiz (Pünktlichkeit, Unterlagen, Kultur etc.).
           `;
           break;
+        }
         case 'linkedin-posts':
           prompt = `
             HANDLUNGSANWEISUNG: Generiere 3 massgeschneiderte LinkedIn-Posts im Schweizer Stil.
@@ -2241,17 +2270,16 @@ function StellifyApp() {
           prompt = "Bitte hilf mir bei meiner Karriere.";
       }
 
-      const response = await ai.models.generateContent({
-        model: model,
-        contents: prompt,
-        config: {
-          systemInstruction: "Du bist ein Schweizer Karriere-Experte. Nutze Schweizer Hochdeutsch (kein ß). Antworte präzise und professionell.",
-          temperature: 0.4,
-          tools: useSearch ? [{ googleSearch: {} }] : undefined
-        }
+      const toolRes = await fetch('/api/process-tool', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, model, useSearch })
       });
+      const toolData = await toolRes.json();
+      if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
 
-      let resultText = response.text;
+      let resultText = toolData.text;
+      const toolSources: string[] = toolData.sources || [];
       
       // Special handling for CV Analysis (JSON)
       if (activeTool.id === 'cv-analysis') {
@@ -2346,15 +2374,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       }
       
       // Handle Grounding Metadata for Search
-      if (useSearch && response.candidates?.[0]?.groundingMetadata?.groundingChunks) {
-        const chunks = response.candidates[0].groundingMetadata.groundingChunks;
-        const links = chunks
-          .filter((chunk: any) => chunk.web?.uri)
-          .map((chunk: any) => `\n- [${chunk.web.title}](${chunk.web.uri})`);
-        
-        if (links.length > 0) {
-          resultText += "\n\n**Quellen:**\n" + links.join("");
-        }
+      if (useSearch && toolSources.length > 0) {
+        resultText += "\n\n**Quellen:**\n" + toolSources.map(s => `\n- ${s}`).join("");
       }
 
       setToolResult(resultText);
@@ -2526,12 +2547,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Häufige Fragen",
       stella_placeholder: "Frag Stella etwas...",
       stella_secure_data: "Sichere Schweizer Datenverarbeitung",
-      hero_title: "Dein persönlicher Karriere-Copilot",
-      hero_desc: "Erleben Sie das perfekte Zusammenspiel von künstlicher Intelligenz und Schweizer Exzellenz. Stellify transformiert Ihre Karriere-Unterlagen mit höchster Präzision und Diskretion für den anspruchsvollen Schweizer Arbeitsmarkt.",
-      cta_free: "Kostenlos testen",
+      hero_title: "Von Bewerbung bis Interview – dein KI-Karriere-Coach",
+      hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch – präzise, diskret und auf den Schweizer Markt zugeschnitten.",
+      cta_free: "Kostenlos starten",
       upload_cv: "Lebenslauf (CV) hochladen",
       update_cv: "Lebenslauf (CV) aktualisieren",
-      cv_info: "Ein CV (Curriculum Vitae) ist dein Lebenslauf. Er ist das wichtigste Dokument deiner Bewerbung.",
+      cv_info: "① CV hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
       dashboard: "Dashboard",
       tools: "Tools",
       pricing: "Preise",
@@ -2596,13 +2617,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Bezahle wie du willst",
       payment_secure: "Sicher via Stripe verarbeitet.",
       how_badge: "Der Prozess",
-      how_desc: "In nur drei einfachen Schritten optimieren wir deine Karriere-Chancen auf dem Schweizer Markt.",
-      how_1_t: "Lebenslauf (CV) Hochladen",
-      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella analysiert deine Stärken, Erfahrungen und den \"Arbeitszeugnis-Code\" in Sekunden.",
-      how_2_t: "Tool Wählen",
-      how_2_d: "Wähle aus über 20 spezialisierten KI-Tools – vom Gehaltsrechner bis zur ATS-Simulation für Schweizer Recruiter.",
-      how_3_t: "Job Gewinnen",
-      how_3_d: "Erhalte massgeschneiderte Unterlagen und Strategien, die genau auf die Anforderungen von Schweizer Unternehmen zugeschnitten sind.",
+      how_desc: "Von CV bis Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
+      how_1_t: "CV hochladen & analysieren",
+      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn nach Schweizer ATS-Standard – in Sekunden.",
+      how_2_t: "Bewerbung perfektionieren",
+      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jede CV-Sektion und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
+      how_3_t: "Interview bestehen",
+      how_3_d: "Trainiere mit dem KI-Interview-Coach: echte Schweizer Fragen, dein persönliches Bewertungsraster und konkrete Formulierungsvorschläge für jede Situation.",
       faq_badge: "Häufige Fragen",
       faq_subtitle: "Alles was du wissen musst",
       faq_contact: "Noch Fragen?",
@@ -3784,20 +3805,34 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
   const t = translations[language] || translations.DE;
 
   const tools = [
-    { 
-      id: 'job-search', 
-      title: t.tools_data['job-search'].title, 
-      desc: t.tools_data['job-search'].desc, 
-      icon: <Search size={20} />, 
-      badge: 'Live Search', 
+    {
+      id: 'interview',
+      title: t.tools_data['interview'].title,
+      desc: t.tools_data['interview'].desc,
+      icon: <Mic size={20} />,
+      badge: 'Coach',
       type: 'gratis',
-      inputs: [
-        { key: 'keyword', label: t.tools_data['job-search'].input_keyword, type: 'text', placeholder: t.tools_data['job-search'].input_keyword_placeholder },
-        { key: 'location', label: t.tools_data['job-search'].input_location, type: 'text', placeholder: t.tools_data['job-search'].input_location_placeholder },
-        { key: 'industry', label: t.tools_data['job-search'].input_industry, type: 'text', placeholder: t.tools_data['job-search'].input_industry_placeholder }
-      ] 
+      inputs: [{ key: 'jobTitle', label: t.tools_data['interview'].input_label, type: 'text', placeholder: t.tools_data['interview'].input_placeholder }]
     },
-    { 
+    {
+      id: 'cv-analysis',
+      title: t.tools_data['cv-analysis'].title,
+      desc: t.tools_data['cv-analysis'].desc,
+      icon: <Search size={20} />,
+      badge: 'Deep Scan',
+      type: 'pro',
+      inputs: []
+    },
+    {
+      id: 'cv-optimizer',
+      title: t.tools_data['cv-optimizer'].title,
+      desc: t.tools_data['cv-optimizer'].desc,
+      icon: <FileText size={20} />,
+      badge: 'Precision',
+      type: 'pro',
+      inputs: [{ key: 'section', label: t.tools_data['cv-optimizer'].input_label, type: 'text', placeholder: t.tools_data['cv-optimizer'].input_placeholder }]
+    },
+    {
       id: 'cv-premium', 
       title: t.tools_data['cv-premium'].title, 
       desc: t.tools_data['cv-premium'].desc, 
@@ -3815,16 +3850,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       type: 'ultimate',
       inputs: [{ key: 'goal', label: t.tools_data['career-roadmap'].input_label, type: 'text', placeholder: t.tools_data['career-roadmap'].input_placeholder }] 
     },
-    { 
-      id: 'cv-optimizer', 
-      title: t.tools_data['cv-optimizer'].title, 
-      desc: t.tools_data['cv-optimizer'].desc, 
-      icon: <FileText size={20} />, 
-      badge: 'Precision', 
-      type: 'pro',
-      inputs: [{ key: 'section', label: t.tools_data['cv-optimizer'].input_label, type: 'text', placeholder: t.tools_data['cv-optimizer'].input_placeholder }] 
-    },
-    { 
+    {
       id: 'salary-calc', 
       title: t.tools_data['salary-calc'].title, 
       desc: t.tools_data['salary-calc'].desc, 
@@ -3874,16 +3900,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       type: 'pro',
       inputs: [{ key: 'targetJob', label: t.tools_data['skill-gap'].input_label, type: 'text', placeholder: t.tools_data['skill-gap'].input_placeholder }] 
     },
-    { 
-      id: 'cv-analysis', 
-      title: t.tools_data['cv-analysis'].title, 
-      desc: t.tools_data['cv-analysis'].desc, 
-      icon: <Search size={20} />, 
-      badge: 'Deep Scan', 
-      type: 'ultimate',
-      inputs: []
-    },
-    { 
+    {
       id: 'tracker', 
       title: t.tools_data['tracker'].title, 
       desc: t.tools_data['tracker'].desc, 
@@ -3901,16 +3918,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       type: 'ultimate',
       inputs: []
     },
-    { 
-      id: 'interview', 
-      title: t.tools_data['interview'].title, 
-      desc: t.tools_data['interview'].desc, 
-      icon: <Mic size={20} />, 
-      badge: 'Coach', 
-      type: 'pro',
-      inputs: [{ key: 'jobTitle', label: t.tools_data['interview'].input_label, type: 'text', placeholder: t.tools_data['interview'].input_placeholder }] 
-    },
-    { 
+    {
       id: 'lehrstellen', 
       title: t.tools_data['lehrstellen'].title, 
       desc: t.tools_data['lehrstellen'].desc, 
@@ -5104,10 +5112,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
               <div className="space-y-4 mb-8">
                 <div className="bg-[#FAFAF8] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
-                  Grüezi! Ich habe dein CV analysiert. Für die Stelle als UX Designer bei der UBS empfehle ich, deine Erfahrung mit Design-Systemen stärker hervorzuheben.
+                  Grüezi! Dein CV ist analysiert. Für das Interview bei der UBS solltest du auf die Frage "Warum UBS?" vorbereitet sein – ich zeige dir die optimale Antwort.
                 </div>
                 <div className="bg-[#004225] text-white p-4 text-sm font-light leading-relaxed max-w-[85%] ml-auto">
-                  Danke Stella! Kannst du mir helfen, das Motivationsschreiben entsprechend anzupassen?
+                  Super! Welche Fragen kommen noch? Und wie antworte ich am besten?
+                </div>
+                <div className="bg-[#FAFAF8] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
+                  Starte den Interview-Coach – du erhältst 5 echte Fragen mit Musterantworten und deinem persönlichen Score.
                 </div>
               </div>
               <div className="flex gap-2">
