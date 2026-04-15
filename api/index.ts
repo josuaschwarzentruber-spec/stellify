@@ -330,6 +330,10 @@ Felder pro Objekt: id (string), title, company, location ("Stadt, Schweiz"), cat
         });
       }
 
+      const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+      const isLiveKey = stripeKey.startsWith('sk_live_');
+      console.log(`[STRIPE] Mode: ${isLiveKey ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, PriceID: ${priceId}`);
+
       const session = await stripeClient.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [{ price: priceId, quantity: 1 }],
@@ -342,8 +346,16 @@ Felder pro Objekt: id (string), title, company, location ("Stadt, Schweiz"), cat
 
       res.json({ success: true, url: session.url });
     } catch (err: any) {
-      console.error(`[STRIPE] Error creating session: ${err.message}`);
-      res.status(500).json({ success: false, error: err.message });
+      console.error(`[STRIPE] Error: ${err.message}`);
+      const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+      const isLiveKey = stripeKey.startsWith('sk_live_');
+      // Surface helpful diagnostics
+      const hint = err.message?.includes('test mode')
+        ? `Du verwendest einen Live-Schlüssel (sk_live_...), aber die Preis-IDs wurden im Test-Modus erstellt. Bitte erstelle die Preise im Stripe Live-Dashboard und setze die Env-Variablen STRIPE_PRICE_PRO_MONTHLY, STRIPE_PRICE_PRO_YEARLY, STRIPE_PRICE_ULTIMATE_MONTHLY, STRIPE_PRICE_ULTIMATE_YEARLY in Vercel.`
+        : err.message?.includes('live mode')
+        ? `Du verwendest einen Test-Schlüssel (sk_test_...), aber die Preis-IDs wurden im Live-Modus erstellt. Verwende entweder beide im Test-Modus oder beide im Live-Modus.`
+        : null;
+      res.status(500).json({ success: false, error: hint || err.message });
     }
   });
 
