@@ -222,11 +222,12 @@ async function startServer() {
       const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
 
       // Map planId and billingCycle to price IDs
+      // Hardcoded fallbacks for Ultimate; Pro requires env vars
       const priceMap: Record<string, string | undefined> = {
         'pro_monthly': process.env.STRIPE_PRICE_PRO_MONTHLY,
         'pro_yearly': process.env.STRIPE_PRICE_PRO_YEARLY,
-        'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY,
-        'ultimate_yearly': process.env.STRIPE_PRICE_ULTIMATE_YEARLY
+        'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || 'price_1TIrSSHEswF7knZxcHQnDDGt',
+        'ultimate_yearly': process.env.STRIPE_PRICE_ULTIMATE_YEARLY || 'price_1TIrT7HEswF7knZxSTFWGFB2'
       };
 
       const priceKey = `${planId}_${billingCycle}`;
