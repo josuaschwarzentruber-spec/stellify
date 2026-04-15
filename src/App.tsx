@@ -390,6 +390,56 @@ const OnboardingTutorial = ({ onComplete, t }: { onComplete: () => void, t: any 
   );
 };
 
+// --- COOKIE CONSENT BANNER ---
+const CookieBanner = ({ t, onAccept, onEssential }: { t: any; onAccept: () => void; onEssential: () => void }) => (
+  <AnimatePresence>
+    <motion.div
+      initial={{ y: 120, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 120, opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed bottom-0 left-0 right-0 z-[200] p-4 md:p-6"
+    >
+      <div className="max-w-4xl mx-auto bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 shadow-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+        {/* Icon */}
+        <div className="flex-shrink-0 w-10 h-10 bg-[#004225]/8 flex items-center justify-center text-[#004225] dark:text-[#00C060]">
+          <Shield size={20} />
+        </div>
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8] mb-1">
+            {t.cookie_title}
+          </p>
+          <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">
+            {t.cookie_desc}{' '}
+            <button
+              onClick={() => window.open('/datenschutz', '_blank')}
+              className="text-[#004225] dark:text-[#00C060] underline underline-offset-2 hover:no-underline"
+            >
+              {t.cookie_privacy_link}
+            </button>
+          </p>
+        </div>
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0 w-full md:w-auto">
+          <button
+            onClick={onEssential}
+            className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border border-black/15 dark:border-white/15 text-[#4A4A45] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+          >
+            {t.cookie_essential}
+          </button>
+          <button
+            onClick={onAccept}
+            className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331D] transition-all"
+          >
+            {t.cookie_accept}
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  </AnimatePresence>
+);
+
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
     {src ? (
@@ -594,6 +644,17 @@ function StellifyApp() {
   } | null>(null);
   const [interviewAnswer, setInterviewAnswer] = useState('');
   const [isProcessingTool, setIsProcessingTool] = useState(false);
+  const [cookieConsent, setCookieConsent] = useState<'accepted' | 'essential' | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('cookieConsent');
+      if (saved === 'accepted' || saved === 'essential') return saved;
+    }
+    return null;
+  });
+  const handleCookieAccept = (type: 'accepted' | 'essential') => {
+    setCookieConsent(type);
+    localStorage.setItem('cookieConsent', type);
+  };
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
@@ -3001,6 +3062,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       stella_insights_with_cv: "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check.",
       stella_insights_no_cv: "Sobald du dein CV hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen.",
       salary_history: "Gehaltsverlauf",
+      hero_precision: "Schweizer KI-Präzision",
+      upload_analyzing: "Analysiere Dokumentenstruktur...",
+      upload_done: "Lebenslauf erfolgreich analysiert. Stella ist bereit.",
+      hero_success_rate: "Erfolgsquote",
+      hero_more_interviews: "Mehr Interviews",
+      tool_see_plans: "Pläne ansehen",
+      tool_maybe_later: "Vielleicht später",
+      tool_inputs: "Eingaben",
+      tool_load_file: "Datei laden",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
       swiss_standard_notice_text: "Präzise abgestimmt auf die spezifischen Anforderungen und kulturellen Nuancen des Schweizer Arbeitsmarktes.",
@@ -3008,6 +3078,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Datenschutz",
       footer_terms: "AGB",
       footer_imprint: "Impressum",
+      cookie_title: "Datenschutz & Cookies",
+      cookie_desc: "Wir verwenden notwendige Cookies für den Betrieb der Plattform sowie optionale Analyse-Cookies zur Verbesserung des Angebots. Deine Daten werden nach Schweizer DSG & DSGVO verarbeitet.",
+      cookie_accept: "Alle akzeptieren",
+      cookie_essential: "Nur Notwendige",
+      cookie_privacy_link: "Datenschutzrichtlinie",
       market_1_t: "Jobwechsel nehmen zu",
       market_1_d: "Durchschnittlich alle 3 Jahre wechseln Arbeitnehmer in der Schweiz ihren Job.",
       market_2_t: "Bewerbungen kosten Zeit",
@@ -3486,6 +3561,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       stella_insights_with_cv: "Stella a analysé votre profil. Votre focus sur la précision correspond parfaitement au marché suisse. Utilisez l'outil d'analyse CV pour un bilan approfondi.",
       stella_insights_no_cv: "Dès que vous chargez votre CV, je crée ici une analyse personnalisée de vos chances sur le marché.",
       salary_history: "Historique salarial",
+      hero_precision: "IA Suisse de précision",
+      upload_analyzing: "Analyse de la structure du document...",
+      upload_done: "CV analysé avec succès. Stella est prête.",
+      hero_success_rate: "Taux de succès",
+      hero_more_interviews: "Plus d'entretiens",
+      tool_see_plans: "Voir les forfaits",
+      tool_maybe_later: "Peut-être plus tard",
+      tool_inputs: "Paramètres",
+      tool_load_file: "Charger fichier",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
       swiss_standard_notice_text: "Précisément adapté aux exigences spécifiques et aux nuances culturelles du marché du travail suisse.",
@@ -3493,6 +3577,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Confidentialité",
       footer_terms: "CGV",
       footer_imprint: "Mentions légales",
+      cookie_title: "Confidentialité & Cookies",
+      cookie_desc: "Nous utilisons des cookies nécessaires au fonctionnement de la plateforme et des cookies d'analyse optionnels pour améliorer nos services. Vos données sont traitées conformément à la LPD suisse et au RGPD.",
+      cookie_accept: "Tout accepter",
+      cookie_essential: "Essentiels uniquement",
+      cookie_privacy_link: "Politique de confidentialité",
       market_1_t: "Les changements d'emploi augmentent",
       market_1_d: "En moyenne, les salariés suisses changent d'emploi tous les 3 ans.",
       market_2_t: "Les candidatures prennent du temps",
@@ -3851,6 +3940,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       stella_insights_with_cv: "Stella ha analizzato il tuo profilo. La tua attenzione alla precisione si adatta perfettamente al mercato svizzero. Usa lo strumento di analisi CV per una verifica approfondita.",
       stella_insights_no_cv: "Non appena carichi il tuo CV, creo qui un'analisi personalizzata delle tue opportunità di mercato.",
       salary_history: "Cronologia stipendi",
+      hero_precision: "IA Svizzera di Precisione",
+      upload_analyzing: "Analisi della struttura del documento...",
+      upload_done: "CV analizzato con successo. Stella è pronta.",
+      hero_success_rate: "Tasso di successo",
+      hero_more_interviews: "Più colloqui",
+      tool_see_plans: "Vedi i piani",
+      tool_maybe_later: "Forse più tardi",
+      tool_inputs: "Parametri",
+      tool_load_file: "Carica file",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
       swiss_standard_notice_text: "Precisamente adattato ai requisiti specifici e alle sfumature culturali del mercato del lavoro svizzero.",
@@ -3858,6 +3956,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Privacy",
       footer_terms: "CGU",
       footer_imprint: "Note legali",
+      cookie_title: "Privacy & Cookie",
+      cookie_desc: "Utilizziamo cookie necessari per il funzionamento della piattaforma e cookie analitici opzionali per migliorare i servizi. I tuoi dati sono trattati in conformità alla LPD svizzera e al GDPR.",
+      cookie_accept: "Accetta tutto",
+      cookie_essential: "Solo essenziali",
+      cookie_privacy_link: "Informativa sulla privacy",
       market_1_t: "I cambi di lavoro aumentano",
       market_1_d: "In media, i dipendenti svizzeri cambiano lavoro ogni 3 anni.",
       market_2_t: "Le candidature richiedono tempo",
@@ -4216,6 +4319,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       stella_insights_with_cv: "Stella has analysed your profile. Your focus on precision fits perfectly with the Swiss market. Use the CV Analysis tool for a deep-dive check.",
       stella_insights_no_cv: "Once you upload your CV, I'll create a tailored analysis of your market opportunities here.",
       salary_history: "Salary History",
+      hero_precision: "Swiss AI Precision",
+      upload_analyzing: "Analysing document structure...",
+      upload_done: "CV successfully analysed. Stella is ready.",
+      hero_success_rate: "Success rate",
+      hero_more_interviews: "More interviews",
+      tool_see_plans: "See plans",
+      tool_maybe_later: "Maybe later",
+      tool_inputs: "Inputs",
+      tool_load_file: "Load file",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
       swiss_standard_notice_text: "Precisely tailored to the specific requirements and cultural nuances of the Swiss job market.",
@@ -4223,6 +4335,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Privacy",
       footer_terms: "Terms",
       footer_imprint: "Imprint",
+      cookie_title: "Privacy & Cookies",
+      cookie_desc: "We use necessary cookies to operate the platform and optional analytics cookies to improve our services. Your data is processed in accordance with the Swiss DSG and GDPR.",
+      cookie_accept: "Accept all",
+      cookie_essential: "Essential only",
+      cookie_privacy_link: "Privacy policy",
       market_1_t: "Job changes are increasing",
       market_1_d: "On average, Swiss employees change jobs every 3 years.",
       market_2_t: "Applications take time",
@@ -5739,7 +5856,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-xs font-bold tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#FDFCFB] animate-pulse" />
-              Schweizer KI-Präzision
+              {t.hero_precision}
             </div>
             <h1 className="text-5xl lg:text-7xl font-serif leading-[1.1] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
               {language === 'DE' ? 'Dein persönlicher' : language === 'FR' ? 'Votre' : language === 'IT' ? 'Il tuo' : language === 'EN' ? 'Your Personal' : 'Tia'} <br />
@@ -5780,7 +5897,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {isUploading && (
               <div className="w-full max-w-md space-y-2">
                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94]">
-                  <span>Analysiere Dokumentenstruktur...</span>
+                  <span>{t.upload_analyzing}</span>
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="h-1 bg-black/5 dark:bg-white/5 overflow-hidden">
@@ -5796,7 +5913,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {cvContext && !isUploading && (
               <div className="flex items-center gap-2 text-[#059669] text-xs font-medium">
                 <CheckCircle2 size={14} />
-                <span>Lebenslauf erfolgreich analysiert. Stella ist bereit.</span>
+                <span>{t.upload_done}</span>
               </div>
             )}
             <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-12">
@@ -5806,11 +5923,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">89%</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Erfolgsquote</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.hero_success_rate}</span>
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">3×</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Mehr Interviews</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.hero_more_interviews}</span>
               </div>
             </div>
           </motion.div>
@@ -7026,18 +7143,18 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           }}
                           className="w-full py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331D] transition-all"
                         >
-                          Pläne ansehen
+                          {t.tool_see_plans}
                         </button>
-                        <button 
+                        <button
                           onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }}
                           className="w-full py-3 border border-black/10 text-[10px] font-bold uppercase tracking-widest hover:bg-black/5 transition-all"
                         >
-                          Vielleicht später
+                          {t.tool_maybe_later}
                         </button>
                       </div>
                     </div>
                   )}
-                  <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-[#004225] dark:text-[#FAFAF8]">Eingaben</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-[#004225] dark:text-[#FAFAF8]">{t.tool_inputs}</h4>
                   <div className="space-y-4">
                     {activeTool.inputs.map((input: any) => (
                       <div key={input.key}>
@@ -7049,7 +7166,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               className="text-[10px] font-bold text-[#004225] dark:text-[#FAFAF8] flex items-center gap-1 hover:underline"
                             >
                               <FileText size={10} />
-                              Datei laden
+                              {t.tool_load_file}
                             </button>
                           )}
                         </div>
@@ -8289,8 +8406,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
       <AnimatePresence>
         {isTutorialOpen && (
-          <OnboardingTutorial 
-            t={t} 
+          <OnboardingTutorial
+            t={t}
             onComplete={async () => {
               setIsTutorialOpen(false);
               if (user?.id) {
@@ -8300,15 +8417,24 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   console.error("Error updating tutorial status:", e);
                 }
               }
-            }} 
+            }}
           />
         )}
       </AnimatePresence>
 
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        className="hidden" 
+      {/* Cookie Consent Banner */}
+      {cookieConsent === null && (
+        <CookieBanner
+          t={t}
+          onAccept={() => handleCookieAccept('accepted')}
+          onEssential={() => handleCookieAccept('essential')}
+        />
+      )}
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
         accept=".pdf"
         onChange={(e) => {
           const file = e.target.files?.[0];
