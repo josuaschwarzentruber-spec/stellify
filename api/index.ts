@@ -251,6 +251,35 @@ Felder pro Objekt: id (string), title, company, location ("Stadt, Schweiz"), cat
     }
   });
 
+  // --- STRIPE DIAGNOSTICS (safe – no secrets exposed) ---
+  app.get("/api/stripe-debug", async (req, res) => {
+    const key = process.env.STRIPE_SECRET_KEY || '';
+    const mode = key.startsWith('sk_live_') ? 'live' : key.startsWith('sk_test_') ? 'test' : 'missing';
+
+    const prices = {
+      pro_monthly:      process.env.STRIPE_PRICE_PRO_MONTHLY      || '(hardcoded) price_1TIrQNHEswF7knZxM65zPbFJ',
+      pro_yearly:       process.env.STRIPE_PRICE_PRO_YEARLY       || '(hardcoded) price_1TIrRqHEswF7knZxlkJaQa2H',
+      ultimate_monthly: process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || '(hardcoded) price_1TIrSSHEswF7knZxcHQnDDGt',
+      ultimate_yearly:  process.env.STRIPE_PRICE_ULTIMATE_YEARLY  || '(hardcoded) price_1TIrT7HEswF7knZxSTFWGFB2',
+    };
+
+    // Try a real Stripe call to verify the key works
+    let stripeStatus = 'not tested';
+    let stripeError = null;
+    if (mode !== 'missing') {
+      try {
+        const s = getStripe();
+        await s.prices.retrieve(Object.values(prices)[0].replace('(hardcoded) ', ''));
+        stripeStatus = 'ok – key and first price ID are valid';
+      } catch (e: any) {
+        stripeStatus = 'error';
+        stripeError = e.message;
+      }
+    }
+
+    res.json({ mode, prices, stripeStatus, stripeError });
+  });
+
   // --- API ROUTES ---
   app.get("/api/health", (req, res) => {
     res.json({ 
