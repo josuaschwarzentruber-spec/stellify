@@ -4011,12 +4011,67 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
   if (!isAuthReady) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8] dark:bg-[#1A1A18] transition-colors">
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-12 h-12 border-2 border-[#004225] border-t-transparent rounded-full animate-spin" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#FAFAF8] animate-pulse">
-            {language === 'DE' ? 'Stellify wird geladen...' : 'Loading Stellify...'}
-          </p>
+      <div className="min-h-screen flex items-center justify-center bg-[#1A1A18] overflow-hidden relative">
+        {/* Animated background gradient orbs */}
+        <motion.div
+          className="absolute w-[600px] h-[600px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(0,66,37,0.35) 0%, transparent 70%)', top: '50%', left: '50%', x: '-50%', y: '-50%' }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute w-[300px] h-[300px] rounded-full"
+          style={{ background: 'radial-gradient(circle, rgba(0,168,84,0.15) 0%, transparent 70%)', top: '30%', left: '60%' }}
+          animate={{ scale: [1.1, 0.9, 1.1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+        />
+
+        {/* Center content */}
+        <div className="relative flex flex-col items-center gap-8">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="text-6xl font-serif tracking-tight text-[#FAFAF8]"
+          >
+            Stell<span className="text-[#00A854]">ify</span>
+          </motion.div>
+
+          {/* Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="text-[11px] font-bold uppercase tracking-[0.4em] text-[#00A854]/70"
+          >
+            Swiss Career Excellence
+          </motion.p>
+
+          {/* Animated line */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="w-32 h-px bg-gradient-to-r from-transparent via-[#00A854] to-transparent origin-center"
+          />
+
+          {/* Loading dots */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.4 }}
+            className="flex gap-2"
+          >
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-1.5 h-1.5 rounded-full bg-[#004225]"
+                animate={{ opacity: [0.3, 1, 0.3], y: [0, -4, 0] }}
+                transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2, ease: 'easeInOut' }}
+              />
+            ))}
+          </motion.div>
         </div>
       </div>
     );
@@ -4027,9 +4082,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       {/* --- NAVIGATION --- */}
       <nav className="sticky top-0 z-50 bg-[#FAFAF8]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors duration-300">
         <div className="flex items-center gap-8">
-          <a href="#" className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
+          <button
+            onClick={() => { setActiveTool(null); if (user) setActiveView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity"
+          >
             Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
-          </a>
+          </button>
           <div className="hidden md:flex items-center gap-6">
             {user ? (
               <>
