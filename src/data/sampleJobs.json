@@ -6,8 +6,8 @@
     "location": "Zürich, Schweiz",
     "category": "IT",
     "description": "Wir suchen einen erfahrenen Full Stack Developer zur Verstärkung unseres Teams. Fokus auf skalierbare Cloud-Architekturen und moderne Web-Technologien.",
-    "ats_keywords": ["TypeScript", "Node.js", "React", "AWS", "Docker", "Kubernetes", "CI/CD", "REST API", "Microservices", "Agile", "Scrum"],
-    "requirements": "Mindestens 5 Jahre Erfahrung in der Softwareentwicklung, Expertise in JavaScript/TypeScript Frameworks und Erfahrung mit Cloud-Infrastrukturen (AWS/Azure)."
+    "url": "https://www.jobs.ch/de/vakanzen/?term=full+stack+developer",
+    "ats_keywords": ["TypeScript", "Node.js", "React", "AWS", "Docker", "Kubernetes"]
   },
   {
     "id": "job-2",
@@ -16,18 +16,18 @@
     "location": "Genf, Schweiz",
     "category": "Marketing",
     "description": "Verantwortlich für die Planung und Umsetzung von Performance-Marketing-Kampagnen zur Steigerung der Brand Awareness und Lead-Generierung.",
-    "ats_keywords": ["SEO", "SEM", "Google Ads", "Google Analytics 4", "Content Strategy", "Social Media Marketing", "CRM", "Hubspot", "A/B Testing", "KPI Tracking"],
-    "requirements": "Erfolgsbilanz im digitalen Marketing, fundierte Kenntnisse in Web-Analyse-Tools und Erfahrung in der Budgetverwaltung für Multi-Channel-Kampagnen."
+    "url": "https://www.jobs.ch/de/vakanzen/?term=marketing+manager",
+    "ats_keywords": ["SEO", "Google Ads", "Analytics", "CRM", "Hubspot"]
   },
   {
     "id": "job-3",
     "title": "Cloud Architect (Azure/DevOps)",
-    "company": "Bern IT Consulting",
+    "company": "Bern IT Consulting GmbH",
     "location": "Bern, Schweiz",
     "category": "IT",
-    "description": "Design und Implementierung von komplexen Cloud-Infrastrukturen für unsere Enterprise-Kunden in der Bundesverwaltung und im Finanzsektor.",
-    "ats_keywords": ["Azure", "Terraform", "Infrastructure as Code", "DevOps", "Security Compliance", "Cloud Migration", "PowerShell", "Governance", "Enterprise Architecture"],
-    "requirements": "Zertifizierter Azure Architect, Erfahrung mit IaC-Tools und tiefes Verständnis für IT-Security und Compliance-Anforderungen in der Schweiz."
+    "description": "Design und Implementierung von komplexen Cloud-Infrastrukturen für Enterprise-Kunden in der Bundesverwaltung und im Finanzsektor.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=cloud+architect",
+    "ats_keywords": ["Azure", "Terraform", "DevOps", "Security", "Enterprise"]
   },
   {
     "id": "job-4",
@@ -36,8 +36,8 @@
     "location": "Basel, Schweiz",
     "category": "Marketing",
     "description": "Erstellung von hochwertigem Content für verschiedene Kanäle im Bereich Life Sciences. Fokus auf Storytelling und Zielgruppenansprache.",
-    "ats_keywords": ["Copywriting", "Content Creation", "Storytelling", "Email Marketing", "SEO Writing", "CMS", "Adobe Creative Cloud", "Brand Voice", "Inbound Marketing"],
-    "requirements": "Exzellente Schreibfähigkeiten in Deutsch und Englisch, Erfahrung im Content-Management und Leidenschaft für komplexe wissenschaftliche Themen."
+    "url": "https://www.jobs.ch/de/vakanzen/?term=content+marketing",
+    "ats_keywords": ["Copywriting", "SEO", "CMS", "Adobe", "Brand Voice"]
   },
   {
     "id": "job-5",
@@ -46,7 +46,177 @@
     "location": "Lausanne, Schweiz",
     "category": "IT",
     "description": "Entwicklung von prädiktiven Modellen und Datenanalysen zur Optimierung von Geschäftsprozessen in der Fertigungsindustrie.",
-    "ats_keywords": ["Python", "R", "SQL", "Machine Learning", "Deep Learning", "PyTorch", "TensorFlow", "Data Visualization", "Tableau", "Big Data", "Spark"],
-    "requirements": "Master oder PhD in Informatik/Mathematik, fundierte Kenntnisse in statistischer Modellierung und Erfahrung in der Arbeit mit grossen Datensätzen."
+    "url": "https://www.jobs.ch/de/vakanzen/?term=data+scientist",
+    "ats_keywords": ["Python", "Machine Learning", "PyTorch", "SQL", "Tableau"]
+  },
+  {
+    "id": "job-6",
+    "title": "Relationship Manager Private Banking",
+    "company": "Helvetic Private Bank AG",
+    "location": "Zürich, Schweiz",
+    "category": "Banking",
+    "description": "Betreuung und Erweiterung eines bestehenden Kundenstamms im Private Banking. Entwicklung massgeschneiderter Anlagestrategien für vermögende Privatkunden.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=relationship+manager+banking",
+    "ats_keywords": ["Private Banking", "Wealth Management", "CRM", "Finanzplanung"]
+  },
+  {
+    "id": "job-7",
+    "title": "HR Business Partner (80-100%)",
+    "company": "Novartis AG",
+    "location": "Basel, Schweiz",
+    "category": "HR",
+    "description": "Strategische HR-Beratung für Führungskräfte in der Pharmabranche. Verantwortlich für Talent Management, Organisationsentwicklung und Change Management.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=hr+business+partner",
+    "ats_keywords": ["HR Strategy", "Talent Management", "SAP SuccessFactors", "Change Management"]
+  },
+  {
+    "id": "job-8",
+    "title": "Mechanical Engineer / Produktentwicklung",
+    "company": "Sulzer AG",
+    "location": "Winterthur, Schweiz",
+    "category": "Engineering",
+    "description": "Entwicklung und Optimierung von Pumpensystemen für industrielle Anwendungen. Enge Zusammenarbeit mit internationalen Projektteams und Kunden.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=mechanical+engineer",
+    "ats_keywords": ["CAD", "SolidWorks", "FEM", "Hydraulik", "Projektmanagement"]
+  },
+  {
+    "id": "job-9",
+    "title": "Compliance Officer (Finanzmarktrecht)",
+    "company": "Zurich Insurance Group",
+    "location": "Zürich, Schweiz",
+    "category": "Finance",
+    "description": "Sicherstellung der regulatorischen Compliance im Bereich Finanzmarktrecht. Beratung interner Stakeholder zu FINMA-Anforderungen und aufsichtsrechtlichen Fragen.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=compliance+officer",
+    "ats_keywords": ["FINMA", "MiFID II", "AML", "KYC", "Regulatory Reporting"]
+  },
+  {
+    "id": "job-10",
+    "title": "Software Engineer – Embedded Systems (C/C++)",
+    "company": "ABB Ltd.",
+    "location": "Baden, Schweiz",
+    "category": "IT",
+    "description": "Entwicklung von Embedded Software für Automatisierungsanlagen und Energiesysteme. Echtzeitsysteme und sicherheitskritische Software für globale Industriekunden.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=embedded+software+engineer",
+    "ats_keywords": ["C++", "RTOS", "CAN Bus", "Embedded Linux", "Unit Testing"]
+  },
+  {
+    "id": "job-11",
+    "title": "Product Manager – FinTech (80-100%)",
+    "company": "SIX Group AG",
+    "location": "Zürich, Schweiz",
+    "category": "Finance",
+    "description": "Verantwortung für die Produktstrategie und Roadmap einer digitalen Zahlungsplattform. Enge Abstimmung mit Technologie, Business und regulatorischen Anforderungen.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=product+manager+fintech",
+    "ats_keywords": ["Agile", "Scrum", "Payment Systems", "API", "Roadmap"]
+  },
+  {
+    "id": "job-12",
+    "title": "Pflegefachfrau/-mann HF/FH (80-100%)",
+    "company": "Universitätsspital Zürich",
+    "location": "Zürich, Schweiz",
+    "category": "Healthcare",
+    "description": "Ganzheitliche Pflege und Betreuung von Patientinnen und Patienten auf einer internistischen Bettenstation mit modernster medizinischer Ausstattung.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=pflegefachfrau",
+    "ats_keywords": ["Pflege", "Patientenbetreuung", "Dokumentation", "Teamwork", "Medizin"]
+  },
+  {
+    "id": "job-13",
+    "title": "Supply Chain Manager (Pharma)",
+    "company": "Roche AG",
+    "location": "Basel, Schweiz",
+    "category": "Pharma",
+    "description": "Gesamtverantwortung für die pharmazeutische Lieferkette von der Rohstoffbeschaffung bis zur Auslieferung. Globale Koordination mit Produktionsstandorten weltweit.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=supply+chain+manager+pharma",
+    "ats_keywords": ["SAP", "GMP", "GDP", "Logistics", "APICS", "S&OP"]
+  },
+  {
+    "id": "job-14",
+    "title": "UX/UI Designer (Figma)",
+    "company": "Digitec Galaxus AG",
+    "location": "Zürich, Schweiz",
+    "category": "IT",
+    "description": "Gestaltung nutzerfreundlicher Interfaces für Schweizer E-Commerce. Erstellung von Prototypen, User Research und enge Zusammenarbeit mit Entwicklungsteams.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=ux+ui+designer",
+    "ats_keywords": ["Figma", "User Research", "Prototyping", "Design System", "A/B Testing"]
+  },
+  {
+    "id": "job-15",
+    "title": "Treuhänder/in mit Fachausweis",
+    "company": "BDO AG",
+    "location": "Luzern, Schweiz",
+    "category": "Finance",
+    "description": "Selbstständige Führung von KMU-Buchhaltungen, Erstellung von Jahresabschlüssen und Steuererklärungen für Privat- und Geschäftskunden in der Zentralschweiz.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=treuhander",
+    "ats_keywords": ["OR", "MWST", "Abacus", "Jahresabschluss", "Steuern", "KMU"]
+  },
+  {
+    "id": "job-16",
+    "title": "Projektleiter Hochbau (Dipl. Architekt/in oder Ing.)",
+    "company": "Implenia Schweiz AG",
+    "location": "Dietlikon, Schweiz",
+    "category": "Engineering",
+    "description": "Eigenverantwortliche Leitung von Hochbauprojekten im Bereich Wohn- und Gewerbebau. Führung von Projektteams und Koordination aller Projektbeteiligten.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=projektleiter+hochbau",
+    "ats_keywords": ["SIA", "Baukostenplanung", "MS Project", "Terminplanung", "LEAN"]
+  },
+  {
+    "id": "job-17",
+    "title": "Kundenberater/in Firmenkunden (KMU)",
+    "company": "Raiffeisen Schweiz",
+    "location": "St. Gallen, Schweiz",
+    "category": "Banking",
+    "description": "Ganzheitliche Beratung von KMU-Kunden in allen Finanz- und Bankdienstleistungen. Akquisition neuer Geschäftskunden und Betreuung bestehender Partnerschaften.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=kundenberater+firmenkunden",
+    "ats_keywords": ["Firmenkundenberatung", "Finanzierung", "KMU", "Kreditwesen", "Beratung"]
+  },
+  {
+    "id": "job-18",
+    "title": "Marketing & Communications Manager (DE/FR)",
+    "company": "Swiss Tourism",
+    "location": "Bern, Schweiz",
+    "category": "Marketing",
+    "description": "Entwicklung und Umsetzung der Kommunikationsstrategie für den Schweizer Tourismus in den DACH- und Romandie-Märkten. Mehrsprachige Kampagnenpflege.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=communications+manager",
+    "ats_keywords": ["PR", "Medienarbeit", "Kampagnenmanagement", "DE/FR", "Social Media"]
+  },
+  {
+    "id": "job-19",
+    "title": "Cyber Security Engineer (SOC/SIEM)",
+    "company": "Post CH AG",
+    "location": "Bern, Schweiz",
+    "category": "IT",
+    "description": "Überwachung und Analyse von Sicherheitsvorfällen in einem modernen Security Operations Center. Implementierung und Optimierung von SIEM-Regeln und -Prozessen.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=cyber+security+engineer",
+    "ats_keywords": ["SIEM", "SOC", "Threat Hunting", "Splunk", "ISO 27001", "Incident Response"]
+  },
+  {
+    "id": "job-20",
+    "title": "Logistiker/in EFZ / Lagerleiter (m/w/d)",
+    "company": "Migros Industrie AG",
+    "location": "Neuenburg, Schweiz",
+    "category": "Logistik",
+    "description": "Leitung des Tagesgeschäfts in einem modernen Logistikzentrum. Sicherstellung effizienter Lagerprozesse, Personalführung und Qualitätssicherung.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=lagerleiter",
+    "ats_keywords": ["WMS", "ERP", "Lean", "5S", "Teamführung", "Logistik"]
+  },
+  {
+    "id": "job-21",
+    "title": "Wirtschaftsinformatiker/in (Application Manager)",
+    "company": "CSS Versicherung",
+    "location": "Luzern, Schweiz",
+    "category": "IT",
+    "description": "Betreuung und Weiterentwicklung von Business-Applikationen in der Versicherungsbranche. Anforderungsanalyse und Schnittstellenkoordination zwischen IT und Fachbereichen.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=application+manager",
+    "ats_keywords": ["ITIL", "Anforderungsanalyse", "SQL", "Jira", "Confluence", "API"]
+  },
+  {
+    "id": "job-22",
+    "title": "Steuerexperte/in (Unternehmenssteuer)",
+    "company": "PricewaterhouseCoopers AG",
+    "location": "Zürich, Schweiz",
+    "category": "Finance",
+    "description": "Beratung nationaler und internationaler Unternehmen in komplexen steuerlichen Fragestellungen. Schwerpunkt auf Unternehmensstrukturierung und M&A-Transaktionen.",
+    "url": "https://www.jobs.ch/de/vakanzen/?term=steuerexperte",
+    "ats_keywords": ["DBG", "StHG", "MWST", "Transfer Pricing", "M&A", "IFRS"]
   }
 ]

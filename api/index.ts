@@ -162,6 +162,64 @@ async function startServer() {
     }
   });
 
+  // --- LIVE JOB SEARCH (Gemini + Google Search grounding) ---
+  app.get("/api/jobs", async (req, res) => {
+    const { keyword = '', location = '', category = '' } = req.query as Record<string, string>;
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    if (!apiKey) {
+      return res.status(500).json({ error: "GEMINI_API_KEY missing" });
+    }
+
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+
+      const searchQuery = [
+        keyword && `"${keyword}"`,
+        category && category,
+        location ? `in ${location} Schweiz` : 'in der Schweiz',
+        'Stelle Job Stellenangebot 2025'
+      ].filter(Boolean).join(' ');
+
+      const prompt = `Suche nach aktuellen Stellenangeboten in der Schweiz.
+Suchbegriff: ${keyword || 'alle Berufe'}, ${category || 'alle Branchen'}, Ort: ${location || 'ganze Schweiz'}.
+
+Gib mir exakt 10 echte, aktuelle Stellenangebote zurück als JSON-Array (KEIN Markdown, KEIN Erklärungstext, NUR das JSON-Array).
+Jedes Objekt muss folgende Felder haben:
+{
+  "id": "unique-id-string",
+  "title": "Stellentitel",
+  "company": "Firmenname",
+  "location": "Stadt, Schweiz",
+  "category": "IT|Marketing|Finance|Banking|Engineering|HR|Healthcare|Pharma|Logistik|Sonstiges",
+  "description": "Kurze 2-Satz Beschreibung der Stelle",
+  "url": "https://www.jobs.ch/de/vakanzen/?term=suchbegriff",
+  "ats_keywords": ["keyword1", "keyword2", "keyword3"]
+}`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: prompt,
+        config: {
+          tools: [{ googleSearch: {} }],
+          temperature: 0.2
+        }
+      });
+
+      const text = response.text || '';
+      // Extract JSON array from response
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const jobs = JSON.parse(jsonMatch[0]);
+        return res.json({ jobs, live: true });
+      }
+      return res.json({ jobs: [], live: true });
+    } catch (error: any) {
+      console.error("[JOBS SEARCH ERROR]", error);
+      return res.status(500).json({ error: error.message });
+    }
+  });
+
   // --- API ROUTES ---
   app.get("/api/health", (req, res) => {
     res.json({ 
