@@ -2962,8 +2962,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Questions fréquentes",
       stella_placeholder: "Demandez quelque chose à Stella...",
       stella_secure_data: "Traitement sécurisé des données suisses",
-      hero_title: "Votre copilote de carrière personnel",
-      hero_desc: "Découvrez l'alliance parfaite entre l'intelligence artificielle et l'excellence suisse. Stellify transforme vos documents de carrière avec la plus haute précision et discrétion pour le marché du travail suisse exigeant.",
+      hero_title: "De la candidature à l'entretien – votre coach carrière IA",
+      hero_desc: "Stellify analyse votre CV, optimise vos candidatures et vous prépare aux entretiens – précisément, discrètement, pour le marché suisse.",
       cta_free: "Tester gratuitement",
       upload_cv: "Télécharger CV (Lebenslauf)",
       update_cv: "Mettre à jour CV (Lebenslauf)",
@@ -3032,13 +3032,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Payez comme vous voulez",
       payment_secure: "Traitement sécurisé via Stripe.",
       how_badge: "Le processus",
-      how_desc: "En seulement trois étapes simples, nous optimisons vos chances de carrière sur le marché suisse.",
-      how_1_t: "Télécharger le CV (Curriculum Vitae)",
-      how_1_d: "Téléchargez votre CV au format PDF. Stella analyse vos forces, vos expériences et le \"code du certificat de travail\" en quelques secondes.",
-      how_2_t: "Choisir un outil",
-      how_2_d: "Choisissez parmi plus de 20 outils IA spécialisés – du calculateur de salaire à la simulation ATS pour les recruteurs suisses.",
-      how_3_t: "Décrocher le job",
-      how_3_d: "Recevez des documents et des stratégies sur mesure, précisément adaptés aux exigences des entreprises suisses.",
+      how_desc: "Du CV à la signature du contrat – Stellify vous accompagne à chaque étape de votre candidature.",
+      how_1_t: "Télécharger & analyser le CV",
+      how_1_d: "Téléchargez votre CV en PDF. Stella le lit entièrement, identifie vos points forts et l'optimise selon les standards ATS suisses.",
+      how_2_t: "Perfectionner la candidature",
+      how_2_d: "Générez des lettres de motivation sur mesure, optimisez chaque section du CV et simulez le contrôle ATS – en allemand suisse standard.",
+      how_3_t: "Réussir l'entretien",
+      how_3_d: "Entraînez-vous avec le coach d'entretien IA : questions réelles, grille d'évaluation personnalisée et suggestions de formulation concrètes.",
       faq_badge: "Questions fréquentes",
       faq_subtitle: "Tout ce que vous devez savoir",
       faq_contact: "Encore des questions ?",
@@ -3254,8 +3254,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Domande frequenti",
       stella_placeholder: "Chiedi qualcosa a Stella...",
       stella_secure_data: "Elaborazione sicura dei dati svizzeri",
-      hero_title: "Il tuo copilota di carriera personale",
-      hero_desc: "Scopri il perfetto connubio tra intelligenza artificiale ed eccellenza svizzera. Stellify trasforma i tuoi documenti di carriera con la massima precisione e discrezione per l'esigente mercato del lavoro svizzero.",
+      hero_title: "Dal CV al colloquio – il tuo coach carriera con IA",
+      hero_desc: "Stellify analizza il tuo CV, ottimizza le tue candidature e ti prepara ai colloqui – con precisione, discrezione e focus sul mercato svizzero.",
       cta_free: "Prova gratuitamente",
       upload_cv: "Carica CV (Lebenslauf)",
       update_cv: "Aggiorna CV (Lebenslauf)",
@@ -3324,13 +3324,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Paga come vuoi",
       payment_secure: "Elaborazione sicura tramite Stripe.",
       how_badge: "Il processo",
-      how_desc: "In soli tre semplici passaggi ottimizziamo le tue opportunità di carriera sul mercato svizzero.",
-      how_1_t: "Carica il CV (Curriculum Vitae)",
-      how_1_d: "Carica il tuo CV in formato PDF. Stella analizza i tuoi punti di forza, le tue esperienze e il \"codice del certificato di lavoro\" in pochi secondi.",
-      how_2_t: "Scegli lo strumento",
-      how_2_d: "Scegli tra oltre 20 strumenti AI specializzati – dal calcolatore di stipendio alla simulazione ATS per i recruiter svizzeri.",
-      how_3_t: "Ottieni il lavoro",
-      how_3_d: "Ricevi documenti e strategie su misura, adattati con precisione ai requisiti delle aziende svizzere.",
+      how_desc: "Dal CV alla firma del contratto – Stellify ti accompagna in ogni fase della tua candidatura.",
+      how_1_t: "Carica & analizza il CV",
+      how_1_d: "Carica il tuo CV in PDF. Stella lo legge completamente, individua i tuoi punti di forza e lo ottimizza secondo gli standard ATS svizzeri.",
+      how_2_t: "Perfeziona la candidatura",
+      how_2_d: "Genera lettere di motivazione su misura, ottimizza ogni sezione del CV e simula il controllo ATS – in tedesco svizzero standard.",
+      how_3_t: "Supera il colloquio",
+      how_3_d: "Allenati con il coach per colloqui IA: domande reali, griglia di valutazione personalizzata e suggerimenti concreti per ogni situazione.",
       faq_badge: "Domande frequenti",
       faq_subtitle: "Tutto quello che devi sapere",
       faq_contact: "Altre domande?",
@@ -3546,8 +3546,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Common Questions",
       stella_placeholder: "Ask Stella something...",
       stella_secure_data: "Secure Swiss Data Processing",
-      hero_title: "Your Personal Career Copilot",
-      hero_desc: "Experience the perfect combination of artificial intelligence and Swiss excellence. Stellify transforms your career documents with the highest precision and discretion for the demanding Swiss job market.",
+      hero_title: "Ace Every Interview. Land Your Dream Job in Switzerland.",
+      hero_desc: "Stellify prepares you for every stage of the Swiss application process – from CV analysis to interview coaching. AI-powered, precise, and tailored to the Swiss job market.",
       cta_free: "Test for free",
       upload_cv: "Upload CV (Resume)",
       update_cv: "Update CV (Resume)",
@@ -3615,14 +3615,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       tool_empty_state: "Fill in the fields and click \"Generate\" to start the AI analysis.",
       payment_title: "Pay as you wish",
       payment_secure: "Securely processed via Stripe.",
-      how_badge: "The Process",
-      how_desc: "In just three simple steps, we optimize your career opportunities in the Swiss market.",
-      how_1_t: "Upload CV (Curriculum Vitae)",
-      how_1_d: "Upload your CV as a PDF. Stella analyzes your strengths, experiences, and the \"work certificate code\" in seconds.",
-      how_2_t: "Choose Tool",
-      how_2_d: "Choose from over 20 specialized AI tools – from salary calculators to ATS simulations for Swiss recruiters.",
-      how_3_t: "Win the Job",
-      how_3_d: "Receive tailored documents and strategies specifically designed for the requirements of Swiss companies.",
+      how_badge: "Your Path to Success",
+      how_desc: "In three steps, Stellify prepares you perfectly for every stage of the Swiss application process.",
+      how_1_t: "Upload & Analyze CV",
+      how_1_d: "Upload your CV as a PDF. Stella identifies weaknesses, missing keywords, and optimization potential for Swiss recruiters in seconds.",
+      how_2_t: "Perfect Your Application",
+      how_2_d: "Optimize your CV, write tailored cover letters, and prepare for ATS systems of Swiss companies – with AI precision.",
+      how_3_t: "Ace the Interview",
+      how_3_d: "Train with realistic interview simulations, get immediate feedback, and learn exactly what Swiss employers look for.",
       faq_badge: "Frequently Asked Questions",
       faq_subtitle: "Everything you need to know",
       faq_contact: "Any questions?",
@@ -4033,20 +4033,20 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           <div className="hidden md:flex items-center gap-6">
             {user ? (
               <>
-                <button 
-                  onClick={() => setActiveView('dashboard')}
+                <button
+                  onClick={() => { setActiveView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`text-sm font-medium transition-colors ${activeView === 'dashboard' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
                 >
                   {t.dashboard}
                 </button>
-                <button 
-                  onClick={() => setActiveView('tools')}
+                <button
+                  onClick={() => { setActiveView('tools'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`text-sm font-medium transition-colors ${activeView === 'tools' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
                 >
                   {t.tools}
                 </button>
-                <button 
-                  onClick={() => setActiveView('jobs')}
+                <button
+                  onClick={() => { setActiveView('jobs'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                   className={`text-sm font-medium transition-colors ${activeView === 'jobs' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
                 >
                   {t.search_type_job}
@@ -4199,9 +4199,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="flex flex-col gap-4">
               {user ? (
                 <>
-                  <button onClick={() => { setActiveView('dashboard'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'dashboard' ? 'text-[#004225]' : ''}`}>{t.dashboard}</button>
-                  <button onClick={() => { setActiveView('tools'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'tools' ? 'text-[#004225]' : ''}`}>{t.tools}</button>
-                  <button onClick={() => { setActiveView('jobs'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'jobs' ? 'text-[#004225]' : ''}`}>{t.search_type_job}</button>
+                  <button onClick={() => { setActiveView('dashboard'); setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`text-lg font-medium text-left ${activeView === 'dashboard' ? 'text-[#004225]' : ''}`}>{t.dashboard}</button>
+                  <button onClick={() => { setActiveView('tools'); setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`text-lg font-medium text-left ${activeView === 'tools' ? 'text-[#004225]' : ''}`}>{t.tools}</button>
+                  <button onClick={() => { setActiveView('jobs'); setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`text-lg font-medium text-left ${activeView === 'jobs' ? 'text-[#004225]' : ''}`}>{t.search_type_job}</button>
                 </>
               ) : (
                 <>
