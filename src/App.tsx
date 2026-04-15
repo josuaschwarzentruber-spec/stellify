@@ -1889,13 +1889,8 @@ function StellifyApp() {
     } catch (e: any) {
       console.error("Subscription error:", e);
       const msg = e.message || '';
-      setSubscriptionError(
-        msg.includes('Konfiguration') || msg.includes('STRIPE_PRICE')
-          ? `⚠️ ${msg} Bitte kontaktiere support.stellify@gmail.com.`
-          : language === 'DE' ? '⚠️ Checkout fehlgeschlagen. Bitte versuche es später noch einmal oder kontaktiere support.stellify@gmail.com.' :
-            language === 'FR' ? '⚠️ Échec du paiement. Réessaie plus tard ou contacte support.stellify@gmail.com.' :
-            language === 'IT' ? '⚠️ Pagamento fallito. Riprova più tardi o contatta support.stellify@gmail.com.' :
-            '⚠️ Checkout failed. Please try again later or contact support.stellify@gmail.com.'
+      // Always show the actual error so the user/admin can diagnose it
+      setSubscriptionError(`⚠️ ${msg || 'Checkout fehlgeschlagen.'} – support.stellify@gmail.com`
       );
     } finally {
       setIsSubscribing(false);
