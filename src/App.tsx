@@ -1553,8 +1553,8 @@ function StellifyApp() {
       ) ? [{
         id: 'user-profile',
         title: `${user.firstName} (Dein Profil)`,
-        content: language === 'DE' ? 'Verwalte deine persönlichen Daten, deinen Lebenslauf und deine Einstellungen.' : 'Manage your personal data, your CV and your settings.',
-        category: language === 'DE' ? 'Profil' : 'Profile',
+        content: language === 'DE' ? 'Verwalte deine persönlichen Daten, deinen Lebenslauf und deine Einstellungen.' : language === 'FR' ? 'Gérez vos données personnelles, votre CV et vos paramètres.' : language === 'IT' ? 'Gestisci i tuoi dati personali, il tuo CV e le tue impostazioni.' : 'Manage your personal data, your CV and your settings.',
+        category: t.profile,
         type: 'profile'
       }] : [];
 
@@ -1895,7 +1895,9 @@ function StellifyApp() {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setAuthError(
           language === 'DE' ? 'Anmeldedaten ungültig. Falls du noch kein Konto in diesem neuen System hast, registriere dich bitte neu.' :
-          'Invalid credentials. If you don\'t have an account in this new system yet, please register a new account.'
+          language === 'FR' ? 'Identifiants invalides. Si vous n\'avez pas encore de compte, veuillez vous inscrire.' :
+          language === 'IT' ? 'Credenziali non valide. Se non hai ancora un account, registrati.' :
+          'Invalid credentials. If you don\'t have an account yet, please register a new account.'
         );
         // If they were trying to login, maybe they need to register
         if (authTab === 'login') {
@@ -1904,6 +1906,8 @@ function StellifyApp() {
       } else if (err.code === 'auth/email-already-in-use') {
         setAuthError(
           language === 'DE' ? 'Diese E-Mail wird bereits verwendet. Bitte melde dich stattdessen an.' :
+          language === 'FR' ? 'Cet e-mail est déjà utilisé. Veuillez vous connecter à la place.' :
+          language === 'IT' ? 'Questa email è già in uso. Accedi invece.' :
           'This email is already in use. Please log in instead.'
         );
         // If they were trying to register, they should login
@@ -1954,6 +1958,8 @@ function StellifyApp() {
       console.error("Reset Error:", err);
       setAuthError(
         language === 'DE' ? 'Fehler beim Senden der Reset-E-Mail.' :
+        language === 'FR' ? 'Erreur lors de l\'envoi de l\'e-mail de réinitialisation.' :
+        language === 'IT' ? 'Errore nell\'invio dell\'e-mail di ripristino.' :
         'Error sending reset email.'
       );
     } finally {
@@ -1969,15 +1975,15 @@ function StellifyApp() {
       const result = await signInWithPopup(auth, provider);
       if (result.user) {
         setIsAuthModalOpen(false);
-        showToast(language === 'DE' ? 'Erfolgreich mit Google angemeldet!' : 'Successfully signed in with Google!', 'success');
+        showToast(language === 'DE' ? 'Erfolgreich mit Google angemeldet!' : language === 'FR' ? 'Connecté avec Google avec succès !' : language === 'IT' ? 'Accesso con Google riuscito!' : 'Successfully signed in with Google!', 'success');
       }
     } catch (err: any) {
       console.error("Google Auth Error:", err);
-      let errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : 'Google authentication failed.';
+      let errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
       if (err.code === 'auth/unauthorized-domain') {
-        errorMsg = language === 'DE' ? 'Diese Domain ist nicht für Google Login autorisiert.' : 'This domain is not authorized for Google Login.';
+        errorMsg = language === 'DE' ? 'Diese Domain ist nicht für Google Login autorisiert.' : language === 'FR' ? 'Ce domaine n\'est pas autorisé pour la connexion Google.' : language === 'IT' ? 'Questo dominio non è autorizzato per il login Google.' : 'This domain is not authorized for Google Login.';
       } else if (err.code === 'auth/popup-blocked') {
-        errorMsg = language === 'DE' ? 'Das Popup wurde blockiert. Bitte erlaube Popups.' : 'Popup was blocked. Please allow popups.';
+        errorMsg = language === 'DE' ? 'Das Popup wurde blockiert. Bitte erlaube Popups.' : language === 'FR' ? 'La fenêtre popup a été bloquée. Veuillez autoriser les popups.' : language === 'IT' ? 'Il popup è stato bloccato. Si prega di consentire i popup.' : 'Popup was blocked. Please allow popups.';
       }
       setAuthError(errorMsg);
       showToast(errorMsg, 'error');
@@ -2212,7 +2218,7 @@ function StellifyApp() {
       const chatData = await chatRes.json();
       if (!chatRes.ok) throw new Error(chatData.error || 'Chat failed');
 
-      const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : "Stella is currently thoughtful. Please try again.");
+      const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : language === 'FR' ? "Stella est en train de réfléchir. Veuillez réessayer." : language === 'IT' ? "Stella sta riflettendo. Si prega di riprovare." : "Stella is currently thoughtful. Please try again.");
       
       if (!user) {
         setMessages(prev => [...prev, { role: 'ai', content: reply }]);
@@ -2229,17 +2235,23 @@ function StellifyApp() {
       }
     } catch (err: any) {
       console.error("Stella Chat Error:", err);
-      let errorMsg = language === 'DE' 
-        ? `Stella ist gerade beschäftigt (Fehler: ${err.message || 'Unbekannt'}). Bitte versuche es später noch einmal.` 
+      let errorMsg = language === 'DE'
+        ? `Stella ist gerade beschäftigt (Fehler: ${err.message || 'Unbekannt'}). Bitte versuche es später noch einmal.`
+        : language === 'FR' ? `Stella est occupée en ce moment (Erreur: ${err.message || 'Inconnue'}). Veuillez réessayer plus tard.`
+        : language === 'IT' ? `Stella è occupata in questo momento (Errore: ${err.message || 'Sconosciuto'}). Si prega di riprovare più tardi.`
         : `Stella is busy right now (Error: ${err.message || 'Unknown'}). Please try again later.`;
-      
+
       if (err.message?.includes('API_KEY_INVALID') || err.message?.includes('API key not valid')) {
         errorMsg = language === 'DE'
           ? "Stella hat ein Problem mit ihrem Zugangsschlüssel. Bitte kontaktiere den Support."
+          : language === 'FR' ? "Stella a un problème avec sa clé d'accès. Veuillez contacter le support."
+          : language === 'IT' ? "Stella ha un problema con la sua chiave di accesso. Si prega di contattare il supporto."
           : "Stella is having trouble with her API key. Please contact support.";
       } else if (err.message?.includes('quota') || err.message?.includes('429')) {
         errorMsg = language === 'DE'
           ? "Stella hat heute schon zu viele Anfragen beantwortet. Bitte versuche es morgen wieder oder upgrade dein Abo."
+          : language === 'FR' ? "Stella a déjà répondu à trop de demandes aujourd'hui. Veuillez réessayer demain ou mettre à niveau votre abonnement."
+          : language === 'IT' ? "Stella ha già risposto a troppe richieste oggi. Si prega di riprovare domani o aggiornare l'abbonamento."
           : "Stella has answered too many requests today. Please try again tomorrow or upgrade your subscription.";
       }
       
@@ -2330,8 +2342,10 @@ function StellifyApp() {
     // Check if tool is ultimate-only
     if (activeTool.type === 'ultimate' && !isUnlimited) {
       setToolResult(
-        language === 'DE' 
-          ? "Dieses exklusive Tool erfordert ein Ultimate-Abo für maximale Präzision und Tiefe. ✨" 
+        language === 'DE'
+          ? "Dieses exklusive Tool erfordert ein Ultimate-Abo für maximale Präzision und Tiefe. ✨"
+          : language === 'FR' ? "Cet outil exclusif nécessite un abonnement Ultimate pour une précision et une profondeur maximales. ✨"
+          : language === 'IT' ? "Questo strumento esclusivo richiede un abbonamento Ultimate per la massima precisione e profondità. ✨"
           : "This exclusive tool requires an Ultimate subscription for maximum precision and depth. ✨"
       );
       setIsProcessingTool(false);
@@ -3404,6 +3418,65 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       cookie_accept: "Alle akzeptieren",
       cookie_essential: "Nur Notwendige",
       cookie_privacy_link: "Datenschutzrichtlinie",
+      close: "Schliessen",
+      back: "Zurück",
+      or_divider: "Oder",
+      stat_members: "Mitglieder",
+      hero_intro: "Dein persönlicher",
+      badge_new: "NEU",
+      interview_live_promo: "Übe dein nächstes Interview – per Text oder Mikrofon",
+      remaining: "verbleibend",
+      search_close_label: "Schliessen",
+      search_open_selection: "Auswahl öffnen",
+      search_stella_advice: "Stella-Beratung",
+      premium_analysis_desc: "Tiefgehende Prüfung nach Schweizer Standards",
+      salary_median_label: "Geschätzter Medianlohn (Brutto/Jahr)",
+      salary_important_notice: "Wichtiger Hinweis",
+      salary_disclaimer: "Diese Schätzung basiert auf aktuellen Markttrends und KI-Modellen für den Schweizer Arbeitsmarkt. Faktoren wie spezifische Zertifizierungen, Bonusvereinbarungen und individuelle Benefits können das tatsächliche Angebot beeinflussen.",
+      generated_app_title: "Deine generierte Bewerbung",
+      copy: "Kopieren",
+      tool_how_to_use: "So nutzt du dieses Tool",
+      tool_scroll_example: "Runterscrollen für Profi-Beispiel",
+      tool_pro_example: "Profi-Beispiel",
+      tool_unlimited_access: "Unlimited Zugang",
+      tool_unlock_desc: "Schalte dieses Tool und alle Premium-Funktionen mit dem Unlimited-Plan frei.",
+      tool_discover_unlimited: "Jetzt Unlimited entdecken",
+      tool_fill_fields: "Fülle die Felder links aus",
+      auth_terms_by_signing: "Mit der Anmeldung akzeptierst du unsere",
+      auth_terms_and: "und",
+      auth_terms_data_processing: "Deine Daten werden sicher in der Schweiz/EU verarbeitet.",
+      auth_register_new: "→ Jetzt neu registrieren",
+      auth_switch_to_login: "→ Zum Login wechseln",
+      auth_reset_session: "Sitzung zurücksetzen",
+      password_weak: "Schwach",
+      password_medium: "Mittel",
+      password_strong: "Stark",
+      interview_complete: "🎉 Interview abgeschlossen!",
+      interview_question_of: "Frage {current} von 5",
+      interview_show_tip: "Insider-Tipp anzeigen",
+      interview_feedback_prev: "✓ Feedback letzte Antwort",
+      interview_your_answer: "Deine Antwort",
+      interview_answer_placeholder: "Schreibe deine Antwort hier...",
+      interview_mic_unavailable: "Mikrofon nicht verfügbar in diesem Browser.",
+      interview_mic_answer: "Per Mikrofon antworten",
+      interview_recording: "Aufnahme läuft...",
+      interview_feedback_unavailable: "Feedback konnte nicht geladen werden.",
+      interview_evaluating: "Stella bewertet...",
+      interview_submit: "Antwort senden → Frage {n}/5",
+      interview_show_model: "Musterantwort anzeigen",
+      interview_common_mistake: "⚠ Häufiger Fehler: ",
+      interview_complete_title: "Interview abgeschlossen",
+      interview_complete_desc: "Alle 5 Fragen beantwortet. Hier dein Summary:",
+      interview_new: "Neues Interview",
+      interview_copy_summary: "Summary kopieren",
+      settings_your_usage: "Deine Nutzung",
+      settings_apps_tools: "Bewerbungen & Tools",
+      settings_generations: "Generierungen",
+      settings_actions_today: "Aktionen heute",
+      settings_free_use: "Gratis-Nutzung",
+      settings_requests: "Anfragen",
+      settings_delete_account: "Konto löschen",
+      app_initializing: "Wird initialisiert...",
       market_1_t: "Jobwechsel nehmen zu",
       market_1_d: "Durchschnittlich alle 3 Jahre wechseln Arbeitnehmer in der Schweiz ihren Job.",
       market_2_t: "Bewerbungen kosten Zeit",
@@ -3903,6 +3976,65 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       cookie_accept: "Tout accepter",
       cookie_essential: "Essentiels uniquement",
       cookie_privacy_link: "Politique de confidentialité",
+      close: "Fermer",
+      back: "Retour",
+      or_divider: "Ou",
+      stat_members: "Membres",
+      hero_intro: "Votre",
+      badge_new: "NOUVEAU",
+      interview_live_promo: "Entraînez-vous – par texte ou micro",
+      remaining: "restants",
+      search_close_label: "Fermer",
+      search_open_selection: "Ouvrir la sélection",
+      search_stella_advice: "Conseil Stella",
+      premium_analysis_desc: "Examen approfondi selon les normes suisses",
+      salary_median_label: "Salaire médian estimé (Brut/An)",
+      salary_important_notice: "Remarque importante",
+      salary_disclaimer: "Cette estimation est basée sur les tendances actuelles du marché et les modèles IA pour le marché du travail suisse. Des facteurs tels que des certifications spécifiques, des accords de bonus et des avantages individuels peuvent influencer l'offre réelle.",
+      generated_app_title: "Votre candidature générée",
+      copy: "Copier",
+      tool_how_to_use: "Comment utiliser cet outil",
+      tool_scroll_example: "Faites défiler pour l'exemple professionnel",
+      tool_pro_example: "Exemple professionnel",
+      tool_unlimited_access: "Accès Unlimited",
+      tool_unlock_desc: "Débloquez cet outil et toutes les fonctionnalités premium avec le plan Unlimited.",
+      tool_discover_unlimited: "Découvrir Unlimited maintenant",
+      tool_fill_fields: "Remplissez les champs à gauche",
+      auth_terms_by_signing: "En vous connectant, vous acceptez nos",
+      auth_terms_and: "et",
+      auth_terms_data_processing: "Vos données sont traitées en toute sécurité en Suisse/UE.",
+      auth_register_new: "→ S'inscrire maintenant",
+      auth_switch_to_login: "→ Passer à la connexion",
+      auth_reset_session: "Réinitialiser la session",
+      password_weak: "Faible",
+      password_medium: "Moyen",
+      password_strong: "Fort",
+      interview_complete: "🎉 Entretien terminé !",
+      interview_question_of: "Question {current} sur 5",
+      interview_show_tip: "Voir le conseil",
+      interview_feedback_prev: "✓ Feedback dernière réponse",
+      interview_your_answer: "Votre réponse",
+      interview_answer_placeholder: "Écrivez votre réponse ici...",
+      interview_mic_unavailable: "Microphone non disponible dans ce navigateur.",
+      interview_mic_answer: "Répondre par microphone",
+      interview_recording: "Enregistrement...",
+      interview_feedback_unavailable: "Feedback indisponible.",
+      interview_evaluating: "Stella évalue...",
+      interview_submit: "Envoyer → Question {n}/5",
+      interview_show_model: "Voir la réponse modèle",
+      interview_common_mistake: "⚠ Erreur courante : ",
+      interview_complete_title: "Entretien terminé",
+      interview_complete_desc: "5 questions répondues. Voici votre résumé :",
+      interview_new: "Nouvel entretien",
+      interview_copy_summary: "Copier le résumé",
+      settings_your_usage: "Votre utilisation",
+      settings_apps_tools: "Candidatures & Outils",
+      settings_generations: "Générations",
+      settings_actions_today: "Actions aujourd'hui",
+      settings_free_use: "Utilisation gratuite",
+      settings_requests: "Demandes",
+      settings_delete_account: "Supprimer le compte",
+      app_initializing: "Initialisation...",
       market_1_t: "Les changements d'emploi augmentent",
       market_1_d: "En moyenne, les salariés suisses changent d'emploi tous les 3 ans.",
       market_2_t: "Les candidatures prennent du temps",
@@ -4282,6 +4414,65 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       cookie_accept: "Accetta tutto",
       cookie_essential: "Solo essenziali",
       cookie_privacy_link: "Informativa sulla privacy",
+      close: "Chiudi",
+      back: "Indietro",
+      or_divider: "Oppure",
+      stat_members: "Membri",
+      hero_intro: "Il tuo",
+      badge_new: "NUOVO",
+      interview_live_promo: "Pratica il tuo colloquio – testo o microfono",
+      remaining: "rimanenti",
+      search_close_label: "Chiudi",
+      search_open_selection: "Apri selezione",
+      search_stella_advice: "Consulenza Stella",
+      premium_analysis_desc: "Esame approfondito secondo gli standard svizzeri",
+      salary_median_label: "Stipendio mediano stimato (Lordo/Anno)",
+      salary_important_notice: "Nota importante",
+      salary_disclaimer: "Questa stima è basata sulle tendenze attuali del mercato e sui modelli IA per il mercato del lavoro svizzero. Fattori come certificazioni specifiche, accordi sui bonus e benefici individuali possono influenzare l'offerta reale.",
+      generated_app_title: "La tua candidatura generata",
+      copy: "Copia",
+      tool_how_to_use: "Come usare questo strumento",
+      tool_scroll_example: "Scorri verso il basso per l'esempio professionale",
+      tool_pro_example: "Esempio professionale",
+      tool_unlimited_access: "Accesso Unlimited",
+      tool_unlock_desc: "Sblocca questo strumento e tutte le funzionalità premium con il piano Unlimited.",
+      tool_discover_unlimited: "Scopri Unlimited ora",
+      tool_fill_fields: "Compila i campi a sinistra",
+      auth_terms_by_signing: "Accedendo, accetti i nostri",
+      auth_terms_and: "e",
+      auth_terms_data_processing: "I tuoi dati vengono elaborati in modo sicuro in Svizzera/UE.",
+      auth_register_new: "→ Registrati ora",
+      auth_switch_to_login: "→ Passa al login",
+      auth_reset_session: "Reimposta sessione",
+      password_weak: "Debole",
+      password_medium: "Medio",
+      password_strong: "Forte",
+      interview_complete: "🎉 Colloquio completato!",
+      interview_question_of: "Domanda {current} di 5",
+      interview_show_tip: "Mostra il suggerimento",
+      interview_feedback_prev: "✓ Feedback ultima risposta",
+      interview_your_answer: "La tua risposta",
+      interview_answer_placeholder: "Scrivi la tua risposta qui...",
+      interview_mic_unavailable: "Microfono non disponibile in questo browser.",
+      interview_mic_answer: "Rispondi tramite microfono",
+      interview_recording: "Registrazione in corso...",
+      interview_feedback_unavailable: "Feedback non disponibile.",
+      interview_evaluating: "Stella sta valutando...",
+      interview_submit: "Invia → Domanda {n}/5",
+      interview_show_model: "Mostra risposta modello",
+      interview_common_mistake: "⚠ Errore comune: ",
+      interview_complete_title: "Colloquio completato",
+      interview_complete_desc: "Tutte le 5 domande risposte. Ecco il tuo riepilogo:",
+      interview_new: "Nuovo colloquio",
+      interview_copy_summary: "Copia riepilogo",
+      settings_your_usage: "Il tuo utilizzo",
+      settings_apps_tools: "Candidature & Strumenti",
+      settings_generations: "Generazioni",
+      settings_actions_today: "Azioni oggi",
+      settings_free_use: "Utilizzo gratuito",
+      settings_requests: "Richieste",
+      settings_delete_account: "Elimina account",
+      app_initializing: "Inizializzazione...",
       market_1_t: "I cambi di lavoro aumentano",
       market_1_d: "In media, i dipendenti svizzeri cambiano lavoro ogni 3 anni.",
       market_2_t: "Le candidature richiedono tempo",
@@ -4661,6 +4852,65 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       cookie_accept: "Accept all",
       cookie_essential: "Essential only",
       cookie_privacy_link: "Privacy policy",
+      close: "Close",
+      back: "Back",
+      or_divider: "Or",
+      stat_members: "Members",
+      hero_intro: "Your Personal",
+      badge_new: "NEW",
+      interview_live_promo: "Practice your next interview – text or microphone",
+      remaining: "remaining",
+      search_close_label: "Close",
+      search_open_selection: "Open Selection",
+      search_stella_advice: "Stella Advice",
+      premium_analysis_desc: "Deep review according to Swiss standards",
+      salary_median_label: "Estimated Median Salary (Gross/Year)",
+      salary_important_notice: "Important Notice",
+      salary_disclaimer: "This estimate is based on current market trends and AI models for the Swiss job market. Factors such as specific certifications, bonus agreements, and individual benefits may influence the actual offer.",
+      generated_app_title: "Your Generated Application",
+      copy: "Copy",
+      tool_how_to_use: "How to use this tool",
+      tool_scroll_example: "Scroll down for professional example",
+      tool_pro_example: "Professional Example",
+      tool_unlimited_access: "Unlimited Access",
+      tool_unlock_desc: "Unlock this tool and all premium features with the Unlimited plan.",
+      tool_discover_unlimited: "Discover Unlimited Now",
+      tool_fill_fields: "Fill in the fields on the left",
+      auth_terms_by_signing: "By signing in, you accept our",
+      auth_terms_and: "and",
+      auth_terms_data_processing: "Your data is securely processed in Switzerland/EU.",
+      auth_register_new: "→ Register new account",
+      auth_switch_to_login: "→ Switch to Login",
+      auth_reset_session: "Reset Session",
+      password_weak: "Weak",
+      password_medium: "Medium",
+      password_strong: "Strong",
+      interview_complete: "🎉 Interview complete!",
+      interview_question_of: "Question {current} of 5",
+      interview_show_tip: "Show tip",
+      interview_feedback_prev: "✓ Last answer feedback",
+      interview_your_answer: "Your Answer",
+      interview_answer_placeholder: "Write your answer here...",
+      interview_mic_unavailable: "Microphone not available in this browser.",
+      interview_mic_answer: "Answer by microphone",
+      interview_recording: "Recording...",
+      interview_feedback_unavailable: "Feedback unavailable.",
+      interview_evaluating: "Stella is evaluating...",
+      interview_submit: "Submit → Question {n}/5",
+      interview_show_model: "Show model answer",
+      interview_common_mistake: "⚠ Common mistake: ",
+      interview_complete_title: "Interview Complete",
+      interview_complete_desc: "All 5 questions answered. Your summary:",
+      interview_new: "New Interview",
+      interview_copy_summary: "Copy Summary",
+      settings_your_usage: "Your Usage",
+      settings_apps_tools: "Applications & Tools",
+      settings_generations: "Generations",
+      settings_actions_today: "Actions today",
+      settings_free_use: "Free use",
+      settings_requests: "Requests",
+      settings_delete_account: "Delete Account",
+      app_initializing: "Initializing...",
       market_1_t: "Job changes are increasing",
       market_1_d: "On average, Swiss employees change jobs every 3 years.",
       market_2_t: "Applications take time",
@@ -5127,7 +5377,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             transition={{ delay: 1.8, duration: 0.4 }}
             className="text-[9px] font-bold uppercase tracking-[0.35em] text-[#FAFAF8]/20"
           >
-            {language === 'DE' ? 'Wird initialisiert...' : language === 'FR' ? 'Initialisation...' : language === 'IT' ? 'Inizializzazione...' : 'Initializing...'}
+            {t.app_initializing}
           </motion.p>
         </div>
 
@@ -5869,10 +6119,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[8px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5">{language === 'DE' ? 'NEU' : language === 'FR' ? 'NOUVEAU' : language === 'IT' ? 'NUOVO' : 'NEW'}</span>
+                          <span className="text-[8px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5">{t.badge_new}</span>
                         </div>
                         <h3 className="text-base font-serif">{t.tools_data['interview-live']?.title || 'Live Interview Coach'}</h3>
-                        <p className="text-xs text-white/60 font-light mt-0.5">{language === 'DE' ? 'Übe dein nächstes Interview – per Text oder Mikrofon' : language === 'FR' ? 'Entraînez-vous – par texte ou micro' : language === 'EN' ? 'Practice your next interview – text or microphone' : 'Pratica il tuo colloquio – testo o microfono'}</p>
+                        <p className="text-xs text-white/60 font-light mt-0.5">{t.interview_live_promo}</p>
                       </div>
                     </div>
                     <ArrowRight size={18} className="shrink-0 group-hover:translate-x-1 transition-transform" />
@@ -6185,7 +6435,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               {t.hero_precision}
             </div>
             <h1 className="text-5xl lg:text-7xl font-serif leading-[1.1] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
-              {language === 'DE' ? 'Dein persönlicher' : language === 'FR' ? 'Votre' : language === 'IT' ? 'Il tuo' : language === 'EN' ? 'Your Personal' : 'Tia'} <br />
+              {t.hero_intro} <br />
               <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_title.split(' ').pop()}</span>
             </h1>
             <p className="text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
@@ -6245,7 +6495,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-12">
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">4'200+</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'DE' ? 'Mitglieder' : language === 'FR' ? 'Membres' : language === 'IT' ? 'Membri' : 'Members'}</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.stat_members}</span>
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">89%</span>
@@ -6593,15 +6843,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           <div className="grid lg:grid-cols-2 gap-12">
             {[
               {
-                title: language === 'DE' ? 'Standard-Anschreiben' : 'Standard Cover Letter',
-                before: language === 'DE' ? 'Ich interessiere mich für die Stelle als Projektleiter. Ich habe viel Erfahrung und bin motiviert.' : 'I am interested in the project manager position. I have a lot of experience and I am motivated.',
-                after: language === 'DE' ? 'Mit meiner fundierten Expertise in der Leitung komplexer Infrastrukturprojekte im Raum Zürich bringe ich die nötige Präzision und das Schweizer Qualitätsbewusstsein mit, um Ihre ambitionierten Ziele bei der [Firma] nachhaltig zu unterstützen.' : 'With my deep expertise in leading complex infrastructure projects in the Zurich area, I bring the necessary precision and Swiss quality awareness to sustainably support your ambitious goals at [Company].',
+                title: language === 'DE' ? 'Standard-Anschreiben' : language === 'FR' ? 'Lettre de motivation standard' : language === 'IT' ? 'Lettera di candidatura standard' : 'Standard Cover Letter',
+                before: language === 'DE' ? 'Ich interessiere mich für die Stelle als Projektleiter. Ich habe viel Erfahrung und bin motiviert.' : language === 'FR' ? 'Je suis intéressé par le poste de chef de projet. J\'ai beaucoup d\'expérience et je suis motivé.' : language === 'IT' ? 'Sono interessato alla posizione di project manager. Ho molta esperienza e sono motivato.' : 'I am interested in the project manager position. I have a lot of experience and I am motivated.',
+                after: language === 'DE' ? 'Mit meiner fundierten Expertise in der Leitung komplexer Infrastrukturprojekte im Raum Zürich bringe ich die nötige Präzision und das Schweizer Qualitätsbewusstsein mit, um Ihre ambitionierten Ziele bei der [Firma] nachhaltig zu unterstützen.' : language === 'FR' ? 'Avec mon expertise approfondie dans la direction de projets d\'infrastructure complexes dans la région de Zurich, j\'apporte la précision nécessaire et la conscience de la qualité suisse pour soutenir durablement vos objectifs ambitieux chez [Entreprise].' : language === 'IT' ? 'Con la mia profonda esperienza nella direzione di complessi progetti infrastrutturali nell\'area di Zurigo, porto la precisione necessaria e la consapevolezza della qualità svizzera per supportare in modo sostenibile i tuoi obiettivi ambiziosi presso [Azienda].' : 'With my deep expertise in leading complex infrastructure projects in the Zurich area, I bring the necessary precision and Swiss quality awareness to sustainably support your ambitious goals at [Company].',
                 tag: 'Precision'
               },
               {
-                title: language === 'DE' ? 'Lebenslauf-Highlight' : 'CV Highlight',
-                before: language === 'DE' ? 'Verantwortlich für das Team und die Budgetplanung.' : 'Responsible for the team and budget planning.',
-                after: language === 'DE' ? 'Strategische Führung eines interdisziplinären Teams von 12 Spezialisten; Optimierung der Budgeteffizienz um 15% durch Einführung eines Lean-Management-Prozesses nach Schweizer Standards.' : 'Strategic leadership of an interdisciplinary team of 12 specialists; optimization of budget efficiency by 15% through the introduction of a lean management process according to Swiss standards.',
+                title: language === 'DE' ? 'Lebenslauf-Highlight' : language === 'FR' ? 'Point fort du CV' : language === 'IT' ? 'Punto di forza del CV' : 'CV Highlight',
+                before: language === 'DE' ? 'Verantwortlich für das Team und die Budgetplanung.' : language === 'FR' ? 'Responsable de l\'équipe et de la planification budgétaire.' : language === 'IT' ? 'Responsabile del team e della pianificazione del budget.' : 'Responsible for the team and budget planning.',
+                after: language === 'DE' ? 'Strategische Führung eines interdisziplinären Teams von 12 Spezialisten; Optimierung der Budgeteffizienz um 15% durch Einführung eines Lean-Management-Prozesses nach Schweizer Standards.' : language === 'FR' ? 'Direction stratégique d\'une équipe interdisciplinaire de 12 spécialistes ; optimisation de l\'efficacité budgétaire de 15% grâce à l\'introduction d\'un processus de gestion lean selon les normes suisses.' : language === 'IT' ? 'Direzione strategica di un team interdisciplinare di 12 specialisti; ottimizzazione dell\'efficienza del budget del 15% attraverso l\'introduzione di un processo di gestione lean secondo gli standard svizzeri.' : 'Strategic leadership of an interdisciplinary team of 12 specialists; optimization of budget efficiency by 15% through the introduction of a lean management process according to Swiss standards.',
                 tag: 'Impact'
               }
             ].map((ex, i) => (
@@ -7299,13 +7549,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                     <span className="px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[8px]">ESC</span>
-                    {language === 'DE' ? 'Schliessen' : 'Close'}
+                    {t.search_close_label}
                   </div>
                   <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${selectedSearchIndex >= 0 ? 'text-[#004225] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}>
                     <span className={`px-1.5 py-0.5 rounded text-[8px] transition-colors ${selectedSearchIndex >= 0 ? 'bg-[#004225] text-white' : 'bg-black/5 dark:bg-white/10'}`}>ENTER</span>
-                    {selectedSearchIndex >= 0 
-                      ? (language === 'DE' ? 'Auswahl öffnen' : 'Open Selection')
-                      : (language === 'DE' ? 'Stella-Beratung' : 'Stella Advice')
+                    {selectedSearchIndex >= 0
+                      ? t.search_open_selection
+                      : t.search_stella_advice
                     }
                   </div>
                 </div>
@@ -7557,9 +7807,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-[#004225] rounded-full animate-pulse shadow-[0_0_8px_rgba(0,66,37,0.4)]" />
                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94]">
-                              {user.role === 'pro' 
-                                ? `${50 - (user.toolUses || 0)} ${language === 'DE' ? 'verbleibend' : 'remaining'}`
-                                : `${1 - (user.toolUses || 0)} ${language === 'DE' ? 'verbleibend' : 'remaining'}`
+                              {user.role === 'pro'
+                                ? `${50 - (user.toolUses || 0)} ${t.remaining}`
+                                : `${1 - (user.toolUses || 0)} ${t.remaining}`
                               }
                             </span>
                           </div>
@@ -7584,8 +7834,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <Headphones size={18} />
                           </div>
                           <div>
-                            <h4 className="text-sm font-medium">{interviewSession.questions[0] && !interviewSession.isComplete ? `${interviewSession.jobContext || toolInput.jobTitle}` : language === 'DE' ? '🎉 Interview abgeschlossen!' : language === 'FR' ? '🎉 Entretien terminé !' : language === 'EN' ? '🎉 Interview complete!' : '🎉 Colloquio completato!'}</h4>
-                            <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">{language === 'DE' ? `Frage ${Math.min(interviewSession.currentQ + 1, 5)} von 5` : language === 'FR' ? `Question ${Math.min(interviewSession.currentQ + 1, 5)} sur 5` : `Question ${Math.min(interviewSession.currentQ + 1, 5)} of 5`}</p>
+                            <h4 className="text-sm font-medium">{interviewSession.questions[0] && !interviewSession.isComplete ? `${interviewSession.jobContext || toolInput.jobTitle}` : t.interview_complete}</h4>
+                            <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">{t.interview_question_of.replace('{current}', String(Math.min(interviewSession.currentQ + 1, 5)))}</p>
                           </div>
                         </div>
                         {/* Progress bar */}
@@ -7607,7 +7857,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <details className="group cursor-pointer">
                               <summary className="text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors list-none flex items-center gap-1 select-none">
                                 <span className="group-open:rotate-90 transition-transform">▶</span>
-                                {language === 'DE' ? 'Insider-Tipp anzeigen' : language === 'FR' ? 'Voir le conseil' : 'Show tip'}
+                                {t.interview_show_tip}
                               </summary>
                               <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
                                 <p className="text-xs text-white/70 font-light">{interviewSession.questions[interviewSession.currentQ]?.tip}</p>
@@ -7618,7 +7868,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           {/* Previous answer feedback */}
                           {interviewSession.currentQ > 0 && interviewSession.feedbacks[interviewSession.currentQ - 1] && (
                             <div className="p-4 bg-[#059669]/5 border border-[#059669]/20 space-y-1">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#059669]">{language === 'DE' ? '✓ Feedback letzte Antwort' : language === 'FR' ? '✓ Feedback dernière réponse' : '✓ Last answer feedback'}</p>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#059669]">{t.interview_feedback_prev}</p>
                               <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">{interviewSession.feedbacks[interviewSession.currentQ - 1]}</p>
                             </div>
                           )}
@@ -7626,19 +7876,19 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           {/* Answer Input */}
                           <div className="space-y-3 flex-1">
                             <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
-                              {language === 'DE' ? 'Deine Antwort' : language === 'FR' ? 'Votre réponse' : language === 'EN' ? 'Your Answer' : 'La tua risposta'}
+                              {t.interview_your_answer}
                             </label>
                             <div className="relative">
                               <textarea
                                 value={interviewAnswer}
                                 onChange={(e) => setInterviewAnswer(e.target.value)}
-                                placeholder={language === 'DE' ? 'Schreibe deine Antwort hier...' : language === 'FR' ? 'Écrivez votre réponse ici...' : language === 'EN' ? 'Write your answer here...' : 'Scrivi la tua risposta qui...'}
+                                placeholder={t.interview_answer_placeholder}
                                 className="w-full p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] transition-all min-h-[120px] font-light text-[#1A1A18] dark:text-[#FAFAF8] resize-none pr-14"
                               />
                               <button
                                 onClick={() => {
                                   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-                                  if (!SpeechRecognition) { alert(language === 'DE' ? 'Mikrofon nicht verfügbar in diesem Browser.' : 'Microphone not available in this browser.'); return; }
+                                  if (!SpeechRecognition) { alert(t.interview_mic_unavailable); return; }
                                   const recognition = new SpeechRecognition();
                                   recognition.lang = language === 'DE' ? 'de-CH' : language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : 'en-US';
                                   recognition.interimResults = false;
@@ -7653,14 +7903,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                   recognition.start();
                                 }}
                                 className={`absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all ${interviewSession.isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-[#004225]/10 hover:bg-[#004225]/20 text-[#004225] dark:text-[#FAFAF8]'}`}
-                                title={language === 'DE' ? 'Per Mikrofon antworten' : 'Answer by microphone'}
+                                title={t.interview_mic_answer}
                               >
                                 <Mic size={14} />
                               </button>
                             </div>
                             {interviewSession.isRecording && (
                               <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest animate-pulse flex items-center gap-1">
-                                <Radio size={10} /> {language === 'DE' ? 'Aufnahme läuft...' : language === 'FR' ? 'Enregistrement...' : 'Recording...'}
+                                <Radio size={10} /> {t.interview_recording}
                               </p>
                             )}
                           </div>
@@ -7685,7 +7935,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                 const evalData = await evalRes.json();
                                 feedback = evalData.text || '';
                               } catch {
-                                feedback = language === 'DE' ? 'Feedback konnte nicht geladen werden.' : 'Feedback unavailable.';
+                                feedback = t.interview_feedback_unavailable;
                               }
                               const newAnswers = [...interviewSession.answers, interviewAnswer];
                               const newFeedbacks = [...interviewSession.feedbacks, feedback];
@@ -7704,20 +7954,20 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             className="w-full py-4 bg-[#004225] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                           >
                             {interviewSession.isEvaluating ? (
-                              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{language === 'DE' ? 'Stella bewertet...' : language === 'FR' ? 'Stella évalue...' : 'Stella evaluating...'}</>
+                              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{t.interview_evaluating}</>
                             ) : (
-                              <>{language === 'DE' ? `Antwort senden → Frage ${interviewSession.currentQ + 1}/5` : language === 'FR' ? `Envoyer → Question ${interviewSession.currentQ + 1}/5` : `Submit → Question ${interviewSession.currentQ + 1}/5`}</>
+                              <>{t.interview_submit.replace('{n}', String(interviewSession.currentQ + 1))}</>
                             )}
                           </button>
                           {/* Model answer toggle */}
                           <details className="group">
                             <summary className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/50 cursor-pointer hover:text-[#004225] transition-colors list-none flex items-center gap-1 select-none">
                               <span className="group-open:rotate-90 transition-transform">▶</span>
-                              {language === 'DE' ? 'Musterantwort anzeigen' : language === 'FR' ? 'Voir la réponse modèle' : 'Show model answer'}
+                              {t.interview_show_model}
                             </summary>
                             <div className="mt-2 p-4 bg-[#004225]/5 border border-[#004225]/10 space-y-2">
                               <p className="text-xs font-light text-[#004225]/80 leading-relaxed">{interviewSession.questions[interviewSession.currentQ]?.model}</p>
-                              <p className="text-[10px] text-red-600/70 font-light italic">{language === 'DE' ? '⚠ Häufiger Fehler: ' : '⚠ Common mistake: '}{interviewSession.questions[interviewSession.currentQ]?.mistakes}</p>
+                              <p className="text-[10px] text-red-600/70 font-light italic">{t.interview_common_mistake}{interviewSession.questions[interviewSession.currentQ]?.mistakes}</p>
                             </div>
                           </details>
                         </>
@@ -7726,8 +7976,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="space-y-6 py-4">
                           <div className="text-center space-y-2">
                             <div className="w-16 h-16 bg-[#004225] text-white flex items-center justify-center mx-auto text-3xl">🎯</div>
-                            <h3 className="text-2xl font-serif">{language === 'DE' ? 'Interview abgeschlossen' : language === 'FR' ? 'Entretien terminé' : language === 'EN' ? 'Interview Complete' : 'Colloquio completato'}</h3>
-                            <p className="text-sm text-[#6B6B66] font-light">{language === 'DE' ? 'Alle 5 Fragen beantwortet. Hier dein Summary:' : language === 'FR' ? '5 questions répondues. Voici votre résumé:' : 'All 5 questions answered. Your summary:'}</p>
+                            <h3 className="text-2xl font-serif">{t.interview_complete_title}</h3>
+                            <p className="text-sm text-[#6B6B66] font-light">{t.interview_complete_desc}</p>
                           </div>
                           <div className="space-y-4">
                             {interviewSession.questions.map((q, i) => (
@@ -7756,7 +8006,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               }}
                               className="flex-1 py-3 border border-[#004225]/20 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:bg-[#004225]/5 transition-all"
                             >
-                              {language === 'DE' ? 'Neues Interview' : language === 'FR' ? 'Nouvel entretien' : 'New Interview'}
+                              {t.interview_new}
                             </button>
                             <button
                               onClick={() => {
@@ -7767,7 +8017,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               className="flex-1 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
                             >
                               <Copy size={12} />
-                              {language === 'DE' ? 'Summary kopieren' : language === 'FR' ? 'Copier le résumé' : 'Copy Summary'}
+                              {t.interview_copy_summary}
                             </button>
                           </div>
                         </div>
@@ -7846,7 +8096,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               </div>
                               <div>
                                 <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">Premium Analysis</h5>
-                                <p className="text-[9px] text-[#004225]/70 font-light">Tiefgehende Prüfung nach Schweizer Standards</p>
+                                <p className="text-[9px] text-[#004225]/70 font-light">{t.premium_analysis_desc}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-1 px-2 py-1 bg-[#004225] text-white text-[8px] font-bold uppercase tracking-widest rounded-sm">
@@ -7859,7 +8109,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <div className="space-y-12 py-8">
                             <div className="text-center space-y-4">
                               <h3 className="text-3xl font-serif text-[#004225]">CHF {parsedSalaryResult.medianSalary.toLocaleString('de-CH')}</h3>
-                              <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94]">Geschätzter Medianlohn (Brutto/Jahr)</p>
+                              <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94]">{t.salary_median_label}</p>
                             </div>
                             
                             <div className="space-y-6">
@@ -7896,11 +8146,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div className="p-6 bg-[#004225]/5 border border-[#004225]/10 space-y-3">
                               <div className="flex items-center gap-2 text-[#004225]">
                                 <Info size={16} />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">Wichtiger Hinweis</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t.salary_important_notice}</span>
                               </div>
                               <p className="text-[10px] font-light leading-relaxed text-[#004225]/80">
-                                Diese Schätzung basiert auf aktuellen Markttrends und KI-Modellen für den Schweizer Arbeitsmarkt. 
-                                Faktoren wie spezifische Zertifizierungen, Bonusvereinbarungen und individuelle Benefits können das tatsächliche Angebot beeinflussen.
+                                {t.salary_disclaimer}
                               </p>
                             </div>
                           </div>
@@ -7919,14 +8168,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       </div>
 
                       <div className="space-y-4">
-                        <h4 className="text-lg font-serif">{language === 'DE' ? 'So nutzt du dieses Tool' : 'How to use this tool'}</h4>
+                        <h4 className="text-lg font-serif">{t.tool_how_to_use}</h4>
                         <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">
                           {activeTool.desc}
                         </p>
                         {t.tools_data[activeTool.id]?.tutorial && activeTool.desc.length > 140 && (
                           <div className="pt-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] animate-pulse">
                             <ChevronDown size={12} />
-                            <span>{language === 'DE' ? 'Runterscrollen für Profi-Beispiel' : 'Scroll down for professional example'}</span>
+                            <span>{t.tool_scroll_example}</span>
                           </div>
                         )}
                       </div>
@@ -7935,7 +8184,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="w-full p-6 bg-[#004225]/5 border border-[#004225]/10 space-y-3 text-left">
                           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
                             <Award size={14} />
-                            <span>{language === 'DE' ? 'Profi-Beispiel' : 'Professional Example'}</span>
+                            <span>{t.tool_pro_example}</span>
                           </div>
                           <p className="text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed italic">
                             "{t.tools_data[activeTool.id].tutorial}"
@@ -7948,12 +8197,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="w-full p-6 bg-amber-50 border border-amber-100 space-y-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-900">
                             <Sparkles size={16} />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Unlimited Zugang</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{t.tool_unlimited_access}</span>
                           </div>
                           <p className="text-[10px] text-amber-800 leading-relaxed">
-                            {language === 'DE' 
-                              ? 'Schalte dieses Tool und alle Premium-Funktionen mit dem Unlimited-Plan frei.' 
-                              : 'Unlock this tool and all premium features with the Unlimited plan.'}
+                            {t.tool_unlock_desc}
                           </p>
                           <button 
                             onClick={() => {
@@ -7963,14 +8210,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             }}
                             className="w-full py-3 bg-amber-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-amber-700 transition-all"
                           >
-                            {language === 'DE' ? 'Jetzt Unlimited entdecken' : 'Discover Unlimited Now'}
+                            {t.tool_discover_unlimited}
                           </button>
                         </div>
                       )}
 
                       <div className="pt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                         <ArrowLeft size={12} />
-                        <span>{language === 'DE' ? 'Fülle die Felder links aus' : 'Fill in the fields on the left'}</span>
+                        <span>{t.tool_fill_fields}</span>
                       </div>
                     </div>
                   )}
@@ -8090,7 +8337,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               className="bg-white w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
             >
               <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FDFCFB]">
-                <h3 className="text-xl font-serif">Deine generierte Bewerbung</h3>
+                <h3 className="text-xl font-serif">{t.generated_app_title}</h3>
                 <button onClick={() => setGeneratedApp(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
                   <X size={20} />
                 </button>
@@ -8102,17 +8349,17 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 <button 
                   onClick={() => {
                     navigator.clipboard.writeText(generatedApp);
-                    showToast(language === 'DE' ? "In die Zwischenablage kopiert!" : "Copied to clipboard!");
+                    showToast(t.tool_copied);
                   }}
                   className="px-6 py-3 text-sm font-medium border border-black/10 hover:bg-black/5 transition-all"
                 >
-                  Kopieren
+                  {t.tool_copy}
                 </button>
-                <button 
+                <button
                   onClick={() => setGeneratedApp(null)}
                   className="px-6 py-3 text-sm font-medium bg-[#004225] text-white hover:bg-[#00331d] transition-all"
                 >
-                  Schliessen
+                  {t.close}
                 </button>
               </div>
             </motion.div>
@@ -8274,9 +8521,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           ))}
                         </div>
                         <p className="text-[9px] text-[#9A9A94] uppercase tracking-wider">
-                          {passwordStrength <= 2 ? (language === 'DE' ? 'Schwach' : 'Weak') : 
-                           passwordStrength <= 4 ? (language === 'DE' ? 'Mittel' : 'Medium') : 
-                           (language === 'DE' ? 'Stark' : 'Strong')}
+                          {passwordStrength <= 2 ? t.password_weak :
+                           passwordStrength <= 4 ? t.password_medium :
+                           t.password_strong}
                         </p>
                       </div>
                     )}
@@ -8304,7 +8551,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => { setAuthTab('register'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                         >
-                          {language === 'DE' ? '→ Jetzt neu registrieren' : '→ Register new account'}
+                          {t.auth_register_new}
                         </button>
                       </div>
                     )}
@@ -8315,7 +8562,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => { setAuthTab('login'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                         >
-                          {language === 'DE' ? '→ Zum Login wechseln' : '→ Switch to Login'}
+                          {t.auth_switch_to_login}
                         </button>
                       </div>
                     )}
@@ -8353,7 +8600,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="w-full border-t border-black/10 dark:border-white/10"></div>
                       </div>
                       <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
-                        <span className="bg-white dark:bg-[#1A1A18] px-2 text-[#9A9A94]">Oder</span>
+                        <span className="bg-white dark:bg-[#1A1A18] px-2 text-[#9A9A94]">{t.or_divider}</span>
                       </div>
                     </div>
 
@@ -8384,13 +8631,17 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       onClick={() => { setAuthTab('login'); setAuthError(''); }}
                       className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                     >
-                      {language === 'DE' ? '← Zurück zum Login' : '← Back to Login'}
+                      {t.auth_back_to_login}
                     </button>
                   </div>
                 )}
 
                 <p className="text-[10px] text-center text-[#9A9A94] mt-6 leading-relaxed">
-                  Mit der Anmeldung akzeptierst du unsere <span className="underline cursor-pointer">AGB</span> und <span className="underline cursor-pointer">Datenschutzerklärung</span>. Deine Daten werden sicher in der Schweiz/EU verarbeitet.
+                  {t.auth_terms_by_signing}{' '}
+                  <span className="underline cursor-pointer">{t.footer_terms}</span>
+                  {' '}{t.auth_terms_and}{' '}
+                  <span className="underline cursor-pointer">{t.footer_privacy}</span>.{' '}
+                  {t.auth_terms_data_processing}
                 </p>
 
                 <div className="mt-8 pt-4 border-t border-black/5 flex justify-center">
@@ -8403,7 +8654,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     }}
                     className="text-[9px] uppercase tracking-widest text-[#9A9A94] hover:text-[#004225] transition-colors"
                   >
-                    {language === 'DE' ? 'Sitzung zurücksetzen' : 'Reset Session'}
+                    {t.auth_reset_session}
                   </button>
                 </div>
               </form>
@@ -8519,7 +8770,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
                       <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
                         <Activity size={14} />
-                        <span>{language === 'DE' ? 'Deine Nutzung' : 'Your Usage'}</span>
+                        <span>{t.settings_your_usage}</span>
                       </div>
                       
                       <div className="space-y-6">
@@ -8529,8 +8780,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div className="space-y-2">
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{language === 'DE' ? 'Bewerbungen & Tools' : 'Applications & Tools'}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {language === 'DE' ? 'Generierungen' : 'Generations'}</p>
+                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {t.settings_generations}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 50) * 100)}%</span>
                               </div>
@@ -8547,7 +8798,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.dashboard_daily_usage}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {language === 'DE' ? 'Aktionen heute' : 'Actions today'}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {t.settings_actions_today}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%</span>
                               </div>
@@ -8566,8 +8817,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div className="space-y-2">
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{language === 'DE' ? 'Bewerbungen & Tools' : 'Applications & Tools'}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 1 {language === 'DE' ? 'Gratis-Nutzung' : 'Free use'}</p>
+                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 1 {t.settings_free_use}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.toolUses || 0) / 1) * 100))}%</span>
                               </div>
@@ -8584,7 +8835,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">Stella Chat</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.freeGenerationsUsed || 0} / 3 {language === 'DE' ? 'Anfragen' : 'Requests'}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.freeGenerationsUsed || 0} / 3 {t.settings_requests}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.freeGenerationsUsed || 0) / 3) * 100))}%</span>
                               </div>
@@ -8676,7 +8927,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   onClick={() => setIsSettingsOpen(false)}
                   className="px-6 py-2 bg-[#004225] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                 >
-                  {language === 'DE' ? 'Schliessen' : 'Close'}
+                  {t.close}
                 </button>
               </div>
             </motion.div>
@@ -8714,7 +8965,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 onClick={() => setIsPromoOpen(false)}
                 className="absolute top-12 right-12 z-[600] text-white/60 hover:text-white transition-all flex items-center gap-3 group"
               >
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">Schliessen</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">{t.close}</span>
                 <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/60 transition-colors bg-black/20 backdrop-blur-sm">
                   <X size={24} />
                 </div>
