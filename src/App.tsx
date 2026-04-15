@@ -30,9 +30,9 @@ import {
   Search, Shield, FileText, AlertCircle, Info,
   Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, GraduationCap, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
-  Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity
+  Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
+  Headphones, Radio, ChevronLeft, BarChart3
 } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
 import { auth, db } from './firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -70,7 +70,7 @@ import Markdown from 'react-markdown';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const PRO_MODEL = "gemini-2.5-pro";
-const FLASH_MODEL = "gemini-2.0-flash";
+const FLASH_MODEL = "gemini-2.5-flash";
 
 // --- TYPES ---
 interface Message {
@@ -102,7 +102,7 @@ class ErrorBoundary extends React.Component<any, any> {
   render() {
     if ((this as any).state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8] p-12 text-center">
+        <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] p-12 text-center">
           <div className="max-w-md space-y-6">
             <h1 className="text-3xl font-serif text-[#004225]">Ein unerwarteter Fehler ist aufgetreten.</h1>
             <p className="text-sm text-[#5C5C58] font-light leading-relaxed">
@@ -389,6 +389,377 @@ const OnboardingTutorial = ({ onComplete, t }: { onComplete: () => void, t: any 
   );
 };
 
+// --- COOKIE CONSENT BANNER ---
+const CookieBanner = ({ t, onAccept, onEssential, onPrivacyLink }: { t: any; onAccept: () => void; onEssential: () => void; onPrivacyLink: () => void }) => (
+  <AnimatePresence>
+    <motion.div
+      initial={{ y: 120, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      exit={{ y: 120, opacity: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed bottom-0 left-0 right-0 z-[200] p-4 md:p-6"
+    >
+      <div className="max-w-4xl mx-auto bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 shadow-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
+        {/* Icon */}
+        <div className="flex-shrink-0 w-10 h-10 bg-[#004225]/8 flex items-center justify-center text-[#004225] dark:text-[#00C060]">
+          <Shield size={20} />
+        </div>
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8] mb-1">
+            {t.cookie_title}
+          </p>
+          <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">
+            {t.cookie_desc}{' '}
+            <button
+              onClick={onPrivacyLink}
+              className="text-[#004225] dark:text-[#00C060] underline underline-offset-2 hover:no-underline"
+            >
+              {t.cookie_privacy_link}
+            </button>
+          </p>
+        </div>
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0 w-full md:w-auto">
+          <button
+            onClick={onEssential}
+            className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border border-black/15 dark:border-white/15 text-[#4A4A45] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+          >
+            {t.cookie_essential}
+          </button>
+          <button
+            onClick={onAccept}
+            className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331D] transition-all"
+          >
+            {t.cookie_accept}
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  </AnimatePresence>
+);
+
+// --- LEGAL PAGES COMPONENT ---
+const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => void }) => {
+  const today = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div className="mb-10">
+      <h2 className="text-xl font-serif text-[#004225] dark:text-[#00A854] mb-4 pb-2 border-b border-[#004225]/10 dark:border-white/10">{title}</h2>
+      <div className="space-y-3 text-sm text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">{children}</div>
+    </div>
+  );
+
+  const placeholder = (text: string) => (
+    <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-1 rounded font-mono text-xs">{text}</span>
+  );
+
+  return (
+    <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
+      <div className="max-w-3xl mx-auto">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"
+        >
+          <ArrowLeft size={14} /> Zurück
+        </button>
+
+        {/* ======= DATENSCHUTZRICHTLINIE ======= */}
+        {activeView === 'datenschutz' && (
+          <article>
+            <header className="mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
+              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Datenschutzrichtlinie</h1>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today} · Gilt für: stellify.ch</p>
+            </header>
+
+            <Section title="1. Verantwortliche Person">
+              <p>Verantwortlich für die Datenbearbeitung im Sinne des Schweizer Datenschutzgesetzes (DSG) und der Europäischen Datenschutz-Grundverordnung (DSGVO) ist:</p>
+              <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1">
+                <p>JTSP</p>
+                <p>Postfach</p>
+                <p>6300 Zug, Schweiz</p>
+                <p>E-Mail: support.stellify@gmail.com</p>
+              </div>
+            </Section>
+
+            <Section title="2. Erhobene Personendaten">
+              <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Kontodaten:</strong> Vorname, E-Mail-Adresse (bei Registrierung)</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur Verarbeitung durch die KI, wird nicht dauerhaft auf unseren Servern gespeichert)</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Nutzungsdaten:</strong> Anzahl Tool-Nutzungen, Chat-Anfragen, Datum des letzten Resets</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zahlungsdaten:</strong> Werden ausschliesslich durch Stripe Inc. verarbeitet. Wir erhalten keine vollständigen Kreditkartendaten.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal im Browser gespeichert)</li>
+              </ul>
+            </Section>
+
+            <Section title="3. Zweck der Datenbearbeitung">
+              <p>Wir bearbeiten deine Daten ausschliesslich zu folgenden Zwecken:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>Bereitstellung und Verbesserung der Plattform-Funktionen</li>
+                <li>Authentifizierung und Kontoverwaltung</li>
+                <li>Abrechnung und Zahlungsabwicklung (via Stripe)</li>
+                <li>Einhaltung gesetzlicher Pflichten</li>
+                <li>KI-gestützte Karriereberatung (Verarbeitung des CV-Textes durch Google Gemini API)</li>
+              </ul>
+            </Section>
+
+            <Section title="4. Rechtsgrundlage der Bearbeitung">
+              <p>Die Bearbeitung deiner Daten stützt sich auf folgende Rechtsgrundlagen:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO / Art. 31 DSG):</strong> Kontodaten und Nutzungsdaten sind für die Bereitstellung des Dienstes notwendig.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Einwilligung (Art. 6 Abs. 1 lit. a DSGVO):</strong> Für optionale Analyse-Cookies.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO):</strong> Sicherheit und Missbrauchsprävention.</li>
+              </ul>
+            </Section>
+
+            <Section title="5. Weitergabe an Dritte">
+              <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
+              <div className="mt-3 space-y-4">
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Google Firebase (Alphabet Inc.)</p>
+                  <p className="text-xs mt-1">Zweck: Authentifizierung, Datenbankhosting (Firestore). Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).</p>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Google Gemini API (Alphabet Inc.)</p>
+                  <p className="text-xs mt-1">Zweck: KI-Verarbeitung von CV-Inhalten und Nutzereingaben. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Gemäss Google API-Nutzungsbedingungen werden Eingabedaten nicht zum Training genutzt.</p>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stripe Inc.</p>
+                  <p className="text-xs mt-1">Zweck: Zahlungsabwicklung. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln. Stripe ist PCI-DSS-zertifiziert.</p>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Vercel Inc.</p>
+                  <p className="text-xs mt-1">Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.</p>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="6. Cookies und lokale Speicherung">
+              <p>Wir verwenden folgende Arten von Cookies und lokalem Speicher:</p>
+              <div className="mt-3 space-y-3">
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>Firebase Auth Session Cookie – Authentifizierung, Ablauf: Session</li>
+                    <li>localStorage: <code className="bg-black/10 dark:bg-white/10 px-1">language</code>, <code className="bg-black/10 dark:bg-white/10 px-1">theme</code>, <code className="bg-black/10 dark:bg-white/10 px-1">cookieConsent</code> – Nutzereinstellungen</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p>
+                  <p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv. Bei zukünftiger Aktivierung erfolgt Information im Cookie-Banner.</p>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="7. Speicherdauer">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Kontodaten: bis zur Kontolöschung durch den Nutzer</li>
+                <li>CV-Text: wird nach der Sitzung nicht dauerhaft gespeichert; in Firestore nur das Nutzerprofil ohne CV-Rohdaten</li>
+                <li>Zahlungsbelege: 10 Jahre gemäss Schweizer Buchführungsrecht (OR Art. 958f)</li>
+                <li>Nutzungsstatistiken: werden monatlich zurückgesetzt</li>
+              </ul>
+            </Section>
+
+            <Section title="8. Deine Rechte">
+              <p>Du hast nach Schweizer DSG und DSGVO folgende Rechte:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Auskunft:</strong> Du kannst jederzeit Auskunft über die gespeicherten Daten verlangen.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Berichtigung:</strong> Unrichtige Daten können jederzeit korrigiert werden.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Löschung:</strong> Du kannst die Löschung deines Kontos und aller damit verbundenen Daten verlangen.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Datenportabilität:</strong> Du kannst deine Daten in einem maschinenlesbaren Format erhalten.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Widerspruch:</strong> Du kannst der Verarbeitung auf Basis berechtigter Interessen widersprechen.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Widerruf der Einwilligung:</strong> Eine einmal erteilte Einwilligung kann jederzeit widerrufen werden.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Beschwerde:</strong> Du hast das Recht, bei der zuständigen Aufsichtsbehörde (EDÖB, edoeb.admin.ch) Beschwerde einzureichen.</li>
+              </ul>
+              <p className="mt-4">Zur Ausübung deiner Rechte wende dich an: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a></p>
+            </Section>
+
+            <Section title="9. Datensicherheit">
+              <p>Wir setzen technische und organisatorische Massnahmen ein, um deine Daten vor unbefugtem Zugriff zu schützen:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>TLS/HTTPS-Verschlüsselung für alle Datenübertragungen</li>
+                <li>Firebase Security Rules für datenbankbasierten Zugriffsschutz</li>
+                <li>Keine Speicherung von Passwörtern im Klartext (Firebase Authentication)</li>
+                <li>Zugriff auf Produktionsdatenbanken nur für autorisierte Personen</li>
+              </ul>
+            </Section>
+
+            <Section title="10. Änderungen dieser Richtlinie">
+              <p>Wir behalten uns vor, diese Datenschutzrichtlinie jederzeit anzupassen. Bei wesentlichen Änderungen informieren wir angemeldete Nutzer per E-Mail. Die aktuelle Version ist stets auf dieser Seite einsehbar.</p>
+            </Section>
+          </article>
+        )}
+
+        {/* ======= IMPRESSUM ======= */}
+        {activeView === 'impressum' && (
+          <article>
+            <header className="mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
+              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Impressum</h1>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today}</p>
+            </header>
+
+            <Section title="Betreiber und Verantwortlicher">
+              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 font-mono text-xs">
+                <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">JTSP</p>
+                <p>Postfach</p>
+                <p>6300 Zug</p>
+                <p>Schweiz</p>
+              </div>
+            </Section>
+
+            <Section title="Kontakt">
+              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 text-sm">
+                <p>E-Mail: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a></p>
+                <p>Website: stellify.ch</p>
+              </div>
+            </Section>
+
+            <Section title="Unternehmensregistrierung (falls zutreffend)">
+              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 text-sm">
+                <p>UID: {placeholder('[CHE-XXX.XXX.XXX]')} <span className="text-xs text-[#6B6B66]">(bei eingetragener Firma)</span></p>
+                <p>Handelsregister-Nr.: {placeholder('[HR-Nummer]')} <span className="text-xs text-[#6B6B66]">(bei eingetragener Firma)</span></p>
+              </div>
+            </Section>
+
+            <Section title="Haftungsausschluss">
+              <p>Die Inhalte dieser Website werden mit grösstmöglicher Sorgfalt erstellt. Der Betreiber übernimmt jedoch keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten Inhalte. Die KI-generierten Texte dienen ausschliesslich als Hilfsmittel und ersetzen keine professionelle Rechts- oder Karriereberatung.</p>
+            </Section>
+
+            <Section title="Urheberrecht">
+              <p>Die auf dieser Website veröffentlichten Inhalte und Werke unterliegen dem Schweizer Urheberrecht. Jede Art von Vervielfältigung oder Verwendung bedarf der schriftlichen Genehmigung des jeweiligen Urhebers bzw. Erstellers.</p>
+            </Section>
+
+            <Section title="Anwendbares Recht">
+              <p>Es gilt ausschliesslich Schweizer Recht. Gerichtsstand ist Zug, Schweiz.</p>
+            </Section>
+          </article>
+        )}
+
+        {/* ======= AGB ======= */}
+        {activeView === 'agb' && (
+          <article>
+            <header className="mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
+              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Allgemeine Geschäftsbedingungen (AGB)</h1>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today} · Anbieter: JTSP, Zug, Schweiz</p>
+            </header>
+
+            <Section title="1. Vertragsgegenstand und Geltungsbereich">
+              <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter JTSP (nachfolgend „Stellify") und registrierten Nutzern (nachfolgend „Nutzer") der Plattform stellify.ch.</p>
+              <p className="mt-2">Stellify bietet eine KI-gestützte Karriereplattform mit Tools zur Lebenslaufoptimierung, Interview-Vorbereitung, Gehaltsanalyse und weiteren Karriere-Diensten an.</p>
+            </Section>
+
+            <Section title="2. Vertragsschluss und Kontoregistrierung">
+              <p>Der Vertrag kommt durch Registrierung und Annahme dieser AGB zustande. Der Nutzer muss mindestens 16 Jahre alt sein. Mit der Registrierung bestätigt der Nutzer, die AGB und die Datenschutzrichtlinie gelesen und akzeptiert zu haben.</p>
+            </Section>
+
+            <Section title="3. Leistungsumfang und Tarife">
+              <p>Stellify bietet drei Tarife an:</p>
+              <div className="mt-3 space-y-3">
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Gratis-Plan (kostenlos)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>1× Tool-Nutzung</li>
+                    <li>3× Stella Chat-Anfragen</li>
+                    <li>KI-Gehaltsrechner (Basisversion)</li>
+                    <li>Schweizer Standards</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Pro-Plan (CHF 19.90 / Monat oder CHF 199.– / Jahr)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>50× Tool-Nutzungen pro Monat</li>
+                    <li>20× Aktionen pro Tag</li>
+                    <li>Zeugnis-Decoder, Interview-Coach, alle Pro-Tools</li>
+                    <li>Zugang zum Live Interview-Coach</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Ultimate-Plan (CHF 39.90 / Monat oder CHF 399.– / Jahr)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>Unbegrenzte Nutzungen ♾️</li>
+                    <li>Alle Pro-Features + exklusive Ultimate-Tools</li>
+                    <li>Deep Analysis Modus</li>
+                    <li>24/7 VIP-Support</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-3">Alle Preise in CHF, inkl. MwSt. Preisänderungen werden mindestens 30 Tage im Voraus angekündigt.</p>
+            </Section>
+
+            <Section title="4. Zahlung und Abrechnung">
+              <p>Die Zahlung erfolgt ausschliesslich über den Zahlungsdienstleister <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong>, USA. Akzeptierte Zahlungsmittel: Kreditkarte (Visa, Mastercard, American Express) sowie weitere von Stripe angebotene Methoden.</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>Die Abrechnung erfolgt im Voraus, monatlich oder jährlich je nach gewähltem Tarif.</li>
+                <li>Stripe speichert Zahlungsdaten. Stellify hat keinen Zugriff auf Kreditkartendaten.</li>
+                <li>Bei Zahlungsausfall wird der Zugang auf den Gratis-Plan zurückgestuft.</li>
+              </ul>
+            </Section>
+
+            <Section title="5. Widerrufsrecht">
+              <p>Bei digitalen Dienstleistungen, die mit ausdrücklicher Zustimmung des Nutzers sofort genutzt werden, erlischt das Widerrufsrecht mit Beginn der Leistungserbringung (Art. 40e OR analog sowie EU-Richtlinie 2011/83/EU). Gleichwohl bietet Stellify als Kulanzleistung eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer an. Anfragen per E-Mail an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a>.</p>
+            </Section>
+
+            <Section title="6. Kündigung und Laufzeit">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Monatliches Abo: jederzeit kündbar, Zugang bis Ende der bezahlten Periode.</li>
+                <li>Jährliches Abo: Kündigung bis 30 Tage vor Ablauf, ansonsten automatische Verlängerung um 1 Jahr.</li>
+                <li>Die Kündigung erfolgt über die Einstellungen im Nutzerkonto oder per E-Mail.</li>
+                <li>Stellify kann das Konto bei schwerwiegendem Verstoss gegen diese AGB fristlos kündigen.</li>
+              </ul>
+            </Section>
+
+            <Section title="7. Nutzungsbeschränkungen und Pflichten des Nutzers">
+              <p>Es ist dem Nutzer untersagt:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>Die Plattform für illegale Zwecke zu nutzen oder Dritte zu täuschen</li>
+                <li>Automatisierte Massenabfragen (Scraping, Bots) durchzuführen</li>
+                <li>Zugangsdaten an Dritte weiterzugeben oder Konten zu teilen</li>
+                <li>KI-generierte Inhalte ohne Prüfung als eigene Werke einzureichen, wenn dies strafbar oder sittenwidrig wäre</li>
+                <li>Die Plattforminfrastruktur zu beeinträchtigen</li>
+              </ul>
+              <p className="mt-3">Der Nutzer ist für die Prüfung und Richtigkeit aller KI-generierten Inhalte selbst verantwortlich. Die KI ersetzt keine Rechts-, Steuer- oder Berufsberatung.</p>
+            </Section>
+
+            <Section title="8. Geistiges Eigentum">
+              <p>Alle Rechte an der Plattform, dem Quellcode, dem Design und den Marken von Stellify liegen beim Betreiber. Dem Nutzer wird eine einfache, nicht übertragbare Lizenz zur Nutzung der Plattform eingeräumt. KI-generierte Inhalte, die im Auftrag des Nutzers erstellt werden, können vom Nutzer für seine Bewerbungsunterlagen verwendet werden.</p>
+            </Section>
+
+            <Section title="9. Haftungsbeschränkung">
+              <p>Stellify haftet nur für Schäden, die durch vorsätzliches oder grob fahrlässiges Verhalten verursacht wurden. Für KI-generierte Inhalte, deren inhaltliche Richtigkeit oder Eignung für einen konkreten Zweck wird keine Haftung übernommen. Die Gesamthaftung ist auf den vom Nutzer in den letzten 12 Monaten bezahlten Betrag begrenzt.</p>
+            </Section>
+
+            <Section title="10. Verfügbarkeit">
+              <p>Stellify ist um einen möglichst hohen Verfügbarkeitsgrad bemüht, garantiert jedoch keine unterbrechungsfreie Verfügbarkeit. Geplante Wartungsarbeiten werden, wenn möglich, im Voraus angekündigt. Ausfälle von Drittanbietern (Firebase, Stripe, Google AI) liegen ausserhalb unseres Einflussbereichs.</p>
+            </Section>
+
+            <Section title="11. Änderungen der AGB und des Leistungsumfangs">
+              <p>Stellify behält sich vor, diese AGB und den Leistungsumfang mit einer Frist von 30 Tagen anzupassen. Wesentliche Änderungen werden per E-Mail kommuniziert. Die fortgesetzte Nutzung nach Inkrafttreten gilt als Zustimmung.</p>
+            </Section>
+
+            <Section title="12. Anwendbares Recht und Gerichtsstand">
+              <p>Es gilt ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>, unter Ausschluss des Kollisionsrechts. Gerichtsstand ist Zug, Schweiz. Für Konsumenten gilt abweichend das zwingende Recht am Wohnsitz des Konsumenten.</p>
+            </Section>
+
+            <Section title="13. Streitbeilegung">
+              <p>Bei Streitigkeiten wenden sich Nutzer zunächst an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a> für eine einvernehmliche Lösung. Die EU-Kommission stellt unter <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] dark:text-[#00A854] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a> eine Online-Schlichtungsplattform bereit.</p>
+            </Section>
+
+            <div className="mt-10 p-5 bg-[#004225]/5 dark:bg-[#00A854]/5 border border-[#004225]/10 dark:border-[#00A854]/10">
+              <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94]">
+                <strong className="text-[#004225] dark:text-[#00A854]">Noch ausstehend:</strong> Die gelb markierten Felder ({placeholder('Strasse + PLZ')}) in Impressum und Datenschutz benötigen noch eine Postadresse. Lies dazu den Hinweis unten. Für eine abschliessende rechtssichere Prüfung empfehlen wir eine Konsultation mit einem Schweizer Anwalt für IT-Recht.
+              </p>
+            </div>
+          </article>
+        )}
+      </div>
+    </section>
+  );
+};
+
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
     {src ? (
@@ -437,7 +808,7 @@ const CVDropzone = ({ onFileAccepted, isUploading, t }: { onFileAccepted: (file:
     >
       <input {...getInputProps()} />
       <div className="space-y-4 relative z-10">
-        <div className="w-16 h-16 bg-[#FAFAF8] dark:bg-[#1A1A18] rounded-full flex items-center justify-center mx-auto text-[#004225] dark:text-[#FAFAF8] group-hover:scale-110 transition-transform duration-500 shadow-sm">
+        <div className="w-16 h-16 bg-[#FDFCFB] dark:bg-[#1A1A18] rounded-full flex items-center justify-center mx-auto text-[#004225] dark:text-[#FAFAF8] group-hover:scale-110 transition-transform duration-500 shadow-sm">
           {isDragActive ? <FileUp size={32} className="animate-bounce" /> : <Upload size={32} />}
         </div>
         <div className="space-y-1">
@@ -499,7 +870,7 @@ function StellifyApp() {
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [splashDone, setSplashDone] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -528,7 +899,7 @@ function StellifyApp() {
   }, []);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'tools' | 'jobs') => {
+  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
@@ -537,7 +908,7 @@ function StellifyApp() {
 
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
-      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | undefined;
+      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb' | undefined;
       if (view) {
         setActiveView(view);
         setActiveTool(null);
@@ -581,7 +952,29 @@ function StellifyApp() {
   const [toolInput, setToolInput] = useState<any>({});
   const [toolResult, setToolResult] = useState<string | null>(null);
   const [parsedSalaryResult, setParsedSalaryResult] = useState<any | null>(null);
+  const [interviewSession, setInterviewSession] = useState<{
+    questions: Array<{q: string; tip: string; model: string; mistakes: string}>;
+    jobContext: string;
+    currentQ: number;
+    answers: string[];
+    feedbacks: string[];
+    isEvaluating: boolean;
+    isRecording: boolean;
+    isComplete: boolean;
+  } | null>(null);
+  const [interviewAnswer, setInterviewAnswer] = useState('');
   const [isProcessingTool, setIsProcessingTool] = useState(false);
+  const [cookieConsent, setCookieConsent] = useState<'accepted' | 'essential' | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('cookieConsent');
+      if (saved === 'accepted' || saved === 'essential') return saved;
+    }
+    return null;
+  });
+  const handleCookieAccept = (type: 'accepted' | 'essential') => {
+    setCookieConsent(type);
+    localStorage.setItem('cookieConsent', type);
+  };
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
@@ -714,14 +1107,14 @@ function StellifyApp() {
             className="flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#003318] transition-colors disabled:opacity-60 whitespace-nowrap"
           >
             {isSearching ? (
-              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> Suche...</>
+              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> {language === 'FR' ? 'Recherche...' : language === 'IT' ? 'Ricerca...' : language === 'EN' ? 'Searching...' : 'Suche...'}</>
             ) : (
-              <><Search size={13} /> KI-Suche</>
+              <><Search size={13} /> {language === 'FR' ? 'Recherche IA' : language === 'IT' ? 'Ricerca IA' : language === 'EN' ? 'AI Search' : 'KI-Suche'}</>
             )}
           </button>
           {isLiveResult && (
             <button onClick={handleReset} className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors whitespace-nowrap">
-              Zurücksetzen
+              {language === 'FR' ? 'Réinitialiser' : language === 'IT' ? 'Reimposta' : language === 'EN' ? 'Reset' : 'Zurücksetzen'}
             </button>
           )}
         </div>
@@ -731,7 +1124,7 @@ function StellifyApp() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
               <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
-              Live · {displayJobs.length} Stellen angezeigt{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
+              Live · {displayJobs.length} {language === 'FR' ? 'offres affichées' : language === 'IT' ? 'offerte mostrate' : language === 'EN' ? 'jobs shown' : 'Stellen angezeigt'}{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
             </div>
             {liveSource === 'adzuna' && (
               <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
@@ -740,14 +1133,14 @@ function StellifyApp() {
             )}
             {liveSource === 'gemini' && (
               <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                via KI-Suche
+                {language === 'FR' ? 'via Recherche IA' : language === 'IT' ? 'via Ricerca IA' : language === 'EN' ? 'via AI Search' : 'via KI-Suche'}
               </span>
             )}
           </div>
         )}
         {!isLiveResult && (
           <p className="text-[11px] text-[#9A9A94] dark:text-[#5C5C58]">
-            {displayJobs.length} Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse
+            {displayJobs.length} {language === 'FR' ? <>offres exemples · Cliquez sur <strong>Recherche IA</strong> pour des résultats en direct</> : language === 'IT' ? <>offerte esempio · Clicca su <strong>Ricerca IA</strong> per risultati live</> : language === 'EN' ? <>sample jobs · Click <strong>AI Search</strong> for live results</> : <>Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse</>}
           </p>
         )}
 
@@ -793,7 +1186,7 @@ function StellifyApp() {
                     ))}
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    Öffnen <ArrowRight size={12} />
+                    {t.tool_open} <ArrowRight size={12} />
                   </span>
                 </div>
               </motion.div>
@@ -815,7 +1208,7 @@ function StellifyApp() {
 
         {/* External links */}
         <div className="pt-4 border-t border-black/5 dark:border-white/5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">Weitere Stellen direkt suchen</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">{language === 'FR' ? 'Rechercher d\'autres postes directement' : language === 'IT' ? 'Cerca altri posti direttamente' : language === 'EN' ? 'Search more jobs directly' : 'Weitere Stellen direkt suchen'}</p>
           <div className="flex flex-wrap gap-3">
             {[
               { label: 'Jobs.ch', url: 'https://www.jobs.ch/de/vakanzen/' },
@@ -1063,10 +1456,6 @@ function StellifyApp() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
       if (e.key === 'Escape') {
         setIsSearchOpen(false);
       }
@@ -1096,15 +1485,19 @@ function StellifyApp() {
           }
         }
         
-        setMessages(prev => [...prev, { 
-          role: 'ai', 
-          content: `Perfekt! Ich habe dein LinkedIn-Profil (${profile.name}) erfolgreich importiert. Ich nutze diese Informationen nun, um deine Bewerbungen noch präziser zu gestalten.` 
-        }]);
+        const importMsg = language === 'FR'
+          ? `Parfait ! J'ai importé ton profil LinkedIn (${profile.name}) avec succès. J'utilise maintenant ces informations pour rendre tes candidatures encore plus précises.`
+          : language === 'IT'
+          ? `Perfetto! Ho importato con successo il tuo profilo LinkedIn (${profile.name}). Userò ora queste informazioni per rendere le tue candidature ancora più precise.`
+          : language === 'EN'
+          ? `Perfect! I've successfully imported your LinkedIn profile (${profile.name}). I'll use this information to make your applications even more precise.`
+          : `Perfekt! Ich habe dein LinkedIn-Profil (${profile.name}) erfolgreich importiert. Ich nutze diese Informationen nun, um deine Bewerbungen noch präziser zu gestalten.`;
+        setMessages(prev => [...prev, { role: 'ai', content: importMsg }]);
       }
     };
     window.addEventListener('message', handleOAuthMessage);
     return () => window.removeEventListener('message', handleOAuthMessage);
-  }, [user, cvContext]);
+  }, [user, cvContext, language]);
 
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -1159,8 +1552,8 @@ function StellifyApp() {
       ) ? [{
         id: 'user-profile',
         title: `${user.firstName} (Dein Profil)`,
-        content: language === 'DE' ? 'Verwalte deine persönlichen Daten, deinen Lebenslauf und deine Einstellungen.' : 'Manage your personal data, your CV and your settings.',
-        category: language === 'DE' ? 'Profil' : 'Profile',
+        content: language === 'DE' ? 'Verwalte deine persönlichen Daten, deinen Lebenslauf und deine Einstellungen.' : language === 'FR' ? 'Gérez vos données personnelles, votre CV et vos paramètres.' : language === 'IT' ? 'Gestisci i tuoi dati personali, il tuo CV e le tue impostazioni.' : 'Manage your personal data, your CV and your settings.',
+        category: t.profile,
         type: 'profile'
       }] : [];
 
@@ -1282,26 +1675,21 @@ function StellifyApp() {
       if (data.success) {
         setCareerRoadmap(data.roadmap.slice(0, 3));
       } else {
-        // Fallback to AI if backend fails
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-          console.warn("GEMINI_API_KEY is missing.");
-          return;
-        }
+        // Fallback to backend AI if first endpoint fails
         const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
         const isPro = user?.role === 'pro' || isUnlimited;
         const model = isPro ? PRO_MODEL : FLASH_MODEL;
-        const ai = new GoogleGenAI({ apiKey });
-        const response = await ai.models.generateContent({
-          model: model,
-          contents: `Basierend auf diesem CV: ${cvContext}, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Markt.`,
-          config: {
-            systemInstruction: "Du bist ein Schweizer Karriere-Experte. Gib nur die 3 Schritte als Liste zurück, kurz und präzise. Nutze Schweizer Hochdeutsch (kein ß).",
-            temperature: 0.4
-          }
+        const res2 = await fetch('/api/process-tool', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: `Basierend auf diesem CV: ${cvContext.substring(0, 1000)}, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Markt. Gib nur die 3 Schritte als nummerierte Liste zurück, kurz und präzise.`,
+            model
+          })
         });
-        const steps = response.text.split('\n').filter(s => s.trim()).slice(0, 3);
-        setCareerRoadmap(steps);
+        const data2 = await res2.json();
+        const steps = (data2.text || '').split('\n').filter((s: string) => s.trim()).slice(0, 3);
+        if (steps.length > 0) setCareerRoadmap(steps);
       }
     } catch (e) {
       console.error("Roadmap Error:", e);
@@ -1351,42 +1739,31 @@ function StellifyApp() {
 
   const analyzeCV = async (text: string) => {
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) return;
-      const ai = new GoogleGenAI({ apiKey });
-      
       const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
       const isPro = user?.role === 'pro' || isUnlimited;
       const model = isPro ? PRO_MODEL : FLASH_MODEL;
-      
-      const response = await ai.models.generateContent({
-        model: model,
-        contents: `Führe eine tiefgehende Analyse und Optimierung des Lebenslaufs für den Schweizer Arbeitsmarkt durch. KONTEXT: CV: ${text}.`,
-        config: {
-          systemInstruction: `
-            Du bist ein Senior Career Consultant für den Schweizer Markt (Zürich, Genf, Basel, Zug).
-            Führe eine Analyse basierend auf Schweizer Standards durch.
-            Prüfe auf: Sprachniveaus (GERS), Arbeitsbewilligungen (L, B, C), Referenzen, Foto-Standards und Bildungs-Äquivalenz.
-            Nutze Schweizer Hochdeutsch (kein ß).
-          `,
-          temperature: 0.4,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              keywords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "10 wichtigste Keywords" },
-              industryMatch: { type: Type.STRING, description: "3 Schweizer Branchen mit besten Chancen" },
-              improvements: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 konkrete Optimierungspunkte" },
-              score: { type: Type.NUMBER, description: "Swiss Market Readiness Score 0-100" },
-              optimizedHighlights: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 impact-driven Bulletpoints" },
-              optimizedSummary: { type: Type.STRING, description: "Kurzprofil für den CV-Header" }
-            },
-            required: ["keywords", "industryMatch", "improvements", "score", "optimizedHighlights", "optimizedSummary"]
-          }
-        }
-      });
 
-      const analysisData = JSON.parse(response.text);
+      const prompt = `Führe eine tiefgehende Analyse des folgenden Lebenslaufs für den Schweizer Arbeitsmarkt durch. CV: ${text.substring(0, 3000)}.
+
+Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt diesen Feldern:
+{
+  "keywords": ["keyword1", "keyword2", ...],
+  "industryMatch": "Branchen-String",
+  "improvements": ["punkt1", "punkt2", "punkt3"],
+  "score": 75,
+  "optimizedHighlights": ["highlight1", "highlight2", "highlight3"],
+  "optimizedSummary": "Kurzprofil-Text"
+}`;
+
+      const res = await fetch('/api/process-tool', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, model })
+      });
+      const data = await res.json();
+      const jsonMatch = (data.text || '').match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return;
+      const analysisData = JSON.parse(jsonMatch[0]);
       setLatestAnalysis(analysisData);
       
       if (user) {
@@ -1501,7 +1878,9 @@ function StellifyApp() {
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setAuthError(
           language === 'DE' ? 'Anmeldedaten ungültig. Falls du noch kein Konto in diesem neuen System hast, registriere dich bitte neu.' :
-          'Invalid credentials. If you don\'t have an account in this new system yet, please register a new account.'
+          language === 'FR' ? 'Identifiants invalides. Si vous n\'avez pas encore de compte, veuillez vous inscrire.' :
+          language === 'IT' ? 'Credenziali non valide. Se non hai ancora un account, registrati.' :
+          'Invalid credentials. If you don\'t have an account yet, please register a new account.'
         );
         // If they were trying to login, maybe they need to register
         if (authTab === 'login') {
@@ -1510,6 +1889,8 @@ function StellifyApp() {
       } else if (err.code === 'auth/email-already-in-use') {
         setAuthError(
           language === 'DE' ? 'Diese E-Mail wird bereits verwendet. Bitte melde dich stattdessen an.' :
+          language === 'FR' ? 'Cet e-mail est déjà utilisé. Veuillez vous connecter à la place.' :
+          language === 'IT' ? 'Questa email è già in uso. Accedi invece.' :
           'This email is already in use. Please log in instead.'
         );
         // If they were trying to register, they should login
@@ -1560,6 +1941,8 @@ function StellifyApp() {
       console.error("Reset Error:", err);
       setAuthError(
         language === 'DE' ? 'Fehler beim Senden der Reset-E-Mail.' :
+        language === 'FR' ? 'Erreur lors de l\'envoi de l\'e-mail de réinitialisation.' :
+        language === 'IT' ? 'Errore nell\'invio dell\'e-mail di ripristino.' :
         'Error sending reset email.'
       );
     } finally {
@@ -1575,15 +1958,15 @@ function StellifyApp() {
       const result = await signInWithPopup(auth, provider);
       if (result.user) {
         setIsAuthModalOpen(false);
-        showToast(language === 'DE' ? 'Erfolgreich mit Google angemeldet!' : 'Successfully signed in with Google!', 'success');
+        showToast(language === 'DE' ? 'Erfolgreich mit Google angemeldet!' : language === 'FR' ? 'Connecté avec Google avec succès !' : language === 'IT' ? 'Accesso con Google riuscito!' : 'Successfully signed in with Google!', 'success');
       }
     } catch (err: any) {
       console.error("Google Auth Error:", err);
-      let errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : 'Google authentication failed.';
+      let errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
       if (err.code === 'auth/unauthorized-domain') {
-        errorMsg = language === 'DE' ? 'Diese Domain ist nicht für Google Login autorisiert.' : 'This domain is not authorized for Google Login.';
+        errorMsg = language === 'DE' ? 'Diese Domain ist nicht für Google Login autorisiert.' : language === 'FR' ? 'Ce domaine n\'est pas autorisé pour la connexion Google.' : language === 'IT' ? 'Questo dominio non è autorizzato per il login Google.' : 'This domain is not authorized for Google Login.';
       } else if (err.code === 'auth/popup-blocked') {
-        errorMsg = language === 'DE' ? 'Das Popup wurde blockiert. Bitte erlaube Popups.' : 'Popup was blocked. Please allow popups.';
+        errorMsg = language === 'DE' ? 'Das Popup wurde blockiert. Bitte erlaube Popups.' : language === 'FR' ? 'La fenêtre popup a été bloquée. Veuillez autoriser les popups.' : language === 'IT' ? 'Il popup è stato bloccato. Si prega di consentire i popup.' : 'Popup was blocked. Please allow popups.';
       }
       setAuthError(errorMsg);
       showToast(errorMsg, 'error');
@@ -1790,12 +2173,14 @@ function StellifyApp() {
         BEHAVIOR:
         - Be proactive: Offer the next logical step briefly.
         - Personalize: Use the context of the uploaded CV intensively.
+        - PREMIUM GUIDANCE: When a user asks about advanced features (e.g., unlimited CV analyses, advanced job matching, interview coaching, salary tools, unlimited messages), ALWAYS mention that these are available in the Pro or Ultimate plan on Stellify. Guide them clearly to the pricing/plans section. Example: "This feature is available in the Pro plan — you can upgrade directly in the Stellify pricing section." Adapt to the user's language.
 
         LANGUAGE:
         - Respond in the user's selected language: ${language}.
         - If the language is German, use Swiss High German (no "ß", use "ss").
 
         USER TIER: ${user?.role === 'unlimited' ? 'Unlimited (Highest Priority/Elite)' : user?.role === 'pro' ? 'Pro (Premium)' : 'Gratis (Standard)'}.
+        ${!isPro ? '- FREE USER: This user is on the free plan. When relevant, briefly and elegantly mention the benefits of upgrading to Pro or Ultimate. Do not be pushy — mention it naturally when it adds value.' : ''}
 
         CONTEXT:
         ${cvContext ? `The candidate has uploaded a CV: ${cvContext}.` : 'The candidate has not yet uploaded a CV. Politely encourage them to do so to receive personalized tips.'}
@@ -1818,7 +2203,7 @@ function StellifyApp() {
       const chatData = await chatRes.json();
       if (!chatRes.ok) throw new Error(chatData.error || 'Chat failed');
 
-      const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : "Stella is currently thoughtful. Please try again.");
+      const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : language === 'FR' ? "Stella est en train de réfléchir. Veuillez réessayer." : language === 'IT' ? "Stella sta riflettendo. Si prega di riprovare." : "Stella is currently thoughtful. Please try again.");
       
       if (!user) {
         setMessages(prev => [...prev, { role: 'ai', content: reply }]);
@@ -1835,17 +2220,23 @@ function StellifyApp() {
       }
     } catch (err: any) {
       console.error("Stella Chat Error:", err);
-      let errorMsg = language === 'DE' 
-        ? `Stella ist gerade beschäftigt (Fehler: ${err.message || 'Unbekannt'}). Bitte versuche es später noch einmal.` 
+      let errorMsg = language === 'DE'
+        ? `Stella ist gerade beschäftigt (Fehler: ${err.message || 'Unbekannt'}). Bitte versuche es später noch einmal.`
+        : language === 'FR' ? `Stella est occupée en ce moment (Erreur: ${err.message || 'Inconnue'}). Veuillez réessayer plus tard.`
+        : language === 'IT' ? `Stella è occupata in questo momento (Errore: ${err.message || 'Sconosciuto'}). Si prega di riprovare più tardi.`
         : `Stella is busy right now (Error: ${err.message || 'Unknown'}). Please try again later.`;
-      
+
       if (err.message?.includes('API_KEY_INVALID') || err.message?.includes('API key not valid')) {
         errorMsg = language === 'DE'
           ? "Stella hat ein Problem mit ihrem Zugangsschlüssel. Bitte kontaktiere den Support."
+          : language === 'FR' ? "Stella a un problème avec sa clé d'accès. Veuillez contacter le support."
+          : language === 'IT' ? "Stella ha un problema con la sua chiave di accesso. Si prega di contattare il supporto."
           : "Stella is having trouble with her API key. Please contact support.";
       } else if (err.message?.includes('quota') || err.message?.includes('429')) {
         errorMsg = language === 'DE'
           ? "Stella hat heute schon zu viele Anfragen beantwortet. Bitte versuche es morgen wieder oder upgrade dein Abo."
+          : language === 'FR' ? "Stella a déjà répondu à trop de demandes aujourd'hui. Veuillez réessayer demain ou mettre à niveau votre abonnement."
+          : language === 'IT' ? "Stella ha già risposto a troppe richieste oggi. Si prega di riprovare domani o aggiornare l'abbonamento."
           : "Stella has answered too many requests today. Please try again tomorrow or upgrade your subscription.";
       }
       
@@ -1936,8 +2327,10 @@ function StellifyApp() {
     // Check if tool is ultimate-only
     if (activeTool.type === 'ultimate' && !isUnlimited) {
       setToolResult(
-        language === 'DE' 
-          ? "Dieses exklusive Tool erfordert ein Ultimate-Abo für maximale Präzision und Tiefe. ✨" 
+        language === 'DE'
+          ? "Dieses exklusive Tool erfordert ein Ultimate-Abo für maximale Präzision und Tiefe. ✨"
+          : language === 'FR' ? "Cet outil exclusif nécessite un abonnement Ultimate pour une précision et une profondeur maximales. ✨"
+          : language === 'IT' ? "Questo strumento esclusivo richiede un abbonamento Ultimate per la massima precisione e profondità. ✨"
           : "This exclusive tool requires an Ultimate subscription for maximum precision and depth. ✨"
       );
       setIsProcessingTool(false);
@@ -2415,6 +2808,65 @@ Bewerte in 3 Kategorien (je 0–100%):
             - Spezifische Fragen für das erste Gespräch.
           `;
           break;
+        case 'interview-live': {
+          prompt = `
+            HANDLUNGSANWEISUNG: Generiere 5 massgeschneiderte Interview-Fragen als JSON-Objekt.
+            STELLE: ${toolInput.jobTitle}${toolInput.company ? ` bei ${toolInput.company}` : ' bei einem Schweizer Unternehmen'}.
+            STELLENBESCHREIBUNG: ${toolInput.jobDesc || 'Keine Details angegeben – nutze branchenübliche Anforderungen.'}.
+            CV: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards.'}.
+            SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
+
+            AUSGABE-FORMAT (NUR JSON, absolut kein Text davor oder danach):
+            {
+              "jobContext": "${toolInput.jobTitle}${toolInput.company ? ` bei ${toolInput.company}` : ''}",
+              "questions": [
+                {
+                  "q": "Frage 1 – präzise und realistisch, wie sie bei Schweizer Unternehmen gestellt wird",
+                  "tip": "Was der Interviewer wirklich wissen will (1-2 Sätze)",
+                  "model": "Optimale Antwort-Strategie (STAR wenn sinnvoll, konkret und kurz)",
+                  "mistakes": "Häufige Fehler bei dieser Frage (1 Satz)"
+                }
+              ]
+            }
+            Erstelle GENAU 5 Fragen. Passe sie spezifisch an die Stelle und das CV an.
+          `;
+          break;
+        }
+        case 'salary-negotiation': {
+          prompt = `
+            HANDLUNGSANWEISUNG: Erstelle einen präzisen Lohnverhandlungs-Leitfaden.
+            STELLE: ${toolInput.jobTitle}.
+            VERHANDLUNGSZIEL: ${toolInput.targetSalary || 'Nicht spezifiziert'}.
+            CV: ${cvContext || 'Nicht vorhanden'}.
+            SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
+
+            DEINE ROLLE: Du bist ein Experte für Schweizer Lohnverhandlungen mit 15 Jahren Erfahrung in der Personalberatung.
+
+            LEITFADEN-STRUKTUR:
+            ## 🎯 Deine Marktpositionierung
+            - Warum bin ich diesen Betrag wert? (Kurz & präzise mit Schweizer Kontext)
+
+            ## 📊 Die richtige Einstiegsforderung
+            - Empfohlener Einstiegsanker (ca. 10-15% über Ziel)
+            - Begründung basierend auf Schweizer Marktdaten
+
+            ## 💬 5 starke Argumente (Schweizer Stil)
+            1-5 konkrete Argumente inkl. 13. Monatslohn, Weiterbildungsbudget, Flexibilität
+
+            ## 🗣️ Formulierungen auf Schweizer Hochdeutsch
+            - Einstiegssatz (selbstbewusst, nicht arrogant)
+            - Bei Gegenfrage "Was verdienen Sie aktuell?"
+            - Bei Einwand "Das liegt über unserem Budget"
+
+            ## 🔄 Fallback-Strategie
+            - Was tun, wenn das Gehalt nicht verhandelbar ist? (Benefits, Bonus, Home Office, Weiterbildung)
+
+            ## 🇨🇭 Schweizer Besonderheiten
+            - 13. Monatslohn: Wie einrechnen und einfordern
+            - Kulturelle Dos & Don'ts in Schweizer Gehaltsverhandlungen
+          `;
+          break;
+        }
         default:
           prompt = "Bitte hilf mir bei meiner Karriere.";
       }
@@ -2422,7 +2874,7 @@ Bewerte in 3 Kategorien (je 0–100%):
       const toolRes = await fetch('/api/process-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model, useSearch })
+        body: JSON.stringify({ prompt, model, useSearch, language })
       });
       const toolData = await toolRes.json();
       if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
@@ -2446,29 +2898,74 @@ Bewerte in 3 Kategorien (je 0–100%):
             }
             
             // Format for display
+            const cvLabels = language === 'FR' ? {
+              keywords: 'Mots-clés principaux du CV',
+              industry: 'Correspondance sectorielle (normes suisses)',
+              linguistic: 'Optimisation linguistique',
+              improvements: 'Potentiel d\'amélioration stratégique',
+              highlights: 'Points forts optimisés du CV',
+              summary: 'Proposition de profil court',
+              noFixes: 'Aucune correction spécifique nécessaire.',
+              noHighlights: 'Aucun point fort généré.',
+              noSummary: 'Aucun profil court généré.',
+              rawData: 'Données brutes (JSON)'
+            } : language === 'IT' ? {
+              keywords: 'Parole chiave principali nel CV',
+              industry: 'Corrispondenza settoriale (standard svizzeri)',
+              linguistic: 'Ottimizzazione linguistica',
+              improvements: 'Potenziale di miglioramento strategico',
+              highlights: 'Punti di forza ottimizzati del CV',
+              summary: 'Proposta di profilo breve',
+              noFixes: 'Nessuna correzione specifica necessaria.',
+              noHighlights: 'Nessun punto di forza generato.',
+              noSummary: 'Nessun profilo breve generato.',
+              rawData: 'Dati grezzi (JSON)'
+            } : language === 'EN' ? {
+              keywords: 'Top CV Keywords',
+              industry: 'Industry Match (Swiss Standards)',
+              linguistic: 'Language Optimization',
+              improvements: 'Strategic Improvement Potential',
+              highlights: 'Optimized CV Highlights',
+              summary: 'Summary Proposal',
+              noFixes: 'No specific corrections needed.',
+              noHighlights: 'No highlights generated.',
+              noSummary: 'No summary generated.',
+              rawData: 'Raw Data (JSON)'
+            } : {
+              keywords: 'Top Keywords im CV',
+              industry: 'Branchen-Match (Schweizer Standards)',
+              linguistic: 'Sprachliche Optimierung',
+              improvements: 'Strategisches Verbesserungspotential',
+              highlights: 'Optimierte CV-Highlights',
+              summary: 'Kurzprofil-Vorschlag',
+              noFixes: 'Keine spezifischen Korrekturen nötig.',
+              noHighlights: 'Keine Highlights generiert.',
+              noSummary: 'Kein Kurzprofil generiert.',
+              rawData: 'Rohdaten (JSON)'
+            };
             resultText = `
 ### 📊 Swiss Market Readiness Score: ${analysisData.score}/100
 
-#### 🔑 Top Keywords im CV:
+#### 🔑 ${cvLabels.keywords}:
 ${analysisData.keywords.map((k: string) => `- ${k}`).join('\n')}
 
-#### 🏢 Branchen-Match (Schweizer Standards):
+#### 🏢 ${cvLabels.industry}:
 ${analysisData.industryMatch}
 
-#### 🗣️ Sprachliche Optimierung (Schweizer Hochdeutsch):
-${analysisData.linguisticFixes?.map((f: string) => `- ${f}`).join('\n') || 'Keine spezifischen Korrekturen nötig.'}
+#### 🗣️ ${cvLabels.linguistic}:
+${analysisData.linguisticFixes?.map((f: string) => `- ${f}`).join('\n') || cvLabels.noFixes}
 
-#### 🚀 Strategisches Verbesserungspotential:
+#### 🚀 ${cvLabels.improvements}:
 ${analysisData.improvements.map((i: string) => `- ${i}`).join('\n')}
 
-#### ✨ Optimierte CV-Highlights:
-${analysisData.optimizedHighlights?.map((h: string) => `- ${h}`).join('\n') || 'Keine Highlights generiert.'}
+#### ✨ ${cvLabels.highlights}:
+${analysisData.optimizedHighlights?.map((h: string) => `- ${h}`).join('\n') || cvLabels.noHighlights}
 
-#### 📝 Kurzprofil-Vorschlag:
-${analysisData.optimizedSummary || 'Kein Kurzprofil generiert.'}
+#### 📝 ${cvLabels.summary}:
+${analysisData.optimizedSummary || cvLabels.noSummary}
 
 ---
-#### 📄 Rohdaten (JSON):
+#### 📄 ${cvLabels.rawData}:
 \`\`\`json
 ${JSON.stringify(analysisData, null, 2)}
 \`\`\`
@@ -2497,24 +2994,53 @@ ${JSON.stringify(analysisData, null, 2)}
             setParsedSalaryResult(salaryData);
             
             // Format for display
+            const salaryLabels = language === 'FR' ? {
+              title: 'Analyse de la valeur marchande suisse',
+              position: 'Poste', industry: 'Secteur', experience: 'Expérience', years: 'ans', canton: 'Canton',
+              salaryHeader: 'Salaire annuel brut estimé (incl. 13e mois)',
+              min: 'Minimum', median: 'Médiane', max: 'Maximum',
+              insights: 'Insights stratégiques de négociation',
+              disclaimer: 'Ces données sont basées sur des modèles IA et servent d\'orientation. Pour des valeurs définitives, nous recommandons Salarium.ch.'
+            } : language === 'IT' ? {
+              title: 'Analisi del valore di mercato svizzero',
+              position: 'Posizione', industry: 'Settore', experience: 'Esperienza', years: 'anni', canton: 'Cantone',
+              salaryHeader: 'Stipendio lordo annuale stimato (incl. 13° mese)',
+              min: 'Minimo', median: 'Mediana', max: 'Massimo',
+              insights: 'Insight strategici di negoziazione',
+              disclaimer: 'Questi dati si basano su modelli IA e servono come orientamento. Per valori definitivi, consigliamo Salarium.ch.'
+            } : language === 'EN' ? {
+              title: 'Swiss Market Value Analysis',
+              position: 'Position', industry: 'Industry', experience: 'Experience', years: 'years', canton: 'Canton',
+              salaryHeader: 'Estimated Annual Gross Salary (incl. 13th month pay)',
+              min: 'Minimum', median: 'Median', max: 'Maximum',
+              insights: 'Strategic Negotiation Insights',
+              disclaimer: 'This data is based on AI models and serves as guidance. For definitive values, we recommend Salarium.ch.'
+            } : {
+              title: 'Schweizer Marktwert-Analyse',
+              position: 'Position', industry: 'Branche', experience: 'Erfahrung', years: 'Jahre', canton: 'Kanton',
+              salaryHeader: 'Geschätztes Brutto-Jahresgehalt (inkl. 13. Monatslohn)',
+              min: 'Minimum', median: 'Median', max: 'Maximum',
+              insights: 'Strategische Verhandlungs-Insights',
+              disclaimer: 'Diese Daten basieren auf KI-Modellen und dienen als Orientierungshilfe. Für verbindliche Werte empfehlen wir Salarium.ch.'
+            };
             resultText = `
-### 💰 Schweizer Marktwert-Analyse
+### 💰 ${salaryLabels.title}
 
-**Position:** ${salaryData.jobTitle}
-**Branche:** ${salaryData.industry}
-**Erfahrung:** ${salaryData.experience} Jahre
-**Kanton:** ${salaryData.canton}
+**${salaryLabels.position}:** ${salaryData.jobTitle}
+**${salaryLabels.industry}:** ${salaryData.industry}
+**${salaryLabels.experience}:** ${salaryData.experience} ${salaryLabels.years}
+**${salaryLabels.canton}:** ${salaryData.canton}
 
-#### 📊 Geschätztes Brutto-Jahresgehalt (inkl. 13. Monatslohn):
-- **Minimum:** CHF ${salaryData.minSalary.toLocaleString('de-CH')}
-- **Median:** CHF ${salaryData.medianSalary.toLocaleString('de-CH')}
-- **Maximum:** CHF ${salaryData.maxSalary.toLocaleString('de-CH')}
+#### 📊 ${salaryLabels.salaryHeader}:
+- **${salaryLabels.min}:** CHF ${salaryData.minSalary.toLocaleString('de-CH')}
+- **${salaryLabels.median}:** CHF ${salaryData.medianSalary.toLocaleString('de-CH')}
+- **${salaryLabels.max}:** CHF ${salaryData.maxSalary.toLocaleString('de-CH')}
 
-#### 💡 Strategische Verhandlungs-Insights:
+#### 💡 ${salaryLabels.insights}:
 ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
 ---
-*Hinweis: Diese Daten basieren auf KI-Modellen und dienen als Orientierungshilfe. Für verbindliche Werte empfehlen wir Salarium.ch.*
+*${salaryLabels.disclaimer}*
             `;
           }
         } catch (e) {
@@ -2524,7 +3050,34 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       
       // Handle Grounding Metadata for Search
       if (useSearch && toolSources.length > 0) {
-        resultText += "\n\n**Quellen:**\n" + toolSources.map(s => `\n- ${s}`).join("");
+        const sourcesLabel = language === 'FR' ? 'Sources' : language === 'IT' ? 'Fonti' : language === 'EN' ? 'Sources' : 'Quellen';
+        resultText += `\n\n**${sourcesLabel}:**\n` + toolSources.map(s => `\n- ${s}`).join("");
+      }
+
+      // Special handling for interview-live (interactive session)
+      if (activeTool.id === 'interview-live') {
+        try {
+          const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const data = JSON.parse(jsonMatch[0]);
+            if (data.questions && Array.isArray(data.questions)) {
+              setInterviewSession({
+                questions: data.questions,
+                jobContext: data.jobContext || toolInput.jobTitle || '',
+                currentQ: 0,
+                answers: [],
+                feedbacks: [],
+                isEvaluating: false,
+                isRecording: false,
+                isComplete: false,
+              });
+              setInterviewAnswer('');
+              resultText = `__INTERVIEW_SESSION_STARTED__`;
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing interview-live JSON:", e);
+        }
       }
 
       setToolResult(resultText);
@@ -2851,6 +3404,68 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Premium Optimierung",
+      tracker_title: "Bewerbungs-Tracker",
+      tracker_desc: "Verwalte deine Chancen",
+      tracker_add: "Neu hinzufügen",
+      tracker_company: "Firma",
+      tracker_company_ph: "z.B. Google",
+      tracker_position: "Position",
+      tracker_position_ph: "z.B. Senior Designer",
+      tracker_status: "Status",
+      tracker_location: "Standort",
+      tracker_location_ph: "z.B. Zürich",
+      tracker_salary: "Gehaltsvorstellung",
+      tracker_salary_ph: "z.B. 120'000 CHF",
+      tracker_notes: "Notizen",
+      tracker_notes_ph: "z.B. Kontaktperson: Hans Muster...",
+      tracker_save: "Speichern",
+      tracker_update: "Aktualisieren",
+      tracker_cancel: "Abbrechen",
+      tracker_wishlist: "Wunschliste",
+      tracker_applied: "Beworben",
+      tracker_interview: "Interview",
+      tracker_offer: "Angebot",
+      tracker_rejected: "Abgelehnt",
+      tracker_notes_badge: "Notizen vorhanden",
+      tracker_empty: "Leer",
+      quick_tools: "Quick Tools",
+      all_tools: "Alle Tools",
+      recent_docs: "Deine letzten Dokumente",
+      view_all: "Alle ansehen",
+      time_just_now: "Gerade eben",
+      stella_context_title: "Stella Context",
+      stella_context_cv_ready: "CV analysiert",
+      stella_context_no_cv: "Kein CV hochgeladen",
+      stella_context_focus: "Fokus-Bereiche",
+      stella_roadmap: "Deine Roadmap",
+      stella_roadmap_empty: "Lade dein CV hoch, um deine Roadmap zu sehen.",
+      stella_insights: "Stella Insights",
+      stella_market_score: "Market Score",
+      stella_top_keywords: "Top Keywords",
+      stella_best_match: "Bester Match",
+      stella_ch_corrections: "Sprachliche Korrekturen (CH-Hochdeutsch)",
+      stella_ch_tips: "Schweiz-Spezifische Tipps",
+      stella_short_profile: "Optimiertes Kurzprofil",
+      stella_highlights: "Optimierte Highlights",
+      stella_name: "Stella – KI-Assistentin",
+      stella_online: "Online – bereit zu helfen",
+      stella_input_ph: "Schreibe Stella etwas...",
+      tool_open: "Öffnen",
+      docs_empty: "Noch keine Dokumente generiert. Starte mit einem Tool unten.",
+      stella_raw_json: "Rohdaten (JSON) anzeigen",
+      stella_full_analysis: "Vollständige Analyse",
+      stella_insights_with_cv: "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check.",
+      stella_insights_no_cv: "Sobald du dein CV hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen.",
+      salary_history: "Gehaltsverlauf",
+      hero_precision: "Schweizer KI-Präzision",
+      upload_analyzing: "Analysiere Dokumentenstruktur...",
+      upload_done: "Lebenslauf erfolgreich analysiert. Stella ist bereit.",
+      hero_success_rate: "Erfolgsquote",
+      hero_more_interviews: "Mehr Interviews",
+      tool_see_plans: "Pläne ansehen",
+      tool_maybe_later: "Vielleicht später",
+      tool_inputs: "Eingaben",
+      tool_load_file: "Datei laden",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
       swiss_standard_notice_text: "Präzise abgestimmt auf die spezifischen Anforderungen und kulturellen Nuancen des Schweizer Arbeitsmarktes.",
@@ -2858,6 +3473,70 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Datenschutz",
       footer_terms: "AGB",
       footer_imprint: "Impressum",
+      cookie_title: "Datenschutz & Cookies",
+      cookie_desc: "Wir verwenden notwendige Cookies für den Betrieb der Plattform sowie optionale Analyse-Cookies zur Verbesserung des Angebots. Deine Daten werden nach Schweizer DSG & DSGVO verarbeitet.",
+      cookie_accept: "Alle akzeptieren",
+      cookie_essential: "Nur Notwendige",
+      cookie_privacy_link: "Datenschutzrichtlinie",
+      close: "Schliessen",
+      back: "Zurück",
+      or_divider: "Oder",
+      stat_members: "Mitglieder",
+      hero_intro: "Dein persönlicher",
+      badge_new: "NEU",
+      interview_live_promo: "Übe dein nächstes Interview – per Text oder Mikrofon",
+      remaining: "verbleibend",
+      search_close_label: "Schliessen",
+      search_open_selection: "Auswahl öffnen",
+      search_stella_advice: "Stella-Beratung",
+      premium_analysis_desc: "Tiefgehende Prüfung nach Schweizer Standards",
+      salary_median_label: "Geschätzter Medianlohn (Brutto/Jahr)",
+      salary_important_notice: "Wichtiger Hinweis",
+      salary_disclaimer: "Diese Schätzung basiert auf aktuellen Markttrends und KI-Modellen für den Schweizer Arbeitsmarkt. Faktoren wie spezifische Zertifizierungen, Bonusvereinbarungen und individuelle Benefits können das tatsächliche Angebot beeinflussen.",
+      generated_app_title: "Deine generierte Bewerbung",
+      copy: "Kopieren",
+      tool_how_to_use: "So nutzt du dieses Tool",
+      tool_scroll_example: "Runterscrollen für Profi-Beispiel",
+      tool_pro_example: "Profi-Beispiel",
+      tool_unlimited_access: "Unlimited Zugang",
+      tool_unlock_desc: "Schalte dieses Tool und alle Premium-Funktionen mit dem Unlimited-Plan frei.",
+      tool_discover_unlimited: "Jetzt Unlimited entdecken",
+      tool_fill_fields: "Fülle die Felder links aus",
+      auth_terms_by_signing: "Mit der Anmeldung akzeptierst du unsere",
+      auth_terms_and: "und",
+      auth_terms_data_processing: "Deine Daten werden sicher in der Schweiz/EU verarbeitet.",
+      auth_register_new: "→ Jetzt neu registrieren",
+      auth_switch_to_login: "→ Zum Login wechseln",
+      auth_reset_session: "Sitzung zurücksetzen",
+      password_weak: "Schwach",
+      password_medium: "Mittel",
+      password_strong: "Stark",
+      interview_complete: "🎉 Interview abgeschlossen!",
+      interview_question_of: "Frage {current} von 5",
+      interview_show_tip: "Insider-Tipp anzeigen",
+      interview_feedback_prev: "✓ Feedback letzte Antwort",
+      interview_your_answer: "Deine Antwort",
+      interview_answer_placeholder: "Schreibe deine Antwort hier...",
+      interview_mic_unavailable: "Mikrofon nicht verfügbar in diesem Browser.",
+      interview_mic_answer: "Per Mikrofon antworten",
+      interview_recording: "Aufnahme läuft...",
+      interview_feedback_unavailable: "Feedback konnte nicht geladen werden.",
+      interview_evaluating: "Stella bewertet...",
+      interview_submit: "Antwort senden → Frage {n}/5",
+      interview_show_model: "Musterantwort anzeigen",
+      interview_common_mistake: "⚠ Häufiger Fehler: ",
+      interview_complete_title: "Interview abgeschlossen",
+      interview_complete_desc: "Alle 5 Fragen beantwortet. Hier dein Summary:",
+      interview_new: "Neues Interview",
+      interview_copy_summary: "Summary kopieren",
+      settings_your_usage: "Deine Nutzung",
+      settings_apps_tools: "Bewerbungen & Tools",
+      settings_generations: "Generierungen",
+      settings_actions_today: "Aktionen heute",
+      settings_free_use: "Gratis-Nutzung",
+      settings_requests: "Anfragen",
+      settings_delete_account: "Konto löschen",
+      app_initializing: "Wird initialisiert...",
       market_1_t: "Jobwechsel nehmen zu",
       market_1_d: "Durchschnittlich alle 3 Jahre wechseln Arbeitnehmer in der Schweiz ihren Job.",
       market_2_t: "Bewerbungen kosten Zeit",
@@ -3070,6 +3749,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           input_industry: 'Branche',
           input_industry_placeholder: 'z.B. IT, Pharma, Banking...',
           tutorial: 'Beispiel: Suche nach "Projektleiter" in "Basel" im Bereich "Pharma". Wir zeigen dir passende Stellen aus unserer Datenbank.'
+        },
+        'interview-live': {
+          title: 'Live Interview-Coach',
+          desc: 'Übe dein Interview für eine spezifische Stelle live. Stella stellt massgeschneiderte Fragen – du antwortest per Text oder Mikrofon.',
+          badge: 'NEU · LIVE',
+          input_job: 'Stellenbezeichnung',
+          input_job_placeholder: 'z.B. Senior UX Designer bei Digitec',
+          input_company: 'Unternehmen (optional)',
+          input_company_placeholder: 'z.B. Nestlé AG, Zürich',
+          input_desc: 'Stellenbeschreibung (optional)',
+          input_desc_placeholder: 'Füge die Stellenbeschreibung ein für noch gezieltere Fragen...',
+          tutorial: 'Beispiel: Interview für "Product Manager" bei ABB. Stella stellt 5 echte Fragen inkl. Feedback zu Tonfall, STAR-Methode und Schweizer Marktkenntnis.'
+        },
+        'salary-negotiation': {
+          title: 'Lohnverhandlungs-Coach',
+          desc: 'Massgeschneiderter Leitfaden für deine Gehaltsverhandlung – Marktpositionierung, Argumente und Schweizer 13. Monatslohn-Strategie.',
+          badge: 'Pro',
+          input_label: 'Aktuelle / Ziel-Vergütung',
+          input_placeholder: 'z.B. Ich möchte von 95k auf 115k CHF aufsteigen...',
+          tutorial: 'Beispiel: Verhandlung bei der Zurich Insurance. Wir liefern 5 konkrete Argumente, die perfekte Einstiegsforderung und Reaktionen auf typische Einwände.'
         }
       }
     },
@@ -3263,6 +3962,68 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Gratuit",
       dashboard_cv_optimize: "Optimisation Premium",
+      tracker_title: "Suivi des candidatures",
+      tracker_desc: "Gérez vos opportunités",
+      tracker_add: "Ajouter",
+      tracker_company: "Entreprise",
+      tracker_company_ph: "ex. Google",
+      tracker_position: "Poste",
+      tracker_position_ph: "ex. Designer Senior",
+      tracker_status: "Statut",
+      tracker_location: "Lieu",
+      tracker_location_ph: "ex. Genève",
+      tracker_salary: "Prétentions salariales",
+      tracker_salary_ph: "ex. 120'000 CHF",
+      tracker_notes: "Notes",
+      tracker_notes_ph: "ex. Contact: Jean Dupont...",
+      tracker_save: "Enregistrer",
+      tracker_update: "Mettre à jour",
+      tracker_cancel: "Annuler",
+      tracker_wishlist: "Souhaité",
+      tracker_applied: "Postulé",
+      tracker_interview: "Entretien",
+      tracker_offer: "Offre",
+      tracker_rejected: "Refusé",
+      tracker_notes_badge: "Notes disponibles",
+      tracker_empty: "Vide",
+      quick_tools: "Outils rapides",
+      all_tools: "Tous les outils",
+      recent_docs: "Vos derniers documents",
+      view_all: "Voir tout",
+      time_just_now: "À l'instant",
+      stella_context_title: "Contexte Stella",
+      stella_context_cv_ready: "CV analysé",
+      stella_context_no_cv: "Aucun CV chargé",
+      stella_context_focus: "Domaines ciblés",
+      stella_roadmap: "Votre feuille de route",
+      stella_roadmap_empty: "Chargez votre CV pour voir votre feuille de route.",
+      stella_insights: "Insights Stella",
+      stella_market_score: "Score marché",
+      stella_top_keywords: "Mots-clés principaux",
+      stella_best_match: "Meilleur match",
+      stella_ch_corrections: "Corrections linguistiques (FR suisse)",
+      stella_ch_tips: "Conseils spécifiques Suisse",
+      stella_short_profile: "Profil court optimisé",
+      stella_highlights: "Points forts optimisés",
+      stella_name: "Stella – Assistante IA",
+      stella_online: "En ligne – prête à aider",
+      stella_input_ph: "Écrivez à Stella...",
+      tool_open: "Ouvrir",
+      docs_empty: "Aucun document généré pour l'instant. Commencez avec un outil ci-dessous.",
+      stella_raw_json: "Afficher données brutes (JSON)",
+      stella_full_analysis: "Analyse complète",
+      stella_insights_with_cv: "Stella a analysé votre profil. Votre focus sur la précision correspond parfaitement au marché suisse. Utilisez l'outil d'analyse CV pour un bilan approfondi.",
+      stella_insights_no_cv: "Dès que vous chargez votre CV, je crée ici une analyse personnalisée de vos chances sur le marché.",
+      salary_history: "Historique salarial",
+      hero_precision: "IA Suisse de précision",
+      upload_analyzing: "Analyse de la structure du document...",
+      upload_done: "CV analysé avec succès. Stella est prête.",
+      hero_success_rate: "Taux de succès",
+      hero_more_interviews: "Plus d'entretiens",
+      tool_see_plans: "Voir les forfaits",
+      tool_maybe_later: "Peut-être plus tard",
+      tool_inputs: "Paramètres",
+      tool_load_file: "Charger fichier",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
       swiss_standard_notice_text: "Précisément adapté aux exigences spécifiques et aux nuances culturelles du marché du travail suisse.",
@@ -3270,6 +4031,70 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Confidentialité",
       footer_terms: "CGV",
       footer_imprint: "Mentions légales",
+      cookie_title: "Confidentialité & Cookies",
+      cookie_desc: "Nous utilisons des cookies nécessaires au fonctionnement de la plateforme et des cookies d'analyse optionnels pour améliorer nos services. Vos données sont traitées conformément à la LPD suisse et au RGPD.",
+      cookie_accept: "Tout accepter",
+      cookie_essential: "Essentiels uniquement",
+      cookie_privacy_link: "Politique de confidentialité",
+      close: "Fermer",
+      back: "Retour",
+      or_divider: "Ou",
+      stat_members: "Membres",
+      hero_intro: "Votre",
+      badge_new: "NOUVEAU",
+      interview_live_promo: "Entraînez-vous – par texte ou micro",
+      remaining: "restants",
+      search_close_label: "Fermer",
+      search_open_selection: "Ouvrir la sélection",
+      search_stella_advice: "Conseil Stella",
+      premium_analysis_desc: "Examen approfondi selon les normes suisses",
+      salary_median_label: "Salaire médian estimé (Brut/An)",
+      salary_important_notice: "Remarque importante",
+      salary_disclaimer: "Cette estimation est basée sur les tendances actuelles du marché et les modèles IA pour le marché du travail suisse. Des facteurs tels que des certifications spécifiques, des accords de bonus et des avantages individuels peuvent influencer l'offre réelle.",
+      generated_app_title: "Votre candidature générée",
+      copy: "Copier",
+      tool_how_to_use: "Comment utiliser cet outil",
+      tool_scroll_example: "Faites défiler pour l'exemple professionnel",
+      tool_pro_example: "Exemple professionnel",
+      tool_unlimited_access: "Accès Unlimited",
+      tool_unlock_desc: "Débloquez cet outil et toutes les fonctionnalités premium avec le plan Unlimited.",
+      tool_discover_unlimited: "Découvrir Unlimited maintenant",
+      tool_fill_fields: "Remplissez les champs à gauche",
+      auth_terms_by_signing: "En vous connectant, vous acceptez nos",
+      auth_terms_and: "et",
+      auth_terms_data_processing: "Vos données sont traitées en toute sécurité en Suisse/UE.",
+      auth_register_new: "→ S'inscrire maintenant",
+      auth_switch_to_login: "→ Passer à la connexion",
+      auth_reset_session: "Réinitialiser la session",
+      password_weak: "Faible",
+      password_medium: "Moyen",
+      password_strong: "Fort",
+      interview_complete: "🎉 Entretien terminé !",
+      interview_question_of: "Question {current} sur 5",
+      interview_show_tip: "Voir le conseil",
+      interview_feedback_prev: "✓ Feedback dernière réponse",
+      interview_your_answer: "Votre réponse",
+      interview_answer_placeholder: "Écrivez votre réponse ici...",
+      interview_mic_unavailable: "Microphone non disponible dans ce navigateur.",
+      interview_mic_answer: "Répondre par microphone",
+      interview_recording: "Enregistrement...",
+      interview_feedback_unavailable: "Feedback indisponible.",
+      interview_evaluating: "Stella évalue...",
+      interview_submit: "Envoyer → Question {n}/5",
+      interview_show_model: "Voir la réponse modèle",
+      interview_common_mistake: "⚠ Erreur courante : ",
+      interview_complete_title: "Entretien terminé",
+      interview_complete_desc: "5 questions répondues. Voici votre résumé :",
+      interview_new: "Nouvel entretien",
+      interview_copy_summary: "Copier le résumé",
+      settings_your_usage: "Votre utilisation",
+      settings_apps_tools: "Candidatures & Outils",
+      settings_generations: "Générations",
+      settings_actions_today: "Actions aujourd'hui",
+      settings_free_use: "Utilisation gratuite",
+      settings_requests: "Demandes",
+      settings_delete_account: "Supprimer le compte",
+      app_initializing: "Initialisation...",
       market_1_t: "Les changements d'emploi augmentent",
       market_1_d: "En moyenne, les salariés suisses changent d'emploi tous les 3 ans.",
       market_2_t: "Les candidatures prennent du temps",
@@ -3362,6 +4187,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           input_industry: 'Secteur',
           input_industry_placeholder: 'ex: IT, Pharma, Banque...',
           tutorial: 'Exemple : Recherche de "Chef de projet" à "Bâle" dans le secteur "Pharma". Nous vous montrons les postes correspondants dans notre base de données.'
+        },
+        'interview-live': {
+          title: 'Coach Entretien Live',
+          desc: 'Entraînez-vous pour un entretien spécifique. Stella pose des questions ciblées – répondez par texte ou microphone.',
+          badge: 'NOUVEAU · LIVE',
+          input_job: 'Intitulé du poste',
+          input_job_placeholder: 'ex: Senior UX Designer chez Digitec',
+          input_company: 'Entreprise (optionnel)',
+          input_company_placeholder: 'ex: Nestlé SA, Genève',
+          input_desc: 'Description du poste (optionnel)',
+          input_desc_placeholder: 'Collez la description pour des questions encore plus ciblées...',
+          tutorial: 'Exemple : Entretien pour "Product Manager" chez ABB. Stella pose 5 vraies questions avec feedback sur le ton, la méthode STAR et la connaissance du marché suisse.'
+        },
+        'salary-negotiation': {
+          title: 'Coach Négociation Salariale',
+          desc: 'Guide sur mesure pour votre négociation salariale – positionnement marché, arguments et stratégie du 13e salaire suisse.',
+          badge: 'Pro',
+          input_label: 'Salaire actuel / cible',
+          input_placeholder: 'ex: Je souhaite passer de 95k à 115k CHF...',
+          tutorial: 'Exemple : Négociation chez Zurich Insurance. Nous fournissons 5 arguments concrets, la demande initiale idéale et les réponses aux objections typiques.'
         }
       }
     },
@@ -3555,6 +4400,68 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Ottimizzazione Premium",
+      tracker_title: "Tracker candidature",
+      tracker_desc: "Gestisci le tue opportunità",
+      tracker_add: "Aggiungi",
+      tracker_company: "Azienda",
+      tracker_company_ph: "es. Google",
+      tracker_position: "Posizione",
+      tracker_position_ph: "es. Designer Senior",
+      tracker_status: "Stato",
+      tracker_location: "Luogo",
+      tracker_location_ph: "es. Zurigo",
+      tracker_salary: "Aspettative salariali",
+      tracker_salary_ph: "es. 120'000 CHF",
+      tracker_notes: "Note",
+      tracker_notes_ph: "es. Contatto: Mario Rossi...",
+      tracker_save: "Salva",
+      tracker_update: "Aggiorna",
+      tracker_cancel: "Annulla",
+      tracker_wishlist: "Desiderato",
+      tracker_applied: "Candidato",
+      tracker_interview: "Colloquio",
+      tracker_offer: "Offerta",
+      tracker_rejected: "Rifiutato",
+      tracker_notes_badge: "Note disponibili",
+      tracker_empty: "Vuoto",
+      quick_tools: "Strumenti rapidi",
+      all_tools: "Tutti gli strumenti",
+      recent_docs: "I tuoi ultimi documenti",
+      view_all: "Vedi tutti",
+      time_just_now: "Proprio ora",
+      stella_context_title: "Contesto Stella",
+      stella_context_cv_ready: "CV analizzato",
+      stella_context_no_cv: "Nessun CV caricato",
+      stella_context_focus: "Aree di focus",
+      stella_roadmap: "La tua roadmap",
+      stella_roadmap_empty: "Carica il tuo CV per vedere la tua roadmap.",
+      stella_insights: "Insights Stella",
+      stella_market_score: "Punteggio mercato",
+      stella_top_keywords: "Parole chiave principali",
+      stella_best_match: "Miglior match",
+      stella_ch_corrections: "Correzioni linguistiche (IT svizzero)",
+      stella_ch_tips: "Consigli specifici per la Svizzera",
+      stella_short_profile: "Profilo breve ottimizzato",
+      stella_highlights: "Punti salienti ottimizzati",
+      stella_name: "Stella – Assistente IA",
+      stella_online: "Online – pronta ad aiutare",
+      stella_input_ph: "Scrivi a Stella...",
+      tool_open: "Apri",
+      docs_empty: "Nessun documento generato ancora. Inizia con uno strumento qui sotto.",
+      stella_raw_json: "Mostra dati grezzi (JSON)",
+      stella_full_analysis: "Analisi completa",
+      stella_insights_with_cv: "Stella ha analizzato il tuo profilo. La tua attenzione alla precisione si adatta perfettamente al mercato svizzero. Usa lo strumento di analisi CV per una verifica approfondita.",
+      stella_insights_no_cv: "Non appena carichi il tuo CV, creo qui un'analisi personalizzata delle tue opportunità di mercato.",
+      salary_history: "Cronologia stipendi",
+      hero_precision: "IA Svizzera di Precisione",
+      upload_analyzing: "Analisi della struttura del documento...",
+      upload_done: "CV analizzato con successo. Stella è pronta.",
+      hero_success_rate: "Tasso di successo",
+      hero_more_interviews: "Più colloqui",
+      tool_see_plans: "Vedi i piani",
+      tool_maybe_later: "Forse più tardi",
+      tool_inputs: "Parametri",
+      tool_load_file: "Carica file",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
       swiss_standard_notice_text: "Precisamente adattato ai requisiti specifici e alle sfumature culturali del mercato del lavoro svizzero.",
@@ -3562,6 +4469,70 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Privacy",
       footer_terms: "CGU",
       footer_imprint: "Note legali",
+      cookie_title: "Privacy & Cookie",
+      cookie_desc: "Utilizziamo cookie necessari per il funzionamento della piattaforma e cookie analitici opzionali per migliorare i servizi. I tuoi dati sono trattati in conformità alla LPD svizzera e al GDPR.",
+      cookie_accept: "Accetta tutto",
+      cookie_essential: "Solo essenziali",
+      cookie_privacy_link: "Informativa sulla privacy",
+      close: "Chiudi",
+      back: "Indietro",
+      or_divider: "Oppure",
+      stat_members: "Membri",
+      hero_intro: "Il tuo",
+      badge_new: "NUOVO",
+      interview_live_promo: "Pratica il tuo colloquio – testo o microfono",
+      remaining: "rimanenti",
+      search_close_label: "Chiudi",
+      search_open_selection: "Apri selezione",
+      search_stella_advice: "Consulenza Stella",
+      premium_analysis_desc: "Esame approfondito secondo gli standard svizzeri",
+      salary_median_label: "Stipendio mediano stimato (Lordo/Anno)",
+      salary_important_notice: "Nota importante",
+      salary_disclaimer: "Questa stima è basata sulle tendenze attuali del mercato e sui modelli IA per il mercato del lavoro svizzero. Fattori come certificazioni specifiche, accordi sui bonus e benefici individuali possono influenzare l'offerta reale.",
+      generated_app_title: "La tua candidatura generata",
+      copy: "Copia",
+      tool_how_to_use: "Come usare questo strumento",
+      tool_scroll_example: "Scorri verso il basso per l'esempio professionale",
+      tool_pro_example: "Esempio professionale",
+      tool_unlimited_access: "Accesso Unlimited",
+      tool_unlock_desc: "Sblocca questo strumento e tutte le funzionalità premium con il piano Unlimited.",
+      tool_discover_unlimited: "Scopri Unlimited ora",
+      tool_fill_fields: "Compila i campi a sinistra",
+      auth_terms_by_signing: "Accedendo, accetti i nostri",
+      auth_terms_and: "e",
+      auth_terms_data_processing: "I tuoi dati vengono elaborati in modo sicuro in Svizzera/UE.",
+      auth_register_new: "→ Registrati ora",
+      auth_switch_to_login: "→ Passa al login",
+      auth_reset_session: "Reimposta sessione",
+      password_weak: "Debole",
+      password_medium: "Medio",
+      password_strong: "Forte",
+      interview_complete: "🎉 Colloquio completato!",
+      interview_question_of: "Domanda {current} di 5",
+      interview_show_tip: "Mostra il suggerimento",
+      interview_feedback_prev: "✓ Feedback ultima risposta",
+      interview_your_answer: "La tua risposta",
+      interview_answer_placeholder: "Scrivi la tua risposta qui...",
+      interview_mic_unavailable: "Microfono non disponibile in questo browser.",
+      interview_mic_answer: "Rispondi tramite microfono",
+      interview_recording: "Registrazione in corso...",
+      interview_feedback_unavailable: "Feedback non disponibile.",
+      interview_evaluating: "Stella sta valutando...",
+      interview_submit: "Invia → Domanda {n}/5",
+      interview_show_model: "Mostra risposta modello",
+      interview_common_mistake: "⚠ Errore comune: ",
+      interview_complete_title: "Colloquio completato",
+      interview_complete_desc: "Tutte le 5 domande risposte. Ecco il tuo riepilogo:",
+      interview_new: "Nuovo colloquio",
+      interview_copy_summary: "Copia riepilogo",
+      settings_your_usage: "Il tuo utilizzo",
+      settings_apps_tools: "Candidature & Strumenti",
+      settings_generations: "Generazioni",
+      settings_actions_today: "Azioni oggi",
+      settings_free_use: "Utilizzo gratuito",
+      settings_requests: "Richieste",
+      settings_delete_account: "Elimina account",
+      app_initializing: "Inizializzazione...",
       market_1_t: "I cambi di lavoro aumentano",
       market_1_d: "In media, i dipendenti svizzeri cambiano lavoro ogni 3 anni.",
       market_2_t: "Le candidature richiedono tempo",
@@ -3654,6 +4625,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           input_industry: 'Settore',
           input_industry_placeholder: 'es: IT, Pharma, Banche...',
           tutorial: 'Esempio: Cerca "Project Manager" a "Basilea" nel settore "Pharma". Ti mostriamo le posizioni corrispondenti dal nostro database.'
+        },
+        'interview-live': {
+          title: 'Coach Colloquio Live',
+          desc: 'Esercitati per un colloquio specifico. Stella pone domande mirate – rispondi per testo o microfono.',
+          badge: 'NUOVO · LIVE',
+          input_job: 'Denominazione del posto',
+          input_job_placeholder: 'es: Senior UX Designer da Digitec',
+          input_company: 'Azienda (opzionale)',
+          input_company_placeholder: 'es: Nestlé SA, Ginevra',
+          input_desc: 'Descrizione del posto (opzionale)',
+          input_desc_placeholder: 'Incolla la descrizione per domande ancora più mirate...',
+          tutorial: 'Esempio: Colloquio per "Product Manager" da ABB. Stella pone 5 domande reali con feedback su tono, metodo STAR e conoscenza del mercato svizzero.'
+        },
+        'salary-negotiation': {
+          title: 'Coach Trattativa Salariale',
+          desc: 'Guida su misura per la trattativa salariale – posizionamento mercato, argomenti e strategia del 13° mese svizzero.',
+          badge: 'Pro',
+          input_label: 'Stipendio attuale / obiettivo',
+          input_placeholder: 'es: Voglio passare da 95k a 115k CHF...',
+          tutorial: 'Esempio: Trattativa da Zurich Insurance. Forniamo 5 argomenti concreti, la domanda iniziale ideale e le risposte alle obiezioni tipiche.'
         }
       }
     },
@@ -3847,6 +4838,68 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Free",
       dashboard_cv_optimize: "Premium Optimization",
+      tracker_title: "Application Tracker",
+      tracker_desc: "Manage your opportunities",
+      tracker_add: "Add new",
+      tracker_company: "Company",
+      tracker_company_ph: "e.g. Google",
+      tracker_position: "Position",
+      tracker_position_ph: "e.g. Senior Designer",
+      tracker_status: "Status",
+      tracker_location: "Location",
+      tracker_location_ph: "e.g. Zurich",
+      tracker_salary: "Salary expectation",
+      tracker_salary_ph: "e.g. CHF 120,000",
+      tracker_notes: "Notes",
+      tracker_notes_ph: "e.g. Contact: John Smith...",
+      tracker_save: "Save",
+      tracker_update: "Update",
+      tracker_cancel: "Cancel",
+      tracker_wishlist: "Wishlist",
+      tracker_applied: "Applied",
+      tracker_interview: "Interview",
+      tracker_offer: "Offer",
+      tracker_rejected: "Rejected",
+      tracker_notes_badge: "Notes available",
+      tracker_empty: "Empty",
+      quick_tools: "Quick Tools",
+      all_tools: "All Tools",
+      recent_docs: "Your Recent Documents",
+      view_all: "View all",
+      time_just_now: "Just now",
+      stella_context_title: "Stella Context",
+      stella_context_cv_ready: "CV analyzed",
+      stella_context_no_cv: "No CV uploaded",
+      stella_context_focus: "Focus Areas",
+      stella_roadmap: "Your Roadmap",
+      stella_roadmap_empty: "Upload your CV to see your roadmap.",
+      stella_insights: "Stella Insights",
+      stella_market_score: "Market Score",
+      stella_top_keywords: "Top Keywords",
+      stella_best_match: "Best Match",
+      stella_ch_corrections: "Language Corrections (Swiss German)",
+      stella_ch_tips: "Switzerland-Specific Tips",
+      stella_short_profile: "Optimized Short Profile",
+      stella_highlights: "Optimized Highlights",
+      stella_name: "Stella – AI Assistant",
+      stella_online: "Online – ready to help",
+      stella_input_ph: "Write to Stella...",
+      tool_open: "Open",
+      docs_empty: "No documents generated yet. Start with a tool below.",
+      stella_raw_json: "Show raw data (JSON)",
+      stella_full_analysis: "Full Analysis",
+      stella_insights_with_cv: "Stella has analysed your profile. Your focus on precision fits perfectly with the Swiss market. Use the CV Analysis tool for a deep-dive check.",
+      stella_insights_no_cv: "Once you upload your CV, I'll create a tailored analysis of your market opportunities here.",
+      salary_history: "Salary History",
+      hero_precision: "Swiss AI Precision",
+      upload_analyzing: "Analysing document structure...",
+      upload_done: "CV successfully analysed. Stella is ready.",
+      hero_success_rate: "Success rate",
+      hero_more_interviews: "More interviews",
+      tool_see_plans: "See plans",
+      tool_maybe_later: "Maybe later",
+      tool_inputs: "Inputs",
+      tool_load_file: "Load file",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
       swiss_standard_notice_text: "Precisely tailored to the specific requirements and cultural nuances of the Swiss job market.",
@@ -3854,6 +4907,70 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       footer_privacy: "Privacy",
       footer_terms: "Terms",
       footer_imprint: "Imprint",
+      cookie_title: "Privacy & Cookies",
+      cookie_desc: "We use necessary cookies to operate the platform and optional analytics cookies to improve our services. Your data is processed in accordance with the Swiss DSG and GDPR.",
+      cookie_accept: "Accept all",
+      cookie_essential: "Essential only",
+      cookie_privacy_link: "Privacy policy",
+      close: "Close",
+      back: "Back",
+      or_divider: "Or",
+      stat_members: "Members",
+      hero_intro: "Your Personal",
+      badge_new: "NEW",
+      interview_live_promo: "Practice your next interview – text or microphone",
+      remaining: "remaining",
+      search_close_label: "Close",
+      search_open_selection: "Open Selection",
+      search_stella_advice: "Stella Advice",
+      premium_analysis_desc: "Deep review according to Swiss standards",
+      salary_median_label: "Estimated Median Salary (Gross/Year)",
+      salary_important_notice: "Important Notice",
+      salary_disclaimer: "This estimate is based on current market trends and AI models for the Swiss job market. Factors such as specific certifications, bonus agreements, and individual benefits may influence the actual offer.",
+      generated_app_title: "Your Generated Application",
+      copy: "Copy",
+      tool_how_to_use: "How to use this tool",
+      tool_scroll_example: "Scroll down for professional example",
+      tool_pro_example: "Professional Example",
+      tool_unlimited_access: "Unlimited Access",
+      tool_unlock_desc: "Unlock this tool and all premium features with the Unlimited plan.",
+      tool_discover_unlimited: "Discover Unlimited Now",
+      tool_fill_fields: "Fill in the fields on the left",
+      auth_terms_by_signing: "By signing in, you accept our",
+      auth_terms_and: "and",
+      auth_terms_data_processing: "Your data is securely processed in Switzerland/EU.",
+      auth_register_new: "→ Register new account",
+      auth_switch_to_login: "→ Switch to Login",
+      auth_reset_session: "Reset Session",
+      password_weak: "Weak",
+      password_medium: "Medium",
+      password_strong: "Strong",
+      interview_complete: "🎉 Interview complete!",
+      interview_question_of: "Question {current} of 5",
+      interview_show_tip: "Show tip",
+      interview_feedback_prev: "✓ Last answer feedback",
+      interview_your_answer: "Your Answer",
+      interview_answer_placeholder: "Write your answer here...",
+      interview_mic_unavailable: "Microphone not available in this browser.",
+      interview_mic_answer: "Answer by microphone",
+      interview_recording: "Recording...",
+      interview_feedback_unavailable: "Feedback unavailable.",
+      interview_evaluating: "Stella is evaluating...",
+      interview_submit: "Submit → Question {n}/5",
+      interview_show_model: "Show model answer",
+      interview_common_mistake: "⚠ Common mistake: ",
+      interview_complete_title: "Interview Complete",
+      interview_complete_desc: "All 5 questions answered. Your summary:",
+      interview_new: "New Interview",
+      interview_copy_summary: "Copy Summary",
+      settings_your_usage: "Your Usage",
+      settings_apps_tools: "Applications & Tools",
+      settings_generations: "Generations",
+      settings_actions_today: "Actions today",
+      settings_free_use: "Free use",
+      settings_requests: "Requests",
+      settings_delete_account: "Delete Account",
+      app_initializing: "Initializing...",
       market_1_t: "Job changes are increasing",
       market_1_d: "On average, Swiss employees change jobs every 3 years.",
       market_2_t: "Applications take time",
@@ -3946,6 +5063,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           input_industry: 'Industry',
           input_industry_placeholder: 'e.g. IT, Pharma, Banking...',
           tutorial: 'Example: Search for "Project Manager" in "Basel" in the "Pharma" sector. We show you matching positions from our database.'
+        },
+        'interview-live': {
+          title: 'Live Interview Coach',
+          desc: 'Practice your interview for a specific role. Stella asks tailored questions – answer by text or microphone.',
+          badge: 'NEW · LIVE',
+          input_job: 'Job Title',
+          input_job_placeholder: 'e.g. Senior UX Designer at Digitec',
+          input_company: 'Company (optional)',
+          input_company_placeholder: 'e.g. Nestlé AG, Zurich',
+          input_desc: 'Job Description (optional)',
+          input_desc_placeholder: 'Paste the job description for even more targeted questions...',
+          tutorial: 'Example: Interview for "Product Manager" at ABB. Stella asks 5 real questions with feedback on tone, STAR method and Swiss market knowledge.'
+        },
+        'salary-negotiation': {
+          title: 'Salary Negotiation Coach',
+          desc: 'Tailored guide for your salary negotiation – market positioning, arguments and Swiss 13th month salary strategy.',
+          badge: 'Pro',
+          input_label: 'Current / Target Salary',
+          input_placeholder: 'e.g. I want to go from 95k to 115k CHF...',
+          tutorial: 'Example: Negotiation at Zurich Insurance. We provide 5 concrete arguments, the ideal opening demand and responses to typical objections.'
         }
       }
     }
@@ -4127,14 +5264,39 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         { key: 'jobAd', label: t.tools_data['linkedin-job'].input_ad, type: 'textarea', placeholder: t.tools_data['linkedin-job'].input_ad_placeholder }
       ] 
     },
-    { 
-      id: 'linkedin-posts', 
-      title: t.tools_data['linkedin-posts'].title, 
-      desc: t.tools_data['linkedin-posts'].desc, 
-      icon: <Share2 size={20} />, 
-      badge: 'Personal Brand', 
+    {
+      id: 'linkedin-posts',
+      title: t.tools_data['linkedin-posts'].title,
+      desc: t.tools_data['linkedin-posts'].desc,
+      icon: <Share2 size={20} />,
+      badge: 'Personal Brand',
       type: 'pro',
-      inputs: [{ key: 'topic', label: t.tools_data['linkedin-posts'].input_label, type: 'text', placeholder: t.tools_data['linkedin-posts'].input_placeholder }] 
+      inputs: [{ key: 'topic', label: t.tools_data['linkedin-posts'].input_label, type: 'text', placeholder: t.tools_data['linkedin-posts'].input_placeholder }]
+    },
+    {
+      id: 'interview-live',
+      title: t.tools_data['interview-live'].title,
+      desc: t.tools_data['interview-live'].desc,
+      icon: <Headphones size={20} />,
+      badge: t.tools_data['interview-live'].badge,
+      type: 'pro',
+      inputs: [
+        { key: 'jobTitle', label: t.tools_data['interview-live'].input_job, type: 'text', placeholder: t.tools_data['interview-live'].input_job_placeholder },
+        { key: 'company', label: t.tools_data['interview-live'].input_company, type: 'text', placeholder: t.tools_data['interview-live'].input_company_placeholder },
+        { key: 'jobDesc', label: t.tools_data['interview-live'].input_desc, type: 'textarea', placeholder: t.tools_data['interview-live'].input_desc_placeholder }
+      ]
+    },
+    {
+      id: 'salary-negotiation',
+      title: t.tools_data['salary-negotiation'].title,
+      desc: t.tools_data['salary-negotiation'].desc,
+      icon: <TrendingUp size={20} />,
+      badge: t.tools_data['salary-negotiation'].badge,
+      type: 'pro',
+      inputs: [
+        { key: 'jobTitle', label: t.tools_data['salary-calc'].input_job, type: 'text', placeholder: t.tools_data['salary-calc'].input_job_placeholder },
+        { key: 'targetSalary', label: t.tools_data['salary-negotiation'].input_label, type: 'text', placeholder: t.tools_data['salary-negotiation'].input_placeholder }
+      ]
     }
   ];
 
@@ -4275,7 +5437,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             transition={{ delay: 1.8, duration: 0.4 }}
             className="text-[9px] font-bold uppercase tracking-[0.35em] text-[#FAFAF8]/20"
           >
-            {language === 'DE' ? 'Wird initialisiert...' : language === 'FR' ? 'Initialisation...' : language === 'IT' ? 'Inizializzazione...' : 'Initializing...'}
+            {t.app_initializing}
           </motion.p>
         </div>
 
@@ -4293,9 +5455,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-[#FDFCFB] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">
       {/* --- NAVIGATION --- */}
-      <nav className="sticky top-0 z-50 bg-[#FAFAF8]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors duration-300">
+      <nav className="sticky top-0 z-50 bg-[#FDFCFB]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors duration-300">
         <div className="flex items-center gap-8">
           <button
             onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
@@ -4388,7 +5550,6 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           >
             <Search size={15} className="text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors shrink-0" />
             <span className="flex-1 text-[#9A9A94] dark:text-[#5C5C58] text-sm">{t.search_placeholder}</span>
-            <span className="text-[10px] font-bold text-[#9A9A94] dark:text-[#5C5C58] px-1.5 py-0.5 bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/10 rounded shrink-0">⌘K</span>
           </button>
         </div>
 
@@ -4502,14 +5663,19 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
 
+      {/* --- LEGAL PAGES --- */}
+      {(activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb') && (
+        <LegalPages activeView={activeView} onBack={() => navigate(user ? 'dashboard' : 'dashboard')} />
+      )}
+
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {user ? (
-        <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FAFAF8] dark:bg-[#1A1A18]">
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb') && user ? (
+        <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
-              <div className="flex flex-col lg:flex-row gap-12">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
               {/* Main Dashboard Area */}
-              <div className="flex-1 space-y-12">
+              <div className="lg:col-span-2 space-y-6">
                 <header>
                   <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">
                     {t.dashboard_welcome} <span className="italic opacity-80">{user.firstName || t.dashboard_pro}</span>.
@@ -4527,7 +5693,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     { label: t.dashboard_stat_chat, value: messages.length, icon: <Send size={16} /> },
                     { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={16} /> }
                   ].map((stat, i) => (
-                    <div key={i} className="p-5 md:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 shadow-sm transition-colors flex flex-col h-full">
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.07, duration: 0.4 }}
+                      className="p-5 md:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 shadow-sm transition-colors flex flex-col h-full">
                       <div className="flex items-center gap-2 text-[#9A9A94] dark:text-[#5C5C58] text-[10px] font-bold uppercase tracking-widest mb-2">
                         {stat.icon}
                         {stat.label}
@@ -4619,7 +5790,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         </div>
                       )}
                       {stat.label === t.dashboard_stat_cv_status && cvContext && (
-                        <button 
+                        <button
                           onClick={() => handleToolClick('cv-premium')}
                           className="mt-3 w-full py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
                         >
@@ -4627,13 +5798,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           {t.dashboard_cv_optimize}
                         </button>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
 
                 {/* TEST TOOLS (Only for Owner) */}
                 {import.meta.env.DEV && user?.email === 'weare2bc@gmail.com' && (
-                  <div className="p-6 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
+                  <div className="p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
                     <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
                       <Shield size={12} />
                       Developer Test Tools
@@ -4680,15 +5851,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-serif">Bewerbungs-Tracker</h2>
-                      <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">Verwalte deine Chancen</p>
+                      <h2 className="text-xl font-serif">{t.tracker_title}</h2>
+                      <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{t.tracker_desc}</p>
                     </div>
                     <button 
                       onClick={() => setIsAddingApp(true)}
                       className="flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
                     >
                       <Plus size={14} />
-                      Neu hinzufügen
+                      {t.tracker_add}
                     </button>
                   </div>
 
@@ -4700,83 +5871,83 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Firma</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
+                          <input
+                            type="text"
                             value={newApp.company}
                             onChange={(e) => setNewApp({...newApp, company: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. Google"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            placeholder={t.tracker_company_ph}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Position</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
+                          <input
+                            type="text"
                             value={newApp.position}
                             onChange={(e) => setNewApp({...newApp, position: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. Senior Designer"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            placeholder={t.tracker_position_ph}
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Status</label>
-                          <select 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
+                          <select
                             value={newApp.status}
                             onChange={(e) => setNewApp({...newApp, status: e.target.value as any})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           >
-                            <option value="Wishlist">Wunschliste</option>
-                            <option value="Applied">Beworben</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Angebot</option>
-                            <option value="Rejected">Abgelehnt</option>
+                            <option value="Wishlist">{t.tracker_wishlist}</option>
+                            <option value="Applied">{t.tracker_applied}</option>
+                            <option value="Interview">{t.tracker_interview}</option>
+                            <option value="Offer">{t.tracker_offer}</option>
+                            <option value="Rejected">{t.tracker_rejected}</option>
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Standort</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
+                          <input
+                            type="text"
                             value={newApp.location}
                             onChange={(e) => setNewApp({...newApp, location: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. Zürich"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            placeholder={t.tracker_location_ph}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Gehaltsvorstellung</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
+                          <input
+                            type="text"
                             value={newApp.salary}
                             onChange={(e) => setNewApp({...newApp, salary: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. 120'000 CHF"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            placeholder={t.tracker_salary_ph}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Notizen</label>
-                        <textarea 
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
+                        <textarea
                           value={newApp.notes}
                           onChange={(e) => setNewApp({...newApp, notes: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
-                          placeholder="z.B. Kontaktperson: Hans Muster, Tel: 079..."
+                          className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
+                          placeholder={t.tracker_notes_ph}
                         />
                       </div>
                       <div className="flex justify-end gap-3 pt-2">
-                        <button 
+                        <button
                           onClick={() => setIsAddingApp(false)}
                           className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
                         >
-                          Abbrechen
+                          {t.tracker_cancel}
                         </button>
-                        <button 
+                        <button
                           onClick={addApplication}
                           className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                         >
-                          Speichern
+                          {t.tracker_save}
                         </button>
                       </div>
                     </motion.div>
@@ -4790,78 +5961,78 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Firma</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
+                          <input
+                            type="text"
                             value={editingApp.company}
                             onChange={(e) => setEditingApp({...editingApp, company: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Position</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
+                          <input
+                            type="text"
                             value={editingApp.position}
                             onChange={(e) => setEditingApp({...editingApp, position: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Status</label>
-                          <select 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
+                          <select
                             value={editingApp.status}
                             onChange={(e) => setEditingApp({...editingApp, status: e.target.value as any})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           >
-                            <option value="Wishlist">Wunschliste</option>
-                            <option value="Applied">Beworben</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Angebot</option>
-                            <option value="Rejected">Abgelehnt</option>
+                            <option value="Wishlist">{t.tracker_wishlist}</option>
+                            <option value="Applied">{t.tracker_applied}</option>
+                            <option value="Interview">{t.tracker_interview}</option>
+                            <option value="Offer">{t.tracker_offer}</option>
+                            <option value="Rejected">{t.tracker_rejected}</option>
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Standort</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
+                          <input
+                            type="text"
                             value={editingApp.location}
                             onChange={(e) => setEditingApp({...editingApp, location: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Gehaltsvorstellung</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
+                          <input
+                            type="text"
                             value={editingApp.salary}
                             onChange={(e) => setEditingApp({...editingApp, salary: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Notizen</label>
-                        <textarea 
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
+                        <textarea
                           value={editingApp.notes}
                           onChange={(e) => setEditingApp({...editingApp, notes: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
+                          className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
                         />
                       </div>
                       <div className="flex justify-end gap-3 pt-2">
-                        <button 
+                        <button
                           onClick={() => setEditingApp(null)}
                           className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
                         >
-                          Abbrechen
+                          {t.tracker_cancel}
                         </button>
-                        <button 
+                        <button
                           onClick={updateApplication}
                           className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                         >
-                          Aktualisieren
+                          {t.tracker_update}
                         </button>
                       </div>
                     </motion.div>
@@ -4872,10 +6043,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       <div key={status} className="space-y-4">
                         <div className="flex items-center justify-between px-1">
                           <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">
-                            {status === 'Wishlist' ? 'Wunschliste' : 
-                             status === 'Applied' ? 'Beworben' : 
-                             status === 'Interview' ? 'Interview' : 
-                             status === 'Offer' ? 'Angebot' : 'Abgelehnt'}
+                            {status === 'Wishlist' ? t.tracker_wishlist :
+                             status === 'Applied' ? t.tracker_applied :
+                             status === 'Interview' ? t.tracker_interview :
+                             status === 'Offer' ? t.tracker_offer : t.tracker_rejected}
                           </h3>
                           <span className="text-[10px] font-mono text-[#9A9A94] bg-black/5 px-2 py-0.5 rounded-full">
                             {applications.filter(a => a.status === status).length}
@@ -4922,7 +6093,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                 {app.notes && (
                                   <div className="flex items-center gap-1 text-[9px] text-[#9A9A94] italic">
                                     <FileText size={10} />
-                                    <span className="truncate max-w-[100px]">Notizen vorhanden</span>
+                                    <span className="truncate max-w-[100px]">{t.tracker_notes_badge}</span>
                                   </div>
                                 )}
                               </div>
@@ -4946,7 +6117,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           ))}
                           {applications.filter(a => a.status === status).length === 0 && (
                             <div className="h-20 border border-dashed border-black/5 flex items-center justify-center">
-                              <span className="text-[9px] text-[#9A9A94] uppercase tracking-widest opacity-30">Leer</span>
+                              <span className="text-[9px] text-[#9A9A94] uppercase tracking-widest opacity-30">{t.tracker_empty}</span>
                             </div>
                           )}
                         </div>
@@ -4958,22 +6129,25 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 {/* Quick Tools */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <h2 className="text-xl font-serif">Quick Tools</h2>
-                    <button 
+                    <h2 className="text-xl font-serif">{t.quick_tools}</h2>
+                    <button
                       onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                       className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1"
                     >
-                      Alle Tools
+                      {t.all_tools}
                     </button>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-                    {tools.slice(0, 6).map((tool) => (
-                      <div 
+                    {tools.slice(0, 6).map((tool, qi) => (
+                      <motion.div
                         key={tool.id}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 + qi * 0.06, duration: 0.35 }}
                         onClick={() => handleToolClick(tool.id)}
                         className="p-4 md:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer flex flex-col items-center text-center space-y-3 md:space-y-4 shadow-sm"
                       >
-                        <div className="w-10 h-10 bg-[#FAFAF8] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] group-hover:bg-[#004225] group-hover:text-white transition-all relative">
+                        <div className="w-10 h-10 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] group-hover:bg-[#004225] group-hover:text-white transition-all relative">
                           {tool.icon}
                           {((tool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                             (tool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
@@ -4983,16 +6157,42 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           )}
                         </div>
                         <h4 className="text-[11px] md:text-xs font-bold uppercase tracking-wider group-hover:text-[#004225] transition-colors line-clamp-2">{tool.title}</h4>
-                      </div>
+                      </motion.div>
                     ))}
                   </div>
                 </div>
 
+                {/* Interview Live CTA Banner */}
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.4 }}
+                  onClick={() => handleToolClick('interview-live')}
+                  className="relative overflow-hidden p-6 bg-[#004225] text-white cursor-pointer group hover:bg-[#00331d] transition-colors"
+                >
+                  <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '12px 12px'}} />
+                  <div className="relative flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white/10 flex items-center justify-center shrink-0">
+                        <Headphones size={22} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[8px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5">{t.badge_new}</span>
+                        </div>
+                        <h3 className="text-base font-serif">{t.tools_data['interview-live']?.title || 'Live Interview Coach'}</h3>
+                        <p className="text-xs text-white/60 font-light mt-0.5">{t.interview_live_promo}</p>
+                      </div>
+                    </div>
+                    <ArrowRight size={18} className="shrink-0 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </motion.div>
+
                 {/* Recent Activity / Documents */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <h2 className="text-xl font-serif">Deine letzten Dokumente</h2>
-                    <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1">Alle ansehen</button>
+                    <h2 className="text-xl font-serif">{t.recent_docs}</h2>
+                    <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1">{t.view_all}</button>
                   </div>
                   <div className="grid gap-4">
                     {toolHistory.length > 0 ? (
@@ -5010,13 +6210,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           }}
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-[#FAFAF8] flex items-center justify-center text-[#004225]">
+                            <div className="w-10 h-10 bg-[#FDFCFB] flex items-center justify-center text-[#004225]">
                               {tools.find(t => t.id === item.toolId)?.icon || <FileText size={20} />}
                             </div>
                             <div>
                               <h4 className="font-medium group-hover:text-[#004225] transition-colors">{item.toolTitle}</h4>
                               <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">
-                                {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH') : 'Gerade eben'}
+                                {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH') : t.time_just_now}
                               </p>
                             </div>
                           </div>
@@ -5025,8 +6225,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       ))
                     ) : (
                       <div className="p-12 bg-white border border-dashed border-black/10 text-center space-y-4">
-                        <div className="w-12 h-12 bg-[#FAFAF8] flex items-center justify-center text-2xl mx-auto opacity-30">📄</div>
-                        <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94] font-light">Noch keine Dokumente generiert. Starte mit einem Tool unten.</p>
+                        <div className="w-12 h-12 bg-[#FDFCFB] flex items-center justify-center text-2xl mx-auto opacity-30">📄</div>
+                        <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.docs_empty}</p>
                       </div>
                     )}
                   </div>
@@ -5034,13 +6234,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               {/* Sidebar / Stella Context */}
-              <div className="w-full lg:w-80 space-y-8">
+              <div className="lg:col-span-1 space-y-6">
                 <div className="p-8 bg-[#004225] text-white space-y-6">
-                  <h3 className="text-xl font-serif">Stella Context</h3>
+                  <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
-                      <span className="text-xs font-light">{cvContext ? 'CV analysiert' : 'Kein CV hochgeladen'}</span>
+                      <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
                     </div>
                     <div className="flex items-center gap-3 opacity-60">
                       <div className={`w-2 h-2 rounded-full ${backendStatus === 'online' ? 'bg-[#059669]' : backendStatus === 'checking' ? 'bg-yellow-500' : 'bg-red-500'}`} />
@@ -5054,7 +6254,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   </div>
                   {cvContext && (
                     <div className="pt-6 border-t border-white/10">
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">Fokus-Bereiche</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
                       <div className="flex flex-wrap gap-2">
                         {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
                           <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
@@ -5065,7 +6265,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </div>
 
                 <div className="p-8 border border-black/5 bg-white space-y-6">
-                  <h3 className="text-lg font-serif">Deine Roadmap</h3>
+                  <h3 className="text-lg font-serif">{t.stella_roadmap}</h3>
                   <div className="space-y-4">
                     {isGeneratingRoadmap ? (
                       <div className="flex flex-col gap-3">
@@ -5081,22 +6281,22 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light italic">Lade dein CV hoch, um deine Roadmap zu sehen.</p>
+                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light italic">{t.stella_roadmap_empty}</p>
                     )}
                   </div>
                 </div>
 
-                <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 space-y-6 transition-colors">
-                  <h3 className="text-lg font-serif text-[#004225] dark:text-[#FAFAF8]">Stella Insights</h3>
+                <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 space-y-6 transition-colors">
+                  <h3 className="text-lg font-serif text-[#004225] dark:text-[#FAFAF8]">{t.stella_insights}</h3>
                   <div className="space-y-4">
                     {latestAnalysis ? (
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Market Score</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_market_score}</span>
                           <span className="text-lg font-serif text-[#004225]">{latestAnalysis.score}/100</span>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Top Keywords</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_top_keywords}</p>
                           <div className="flex flex-wrap gap-1">
                             {latestAnalysis.keywords.slice(0, 5).map((k: string) => (
                               <span key={k} className="px-2 py-0.5 bg-[#004225]/10 text-[8px] font-medium text-[#004225]">{k}</span>
@@ -5104,7 +6304,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Bester Match</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_best_match}</p>
                           <div className="flex items-center gap-2">
                             <p className="text-xs font-light text-[#004225]/80">{latestAnalysis.industryMatch}</p>
                             <span className="px-1 py-0.5 bg-[#004225]/5 border border-[#004225]/10 text-[6px] font-bold uppercase tracking-tighter text-[#004225]/60">NOGA Standard</span>
@@ -5112,7 +6312,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         </div>
                         {latestAnalysis.linguisticFixes && latestAnalysis.linguisticFixes.length > 0 && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Sprachliche Korrekturen (CH-Hochdeutsch)</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_corrections}</p>
                             <ul className="space-y-1">
                               {latestAnalysis.linguisticFixes.map((fix: string, i: number) => (
                                 <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
@@ -5125,7 +6325,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         )}
                         {latestAnalysis.improvements && latestAnalysis.improvements.length > 0 && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Schweiz-Spezifische Tipps</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_tips}</p>
                             <ul className="space-y-1">
                               {latestAnalysis.improvements.map((imp: string, i: number) => (
                                 <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
@@ -5138,7 +6338,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         )}
                         {latestAnalysis.optimizedSummary && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Optimiertes Kurzprofil</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_short_profile}</p>
                             <p className="text-[10px] font-light text-[#004225]/80 leading-relaxed italic">
                               "{latestAnalysis.optimizedSummary}"
                             </p>
@@ -5147,7 +6347,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         {latestAnalysis.optimizedHighlights && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
                             <div className="flex items-center justify-between">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Optimierte Highlights</p>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_highlights}</p>
                               <button 
                                 onClick={() => {
                                   const text = latestAnalysis.optimizedHighlights.join('\n');
@@ -5173,7 +6373,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <details className="group">
                             <summary className="text-[8px] font-bold uppercase tracking-widest text-[#004225]/40 cursor-pointer hover:text-[#004225]/60 transition-colors list-none flex items-center gap-1">
                               <span className="group-open:rotate-90 transition-transform">▶</span>
-                              Rohdaten (JSON) anzeigen
+                              {t.stella_raw_json}
                             </summary>
                             <pre className="mt-2 p-2 bg-[#004225]/5 text-[8px] font-mono text-[#004225]/60 overflow-x-auto custom-scrollbar">
                               {JSON.stringify(latestAnalysis, null, 2)}
@@ -5184,14 +6384,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => handleToolClick('cv-analysis')}
                           className="w-full py-2 border border-[#004225]/20 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:bg-[#004225]/5 transition-all"
                         >
-                          Vollständige Analyse
+                          {t.stella_full_analysis}
                         </button>
                       </div>
                     ) : (
                       <p className="text-xs text-[#004225]/70 dark:text-[#FAFAF8]/70 font-light leading-relaxed">
-                        {cvContext 
-                          ? "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check."
-                          : "Sobald du dein CV hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen."}
+                        {cvContext ? t.stella_insights_with_cv : t.stella_insights_no_cv}
                       </p>
                     )}
                   </div>
@@ -5200,12 +6398,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 {salaryCalculations.length > 0 && (
                   <div className="p-8 border border-black/5 bg-white space-y-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-serif">Gehaltsverlauf</h3>
+                      <h3 className="text-lg font-serif">{t.salary_history}</h3>
                       <Coins size={18} className="text-[#004225]/40" />
                     </div>
                     <div className="space-y-4">
                       {salaryCalculations.map((calc) => (
-                        <div key={calc.id} className="p-4 bg-[#FAFAF8] border border-black/5 space-y-2 group hover:border-[#004225]/20 transition-all">
+                        <div key={calc.id} className="p-4 bg-[#FDFCFB] border border-black/5 space-y-2 group hover:border-[#004225]/20 transition-all">
                           <div className="flex justify-between items-start">
                             <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A18] truncate pr-4">{calc.jobTitle}</h4>
                             <span className="text-[8px] font-mono text-[#9A9A94]">{calc.createdAt?.toDate ? calc.createdAt.toDate().toLocaleDateString('de-CH') : ''}</span>
@@ -5264,7 +6462,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       className="p-6 md:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm"
                     >
                       <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-[#FAFAF8] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
+                        <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
                           <span className="relative z-0 flex items-center justify-center">{tool.icon}</span>
                         </div>
                         <div className="flex flex-col items-end gap-1">
@@ -5274,7 +6472,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       <h3 className="text-lg md:text-xl font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
                       <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-6 line-clamp-3">{tool.desc}</p>
                       <button className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn">
-                        Öffnen <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                        {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
                   ))}
@@ -5291,18 +6489,18 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             viewport={{ once: true }}
             className="space-y-8"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-xs font-bold tracking-widest uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#FAFAF8] animate-pulse" />
-              Schweizer KI-Präzision
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-xs font-bold tracking-widest uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#FDFCFB] animate-pulse" />
+              {t.hero_precision}
             </div>
             <h1 className="text-5xl lg:text-7xl font-serif leading-[1.1] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
-              {language === 'DE' ? 'Dein persönlicher' : language === 'FR' ? 'Votre' : language === 'IT' ? 'Il tuo' : language === 'EN' ? 'Your Personal' : 'Tia'} <br />
+              {t.hero_intro} <br />
               <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_title.split(' ').pop()}</span>
             </h1>
             <p className="text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
               {t.hero_desc}
             </p>
-            <div className="p-4 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border-l-4 border-[#004225] dark:border-[#FAFAF8] text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light italic">
+            <div className="p-4 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border-l-4 border-[#004225] dark:border-[#FAFAF8] text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light italic">
               {t.cv_info}
             </div>
             <div className="flex flex-col items-center gap-6 w-full max-w-md">
@@ -5334,12 +6532,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {isUploading && (
               <div className="w-full max-w-md space-y-2">
                 <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94]">
-                  <span>Analysiere Dokumentenstruktur...</span>
+                  <span>{t.upload_analyzing}</span>
                   <span>{uploadProgress}%</span>
                 </div>
                 <div className="h-1 bg-black/5 dark:bg-white/5 overflow-hidden">
                   <motion.div 
-                    className="h-full bg-[#004225] dark:bg-[#FAFAF8]"
+                    className="h-full bg-[#004225] dark:bg-[#FDFCFB]"
                     initial={{ width: 0 }}
                     animate={{ width: `${uploadProgress}%` }}
                   />
@@ -5350,21 +6548,21 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {cvContext && !isUploading && (
               <div className="flex items-center gap-2 text-[#059669] text-xs font-medium">
                 <CheckCircle2 size={14} />
-                <span>Lebenslauf erfolgreich analysiert. Stella ist bereit.</span>
+                <span>{t.upload_done}</span>
               </div>
             )}
             <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-12">
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">4'200+</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'DE' ? 'Mitglieder' : language === 'FR' ? 'Membres' : language === 'IT' ? 'Membri' : 'Members'}</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.stat_members}</span>
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">89%</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Erfolgsquote</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.hero_success_rate}</span>
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">3×</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Mehr Interviews</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.hero_more_interviews}</span>
               </div>
             </div>
           </motion.div>
@@ -5379,27 +6577,27 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <div className="flex items-center gap-4 mb-8 pb-6 border-b border-black/5 dark:border-white/5">
                 <div className="w-12 h-12 bg-[#004225] flex items-center justify-center text-white font-serif text-xl">S</div>
                 <div>
-                  <h3 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stella – KI-Assistentin</h3>
+                  <h3 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{t.stella_name}</h3>
                   <p className="text-xs text-[#059669] flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
-                    Online – bereit zu helfen
+                    {t.stella_online}
                   </p>
                 </div>
               </div>
               <div className="space-y-4 mb-8">
-                <div className="bg-[#FAFAF8] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
+                <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
                   Grüezi! Dein CV ist analysiert. Für das Interview bei der UBS solltest du auf die Frage "Warum UBS?" vorbereitet sein – ich zeige dir die optimale Antwort.
                 </div>
                 <div className="bg-[#004225] text-white p-4 text-sm font-light leading-relaxed max-w-[85%] ml-auto">
                   Super! Welche Fragen kommen noch? Und wie antworte ich am besten?
                 </div>
-                <div className="bg-[#FAFAF8] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
+                <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
                   Starte den Interview-Coach – du erhältst 5 echte Fragen mit Musterantworten und deinem persönlichen Score.
                 </div>
               </div>
               <div className="flex gap-2">
-                <div className="flex-1 h-10 bg-[#FAFAF8] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 px-4 flex items-center text-xs text-[#9A9A94] dark:text-[#5C5C58]">
-                  Schreibe Stella etwas...
+                <div className="flex-1 h-10 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 px-4 flex items-center text-xs text-[#9A9A94] dark:text-[#5C5C58]">
+                  {t.stella_input_ph}
                 </div>
                 <div className="w-10 h-10 bg-[#004225] flex items-center justify-center text-white">
                   <Send size={16} />
@@ -5407,17 +6605,20 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
             </div>
             {/* Decorative elements */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 -z-10" />
-            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 -z-10" />
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
           </motion.div>
         </section>
       )}
+
+      {/* --- MARKETING SECTIONS + FOOTER (hidden on legal pages) --- */}
+      {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && <>
 
       {/* --- WHY STELLIFY SECTION --- */}
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
               {t.comparison_badge}
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.comparison_title}</h2>
@@ -5433,7 +6634,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="p-8 bg-[#FAFAF8] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#FAFAF8]/20 transition-all group"
+                className="p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#FAFAF8]/20 transition-all group"
               >
                 <div className="w-12 h-12 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] mb-6 group-hover:scale-110 transition-transform">
                   {point.icon === 'Target' && <Target size={24} />}
@@ -5466,7 +6667,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 ))}
               </ul>
             </div>
-            <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FAFAF8]/5">
+            <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FDFCFB]/5">
               <h3 className="text-lg font-medium text-[#004225] dark:text-[#FAFAF8] mb-6 flex items-center gap-2">
                 <CheckCircle2 size={20} className="text-[#004225] dark:text-[#FAFAF8]" />
                 {t.comparison_good_title}
@@ -5485,11 +6686,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- DATA SECURITY SECTION --- */}
-      <section className="px-6 lg:px-12 py-24 bg-[#FAFAF8] dark:bg-[#2A2A26] transition-colors">
+      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
                 {t.security_badge}
               </div>
               <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-6 text-[#1A1A18] dark:text-[#FAFAF8]">{t.security_title}</h2>
@@ -5563,12 +6764,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           <motion.div 
             animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#FAFAF8] rounded-full blur-[140px]" 
+            className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#FDFCFB] rounded-full blur-[140px]" 
           />
           <motion.div 
             animate={{ scale: [1.2, 1, 1.2], opacity: [0.05, 0.15, 0.05] }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-[#FAFAF8] rounded-full blur-[160px]" 
+            className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-[#FDFCFB] rounded-full blur-[160px]" 
           />
 
           {/* 5. Scanline Effect */}
@@ -5701,15 +6902,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           <div className="grid lg:grid-cols-2 gap-12">
             {[
               {
-                title: language === 'DE' ? 'Standard-Anschreiben' : 'Standard Cover Letter',
-                before: language === 'DE' ? 'Ich interessiere mich für die Stelle als Projektleiter. Ich habe viel Erfahrung und bin motiviert.' : 'I am interested in the project manager position. I have a lot of experience and I am motivated.',
-                after: language === 'DE' ? 'Mit meiner fundierten Expertise in der Leitung komplexer Infrastrukturprojekte im Raum Zürich bringe ich die nötige Präzision und das Schweizer Qualitätsbewusstsein mit, um Ihre ambitionierten Ziele bei der [Firma] nachhaltig zu unterstützen.' : 'With my deep expertise in leading complex infrastructure projects in the Zurich area, I bring the necessary precision and Swiss quality awareness to sustainably support your ambitious goals at [Company].',
+                title: language === 'DE' ? 'Standard-Anschreiben' : language === 'FR' ? 'Lettre de motivation standard' : language === 'IT' ? 'Lettera di candidatura standard' : 'Standard Cover Letter',
+                before: language === 'DE' ? 'Ich interessiere mich für die Stelle als Projektleiter. Ich habe viel Erfahrung und bin motiviert.' : language === 'FR' ? 'Je suis intéressé par le poste de chef de projet. J\'ai beaucoup d\'expérience et je suis motivé.' : language === 'IT' ? 'Sono interessato alla posizione di project manager. Ho molta esperienza e sono motivato.' : 'I am interested in the project manager position. I have a lot of experience and I am motivated.',
+                after: language === 'DE' ? 'Mit meiner fundierten Expertise in der Leitung komplexer Infrastrukturprojekte im Raum Zürich bringe ich die nötige Präzision und das Schweizer Qualitätsbewusstsein mit, um Ihre ambitionierten Ziele bei der [Firma] nachhaltig zu unterstützen.' : language === 'FR' ? 'Avec mon expertise approfondie dans la direction de projets d\'infrastructure complexes dans la région de Zurich, j\'apporte la précision nécessaire et la conscience de la qualité suisse pour soutenir durablement vos objectifs ambitieux chez [Entreprise].' : language === 'IT' ? 'Con la mia profonda esperienza nella direzione di complessi progetti infrastrutturali nell\'area di Zurigo, porto la precisione necessaria e la consapevolezza della qualità svizzera per supportare in modo sostenibile i tuoi obiettivi ambiziosi presso [Azienda].' : 'With my deep expertise in leading complex infrastructure projects in the Zurich area, I bring the necessary precision and Swiss quality awareness to sustainably support your ambitious goals at [Company].',
                 tag: 'Precision'
               },
               {
-                title: language === 'DE' ? 'Lebenslauf-Highlight' : 'CV Highlight',
-                before: language === 'DE' ? 'Verantwortlich für das Team und die Budgetplanung.' : 'Responsible for the team and budget planning.',
-                after: language === 'DE' ? 'Strategische Führung eines interdisziplinären Teams von 12 Spezialisten; Optimierung der Budgeteffizienz um 15% durch Einführung eines Lean-Management-Prozesses nach Schweizer Standards.' : 'Strategic leadership of an interdisciplinary team of 12 specialists; optimization of budget efficiency by 15% through the introduction of a lean management process according to Swiss standards.',
+                title: language === 'DE' ? 'Lebenslauf-Highlight' : language === 'FR' ? 'Point fort du CV' : language === 'IT' ? 'Punto di forza del CV' : 'CV Highlight',
+                before: language === 'DE' ? 'Verantwortlich für das Team und die Budgetplanung.' : language === 'FR' ? 'Responsable de l\'équipe et de la planification budgétaire.' : language === 'IT' ? 'Responsabile del team e della pianificazione del budget.' : 'Responsible for the team and budget planning.',
+                after: language === 'DE' ? 'Strategische Führung eines interdisziplinären Teams von 12 Spezialisten; Optimierung der Budgeteffizienz um 15% durch Einführung eines Lean-Management-Prozesses nach Schweizer Standards.' : language === 'FR' ? 'Direction stratégique d\'une équipe interdisciplinaire de 12 spécialistes ; optimisation de l\'efficacité budgétaire de 15% grâce à l\'introduction d\'un processus de gestion lean selon les normes suisses.' : language === 'IT' ? 'Direzione strategica di un team interdisciplinare di 12 specialisti; ottimizzazione dell\'efficienza del budget del 15% attraverso l\'introduzione di un processo di gestione lean secondo gli standard svizzeri.' : 'Strategic leadership of an interdisciplinary team of 12 specialists; optimization of budget efficiency by 15% through the introduction of a lean management process according to Swiss standards.',
                 tag: 'Impact'
               }
             ].map((ex, i) => (
@@ -5719,7 +6920,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] bg-[#004225]/5 px-2 py-1">{ex.tag}</span>
                 </div>
                 <div className="grid gap-4">
-                  <div className="p-6 bg-[#FAFAF8] border border-black/5 relative">
+                  <div className="p-6 bg-[#FDFCFB] border border-black/5 relative">
                     <span className="absolute -top-2 -left-2 px-2 py-0.5 bg-red-500 text-white text-[8px] font-bold uppercase tracking-widest">Standard</span>
                     <p className="text-sm text-[#9A9A94] italic">"{ex.before}"</p>
                   </div>
@@ -5735,7 +6936,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- SUCCESS STORIES SECTION --- */}
-      <section id="success" className="px-6 lg:px-12 py-24 bg-[#FAFAF8]">
+      <section id="success" className="px-6 lg:px-12 py-24 bg-[#FDFCFB]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4">{t.success_title}</h2>
@@ -5810,7 +7011,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- TOOLS GRID --- */}
-      <section id="features" className="px-6 lg:px-12 py-24 bg-[#FAFAF8]">
+      <section id="features" className="px-6 lg:px-12 py-24 bg-[#FDFCFB]">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-16">
             <div>
@@ -5831,7 +7032,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 className="p-6 md:p-8 bg-white border border-black/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm"
               >
                 <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 bg-[#FAFAF8] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
+                  <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
                     <span className="relative z-0 flex items-center justify-center">{tool.icon}</span>
                     {((tool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                       (tool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
@@ -5884,7 +7085,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               { title: t.market_3_t, desc: t.market_3_d, icon: '🤖' },
               { title: t.market_4_t, desc: t.market_4_d, icon: '🇨🇭' }
             ].map((item, i) => (
-              <div key={i} className="p-8 bg-[#FAFAF8] border border-black/5">
+              <div key={i} className="p-8 bg-[#FDFCFB] border border-black/5">
                 <div className="text-3xl mb-6">{item.icon}</div>
                 <h4 className="font-medium mb-3">{item.title}</h4>
                 <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">{item.desc}</p>
@@ -6067,7 +7268,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               { step: '02', title: t.how_2_t, desc: t.how_2_d },
               { step: '03', title: t.how_3_t, desc: t.how_3_d }
             ].map((item, i) => (
-              <div key={i} className="relative p-8 bg-[#FAFAF8] border border-black/5 group hover:border-[#004225]/30 transition-all">
+              <div key={i} className="relative p-8 bg-[#FDFCFB] border border-black/5 group hover:border-[#004225]/30 transition-all">
                 <div className="text-5xl font-serif text-[#004225]/10 mb-6 group-hover:text-[#004225]/20 transition-all">{item.step}</div>
                 <h3 className="text-xl font-medium mb-4">{item.title}</h3>
                 <p className="text-sm text-[#5C5C58] font-light leading-relaxed">{item.desc}</p>
@@ -6112,7 +7313,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           <p className="text-white/60 font-light text-lg">{t.cta_final_desc}</p>
           <button 
             onClick={() => setIsAuthModalOpen(true)}
-            className="bg-white text-[#004225] px-10 py-5 text-xl font-medium hover:bg-[#FAFAF8] transition-all inline-flex items-center gap-3 group"
+            className="bg-white text-[#004225] px-10 py-5 text-xl font-medium hover:bg-[#FDFCFB] transition-all inline-flex items-center gap-3 group"
           >
             {t.cta_final_btn}
             <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
@@ -6175,9 +7376,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{t.footer_legal}</h4>
               <ul className="space-y-4 text-sm font-light">
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_privacy}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_terms}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_imprint}</a></li>
+                <li><button onClick={() => navigate('datenschutz')} className="hover:text-white transition-colors text-left">{t.footer_privacy}</button></li>
+                <li><button onClick={() => navigate('agb')} className="hover:text-white transition-colors text-left">{t.footer_terms}</button></li>
+                <li><button onClick={() => navigate('impressum')} className="hover:text-white transition-colors text-left">{t.footer_imprint}</button></li>
               </ul>
             </div>
           </div>
@@ -6198,6 +7399,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </footer>
+
+      </> /* end marketing sections */}
 
       {/* Mobile Back-to-Top Button */}
       <button
@@ -6357,7 +7560,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                   className={`p-3 transition-all cursor-pointer group rounded-lg border-2 ${
                                     isSelected 
                                       ? 'bg-[#004225]/10 border-[#004225] dark:bg-[#004225]/30 dark:border-[#FAFAF8]/30 shadow-md' 
-                                      : 'hover:bg-[#FAFAF8] dark:hover:bg-white/5 border-transparent hover:border-black/5 dark:hover:border-white/5'
+                                      : 'hover:bg-[#FDFCFB] dark:hover:bg-white/5 border-transparent hover:border-black/5 dark:hover:border-white/5'
                                   }`}
                                 >
                                   <div className="flex justify-between items-start mb-0.5">
@@ -6398,20 +7601,20 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 )}
               </div>
 
-              <div className="p-4 bg-[#FAFAF8] dark:bg-[#2A2A26] border-t border-black/5 dark:border-white/5 flex justify-between items-center">
+              <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border-t border-black/5 dark:border-white/5 flex justify-between items-center">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                   {t.search_results.replace('{count}', searchResults.length.toString())}
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                     <span className="px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[8px]">ESC</span>
-                    {language === 'DE' ? 'Schliessen' : 'Close'}
+                    {t.search_close_label}
                   </div>
                   <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${selectedSearchIndex >= 0 ? 'text-[#004225] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}>
                     <span className={`px-1.5 py-0.5 rounded text-[8px] transition-colors ${selectedSearchIndex >= 0 ? 'bg-[#004225] text-white' : 'bg-black/5 dark:bg-white/10'}`}>ENTER</span>
-                    {selectedSearchIndex >= 0 
-                      ? (language === 'DE' ? 'Auswahl öffnen' : 'Open Selection')
-                      : (language === 'DE' ? 'Stella-Beratung' : 'Stella Advice')
+                    {selectedSearchIndex >= 0
+                      ? t.search_open_selection
+                      : t.search_stella_advice
                     }
                   </div>
                 </div>
@@ -6430,7 +7633,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-24 right-6 w-[450px] h-[700px] max-w-[90vw] max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
           >
-            <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FAFAF8] dark:bg-[#2A2A26]">
+            <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-[#004225] flex items-center justify-center text-white font-serif">S</div>
                 <div>
@@ -6462,14 +7665,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </button>
             </div>
 
-            <div className="bg-[#004225]/5 dark:bg-[#FAFAF8]/5 p-3 border-b border-[#004225]/10 dark:border-[#FAFAF8]/10 flex items-center gap-3">
+            <div className="bg-[#004225]/5 dark:bg-[#FDFCFB]/5 p-3 border-b border-[#004225]/10 dark:border-[#FAFAF8]/10 flex items-center gap-3">
               <Shield size={14} className="text-[#004225] dark:text-[#FAFAF8]" />
               <p className="text-[10px] text-[#004225] dark:text-[#FAFAF8] font-medium uppercase tracking-widest">
                 {t.stella_secure_data}
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FAFAF8]/50 dark:bg-[#1A1A18]/50 transition-colors">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FDFCFB]/50 dark:bg-[#1A1A18]/50 transition-colors">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] p-4 text-sm font-light leading-relaxed relative group ${
@@ -6504,7 +7707,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
                   placeholder={t.stella_placeholder}
-                  className="flex-1 bg-[#FAFAF8] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 px-4 py-2 text-sm font-light outline-none focus:border-[#004225]/30 dark:focus:border-[#FAFAF8]/30 transition-all text-[#1A1A18] dark:text-[#FAFAF8]"
+                  className="flex-1 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 px-4 py-2 text-sm font-light outline-none focus:border-[#004225]/30 dark:focus:border-[#FAFAF8]/30 transition-all text-[#1A1A18] dark:text-[#FAFAF8]"
                 />
                 <button 
                   onClick={() => sendMessage()}
@@ -6538,7 +7741,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white dark:bg-[#1A1A18] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors"
             >
-              <div className="p-4 md:p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FAFAF8] dark:bg-[#2A2A26]">
+              <div className="p-4 md:p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
                 <div className="flex items-center gap-3 md:gap-4 min-w-0">
                   <div className="w-10 h-10 shrink-0 bg-[#004225] text-white flex items-center justify-center">
                     {activeTool.icon}
@@ -6548,14 +7751,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold opacity-80">{activeTool.badge}</p>
                   </div>
                 </div>
-                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
+                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
                   <X size={20} />
                 </button>
               </div>
 
               <div className="flex-1 overflow-y-auto flex flex-col lg:flex-row relative">
                 {/* Inputs */}
-                <div className={`w-full lg:w-1/3 p-6 md:p-8 bg-[#FAFAF8] dark:bg-[#2A2A26] border-r border-black/5 dark:border-white/5 transition-colors relative`}>
+                <div className={`w-full lg:w-1/3 p-6 md:p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border-r border-black/5 dark:border-white/5 transition-colors relative`}>
                   {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                     (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
                     <div className="absolute inset-0 z-50 bg-white/80 dark:bg-[#1A1A18]/80 backdrop-blur-md flex flex-col items-center justify-start pt-12 p-8 text-center">
@@ -6580,18 +7783,18 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           }}
                           className="w-full py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331D] transition-all"
                         >
-                          Pläne ansehen
+                          {t.tool_see_plans}
                         </button>
-                        <button 
-                          onClick={() => { setActiveTool(null); setParsedSalaryResult(null); }}
+                        <button
+                          onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }}
                           className="w-full py-3 border border-black/10 text-[10px] font-bold uppercase tracking-widest hover:bg-black/5 transition-all"
                         >
-                          Vielleicht später
+                          {t.tool_maybe_later}
                         </button>
                       </div>
                     </div>
                   )}
-                  <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-[#004225] dark:text-[#FAFAF8]">Eingaben</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-[#004225] dark:text-[#FAFAF8]">{t.tool_inputs}</h4>
                   <div className="space-y-4">
                     {activeTool.inputs.map((input: any) => (
                       <div key={input.key}>
@@ -6603,7 +7806,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               className="text-[10px] font-bold text-[#004225] dark:text-[#FAFAF8] flex items-center gap-1 hover:underline"
                             >
                               <FileText size={10} />
-                              Datei laden
+                              {t.tool_load_file}
                             </button>
                           )}
                         </div>
@@ -6626,7 +7829,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       </div>
                     ))}
                     {activeTool.id === 'salary-calc' && (
-                      <div className="p-4 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 flex items-start gap-3">
+                      <div className="p-4 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 flex items-start gap-3">
                         <ShieldCheck size={16} className="text-[#004225] dark:text-[#FAFAF8] shrink-0 mt-0.5" />
                         <p className="text-[10px] text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed italic">
                           {t.salary_security_notice}
@@ -6634,7 +7837,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       </div>
                     )}
                     {!cvContext && activeTool.id !== 'salary-calc' && activeTool.id !== 'zeugnis' && activeTool.id !== 'job-search' && (
-                      <div className="p-4 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 text-[10px] text-[#004225] dark:text-[#FAFAF8] leading-relaxed">
+                      <div className="p-4 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 text-[10px] text-[#004225] dark:text-[#FAFAF8] leading-relaxed">
                         {t.tool_no_cv}
                       </div>
                     )}
@@ -6663,9 +7866,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-[#004225] rounded-full animate-pulse shadow-[0_0_8px_rgba(0,66,37,0.4)]" />
                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94]">
-                              {user.role === 'pro' 
-                                ? `${50 - (user.toolUses || 0)} ${language === 'DE' ? 'verbleibend' : 'remaining'}`
-                                : `${1 - (user.toolUses || 0)} ${language === 'DE' ? 'verbleibend' : 'remaining'}`
+                              {user.role === 'pro'
+                                ? `${50 - (user.toolUses || 0)} ${t.remaining}`
+                                : `${1 - (user.toolUses || 0)} ${t.remaining}`
                               }
                             </span>
                           </div>
@@ -6679,8 +7882,207 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </div>
 
                 {/* Results */}
-                <div className="flex-1 p-8 bg-white dark:bg-[#1A1A18] relative transition-colors overflow-y-auto custom-scrollbar">
-                  {isProcessingTool ? (
+                <div className="flex-1 p-6 md:p-8 bg-white dark:bg-[#1A1A18] relative transition-colors overflow-y-auto custom-scrollbar">
+                  {/* INTERACTIVE INTERVIEW SESSION */}
+                  {activeTool.id === 'interview-live' && interviewSession && !isProcessingTool ? (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col gap-6">
+                      {/* Header */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-[#004225] text-white flex items-center justify-center">
+                            <Headphones size={18} />
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium">{interviewSession.questions[0] && !interviewSession.isComplete ? `${interviewSession.jobContext || toolInput.jobTitle}` : t.interview_complete}</h4>
+                            <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">{t.interview_question_of.replace('{current}', String(Math.min(interviewSession.currentQ + 1, 5)))}</p>
+                          </div>
+                        </div>
+                        {/* Progress bar */}
+                        <div className="flex gap-1">
+                          {interviewSession.questions.map((_, i) => (
+                            <div key={i} className={`w-6 h-1.5 rounded-full transition-all ${i < interviewSession.answers.length ? 'bg-[#059669]' : i === interviewSession.currentQ && !interviewSession.isComplete ? 'bg-[#004225]' : 'bg-black/10 dark:bg-white/10'}`} />
+                          ))}
+                        </div>
+                      </div>
+
+                      {!interviewSession.isComplete ? (
+                        <>
+                          {/* Current Question */}
+                          <div className="p-6 bg-[#004225] text-white space-y-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-7 h-7 bg-white/10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">{interviewSession.currentQ + 1}</div>
+                              <p className="text-base font-light leading-relaxed">{interviewSession.questions[interviewSession.currentQ]?.q}</p>
+                            </div>
+                            <details className="group cursor-pointer">
+                              <summary className="text-[10px] font-bold uppercase tracking-widest text-white/40 hover:text-white/70 transition-colors list-none flex items-center gap-1 select-none">
+                                <span className="group-open:rotate-90 transition-transform">▶</span>
+                                {t.interview_show_tip}
+                              </summary>
+                              <div className="mt-3 pt-3 border-t border-white/10 space-y-2">
+                                <p className="text-xs text-white/70 font-light">{interviewSession.questions[interviewSession.currentQ]?.tip}</p>
+                              </div>
+                            </details>
+                          </div>
+
+                          {/* Previous answer feedback */}
+                          {interviewSession.currentQ > 0 && interviewSession.feedbacks[interviewSession.currentQ - 1] && (
+                            <div className="p-4 bg-[#059669]/5 border border-[#059669]/20 space-y-1">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#059669]">{t.interview_feedback_prev}</p>
+                              <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">{interviewSession.feedbacks[interviewSession.currentQ - 1]}</p>
+                            </div>
+                          )}
+
+                          {/* Answer Input */}
+                          <div className="space-y-3 flex-1">
+                            <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
+                              {t.interview_your_answer}
+                            </label>
+                            <div className="relative">
+                              <textarea
+                                value={interviewAnswer}
+                                onChange={(e) => setInterviewAnswer(e.target.value)}
+                                placeholder={t.interview_answer_placeholder}
+                                className="w-full p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] transition-all min-h-[120px] font-light text-[#1A1A18] dark:text-[#FAFAF8] resize-none pr-14"
+                              />
+                              <button
+                                onClick={() => {
+                                  const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+                                  if (!SpeechRecognition) { alert(t.interview_mic_unavailable); return; }
+                                  const recognition = new SpeechRecognition();
+                                  recognition.lang = language === 'DE' ? 'de-CH' : language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : 'en-US';
+                                  recognition.interimResults = false;
+                                  recognition.onresult = (event: any) => {
+                                    const transcript = event.results[0][0].transcript;
+                                    setInterviewAnswer(prev => prev ? prev + ' ' + transcript : transcript);
+                                    setInterviewSession(prev => prev ? { ...prev, isRecording: false } : null);
+                                  };
+                                  recognition.onerror = () => setInterviewSession(prev => prev ? { ...prev, isRecording: false } : null);
+                                  recognition.onend = () => setInterviewSession(prev => prev ? { ...prev, isRecording: false } : null);
+                                  setInterviewSession(prev => prev ? { ...prev, isRecording: true } : null);
+                                  recognition.start();
+                                }}
+                                className={`absolute bottom-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all ${interviewSession.isRecording ? 'bg-red-500 text-white animate-pulse' : 'bg-[#004225]/10 hover:bg-[#004225]/20 text-[#004225] dark:text-[#FAFAF8]'}`}
+                                title={t.interview_mic_answer}
+                              >
+                                <Mic size={14} />
+                              </button>
+                            </div>
+                            {interviewSession.isRecording && (
+                              <p className="text-[10px] text-red-500 font-bold uppercase tracking-widest animate-pulse flex items-center gap-1">
+                                <Radio size={10} /> {t.interview_recording}
+                              </p>
+                            )}
+                          </div>
+
+                          {/* Submit Button */}
+                          <button
+                            disabled={!interviewAnswer.trim() || interviewSession.isEvaluating}
+                            onClick={async () => {
+                              if (!interviewAnswer.trim()) return;
+                              setInterviewSession(prev => prev ? { ...prev, isEvaluating: true } : null);
+                              const q = interviewSession.questions[interviewSession.currentQ];
+                              let feedback = '';
+                              try {
+                                const evalRes = await fetch('/api/process-tool', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    prompt: `Bewerte diese Interview-Antwort kurz (2-3 Sätze) auf Schweizer Hochdeutsch.\nFrage: "${q.q}"\nAntwort: "${interviewAnswer}"\nMusterantwort-Framework: "${q.model}"\nGib CONCRETES, kurzes Feedback: Was war gut? Was fehlt? Eine direkte Verbesserung.`,
+                                    model: FLASH_MODEL
+                                  })
+                                });
+                                const evalData = await evalRes.json();
+                                feedback = evalData.text || '';
+                              } catch {
+                                feedback = t.interview_feedback_unavailable;
+                              }
+                              const newAnswers = [...interviewSession.answers, interviewAnswer];
+                              const newFeedbacks = [...interviewSession.feedbacks, feedback];
+                              const nextQ = interviewSession.currentQ + 1;
+                              const isComplete = nextQ >= interviewSession.questions.length;
+                              setInterviewSession(prev => prev ? {
+                                ...prev,
+                                answers: newAnswers,
+                                feedbacks: newFeedbacks,
+                                currentQ: nextQ,
+                                isEvaluating: false,
+                                isComplete,
+                              } : null);
+                              setInterviewAnswer('');
+                            }}
+                            className="w-full py-4 bg-[#004225] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                          >
+                            {interviewSession.isEvaluating ? (
+                              <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{t.interview_evaluating}</>
+                            ) : (
+                              <>{t.interview_submit.replace('{n}', String(interviewSession.currentQ + 1))}</>
+                            )}
+                          </button>
+                          {/* Model answer toggle */}
+                          <details className="group">
+                            <summary className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/50 cursor-pointer hover:text-[#004225] transition-colors list-none flex items-center gap-1 select-none">
+                              <span className="group-open:rotate-90 transition-transform">▶</span>
+                              {t.interview_show_model}
+                            </summary>
+                            <div className="mt-2 p-4 bg-[#004225]/5 border border-[#004225]/10 space-y-2">
+                              <p className="text-xs font-light text-[#004225]/80 leading-relaxed">{interviewSession.questions[interviewSession.currentQ]?.model}</p>
+                              <p className="text-[10px] text-red-600/70 font-light italic">{t.interview_common_mistake}{interviewSession.questions[interviewSession.currentQ]?.mistakes}</p>
+                            </div>
+                          </details>
+                        </>
+                      ) : (
+                        /* COMPLETED STATE */
+                        <div className="space-y-6 py-4">
+                          <div className="text-center space-y-2">
+                            <div className="w-16 h-16 bg-[#004225] text-white flex items-center justify-center mx-auto text-3xl">🎯</div>
+                            <h3 className="text-2xl font-serif">{t.interview_complete_title}</h3>
+                            <p className="text-sm text-[#6B6B66] font-light">{t.interview_complete_desc}</p>
+                          </div>
+                          <div className="space-y-4">
+                            {interviewSession.questions.map((q, i) => (
+                              <div key={i} className="border border-black/5 dark:border-white/5 p-4 space-y-2">
+                                <div className="flex items-start gap-2">
+                                  <span className="w-5 h-5 bg-[#004225] text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+                                  <p className="text-xs font-medium">{q.q}</p>
+                                </div>
+                                {interviewSession.answers[i] && (
+                                  <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light pl-7 italic">"{interviewSession.answers[i]}"</p>
+                                )}
+                                {interviewSession.feedbacks[i] && (
+                                  <div className="pl-7 p-2 bg-[#059669]/5 border-l-2 border-[#059669]/30">
+                                    <p className="text-[10px] text-[#059669] font-medium">{interviewSession.feedbacks[i]}</p>
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex gap-3">
+                            <button
+                              onClick={() => {
+                                setInterviewSession(null);
+                                setInterviewAnswer('');
+                                setToolResult(null);
+                              }}
+                              className="flex-1 py-3 border border-[#004225]/20 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:bg-[#004225]/5 transition-all"
+                            >
+                              {t.interview_new}
+                            </button>
+                            <button
+                              onClick={() => {
+                                const summary = interviewSession.questions.map((q, i) => `Q${i+1}: ${q.q}\nAntwort: ${interviewSession.answers[i] || '-'}\nFeedback: ${interviewSession.feedbacks[i] || '-'}`).join('\n\n');
+                                navigator.clipboard.writeText(summary);
+                                showToast(t.tool_copied);
+                              }}
+                              className="flex-1 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
+                            >
+                              <Copy size={12} />
+                              {t.interview_copy_summary}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  ) : isProcessingTool ? (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-[#1A1A18]/80 backdrop-blur-sm z-10">
                       <div className="w-12 h-12 border-4 border-[#004225]/10 dark:border-[#FAFAF8]/10 border-t-[#004225] dark:border-t-[#FAFAF8] rounded-full animate-spin mb-4" />
                       <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.tool_analyzing}</p>
@@ -6753,7 +8155,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               </div>
                               <div>
                                 <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">Premium Analysis</h5>
-                                <p className="text-[9px] text-[#004225]/70 font-light">Tiefgehende Prüfung nach Schweizer Standards</p>
+                                <p className="text-[9px] text-[#004225]/70 font-light">{t.premium_analysis_desc}</p>
                               </div>
                             </div>
                             <div className="flex items-center gap-1 px-2 py-1 bg-[#004225] text-white text-[8px] font-bold uppercase tracking-widest rounded-sm">
@@ -6766,7 +8168,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <div className="space-y-12 py-8">
                             <div className="text-center space-y-4">
                               <h3 className="text-3xl font-serif text-[#004225]">CHF {parsedSalaryResult.medianSalary.toLocaleString('de-CH')}</h3>
-                              <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94]">Geschätzter Medianlohn (Brutto/Jahr)</p>
+                              <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94]">{t.salary_median_label}</p>
                             </div>
                             
                             <div className="space-y-6">
@@ -6791,7 +8193,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-black/5">
                               {parsedSalaryResult.insights.map((insight: string, i: number) => (
-                                <div key={i} className="p-4 bg-[#FAFAF8] border border-black/5 space-y-2">
+                                <div key={i} className="p-4 bg-[#FDFCFB] border border-black/5 space-y-2">
                                   <div className="w-6 h-6 bg-[#004225]/10 rounded-full flex items-center justify-center text-[#004225]">
                                     {i === 0 ? <MapPin size={12} /> : i === 1 ? <Briefcase size={12} /> : <TrendingUp size={12} />}
                                   </div>
@@ -6803,11 +8205,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div className="p-6 bg-[#004225]/5 border border-[#004225]/10 space-y-3">
                               <div className="flex items-center gap-2 text-[#004225]">
                                 <Info size={16} />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">Wichtiger Hinweis</span>
+                                <span className="text-[10px] font-bold uppercase tracking-widest">{t.salary_important_notice}</span>
                               </div>
                               <p className="text-[10px] font-light leading-relaxed text-[#004225]/80">
-                                Diese Schätzung basiert auf aktuellen Markttrends und KI-Modellen für den Schweizer Arbeitsmarkt. 
-                                Faktoren wie spezifische Zertifizierungen, Bonusvereinbarungen und individuelle Benefits können das tatsächliche Angebot beeinflussen.
+                                {t.salary_disclaimer}
                               </p>
                             </div>
                           </div>
@@ -6821,19 +8222,19 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-start pt-6 pb-12 text-center space-y-6 max-w-md mx-auto">
-                      <div className="w-16 h-16 bg-[#FAFAF8] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] rounded-full shrink-0">
+                      <div className="w-16 h-16 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] rounded-full shrink-0">
                         <Lightbulb size={32} />
                       </div>
 
                       <div className="space-y-4">
-                        <h4 className="text-lg font-serif">{language === 'DE' ? 'So nutzt du dieses Tool' : 'How to use this tool'}</h4>
+                        <h4 className="text-lg font-serif">{t.tool_how_to_use}</h4>
                         <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">
                           {activeTool.desc}
                         </p>
                         {t.tools_data[activeTool.id]?.tutorial && activeTool.desc.length > 140 && (
                           <div className="pt-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] animate-pulse">
                             <ChevronDown size={12} />
-                            <span>{language === 'DE' ? 'Runterscrollen für Profi-Beispiel' : 'Scroll down for professional example'}</span>
+                            <span>{t.tool_scroll_example}</span>
                           </div>
                         )}
                       </div>
@@ -6842,7 +8243,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="w-full p-6 bg-[#004225]/5 border border-[#004225]/10 space-y-3 text-left">
                           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
                             <Award size={14} />
-                            <span>{language === 'DE' ? 'Profi-Beispiel' : 'Professional Example'}</span>
+                            <span>{t.tool_pro_example}</span>
                           </div>
                           <p className="text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed italic">
                             "{t.tools_data[activeTool.id].tutorial}"
@@ -6855,12 +8256,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="w-full p-6 bg-amber-50 border border-amber-100 space-y-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-900">
                             <Sparkles size={16} />
-                            <span className="text-[10px] font-bold uppercase tracking-widest">Unlimited Zugang</span>
+                            <span className="text-[10px] font-bold uppercase tracking-widest">{t.tool_unlimited_access}</span>
                           </div>
                           <p className="text-[10px] text-amber-800 leading-relaxed">
-                            {language === 'DE' 
-                              ? 'Schalte dieses Tool und alle Premium-Funktionen mit dem Unlimited-Plan frei.' 
-                              : 'Unlock this tool and all premium features with the Unlimited plan.'}
+                            {t.tool_unlock_desc}
                           </p>
                           <button 
                             onClick={() => {
@@ -6870,14 +8269,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             }}
                             className="w-full py-3 bg-amber-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-amber-700 transition-all"
                           >
-                            {language === 'DE' ? 'Jetzt Unlimited entdecken' : 'Discover Unlimited Now'}
+                            {t.tool_discover_unlimited}
                           </button>
                         </div>
                       )}
 
                       <div className="pt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                         <ArrowLeft size={12} />
-                        <span>{language === 'DE' ? 'Fülle die Felder links aus' : 'Fill in the fields on the left'}</span>
+                        <span>{t.tool_fill_fields}</span>
                       </div>
                     </div>
                   )}
@@ -6898,7 +8297,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white dark:bg-[#1A1A18] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors"
             >
-              <div className="p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FAFAF8] dark:bg-[#2A2A26]">
+              <div className="p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-[#004225] text-white flex items-center justify-center rounded-full">
                     <Briefcase size={24} />
@@ -6957,14 +8356,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
-              <div className="p-6 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row justify-end gap-4 bg-[#FAFAF8] dark:bg-[#2A2A26]">
+              <div className="p-6 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row justify-end gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26]">
                 <button 
                   onClick={() => {
                     setIsJobModalOpen(false);
                     handleToolClick('ats-sim');
                     setToolInput({ ...toolInput, jobAd: `${selectedJob.title} bei ${selectedJob.company}\n\n${selectedJob.description}\n\n${selectedJob.requirements}` });
                   }}
-                  className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border border-[#004225] dark:border-[#FAFAF8] text-[#004225] dark:text-[#FAFAF8] hover:bg-[#004225] dark:hover:bg-[#FAFAF8] hover:text-white dark:hover:text-[#1A1A18] transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border border-[#004225] dark:border-[#FAFAF8] text-[#004225] dark:text-[#FAFAF8] hover:bg-[#004225] dark:hover:bg-[#FDFCFB] hover:text-white dark:hover:text-[#1A1A18] transition-all flex items-center justify-center gap-2"
                 >
                   <Target size={14} />
                   ATS Check
@@ -6996,8 +8395,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
             >
-              <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FAFAF8]">
-                <h3 className="text-xl font-serif">Deine generierte Bewerbung</h3>
+              <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FDFCFB]">
+                <h3 className="text-xl font-serif">{t.generated_app_title}</h3>
                 <button onClick={() => setGeneratedApp(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
                   <X size={20} />
                 </button>
@@ -7005,21 +8404,21 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <div className="flex-1 overflow-y-auto p-8 font-serif text-lg leading-relaxed whitespace-pre-wrap">
                 {generatedApp}
               </div>
-              <div className="p-6 border-t border-black/5 flex justify-end gap-4 bg-[#FAFAF8]">
+              <div className="p-6 border-t border-black/5 flex justify-end gap-4 bg-[#FDFCFB]">
                 <button 
                   onClick={() => {
                     navigator.clipboard.writeText(generatedApp);
-                    showToast(language === 'DE' ? "In die Zwischenablage kopiert!" : "Copied to clipboard!");
+                    showToast(t.tool_copied);
                   }}
                   className="px-6 py-3 text-sm font-medium border border-black/10 hover:bg-black/5 transition-all"
                 >
-                  Kopieren
+                  {t.tool_copy}
                 </button>
-                <button 
+                <button
                   onClick={() => setGeneratedApp(null)}
                   className="px-6 py-3 text-sm font-medium bg-[#004225] text-white hover:bg-[#00331d] transition-all"
                 >
-                  Schliessen
+                  {t.close}
                 </button>
               </div>
             </motion.div>
@@ -7094,7 +8493,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               {authTab !== 'forgot' && (
-                <div className="flex bg-[#FAFAF8] dark:bg-[#2A2A26] p-1 mb-8">
+                <div className="flex bg-[#FDFCFB] dark:bg-[#2A2A26] p-1 mb-8">
                   <button 
                     onClick={() => { setAuthTab('login'); setAuthError(''); }}
                     className={`flex-1 py-2 text-xs font-medium transition-all ${authTab === 'login' ? 'bg-white dark:bg-[#1A1A18] shadow-sm text-[#1A1A18] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}
@@ -7181,9 +8580,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           ))}
                         </div>
                         <p className="text-[9px] text-[#9A9A94] uppercase tracking-wider">
-                          {passwordStrength <= 2 ? (language === 'DE' ? 'Schwach' : 'Weak') : 
-                           passwordStrength <= 4 ? (language === 'DE' ? 'Mittel' : 'Medium') : 
-                           (language === 'DE' ? 'Stark' : 'Strong')}
+                          {passwordStrength <= 2 ? t.password_weak :
+                           passwordStrength <= 4 ? t.password_medium :
+                           t.password_strong}
                         </p>
                       </div>
                     )}
@@ -7211,7 +8610,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => { setAuthTab('register'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                         >
-                          {language === 'DE' ? '→ Jetzt neu registrieren' : '→ Register new account'}
+                          {t.auth_register_new}
                         </button>
                       </div>
                     )}
@@ -7222,7 +8621,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => { setAuthTab('login'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                         >
-                          {language === 'DE' ? '→ Zum Login wechseln' : '→ Switch to Login'}
+                          {t.auth_switch_to_login}
                         </button>
                       </div>
                     )}
@@ -7260,7 +8659,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <div className="w-full border-t border-black/10 dark:border-white/10"></div>
                       </div>
                       <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
-                        <span className="bg-white dark:bg-[#1A1A18] px-2 text-[#9A9A94]">Oder</span>
+                        <span className="bg-white dark:bg-[#1A1A18] px-2 text-[#9A9A94]">{t.or_divider}</span>
                       </div>
                     </div>
 
@@ -7291,13 +8690,17 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       onClick={() => { setAuthTab('login'); setAuthError(''); }}
                       className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                     >
-                      {language === 'DE' ? '← Zurück zum Login' : '← Back to Login'}
+                      {t.auth_back_to_login}
                     </button>
                   </div>
                 )}
 
                 <p className="text-[10px] text-center text-[#9A9A94] mt-6 leading-relaxed">
-                  Mit der Anmeldung akzeptierst du unsere <span className="underline cursor-pointer">AGB</span> und <span className="underline cursor-pointer">Datenschutzerklärung</span>. Deine Daten werden sicher in der Schweiz/EU verarbeitet.
+                  {t.auth_terms_by_signing}{' '}
+                  <span className="underline cursor-pointer">{t.footer_terms}</span>
+                  {' '}{t.auth_terms_and}{' '}
+                  <span className="underline cursor-pointer">{t.footer_privacy}</span>.{' '}
+                  {t.auth_terms_data_processing}
                 </p>
 
                 <div className="mt-8 pt-4 border-t border-black/5 flex justify-center">
@@ -7310,7 +8713,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     }}
                     className="text-[9px] uppercase tracking-widest text-[#9A9A94] hover:text-[#004225] transition-colors"
                   >
-                    {language === 'DE' ? 'Sitzung zurücksetzen' : 'Reset Session'}
+                    {t.auth_reset_session}
                   </button>
                 </div>
               </form>
@@ -7329,7 +8732,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white w-full max-w-2xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col"
             >
-              <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FAFAF8]">
+              <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FDFCFB]">
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-[#004225] text-white flex items-center justify-center">
                     <Settings size={20} />
@@ -7352,7 +8755,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
-                            className="flex-1 bg-[#FAFAF8] border border-black/10 px-3 py-2 text-sm outline-none focus:border-[#004225]/30"
+                            className="flex-1 bg-[#FDFCFB] border border-black/10 px-3 py-2 text-sm outline-none focus:border-[#004225]/30"
                             autoFocus
                           />
                           <button 
@@ -7405,7 +8808,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
                 <section className="space-y-4">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.subscription}</h4>
-                  <div className="p-4 bg-[#FAFAF8] border border-black/5 flex justify-between items-center">
+                  <div className="p-4 bg-[#FDFCFB] border border-black/5 flex justify-between items-center">
                     <div>
                       <p className="text-sm font-medium">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Unlimited' : 'Stellify Gratis'}</p>
                       <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
@@ -7423,10 +8826,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
                   {/* Detailed Usage in Settings */}
                   {(user?.role === 'pro' || user?.role === 'client') && (
-                    <div className="p-6 bg-[#FAFAF8] border border-black/5 space-y-6">
+                    <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
                       <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
                         <Activity size={14} />
-                        <span>{language === 'DE' ? 'Deine Nutzung' : 'Your Usage'}</span>
+                        <span>{t.settings_your_usage}</span>
                       </div>
                       
                       <div className="space-y-6">
@@ -7436,8 +8839,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div className="space-y-2">
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{language === 'DE' ? 'Bewerbungen & Tools' : 'Applications & Tools'}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {language === 'DE' ? 'Generierungen' : 'Generations'}</p>
+                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {t.settings_generations}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 50) * 100)}%</span>
                               </div>
@@ -7454,7 +8857,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.dashboard_daily_usage}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {language === 'DE' ? 'Aktionen heute' : 'Actions today'}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {t.settings_actions_today}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%</span>
                               </div>
@@ -7473,8 +8876,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div className="space-y-2">
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{language === 'DE' ? 'Bewerbungen & Tools' : 'Applications & Tools'}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 1 {language === 'DE' ? 'Gratis-Nutzung' : 'Free use'}</p>
+                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 1 {t.settings_free_use}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.toolUses || 0) / 1) * 100))}%</span>
                               </div>
@@ -7491,7 +8894,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">Stella Chat</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.freeGenerationsUsed || 0} / 3 {language === 'DE' ? 'Anfragen' : 'Requests'}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.freeGenerationsUsed || 0} / 3 {t.settings_requests}</p>
                                 </div>
                                 <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.freeGenerationsUsed || 0) / 3) * 100))}%</span>
                               </div>
@@ -7578,12 +8981,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   <button className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
                 </section>
               </div>
-              <div className="p-6 border-t border-black/5 bg-[#FAFAF8] flex justify-end">
+              <div className="p-6 border-t border-black/5 bg-[#FDFCFB] flex justify-end">
                 <button 
                   onClick={() => setIsSettingsOpen(false)}
                   className="px-6 py-2 bg-[#004225] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                 >
-                  {language === 'DE' ? 'Schliessen' : 'Close'}
+                  {t.close}
                 </button>
               </div>
             </motion.div>
@@ -7621,7 +9024,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 onClick={() => setIsPromoOpen(false)}
                 className="absolute top-12 right-12 z-[600] text-white/60 hover:text-white transition-all flex items-center gap-3 group"
               >
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">Schliessen</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">{t.close}</span>
                 <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/60 transition-colors bg-black/20 backdrop-blur-sm">
                   <X size={24} />
                 </div>
@@ -7644,8 +9047,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
       <AnimatePresence>
         {isTutorialOpen && (
-          <OnboardingTutorial 
-            t={t} 
+          <OnboardingTutorial
+            t={t}
             onComplete={async () => {
               setIsTutorialOpen(false);
               if (user?.id) {
@@ -7655,15 +9058,25 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   console.error("Error updating tutorial status:", e);
                 }
               }
-            }} 
+            }}
           />
         )}
       </AnimatePresence>
 
-      <input 
-        type="file" 
-        ref={fileInputRef} 
-        className="hidden" 
+      {/* Cookie Consent Banner */}
+      {cookieConsent === null && (
+        <CookieBanner
+          t={t}
+          onAccept={() => handleCookieAccept('accepted')}
+          onEssential={() => handleCookieAccept('essential')}
+          onPrivacyLink={() => { handleCookieAccept('essential'); navigate('datenschutz'); }}
+        />
+      )}
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
         accept=".pdf"
         onChange={(e) => {
           const file = e.target.files?.[0];

@@ -110,16 +110,25 @@ app.post("/api/chat", async (req, res) => {
 
 // ── Gemini Tool ───────────────────────────────────────────────────────────────
 app.post("/api/process-tool", async (req, res) => {
-  const { prompt, model, useSearch } = req.body;
+  const { prompt, model, useSearch, language } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
+
+  const langInstructions: Record<string, string> = {
+    DE: "Du bist ein Schweizer Karriere-Experte. Antworte auf Schweizer Hochdeutsch (kein ß). Antworte präzise und professionell.",
+    FR: "Tu es un expert en carrière suisse. Réponds en français suisse. Sois précis et professionnel.",
+    IT: "Sei un esperto di carriera svizzero. Rispondi in italiano svizzero. Sii preciso e professionale.",
+    EN: "You are a Swiss career expert. Respond in English. Be precise and professional.",
+  };
+  const systemInstruction = langInstructions[language] || langInstructions.DE;
+
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: model || "gemini-2.0-flash",
       contents: prompt,
       config: {
-        systemInstruction: "Du bist ein Schweizer Karriere-Experte. Nutze Schweizer Hochdeutsch (kein ß). Antworte präzise und professionell.",
+        systemInstruction,
         temperature: 0.4,
         tools: useSearch ? [{ googleSearch: {} }] : undefined
       }
