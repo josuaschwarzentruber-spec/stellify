@@ -477,10 +477,10 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
             <Section title="1. Verantwortliche Person">
               <p>Verantwortlich für die Datenbearbeitung im Sinne des Schweizer Datenschutzgesetzes (DSG) und der Europäischen Datenschutz-Grundverordnung (DSGVO) ist:</p>
               <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1">
-                <p>{placeholder('[VORNAME NACHNAME / FIRMENNAME]')}</p>
+                <p>JTSP</p>
                 <p>{placeholder('[STRASSE UND HAUSNUMMER]')}</p>
-                <p>{placeholder('[PLZ ORT]')}, Schweiz</p>
-                <p>E-Mail: {placeholder('[kontakt@stellify.ch]')}</p>
+                <p>{placeholder('[PLZ]')} Zug, Schweiz</p>
+                <p>E-Mail: support.stellify@gmail.com</p>
               </div>
             </Section>
 
@@ -574,7 +574,7 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
                 <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Widerruf der Einwilligung:</strong> Eine einmal erteilte Einwilligung kann jederzeit widerrufen werden.</li>
                 <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Beschwerde:</strong> Du hast das Recht, bei der zuständigen Aufsichtsbehörde (EDÖB, edoeb.admin.ch) Beschwerde einzureichen.</li>
               </ul>
-              <p className="mt-4">Zur Ausübung deiner Rechte wende dich an: {placeholder('[kontakt@stellify.ch]')}</p>
+              <p className="mt-4">Zur Ausübung deiner Rechte wende dich an: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a></p>
             </Section>
 
             <Section title="9. Datensicherheit">
@@ -604,16 +604,16 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
 
             <Section title="Betreiber und Verantwortlicher">
               <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 font-mono text-xs">
-                <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{placeholder('[VORNAME NACHNAME / FIRMENNAME]')}</p>
+                <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">JTSP</p>
                 <p>{placeholder('[STRASSE UND HAUSNUMMER]')}</p>
-                <p>{placeholder('[PLZ]')} {placeholder('[ORT]')}</p>
+                <p>{placeholder('[PLZ]')} Zug</p>
                 <p>Schweiz</p>
               </div>
             </Section>
 
             <Section title="Kontakt">
               <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 text-sm">
-                <p>E-Mail: {placeholder('[kontakt@stellify.ch]')}</p>
+                <p>E-Mail: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a></p>
                 <p>Website: stellify.ch</p>
               </div>
             </Section>
@@ -634,7 +634,7 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
             </Section>
 
             <Section title="Anwendbares Recht">
-              <p>Es gilt ausschliesslich Schweizer Recht. Gerichtsstand ist {placeholder('[Kanton / Ort]')}, Schweiz.</p>
+              <p>Es gilt ausschliesslich Schweizer Recht. Gerichtsstand ist Zug, Schweiz.</p>
             </Section>
           </article>
         )}
@@ -645,11 +645,11 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
             <header className="mb-12">
               <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
               <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Allgemeine Geschäftsbedingungen (AGB)</h1>
-              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today} · Anbieter: {placeholder('[FIRMENNAME]')}, Schweiz</p>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today} · Anbieter: JTSP, Zug, Schweiz</p>
             </header>
 
             <Section title="1. Vertragsgegenstand und Geltungsbereich">
-              <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter {placeholder('[FIRMENNAME]')} (nachfolgend „Stellify") und registrierten Nutzern (nachfolgend „Nutzer") der Plattform stellify.ch.</p>
+              <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter JTSP (nachfolgend „Stellify") und registrierten Nutzern (nachfolgend „Nutzer") der Plattform stellify.ch.</p>
               <p className="mt-2">Stellify bietet eine KI-gestützte Karriereplattform mit Tools zur Lebenslaufoptimierung, Interview-Vorbereitung, Gehaltsanalyse und weiteren Karriere-Diensten an.</p>
             </Section>
 
@@ -701,7 +701,7 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
             </Section>
 
             <Section title="5. Widerrufsrecht">
-              <p>Bei digitalen Dienstleistungen, die mit ausdrücklicher Zustimmung des Nutzers sofort genutzt werden, erlischt das Widerrufsrecht mit Beginn der Leistungserbringung (Art. 40e OR analog sowie EU-Richtlinie 2011/83/EU). Gleichwohl bietet Stellify als Kulanzleistung eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer an. Anfragen per E-Mail an {placeholder('[kontakt@stellify.ch]')}.</p>
+              <p>Bei digitalen Dienstleistungen, die mit ausdrücklicher Zustimmung des Nutzers sofort genutzt werden, erlischt das Widerrufsrecht mit Beginn der Leistungserbringung (Art. 40e OR analog sowie EU-Richtlinie 2011/83/EU). Gleichwohl bietet Stellify als Kulanzleistung eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer an. Anfragen per E-Mail an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a>.</p>
             </Section>
 
             <Section title="6. Kündigung und Laufzeit">
@@ -742,16 +742,16 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
             </Section>
 
             <Section title="12. Anwendbares Recht und Gerichtsstand">
-              <p>Es gilt ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>, unter Ausschluss des Kollisionsrechts. Gerichtsstand ist {placeholder('[Kanton / Ort]')}, Schweiz. Für Konsumenten gilt abweichend das zwingende Recht am Wohnsitz des Konsumenten.</p>
+              <p>Es gilt ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>, unter Ausschluss des Kollisionsrechts. Gerichtsstand ist Zug, Schweiz. Für Konsumenten gilt abweichend das zwingende Recht am Wohnsitz des Konsumenten.</p>
             </Section>
 
             <Section title="13. Streitbeilegung">
-              <p>Bei Streitigkeiten wenden sich Nutzer zunächst an {placeholder('[kontakt@stellify.ch]')} für eine einvernehmliche Lösung. Die EU-Kommission stellt unter <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] dark:text-[#00A854] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a> eine Online-Schlichtungsplattform bereit.</p>
+              <p>Bei Streitigkeiten wenden sich Nutzer zunächst an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] dark:text-[#00A854] underline">support.stellify@gmail.com</a> für eine einvernehmliche Lösung. Die EU-Kommission stellt unter <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] dark:text-[#00A854] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a> eine Online-Schlichtungsplattform bereit.</p>
             </Section>
 
             <div className="mt-10 p-5 bg-[#004225]/5 dark:bg-[#00A854]/5 border border-[#004225]/10 dark:border-[#00A854]/10">
               <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94]">
-                <strong className="text-[#004225] dark:text-[#00A854]">Hinweis für den Betreiber:</strong> Die gelb markierten Felder ({placeholder('wie dieses')}) müssen vor der Veröffentlichung mit deinen echten Angaben ausgefüllt werden. Für eine rechtssichere Überprüfung empfehlen wir eine Konsultation mit einem Schweizer Anwalt für Vertragsrecht / IT-Recht.
+                <strong className="text-[#004225] dark:text-[#00A854]">Noch ausstehend:</strong> Die gelb markierten Felder ({placeholder('Strasse + PLZ')}) in Impressum und Datenschutz benötigen noch eine Postadresse. Lies dazu den Hinweis unten. Für eine abschliessende rechtssichere Prüfung empfehlen wir eine Konsultation mit einem Schweizer Anwalt für IT-Recht.
               </p>
             </div>
           </article>
