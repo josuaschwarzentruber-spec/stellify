@@ -577,54 +577,91 @@ function StellifyApp() {
   // --- JOB BOARD COMPONENT ---
   const JobBoard = () => {
     const [jobFilters, setJobFilters] = useState({ keyword: '', location: '', industry: '' });
-    
-    const filteredJobs = (sampleJobs as any[]).filter(job => {
-      const keyword = jobFilters.keyword.toLowerCase();
+    const [liveJobs, setLiveJobs] = useState<any[] | null>(null);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isLiveResult, setIsLiveResult] = useState(false);
+
+    const localFiltered = (sampleJobs as any[]).filter(job => {
+      const kw = jobFilters.keyword.toLowerCase();
       const loc = jobFilters.location.toLowerCase();
       const ind = jobFilters.industry.toLowerCase();
-      
-      const matchesKeyword = !keyword || 
-        job.title.toLowerCase().includes(keyword) || 
-        job.description.toLowerCase().includes(keyword) ||
-        (job.ats_keywords && job.ats_keywords.some((k: string) => k.toLowerCase().includes(keyword)));
-      const matchesLocation = !loc || job.location.toLowerCase().includes(loc);
-      const matchesIndustry = !ind || job.category.toLowerCase().includes(ind);
-      
-      return matchesKeyword && matchesLocation && matchesIndustry;
+      return (!kw || job.title.toLowerCase().includes(kw) || job.description.toLowerCase().includes(kw) || job.ats_keywords?.some((k: string) => k.toLowerCase().includes(kw)))
+        && (!loc || job.location.toLowerCase().includes(loc))
+        && (!ind || job.category.toLowerCase().includes(ind));
     });
+
+    const displayJobs = liveJobs !== null ? liveJobs : localFiltered;
+
+    const handleLiveSearch = async () => {
+      setIsSearching(true);
+      setIsLiveResult(false);
+      try {
+        const params = new URLSearchParams();
+        if (jobFilters.keyword) params.set('keyword', jobFilters.keyword);
+        if (jobFilters.location) params.set('location', jobFilters.location);
+        if (jobFilters.industry) params.set('category', jobFilters.industry);
+        const res = await fetch(`/api/jobs?${params}`);
+        const data = await res.json();
+        if (data.jobs && data.jobs.length > 0) {
+          setLiveJobs(data.jobs);
+          setIsLiveResult(true);
+        } else {
+          setLiveJobs([]);
+        }
+      } catch {
+        setLiveJobs(null);
+      } finally {
+        setIsSearching(false);
+      }
+    };
+
+    const handleReset = () => {
+      setLiveJobs(null);
+      setIsLiveResult(false);
+      setJobFilters({ keyword: '', location: '', industry: '' });
+    };
+
+    const handleOpenJob = (url: string) => {
+      if (url && url !== '#') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+    };
 
     return (
       <div className="space-y-8">
+        {/* Search bar */}
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_keyword}</label>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94]" size={14} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder={t.search_placeholder}
                 className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 pl-10 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
                 value={jobFilters.keyword}
-                onChange={(e) => setJobFilters({ ...jobFilters, keyword: e.target.value })}
+                onChange={(e) => { setJobFilters({ ...jobFilters, keyword: e.target.value }); setLiveJobs(null); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleLiveSearch()}
               />
             </div>
           </div>
-          <div className="w-full md:w-48 space-y-2">
+          <div className="w-full md:w-44 space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_location}</label>
-            <input 
-              type="text" 
-              placeholder="e.g. Zürich"
+            <input
+              type="text"
+              placeholder="z.B. Zürich"
               className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
               value={jobFilters.location}
-              onChange={(e) => setJobFilters({ ...jobFilters, location: e.target.value })}
+              onChange={(e) => { setJobFilters({ ...jobFilters, location: e.target.value }); setLiveJobs(null); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleLiveSearch()}
             />
           </div>
-          <div className="w-full md:w-48 space-y-2">
+          <div className="w-full md:w-44 space-y-2">
             <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_industry}</label>
-            <select 
+            <select
               className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
               value={jobFilters.industry}
-              onChange={(e) => setJobFilters({ ...jobFilters, industry: e.target.value })}
+              onChange={(e) => { setJobFilters({ ...jobFilters, industry: e.target.value }); setLiveJobs(null); }}
             >
               <option value="">{t.filter_all}</option>
               <option value="IT">IT</option>
@@ -633,55 +670,87 @@ function StellifyApp() {
               <option value="Pharma">Pharma</option>
               <option value="Banking">Banking</option>
               <option value="Engineering">Engineering</option>
+              <option value="HR">HR</option>
+              <option value="Healthcare">Healthcare</option>
+              <option value="Logistik">Logistik</option>
             </select>
           </div>
+          {/* Live Search button */}
+          <button
+            onClick={handleLiveSearch}
+            disabled={isSearching}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#003318] transition-colors disabled:opacity-60 whitespace-nowrap"
+          >
+            {isSearching ? (
+              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> Suche...</>
+            ) : (
+              <><Search size={13} /> KI-Suche</>
+            )}
+          </button>
+          {isLiveResult && (
+            <button onClick={handleReset} className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors whitespace-nowrap">
+              Zurücksetzen
+            </button>
+          )}
         </div>
 
+        {/* Live result badge */}
+        {isLiveResult && (
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
+            Live-Ergebnisse via KI-Suche · {displayJobs.length} Stellen gefunden
+          </div>
+        )}
+        {!isLiveResult && (
+          <p className="text-[11px] text-[#9A9A94] dark:text-[#5C5C58]">
+            {displayJobs.length} Stellen · Klicke auf <strong>KI-Suche</strong> für Live-Ergebnisse aus dem Netz
+          </p>
+        )}
+
+        {/* Job cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {filteredJobs.map((job) => (
-            <motion.div 
-              key={job.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -4 }}
-              onClick={() => handleJobClick(job.id)}
-              className="bg-white dark:bg-[#2A2A26] p-6 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-serif group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors dark:text-[#FAFAF8]">{job.title}</h3>
-                  <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{job.company}</p>
+          <AnimatePresence mode="popLayout">
+            {displayJobs.map((job, i) => (
+              <motion.div
+                key={job.id || i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ delay: i * 0.04 }}
+                whileHover={{ y: -3 }}
+                onClick={() => handleOpenJob(job.url)}
+                className="bg-white dark:bg-[#2A2A26] p-6 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="space-y-1 flex-1 pr-4">
+                    <h3 className="text-lg font-serif group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors dark:text-[#FAFAF8] leading-snug">{job.title}</h3>
+                    <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{job.company}</p>
+                  </div>
+                  <div className="px-2 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 text-[#004225] dark:text-[#00A854] text-[9px] font-bold uppercase tracking-widest shrink-0">
+                    {job.category}
+                  </div>
                 </div>
-                <div className="px-2 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 text-[#004225] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest">
-                  {job.category}
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-xs text-[#6B6B66] dark:text-[#9A9A94] mb-4">
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 text-xs text-[#6B6B66] dark:text-[#9A9A94] mb-4">
                   <MapPin size={12} />
                   {job.location}
                 </div>
-              </div>
-              <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">
-                {job.description}
-              </p>
-              <div className="flex justify-between items-center">
-                <div className="flex gap-2">
-                  {job.ats_keywords?.slice(0, 3).map((kw: string) => (
-                    <span key={kw} className="text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 bg-black/5 dark:bg-white/5 text-[#9A9A94] dark:text-[#5C5C58]">
-                      {kw}
-                    </span>
-                  ))}
+                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">{job.description}</p>
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2 flex-wrap">
+                    {job.ats_keywords?.slice(0, 3).map((kw: string) => (
+                      <span key={kw} className="text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 bg-black/5 dark:bg-white/5 text-[#9A9A94] dark:text-[#5C5C58]">{kw}</span>
+                    ))}
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    Öffnen <ArrowRight size={12} />
+                  </span>
                 </div>
-                <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Details <ArrowRight size={12} />
-                </button>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
-        
-        {filteredJobs.length === 0 && (
+
+        {displayJobs.length === 0 && !isSearching && (
           <div className="py-24 text-center space-y-4">
             <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto text-[#9A9A94]">
               <Search size={32} />
@@ -692,6 +761,30 @@ function StellifyApp() {
             </div>
           </div>
         )}
+
+        {/* External links */}
+        <div className="pt-4 border-t border-black/5 dark:border-white/5">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">Weitere Stellen direkt suchen</p>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { label: 'Jobs.ch', url: 'https://www.jobs.ch/de/vakanzen/' },
+              { label: 'Indeed CH', url: 'https://ch.indeed.com/' },
+              { label: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs/search/?location=Switzerland' },
+              { label: 'Jobup.ch', url: 'https://www.jobup.ch/de/jobs/' },
+              { label: 'Yousty.ch', url: 'https://www.yousty.ch/de-CH/stellen' },
+            ].map(({ label, url }) => (
+              <a
+                key={label}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-1.5 border border-black/10 dark:border-white/10 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] hover:border-[#004225] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors flex items-center gap-1"
+              >
+                {label} <ArrowRight size={10} />
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
     );
   };
