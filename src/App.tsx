@@ -4356,21 +4356,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         </div>
 
         <div className="flex-1 max-w-md mx-8 hidden lg:block">
-          <div className="relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6B6B66] dark:text-[#9A9A94] group-focus-within:text-[#004225] transition-colors" size={16} />
-            <input 
-              type="text" 
-              placeholder={t.search_placeholder}
-              className="w-full bg-black/5 dark:bg-white/5 border border-transparent focus:border-[#004225]/20 focus:bg-white dark:focus:bg-[#2A2A26] pl-10 pr-12 py-2 text-sm font-light outline-none transition-all rounded-lg"
-              onFocus={() => setIsSearchOpen(true)}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded border border-black/10 dark:border-white/10 pointer-events-none">
-              <Command size={10} className="text-[#9A9A94]" />
-              <span className="text-[10px] text-[#9A9A94] font-bold">K</span>
-            </div>
-          </div>
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="w-full flex items-center gap-3 bg-black/5 dark:bg-white/5 border border-transparent hover:border-[#004225]/20 hover:bg-white dark:hover:bg-[#2A2A26] pl-3 pr-3 py-2 text-sm font-light text-left transition-all rounded-lg group"
+          >
+            <Search size={15} className="text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors shrink-0" />
+            <span className="flex-1 text-[#9A9A94] dark:text-[#5C5C58] text-sm">{t.search_placeholder}</span>
+            <span className="text-[10px] font-bold text-[#9A9A94] dark:text-[#5C5C58] px-1.5 py-0.5 bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/10 rounded shrink-0">⌘K</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-4">
@@ -6229,8 +6222,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         return Math.max(prev - 1, 0);
                       });
                     } else if (e.key === 'Enter') {
-                      if (selectedSearchIndex >= 0) {
-                        const result = searchResults[selectedSearchIndex];
+                      // If a result is selected via arrow keys, navigate to it
+                      const idx = selectedSearchIndex >= 0 ? selectedSearchIndex : (searchResults.length > 0 ? 0 : -1);
+                      if (idx >= 0 && searchResults[idx]) {
+                        const result = searchResults[idx];
                         if (result.type === 'profile') {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                           showToast(t.search_nav_profile);
@@ -6240,17 +6235,20 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           window.location.hash = result.link;
                         }
                         setIsSearchOpen(false);
+                        setSearchQuery('');
                       } else if (searchQuery.trim().length > 0) {
+                        // No results → ask Stella
                         setIsStellaOpen(true);
                         setIsSearchOpen(false);
                         sendMessage(searchQuery);
+                        setSearchQuery('');
                       }
                     } else if (e.key === 'Escape') {
                       setIsSearchOpen(false);
                     }
                   }}
                 />
-                <button onClick={() => setIsSearchOpen(false)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
+                <button onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
                   <X size={20} />
                 </button>
               </div>
