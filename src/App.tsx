@@ -391,7 +391,7 @@ const OnboardingTutorial = ({ onComplete, t }: { onComplete: () => void, t: any 
 };
 
 // --- COOKIE CONSENT BANNER ---
-const CookieBanner = ({ t, onAccept, onEssential }: { t: any; onAccept: () => void; onEssential: () => void }) => (
+const CookieBanner = ({ t, onAccept, onEssential, onPrivacyLink }: { t: any; onAccept: () => void; onEssential: () => void; onPrivacyLink: () => void }) => (
   <AnimatePresence>
     <motion.div
       initial={{ y: 120, opacity: 0 }}
@@ -413,7 +413,7 @@ const CookieBanner = ({ t, onAccept, onEssential }: { t: any; onAccept: () => vo
           <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">
             {t.cookie_desc}{' '}
             <button
-              onClick={() => window.open('/datenschutz', '_blank')}
+              onClick={onPrivacyLink}
               className="text-[#004225] dark:text-[#00C060] underline underline-offset-2 hover:no-underline"
             >
               {t.cookie_privacy_link}
@@ -439,6 +439,327 @@ const CookieBanner = ({ t, onAccept, onEssential }: { t: any; onAccept: () => vo
     </motion.div>
   </AnimatePresence>
 );
+
+// --- LEGAL PAGES COMPONENT ---
+const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => void }) => {
+  const today = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+    <div className="mb-10">
+      <h2 className="text-xl font-serif text-[#004225] dark:text-[#00A854] mb-4 pb-2 border-b border-[#004225]/10 dark:border-white/10">{title}</h2>
+      <div className="space-y-3 text-sm text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">{children}</div>
+    </div>
+  );
+
+  const placeholder = (text: string) => (
+    <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-1 rounded font-mono text-xs">{text}</span>
+  );
+
+  return (
+    <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
+      <div className="max-w-3xl mx-auto">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"
+        >
+          <ArrowLeft size={14} /> Zurück
+        </button>
+
+        {/* ======= DATENSCHUTZRICHTLINIE ======= */}
+        {activeView === 'datenschutz' && (
+          <article>
+            <header className="mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
+              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Datenschutzrichtlinie</h1>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today} · Gilt für: stellify.ch</p>
+            </header>
+
+            <Section title="1. Verantwortliche Person">
+              <p>Verantwortlich für die Datenbearbeitung im Sinne des Schweizer Datenschutzgesetzes (DSG) und der Europäischen Datenschutz-Grundverordnung (DSGVO) ist:</p>
+              <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1">
+                <p>{placeholder('[VORNAME NACHNAME / FIRMENNAME]')}</p>
+                <p>{placeholder('[STRASSE UND HAUSNUMMER]')}</p>
+                <p>{placeholder('[PLZ ORT]')}, Schweiz</p>
+                <p>E-Mail: {placeholder('[kontakt@stellify.ch]')}</p>
+              </div>
+            </Section>
+
+            <Section title="2. Erhobene Personendaten">
+              <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Kontodaten:</strong> Vorname, E-Mail-Adresse (bei Registrierung)</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur Verarbeitung durch die KI, wird nicht dauerhaft auf unseren Servern gespeichert)</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Nutzungsdaten:</strong> Anzahl Tool-Nutzungen, Chat-Anfragen, Datum des letzten Resets</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zahlungsdaten:</strong> Werden ausschliesslich durch Stripe Inc. verarbeitet. Wir erhalten keine vollständigen Kreditkartendaten.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal im Browser gespeichert)</li>
+              </ul>
+            </Section>
+
+            <Section title="3. Zweck der Datenbearbeitung">
+              <p>Wir bearbeiten deine Daten ausschliesslich zu folgenden Zwecken:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>Bereitstellung und Verbesserung der Plattform-Funktionen</li>
+                <li>Authentifizierung und Kontoverwaltung</li>
+                <li>Abrechnung und Zahlungsabwicklung (via Stripe)</li>
+                <li>Einhaltung gesetzlicher Pflichten</li>
+                <li>KI-gestützte Karriereberatung (Verarbeitung des CV-Textes durch Google Gemini API)</li>
+              </ul>
+            </Section>
+
+            <Section title="4. Rechtsgrundlage der Bearbeitung">
+              <p>Die Bearbeitung deiner Daten stützt sich auf folgende Rechtsgrundlagen:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Vertragserfüllung (Art. 6 Abs. 1 lit. b DSGVO / Art. 31 DSG):</strong> Kontodaten und Nutzungsdaten sind für die Bereitstellung des Dienstes notwendig.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Einwilligung (Art. 6 Abs. 1 lit. a DSGVO):</strong> Für optionale Analyse-Cookies.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO):</strong> Sicherheit und Missbrauchsprävention.</li>
+              </ul>
+            </Section>
+
+            <Section title="5. Weitergabe an Dritte">
+              <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
+              <div className="mt-3 space-y-4">
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Google Firebase (Alphabet Inc.)</p>
+                  <p className="text-xs mt-1">Zweck: Authentifizierung, Datenbankhosting (Firestore). Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).</p>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Google Gemini API (Alphabet Inc.)</p>
+                  <p className="text-xs mt-1">Zweck: KI-Verarbeitung von CV-Inhalten und Nutzereingaben. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Gemäss Google API-Nutzungsbedingungen werden Eingabedaten nicht zum Training genutzt.</p>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stripe Inc.</p>
+                  <p className="text-xs mt-1">Zweck: Zahlungsabwicklung. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln. Stripe ist PCI-DSS-zertifiziert.</p>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Vercel Inc.</p>
+                  <p className="text-xs mt-1">Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.</p>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="6. Cookies und lokale Speicherung">
+              <p>Wir verwenden folgende Arten von Cookies und lokalem Speicher:</p>
+              <div className="mt-3 space-y-3">
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>Firebase Auth Session Cookie – Authentifizierung, Ablauf: Session</li>
+                    <li>localStorage: <code className="bg-black/10 dark:bg-white/10 px-1">language</code>, <code className="bg-black/10 dark:bg-white/10 px-1">theme</code>, <code className="bg-black/10 dark:bg-white/10 px-1">cookieConsent</code> – Nutzereinstellungen</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p>
+                  <p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv. Bei zukünftiger Aktivierung erfolgt Information im Cookie-Banner.</p>
+                </div>
+              </div>
+            </Section>
+
+            <Section title="7. Speicherdauer">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Kontodaten: bis zur Kontolöschung durch den Nutzer</li>
+                <li>CV-Text: wird nach der Sitzung nicht dauerhaft gespeichert; in Firestore nur das Nutzerprofil ohne CV-Rohdaten</li>
+                <li>Zahlungsbelege: 10 Jahre gemäss Schweizer Buchführungsrecht (OR Art. 958f)</li>
+                <li>Nutzungsstatistiken: werden monatlich zurückgesetzt</li>
+              </ul>
+            </Section>
+
+            <Section title="8. Deine Rechte">
+              <p>Du hast nach Schweizer DSG und DSGVO folgende Rechte:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Auskunft:</strong> Du kannst jederzeit Auskunft über die gespeicherten Daten verlangen.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Berichtigung:</strong> Unrichtige Daten können jederzeit korrigiert werden.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Löschung:</strong> Du kannst die Löschung deines Kontos und aller damit verbundenen Daten verlangen.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Datenportabilität:</strong> Du kannst deine Daten in einem maschinenlesbaren Format erhalten.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Widerspruch:</strong> Du kannst der Verarbeitung auf Basis berechtigter Interessen widersprechen.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Widerruf der Einwilligung:</strong> Eine einmal erteilte Einwilligung kann jederzeit widerrufen werden.</li>
+                <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Beschwerde:</strong> Du hast das Recht, bei der zuständigen Aufsichtsbehörde (EDÖB, edoeb.admin.ch) Beschwerde einzureichen.</li>
+              </ul>
+              <p className="mt-4">Zur Ausübung deiner Rechte wende dich an: {placeholder('[kontakt@stellify.ch]')}</p>
+            </Section>
+
+            <Section title="9. Datensicherheit">
+              <p>Wir setzen technische und organisatorische Massnahmen ein, um deine Daten vor unbefugtem Zugriff zu schützen:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>TLS/HTTPS-Verschlüsselung für alle Datenübertragungen</li>
+                <li>Firebase Security Rules für datenbankbasierten Zugriffsschutz</li>
+                <li>Keine Speicherung von Passwörtern im Klartext (Firebase Authentication)</li>
+                <li>Zugriff auf Produktionsdatenbanken nur für autorisierte Personen</li>
+              </ul>
+            </Section>
+
+            <Section title="10. Änderungen dieser Richtlinie">
+              <p>Wir behalten uns vor, diese Datenschutzrichtlinie jederzeit anzupassen. Bei wesentlichen Änderungen informieren wir angemeldete Nutzer per E-Mail. Die aktuelle Version ist stets auf dieser Seite einsehbar.</p>
+            </Section>
+          </article>
+        )}
+
+        {/* ======= IMPRESSUM ======= */}
+        {activeView === 'impressum' && (
+          <article>
+            <header className="mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
+              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Impressum</h1>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today}</p>
+            </header>
+
+            <Section title="Betreiber und Verantwortlicher">
+              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 font-mono text-xs">
+                <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{placeholder('[VORNAME NACHNAME / FIRMENNAME]')}</p>
+                <p>{placeholder('[STRASSE UND HAUSNUMMER]')}</p>
+                <p>{placeholder('[PLZ]')} {placeholder('[ORT]')}</p>
+                <p>Schweiz</p>
+              </div>
+            </Section>
+
+            <Section title="Kontakt">
+              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 text-sm">
+                <p>E-Mail: {placeholder('[kontakt@stellify.ch]')}</p>
+                <p>Website: stellify.ch</p>
+              </div>
+            </Section>
+
+            <Section title="Unternehmensregistrierung (falls zutreffend)">
+              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 text-sm">
+                <p>UID: {placeholder('[CHE-XXX.XXX.XXX]')} <span className="text-xs text-[#6B6B66]">(bei eingetragener Firma)</span></p>
+                <p>Handelsregister-Nr.: {placeholder('[HR-Nummer]')} <span className="text-xs text-[#6B6B66]">(bei eingetragener Firma)</span></p>
+              </div>
+            </Section>
+
+            <Section title="Haftungsausschluss">
+              <p>Die Inhalte dieser Website werden mit grösstmöglicher Sorgfalt erstellt. Der Betreiber übernimmt jedoch keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten Inhalte. Die KI-generierten Texte dienen ausschliesslich als Hilfsmittel und ersetzen keine professionelle Rechts- oder Karriereberatung.</p>
+            </Section>
+
+            <Section title="Urheberrecht">
+              <p>Die auf dieser Website veröffentlichten Inhalte und Werke unterliegen dem Schweizer Urheberrecht. Jede Art von Vervielfältigung oder Verwendung bedarf der schriftlichen Genehmigung des jeweiligen Urhebers bzw. Erstellers.</p>
+            </Section>
+
+            <Section title="Anwendbares Recht">
+              <p>Es gilt ausschliesslich Schweizer Recht. Gerichtsstand ist {placeholder('[Kanton / Ort]')}, Schweiz.</p>
+            </Section>
+          </article>
+        )}
+
+        {/* ======= AGB ======= */}
+        {activeView === 'agb' && (
+          <article>
+            <header className="mb-12">
+              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">Rechtliches</p>
+              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">Allgemeine Geschäftsbedingungen (AGB)</h1>
+              <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">Stand: {today} · Anbieter: {placeholder('[FIRMENNAME]')}, Schweiz</p>
+            </header>
+
+            <Section title="1. Vertragsgegenstand und Geltungsbereich">
+              <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter {placeholder('[FIRMENNAME]')} (nachfolgend „Stellify") und registrierten Nutzern (nachfolgend „Nutzer") der Plattform stellify.ch.</p>
+              <p className="mt-2">Stellify bietet eine KI-gestützte Karriereplattform mit Tools zur Lebenslaufoptimierung, Interview-Vorbereitung, Gehaltsanalyse und weiteren Karriere-Diensten an.</p>
+            </Section>
+
+            <Section title="2. Vertragsschluss und Kontoregistrierung">
+              <p>Der Vertrag kommt durch Registrierung und Annahme dieser AGB zustande. Der Nutzer muss mindestens 16 Jahre alt sein. Mit der Registrierung bestätigt der Nutzer, die AGB und die Datenschutzrichtlinie gelesen und akzeptiert zu haben.</p>
+            </Section>
+
+            <Section title="3. Leistungsumfang und Tarife">
+              <p>Stellify bietet drei Tarife an:</p>
+              <div className="mt-3 space-y-3">
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Gratis-Plan (kostenlos)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>1× Tool-Nutzung</li>
+                    <li>3× Stella Chat-Anfragen</li>
+                    <li>KI-Gehaltsrechner (Basisversion)</li>
+                    <li>Schweizer Standards</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Pro-Plan (CHF 19.90 / Monat oder CHF 199.– / Jahr)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>50× Tool-Nutzungen pro Monat</li>
+                    <li>20× Aktionen pro Tag</li>
+                    <li>Zeugnis-Decoder, Interview-Coach, alle Pro-Tools</li>
+                    <li>Zugang zum Live Interview-Coach</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]">
+                  <p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Ultimate-Plan (CHF 39.90 / Monat oder CHF 399.– / Jahr)</p>
+                  <ul className="text-xs mt-2 space-y-1 list-disc pl-4">
+                    <li>Unbegrenzte Nutzungen ♾️</li>
+                    <li>Alle Pro-Features + exklusive Ultimate-Tools</li>
+                    <li>Deep Analysis Modus</li>
+                    <li>24/7 VIP-Support</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-3">Alle Preise in CHF, inkl. MwSt. Preisänderungen werden mindestens 30 Tage im Voraus angekündigt.</p>
+            </Section>
+
+            <Section title="4. Zahlung und Abrechnung">
+              <p>Die Zahlung erfolgt ausschliesslich über den Zahlungsdienstleister <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong>, USA. Akzeptierte Zahlungsmittel: Kreditkarte (Visa, Mastercard, American Express) sowie weitere von Stripe angebotene Methoden.</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>Die Abrechnung erfolgt im Voraus, monatlich oder jährlich je nach gewähltem Tarif.</li>
+                <li>Stripe speichert Zahlungsdaten. Stellify hat keinen Zugriff auf Kreditkartendaten.</li>
+                <li>Bei Zahlungsausfall wird der Zugang auf den Gratis-Plan zurückgestuft.</li>
+              </ul>
+            </Section>
+
+            <Section title="5. Widerrufsrecht">
+              <p>Bei digitalen Dienstleistungen, die mit ausdrücklicher Zustimmung des Nutzers sofort genutzt werden, erlischt das Widerrufsrecht mit Beginn der Leistungserbringung (Art. 40e OR analog sowie EU-Richtlinie 2011/83/EU). Gleichwohl bietet Stellify als Kulanzleistung eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer an. Anfragen per E-Mail an {placeholder('[kontakt@stellify.ch]')}.</p>
+            </Section>
+
+            <Section title="6. Kündigung und Laufzeit">
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Monatliches Abo: jederzeit kündbar, Zugang bis Ende der bezahlten Periode.</li>
+                <li>Jährliches Abo: Kündigung bis 30 Tage vor Ablauf, ansonsten automatische Verlängerung um 1 Jahr.</li>
+                <li>Die Kündigung erfolgt über die Einstellungen im Nutzerkonto oder per E-Mail.</li>
+                <li>Stellify kann das Konto bei schwerwiegendem Verstoss gegen diese AGB fristlos kündigen.</li>
+              </ul>
+            </Section>
+
+            <Section title="7. Nutzungsbeschränkungen und Pflichten des Nutzers">
+              <p>Es ist dem Nutzer untersagt:</p>
+              <ul className="list-disc pl-5 space-y-2 mt-2">
+                <li>Die Plattform für illegale Zwecke zu nutzen oder Dritte zu täuschen</li>
+                <li>Automatisierte Massenabfragen (Scraping, Bots) durchzuführen</li>
+                <li>Zugangsdaten an Dritte weiterzugeben oder Konten zu teilen</li>
+                <li>KI-generierte Inhalte ohne Prüfung als eigene Werke einzureichen, wenn dies strafbar oder sittenwidrig wäre</li>
+                <li>Die Plattforminfrastruktur zu beeinträchtigen</li>
+              </ul>
+              <p className="mt-3">Der Nutzer ist für die Prüfung und Richtigkeit aller KI-generierten Inhalte selbst verantwortlich. Die KI ersetzt keine Rechts-, Steuer- oder Berufsberatung.</p>
+            </Section>
+
+            <Section title="8. Geistiges Eigentum">
+              <p>Alle Rechte an der Plattform, dem Quellcode, dem Design und den Marken von Stellify liegen beim Betreiber. Dem Nutzer wird eine einfache, nicht übertragbare Lizenz zur Nutzung der Plattform eingeräumt. KI-generierte Inhalte, die im Auftrag des Nutzers erstellt werden, können vom Nutzer für seine Bewerbungsunterlagen verwendet werden.</p>
+            </Section>
+
+            <Section title="9. Haftungsbeschränkung">
+              <p>Stellify haftet nur für Schäden, die durch vorsätzliches oder grob fahrlässiges Verhalten verursacht wurden. Für KI-generierte Inhalte, deren inhaltliche Richtigkeit oder Eignung für einen konkreten Zweck wird keine Haftung übernommen. Die Gesamthaftung ist auf den vom Nutzer in den letzten 12 Monaten bezahlten Betrag begrenzt.</p>
+            </Section>
+
+            <Section title="10. Verfügbarkeit">
+              <p>Stellify ist um einen möglichst hohen Verfügbarkeitsgrad bemüht, garantiert jedoch keine unterbrechungsfreie Verfügbarkeit. Geplante Wartungsarbeiten werden, wenn möglich, im Voraus angekündigt. Ausfälle von Drittanbietern (Firebase, Stripe, Google AI) liegen ausserhalb unseres Einflussbereichs.</p>
+            </Section>
+
+            <Section title="11. Änderungen der AGB und des Leistungsumfangs">
+              <p>Stellify behält sich vor, diese AGB und den Leistungsumfang mit einer Frist von 30 Tagen anzupassen. Wesentliche Änderungen werden per E-Mail kommuniziert. Die fortgesetzte Nutzung nach Inkrafttreten gilt als Zustimmung.</p>
+            </Section>
+
+            <Section title="12. Anwendbares Recht und Gerichtsstand">
+              <p>Es gilt ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>, unter Ausschluss des Kollisionsrechts. Gerichtsstand ist {placeholder('[Kanton / Ort]')}, Schweiz. Für Konsumenten gilt abweichend das zwingende Recht am Wohnsitz des Konsumenten.</p>
+            </Section>
+
+            <Section title="13. Streitbeilegung">
+              <p>Bei Streitigkeiten wenden sich Nutzer zunächst an {placeholder('[kontakt@stellify.ch]')} für eine einvernehmliche Lösung. Die EU-Kommission stellt unter <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] dark:text-[#00A854] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a> eine Online-Schlichtungsplattform bereit.</p>
+            </Section>
+
+            <div className="mt-10 p-5 bg-[#004225]/5 dark:bg-[#00A854]/5 border border-[#004225]/10 dark:border-[#00A854]/10">
+              <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94]">
+                <strong className="text-[#004225] dark:text-[#00A854]">Hinweis für den Betreiber:</strong> Die gelb markierten Felder ({placeholder('wie dieses')}) müssen vor der Veröffentlichung mit deinen echten Angaben ausgefüllt werden. Für eine rechtssichere Überprüfung empfehlen wir eine Konsultation mit einem Schweizer Anwalt für Vertragsrecht / IT-Recht.
+              </p>
+            </div>
+          </article>
+        )}
+      </div>
+    </section>
+  );
+};
 
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
@@ -5033,8 +5354,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
 
+      {/* --- LEGAL PAGES --- */}
+      {(activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb') && (
+        <LegalPages activeView={activeView} onBack={() => navigate(user ? 'dashboard' : 'dashboard')} />
+      )}
+
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {user ? (
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb') && user ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
@@ -5976,6 +6302,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         </section>
       )}
 
+      {/* --- MARKETING SECTIONS + FOOTER (hidden on legal pages) --- */}
+      {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && <>
+
       {/* --- WHY STELLIFY SECTION --- */}
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
@@ -6738,9 +7067,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{t.footer_legal}</h4>
               <ul className="space-y-4 text-sm font-light">
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_privacy}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_terms}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_imprint}</a></li>
+                <li><button onClick={() => navigate('datenschutz')} className="hover:text-white transition-colors text-left">{t.footer_privacy}</button></li>
+                <li><button onClick={() => navigate('agb')} className="hover:text-white transition-colors text-left">{t.footer_terms}</button></li>
+                <li><button onClick={() => navigate('impressum')} className="hover:text-white transition-colors text-left">{t.footer_imprint}</button></li>
               </ul>
             </div>
           </div>
@@ -6761,6 +7090,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </footer>
+
+      </> /* end marketing sections */}
 
       {/* Mobile Back-to-Top Button */}
       <button
@@ -8428,6 +8759,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           t={t}
           onAccept={() => handleCookieAccept('accepted')}
           onEssential={() => handleCookieAccept('essential')}
+          onPrivacyLink={() => { handleCookieAccept('essential'); navigate('datenschutz'); }}
         />
       )}
 
