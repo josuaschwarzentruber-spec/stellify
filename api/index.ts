@@ -224,8 +224,8 @@ async function startServer() {
       // Map planId and billingCycle to price IDs
       // Hardcoded fallbacks for Ultimate; Pro requires env vars
       const priceMap: Record<string, string | undefined> = {
-        'pro_monthly': process.env.STRIPE_PRICE_PRO_MONTHLY,
-        'pro_yearly': process.env.STRIPE_PRICE_PRO_YEARLY,
+        'pro_monthly': process.env.STRIPE_PRICE_PRO_MONTHLY || 'price_1TIrQNHEswF7knZxM65zPbFJ',
+        'pro_yearly': process.env.STRIPE_PRICE_PRO_YEARLY || 'price_1TIrRqHEswF7knZxlkJaQa2H',
         'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || 'price_1TIrSSHEswF7knZxcHQnDDGt',
         'ultimate_yearly': process.env.STRIPE_PRICE_ULTIMATE_YEARLY || 'price_1TIrT7HEswF7knZxSTFWGFB2'
       };
