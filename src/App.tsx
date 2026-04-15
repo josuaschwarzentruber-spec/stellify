@@ -33,7 +33,6 @@ import {
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3
 } from 'lucide-react';
-import { GoogleGenAI, Type } from "@google/genai";
 import { auth, db } from './firebase';
 import { 
   signInWithEmailAndPassword, 
@@ -1108,14 +1107,14 @@ function StellifyApp() {
             className="flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#003318] transition-colors disabled:opacity-60 whitespace-nowrap"
           >
             {isSearching ? (
-              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> Suche...</>
+              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> {language === 'FR' ? 'Recherche...' : language === 'IT' ? 'Ricerca...' : language === 'EN' ? 'Searching...' : 'Suche...'}</>
             ) : (
-              <><Search size={13} /> KI-Suche</>
+              <><Search size={13} /> {language === 'FR' ? 'Recherche IA' : language === 'IT' ? 'Ricerca IA' : language === 'EN' ? 'AI Search' : 'KI-Suche'}</>
             )}
           </button>
           {isLiveResult && (
             <button onClick={handleReset} className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors whitespace-nowrap">
-              Zurücksetzen
+              {language === 'FR' ? 'Réinitialiser' : language === 'IT' ? 'Reimposta' : language === 'EN' ? 'Reset' : 'Zurücksetzen'}
             </button>
           )}
         </div>
@@ -1125,7 +1124,7 @@ function StellifyApp() {
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
               <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
-              Live · {displayJobs.length} Stellen angezeigt{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
+              Live · {displayJobs.length} {language === 'FR' ? 'offres affichées' : language === 'IT' ? 'offerte mostrate' : language === 'EN' ? 'jobs shown' : 'Stellen angezeigt'}{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
             </div>
             {liveSource === 'adzuna' && (
               <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
@@ -1134,14 +1133,14 @@ function StellifyApp() {
             )}
             {liveSource === 'gemini' && (
               <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                via KI-Suche
+                {language === 'FR' ? 'via Recherche IA' : language === 'IT' ? 'via Ricerca IA' : language === 'EN' ? 'via AI Search' : 'via KI-Suche'}
               </span>
             )}
           </div>
         )}
         {!isLiveResult && (
           <p className="text-[11px] text-[#9A9A94] dark:text-[#5C5C58]">
-            {displayJobs.length} Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse
+            {displayJobs.length} {language === 'FR' ? <>offres exemples · Cliquez sur <strong>Recherche IA</strong> pour des résultats en direct</> : language === 'IT' ? <>offerte esempio · Clicca su <strong>Ricerca IA</strong> per risultati live</> : language === 'EN' ? <>sample jobs · Click <strong>AI Search</strong> for live results</> : <>Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse</>}
           </p>
         )}
 
@@ -1209,7 +1208,7 @@ function StellifyApp() {
 
         {/* External links */}
         <div className="pt-4 border-t border-black/5 dark:border-white/5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">Weitere Stellen direkt suchen</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">{language === 'FR' ? 'Rechercher d\'autres postes directement' : language === 'IT' ? 'Cerca altri posti direttamente' : language === 'EN' ? 'Search more jobs directly' : 'Weitere Stellen direkt suchen'}</p>
           <div className="flex flex-wrap gap-3">
             {[
               { label: 'Jobs.ch', url: 'https://www.jobs.ch/de/vakanzen/' },
@@ -1457,10 +1456,6 @@ function StellifyApp() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
       if (e.key === 'Escape') {
         setIsSearchOpen(false);
       }
@@ -1490,15 +1485,19 @@ function StellifyApp() {
           }
         }
         
-        setMessages(prev => [...prev, { 
-          role: 'ai', 
-          content: `Perfekt! Ich habe dein LinkedIn-Profil (${profile.name}) erfolgreich importiert. Ich nutze diese Informationen nun, um deine Bewerbungen noch präziser zu gestalten.` 
-        }]);
+        const importMsg = language === 'FR'
+          ? `Parfait ! J'ai importé ton profil LinkedIn (${profile.name}) avec succès. J'utilise maintenant ces informations pour rendre tes candidatures encore plus précises.`
+          : language === 'IT'
+          ? `Perfetto! Ho importato con successo il tuo profilo LinkedIn (${profile.name}). Userò ora queste informazioni per rendere le tue candidature ancora più precise.`
+          : language === 'EN'
+          ? `Perfect! I've successfully imported your LinkedIn profile (${profile.name}). I'll use this information to make your applications even more precise.`
+          : `Perfekt! Ich habe dein LinkedIn-Profil (${profile.name}) erfolgreich importiert. Ich nutze diese Informationen nun, um deine Bewerbungen noch präziser zu gestalten.`;
+        setMessages(prev => [...prev, { role: 'ai', content: importMsg }]);
       }
     };
     window.addEventListener('message', handleOAuthMessage);
     return () => window.removeEventListener('message', handleOAuthMessage);
-  }, [user, cvContext]);
+  }, [user, cvContext, language]);
 
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
@@ -1676,26 +1675,21 @@ function StellifyApp() {
       if (data.success) {
         setCareerRoadmap(data.roadmap.slice(0, 3));
       } else {
-        // Fallback to AI if backend fails
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-          console.warn("GEMINI_API_KEY is missing.");
-          return;
-        }
+        // Fallback to backend AI if first endpoint fails
         const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
         const isPro = user?.role === 'pro' || isUnlimited;
         const model = isPro ? PRO_MODEL : FLASH_MODEL;
-        const ai = new GoogleGenAI({ apiKey });
-        const response = await ai.models.generateContent({
-          model: model,
-          contents: `Basierend auf diesem CV: ${cvContext}, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Markt.`,
-          config: {
-            systemInstruction: "Du bist ein Schweizer Karriere-Experte. Gib nur die 3 Schritte als Liste zurück, kurz und präzise. Nutze Schweizer Hochdeutsch (kein ß).",
-            temperature: 0.4
-          }
+        const res2 = await fetch('/api/process-tool', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: `Basierend auf diesem CV: ${cvContext.substring(0, 1000)}, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Markt. Gib nur die 3 Schritte als nummerierte Liste zurück, kurz und präzise.`,
+            model
+          })
         });
-        const steps = response.text.split('\n').filter(s => s.trim()).slice(0, 3);
-        setCareerRoadmap(steps);
+        const data2 = await res2.json();
+        const steps = (data2.text || '').split('\n').filter((s: string) => s.trim()).slice(0, 3);
+        if (steps.length > 0) setCareerRoadmap(steps);
       }
     } catch (e) {
       console.error("Roadmap Error:", e);
@@ -1745,42 +1739,31 @@ function StellifyApp() {
 
   const analyzeCV = async (text: string) => {
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) return;
-      const ai = new GoogleGenAI({ apiKey });
-      
       const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
       const isPro = user?.role === 'pro' || isUnlimited;
       const model = isPro ? PRO_MODEL : FLASH_MODEL;
-      
-      const response = await ai.models.generateContent({
-        model: model,
-        contents: `Führe eine tiefgehende Analyse und Optimierung des Lebenslaufs für den Schweizer Arbeitsmarkt durch. KONTEXT: CV: ${text}.`,
-        config: {
-          systemInstruction: `
-            Du bist ein Senior Career Consultant für den Schweizer Markt (Zürich, Genf, Basel, Zug).
-            Führe eine Analyse basierend auf Schweizer Standards durch.
-            Prüfe auf: Sprachniveaus (GERS), Arbeitsbewilligungen (L, B, C), Referenzen, Foto-Standards und Bildungs-Äquivalenz.
-            Nutze Schweizer Hochdeutsch (kein ß).
-          `,
-          temperature: 0.4,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              keywords: { type: Type.ARRAY, items: { type: Type.STRING }, description: "10 wichtigste Keywords" },
-              industryMatch: { type: Type.STRING, description: "3 Schweizer Branchen mit besten Chancen" },
-              improvements: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 konkrete Optimierungspunkte" },
-              score: { type: Type.NUMBER, description: "Swiss Market Readiness Score 0-100" },
-              optimizedHighlights: { type: Type.ARRAY, items: { type: Type.STRING }, description: "3 impact-driven Bulletpoints" },
-              optimizedSummary: { type: Type.STRING, description: "Kurzprofil für den CV-Header" }
-            },
-            required: ["keywords", "industryMatch", "improvements", "score", "optimizedHighlights", "optimizedSummary"]
-          }
-        }
-      });
 
-      const analysisData = JSON.parse(response.text);
+      const prompt = `Führe eine tiefgehende Analyse des folgenden Lebenslaufs für den Schweizer Arbeitsmarkt durch. CV: ${text.substring(0, 3000)}.
+
+Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt diesen Feldern:
+{
+  "keywords": ["keyword1", "keyword2", ...],
+  "industryMatch": "Branchen-String",
+  "improvements": ["punkt1", "punkt2", "punkt3"],
+  "score": 75,
+  "optimizedHighlights": ["highlight1", "highlight2", "highlight3"],
+  "optimizedSummary": "Kurzprofil-Text"
+}`;
+
+      const res = await fetch('/api/process-tool', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, model })
+      });
+      const data = await res.json();
+      const jsonMatch = (data.text || '').match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return;
+      const analysisData = JSON.parse(jsonMatch[0]);
       setLatestAnalysis(analysisData);
       
       if (user) {
@@ -2190,12 +2173,14 @@ function StellifyApp() {
         BEHAVIOR:
         - Be proactive: Offer the next logical step briefly.
         - Personalize: Use the context of the uploaded CV intensively.
+        - PREMIUM GUIDANCE: When a user asks about advanced features (e.g., unlimited CV analyses, advanced job matching, interview coaching, salary tools, unlimited messages), ALWAYS mention that these are available in the Pro or Ultimate plan on Stellify. Guide them clearly to the pricing/plans section. Example: "This feature is available in the Pro plan — you can upgrade directly in the Stellify pricing section." Adapt to the user's language.
 
         LANGUAGE:
         - Respond in the user's selected language: ${language}.
         - If the language is German, use Swiss High German (no "ß", use "ss").
 
         USER TIER: ${user?.role === 'unlimited' ? 'Unlimited (Highest Priority/Elite)' : user?.role === 'pro' ? 'Pro (Premium)' : 'Gratis (Standard)'}.
+        ${!isPro ? '- FREE USER: This user is on the free plan. When relevant, briefly and elegantly mention the benefits of upgrading to Pro or Ultimate. Do not be pushy — mention it naturally when it adds value.' : ''}
 
         CONTEXT:
         ${cvContext ? `The candidate has uploaded a CV: ${cvContext}.` : 'The candidate has not yet uploaded a CV. Politely encourage them to do so to receive personalized tips.'}
@@ -2889,7 +2874,7 @@ Bewerte in 3 Kategorien (je 0–100%):
       const toolRes = await fetch('/api/process-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model, useSearch })
+        body: JSON.stringify({ prompt, model, useSearch, language })
       });
       const toolData = await toolRes.json();
       if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
@@ -2913,29 +2898,74 @@ Bewerte in 3 Kategorien (je 0–100%):
             }
             
             // Format for display
+            const cvLabels = language === 'FR' ? {
+              keywords: 'Mots-clés principaux du CV',
+              industry: 'Correspondance sectorielle (normes suisses)',
+              linguistic: 'Optimisation linguistique',
+              improvements: 'Potentiel d\'amélioration stratégique',
+              highlights: 'Points forts optimisés du CV',
+              summary: 'Proposition de profil court',
+              noFixes: 'Aucune correction spécifique nécessaire.',
+              noHighlights: 'Aucun point fort généré.',
+              noSummary: 'Aucun profil court généré.',
+              rawData: 'Données brutes (JSON)'
+            } : language === 'IT' ? {
+              keywords: 'Parole chiave principali nel CV',
+              industry: 'Corrispondenza settoriale (standard svizzeri)',
+              linguistic: 'Ottimizzazione linguistica',
+              improvements: 'Potenziale di miglioramento strategico',
+              highlights: 'Punti di forza ottimizzati del CV',
+              summary: 'Proposta di profilo breve',
+              noFixes: 'Nessuna correzione specifica necessaria.',
+              noHighlights: 'Nessun punto di forza generato.',
+              noSummary: 'Nessun profilo breve generato.',
+              rawData: 'Dati grezzi (JSON)'
+            } : language === 'EN' ? {
+              keywords: 'Top CV Keywords',
+              industry: 'Industry Match (Swiss Standards)',
+              linguistic: 'Language Optimization',
+              improvements: 'Strategic Improvement Potential',
+              highlights: 'Optimized CV Highlights',
+              summary: 'Summary Proposal',
+              noFixes: 'No specific corrections needed.',
+              noHighlights: 'No highlights generated.',
+              noSummary: 'No summary generated.',
+              rawData: 'Raw Data (JSON)'
+            } : {
+              keywords: 'Top Keywords im CV',
+              industry: 'Branchen-Match (Schweizer Standards)',
+              linguistic: 'Sprachliche Optimierung',
+              improvements: 'Strategisches Verbesserungspotential',
+              highlights: 'Optimierte CV-Highlights',
+              summary: 'Kurzprofil-Vorschlag',
+              noFixes: 'Keine spezifischen Korrekturen nötig.',
+              noHighlights: 'Keine Highlights generiert.',
+              noSummary: 'Kein Kurzprofil generiert.',
+              rawData: 'Rohdaten (JSON)'
+            };
             resultText = `
 ### 📊 Swiss Market Readiness Score: ${analysisData.score}/100
 
-#### 🔑 Top Keywords im CV:
+#### 🔑 ${cvLabels.keywords}:
 ${analysisData.keywords.map((k: string) => `- ${k}`).join('\n')}
 
-#### 🏢 Branchen-Match (Schweizer Standards):
+#### 🏢 ${cvLabels.industry}:
 ${analysisData.industryMatch}
 
-#### 🗣️ Sprachliche Optimierung (Schweizer Hochdeutsch):
-${analysisData.linguisticFixes?.map((f: string) => `- ${f}`).join('\n') || 'Keine spezifischen Korrekturen nötig.'}
+#### 🗣️ ${cvLabels.linguistic}:
+${analysisData.linguisticFixes?.map((f: string) => `- ${f}`).join('\n') || cvLabels.noFixes}
 
-#### 🚀 Strategisches Verbesserungspotential:
+#### 🚀 ${cvLabels.improvements}:
 ${analysisData.improvements.map((i: string) => `- ${i}`).join('\n')}
 
-#### ✨ Optimierte CV-Highlights:
-${analysisData.optimizedHighlights?.map((h: string) => `- ${h}`).join('\n') || 'Keine Highlights generiert.'}
+#### ✨ ${cvLabels.highlights}:
+${analysisData.optimizedHighlights?.map((h: string) => `- ${h}`).join('\n') || cvLabels.noHighlights}
 
-#### 📝 Kurzprofil-Vorschlag:
-${analysisData.optimizedSummary || 'Kein Kurzprofil generiert.'}
+#### 📝 ${cvLabels.summary}:
+${analysisData.optimizedSummary || cvLabels.noSummary}
 
 ---
-#### 📄 Rohdaten (JSON):
+#### 📄 ${cvLabels.rawData}:
 \`\`\`json
 ${JSON.stringify(analysisData, null, 2)}
 \`\`\`
@@ -2964,24 +2994,53 @@ ${JSON.stringify(analysisData, null, 2)}
             setParsedSalaryResult(salaryData);
             
             // Format for display
+            const salaryLabels = language === 'FR' ? {
+              title: 'Analyse de la valeur marchande suisse',
+              position: 'Poste', industry: 'Secteur', experience: 'Expérience', years: 'ans', canton: 'Canton',
+              salaryHeader: 'Salaire annuel brut estimé (incl. 13e mois)',
+              min: 'Minimum', median: 'Médiane', max: 'Maximum',
+              insights: 'Insights stratégiques de négociation',
+              disclaimer: 'Ces données sont basées sur des modèles IA et servent d\'orientation. Pour des valeurs définitives, nous recommandons Salarium.ch.'
+            } : language === 'IT' ? {
+              title: 'Analisi del valore di mercato svizzero',
+              position: 'Posizione', industry: 'Settore', experience: 'Esperienza', years: 'anni', canton: 'Cantone',
+              salaryHeader: 'Stipendio lordo annuale stimato (incl. 13° mese)',
+              min: 'Minimo', median: 'Mediana', max: 'Massimo',
+              insights: 'Insight strategici di negoziazione',
+              disclaimer: 'Questi dati si basano su modelli IA e servono come orientamento. Per valori definitivi, consigliamo Salarium.ch.'
+            } : language === 'EN' ? {
+              title: 'Swiss Market Value Analysis',
+              position: 'Position', industry: 'Industry', experience: 'Experience', years: 'years', canton: 'Canton',
+              salaryHeader: 'Estimated Annual Gross Salary (incl. 13th month pay)',
+              min: 'Minimum', median: 'Median', max: 'Maximum',
+              insights: 'Strategic Negotiation Insights',
+              disclaimer: 'This data is based on AI models and serves as guidance. For definitive values, we recommend Salarium.ch.'
+            } : {
+              title: 'Schweizer Marktwert-Analyse',
+              position: 'Position', industry: 'Branche', experience: 'Erfahrung', years: 'Jahre', canton: 'Kanton',
+              salaryHeader: 'Geschätztes Brutto-Jahresgehalt (inkl. 13. Monatslohn)',
+              min: 'Minimum', median: 'Median', max: 'Maximum',
+              insights: 'Strategische Verhandlungs-Insights',
+              disclaimer: 'Diese Daten basieren auf KI-Modellen und dienen als Orientierungshilfe. Für verbindliche Werte empfehlen wir Salarium.ch.'
+            };
             resultText = `
-### 💰 Schweizer Marktwert-Analyse
+### 💰 ${salaryLabels.title}
 
-**Position:** ${salaryData.jobTitle}
-**Branche:** ${salaryData.industry}
-**Erfahrung:** ${salaryData.experience} Jahre
-**Kanton:** ${salaryData.canton}
+**${salaryLabels.position}:** ${salaryData.jobTitle}
+**${salaryLabels.industry}:** ${salaryData.industry}
+**${salaryLabels.experience}:** ${salaryData.experience} ${salaryLabels.years}
+**${salaryLabels.canton}:** ${salaryData.canton}
 
-#### 📊 Geschätztes Brutto-Jahresgehalt (inkl. 13. Monatslohn):
-- **Minimum:** CHF ${salaryData.minSalary.toLocaleString('de-CH')}
-- **Median:** CHF ${salaryData.medianSalary.toLocaleString('de-CH')}
-- **Maximum:** CHF ${salaryData.maxSalary.toLocaleString('de-CH')}
+#### 📊 ${salaryLabels.salaryHeader}:
+- **${salaryLabels.min}:** CHF ${salaryData.minSalary.toLocaleString('de-CH')}
+- **${salaryLabels.median}:** CHF ${salaryData.medianSalary.toLocaleString('de-CH')}
+- **${salaryLabels.max}:** CHF ${salaryData.maxSalary.toLocaleString('de-CH')}
 
-#### 💡 Strategische Verhandlungs-Insights:
+#### 💡 ${salaryLabels.insights}:
 ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
 ---
-*Hinweis: Diese Daten basieren auf KI-Modellen und dienen als Orientierungshilfe. Für verbindliche Werte empfehlen wir Salarium.ch.*
+*${salaryLabels.disclaimer}*
             `;
           }
         } catch (e) {
@@ -2991,7 +3050,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       
       // Handle Grounding Metadata for Search
       if (useSearch && toolSources.length > 0) {
-        resultText += "\n\n**Quellen:**\n" + toolSources.map(s => `\n- ${s}`).join("");
+        const sourcesLabel = language === 'FR' ? 'Sources' : language === 'IT' ? 'Fonti' : language === 'EN' ? 'Sources' : 'Quellen';
+        resultText += `\n\n**${sourcesLabel}:**\n` + toolSources.map(s => `\n- ${s}`).join("");
       }
 
       // Special handling for interview-live (interactive session)
@@ -5490,7 +5550,6 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           >
             <Search size={15} className="text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors shrink-0" />
             <span className="flex-1 text-[#9A9A94] dark:text-[#5C5C58] text-sm">{t.search_placeholder}</span>
-            <span className="text-[10px] font-bold text-[#9A9A94] dark:text-[#5C5C58] px-1.5 py-0.5 bg-black/5 dark:bg-white/10 border border-black/10 dark:border-white/10 rounded shrink-0">⌘K</span>
           </button>
         </div>
 
