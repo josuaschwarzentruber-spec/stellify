@@ -71,7 +71,7 @@ import Markdown from 'react-markdown';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 const PRO_MODEL = "gemini-2.5-pro";
-const FLASH_MODEL = "gemini-2.0-flash";
+const FLASH_MODEL = "gemini-2.5-flash";
 
 // --- TYPES ---
 interface Message {
@@ -550,7 +550,7 @@ function StellifyApp() {
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [splashDone, setSplashDone] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -579,7 +579,7 @@ function StellifyApp() {
   }, []);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'tools' | 'jobs') => {
+  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
@@ -588,7 +588,7 @@ function StellifyApp() {
 
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
-      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | undefined;
+      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb' | undefined;
       if (view) {
         setActiveView(view);
         setActiveTool(null);
