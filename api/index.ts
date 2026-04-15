@@ -7,17 +7,33 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import Stripe from "stripe";
-import { initializeApp, getApps } from "firebase-admin/app";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { GoogleGenAI } from "@google/genai";
 
 dotenv.config();
 
 // Initialize Firebase Admin
-if (!getApps().length) {
-  initializeApp();
+// Supports both explicit env-var credentials (Vercel) and ADC (Google Cloud)
+let dbAdmin: ReturnType<typeof getFirestore> | null = null;
+try {
+  if (!getApps().length) {
+    const projectId  = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey  = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+
+    if (projectId && clientEmail && privateKey) {
+      initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
+      console.log('[FIREBASE ADMIN] Initialized with service account credentials');
+    } else {
+      initializeApp(); // Fallback: Application Default Credentials (GCP only)
+      console.log('[FIREBASE ADMIN] Initialized with ADC');
+    }
+  }
+  dbAdmin = getFirestore();
+} catch (e: any) {
+  console.error('[FIREBASE ADMIN] Init failed – webhook/role updates disabled:', e.message);
 }
-const dbAdmin = getFirestore();
 
 function normaliseRole(planId: string): string {
   if (planId === 'ultimate') return 'unlimited';
@@ -76,14 +92,18 @@ async function startServer() {
 
       if (userId && planId) {
         console.log(`[WEBHOOK] Payment successful for User: ${userId}, Plan: ${planId}`);
-        try {
-          await dbAdmin.collection("users").doc(userId).update({
-            role: normaliseRole(planId),
-            updatedAt: FieldValue.serverTimestamp()
-          });
-          console.log(`[WEBHOOK] User role updated to ${normaliseRole(planId)}`);
-        } catch (err) {
-          console.error(`[WEBHOOK] Error updating user role: ${err}`);
+        if (!dbAdmin) {
+          console.error('[WEBHOOK] Firebase Admin not initialized – cannot update user role');
+        } else {
+          try {
+            await dbAdmin.collection("users").doc(userId).update({
+              role: normaliseRole(planId),
+              updatedAt: FieldValue.serverTimestamp()
+            });
+            console.log(`[WEBHOOK] User role updated to ${normaliseRole(planId)}`);
+          } catch (err) {
+            console.error(`[WEBHOOK] Error updating user role: ${err}`);
+          }
         }
       }
     }
@@ -277,7 +297,13 @@ Felder pro Objekt: id (string), title, company, location ("Stadt, Schweiz"), cat
       }
     }
 
-    res.json({ mode, prices, stripeStatus, stripeError });
+    res.json({
+      mode,
+      prices,
+      stripeStatus,
+      stripeError,
+      firebaseAdmin: dbAdmin ? 'initialized' : 'NOT initialized – set FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY in Vercel',
+    });
   });
 
   // --- API ROUTES ---
@@ -395,8 +421,9 @@ Felder pro Objekt: id (string), title, company, location ("Stadt, Schweiz"), cat
     
     if (!userId) return res.status(400).json({ error: "No userId provided" });
 
+    if (!dbAdmin) return res.status(503).json({ error: 'Firebase Admin nicht konfiguriert' });
     console.log(`[TEST] Simulating successful payment for User: ${userId}, New Plan: ${planId}`);
-    
+
     try {
       await dbAdmin.collection("users").doc(userId).update({
         role: normaliseRole(planId),
