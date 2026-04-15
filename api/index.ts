@@ -162,60 +162,91 @@ async function startServer() {
     }
   });
 
-  // --- LIVE JOB SEARCH (Gemini + Google Search grounding) ---
+  // --- LIVE JOB SEARCH ---
+  // Priority: 1) Adzuna API (real Swiss jobs, free public API)
+  //           2) Gemini + Google Search grounding (fallback)
   app.get("/api/jobs", async (req, res) => {
-    const { keyword = '', location = '', category = '' } = req.query as Record<string, string>;
-    const apiKey = process.env.GEMINI_API_KEY;
+    const { keyword = '', location = '', category = '', page = '1' } = req.query as Record<string, string>;
 
-    if (!apiKey) {
-      return res.status(500).json({ error: "GEMINI_API_KEY missing" });
+    // ── 1. Adzuna (preferred) ──────────────────────────────────────────────
+    const adzunaAppId  = process.env.ADZUNA_APP_ID;
+    const adzunaAppKey = process.env.ADZUNA_APP_KEY;
+
+    if (adzunaAppId && adzunaAppKey) {
+      try {
+        // Adzuna category slugs that map to our UI categories
+        const categoryMap: Record<string, string> = {
+          IT: 'it-jobs', Marketing: 'marketing-jobs', Finance: 'finance-jobs',
+          Banking: 'finance-jobs', Engineering: 'engineering-jobs',
+          HR: 'hr-jobs', Healthcare: 'healthcare-nursing-jobs',
+          Pharma: 'scientific-qa-jobs', Logistik: 'logistics-warehouse-jobs',
+        };
+        const params = new URLSearchParams({
+          app_id: adzunaAppId,
+          app_key: adzunaAppKey,
+          results_per_page: '12',
+          content_type: 'application/json',
+        });
+        if (keyword)  params.set('what', keyword);
+        if (location) params.set('where', location);
+        const catSlug = categoryMap[category];
+        const catPath = catSlug ? `/${catSlug}` : '';
+        const url = `https://api.adzuna.com/v1/api/jobs/ch/search/${page}${catPath}?${params}`;
+
+        const adzRes = await fetch(url);
+        if (!adzRes.ok) throw new Error(`Adzuna HTTP ${adzRes.status}`);
+        const adzData = await adzRes.json() as any;
+
+        const jobs = (adzData.results || []).map((r: any) => ({
+          id:           r.id,
+          title:        r.title,
+          company:      r.company?.display_name || 'Unbekannte Firma',
+          location:     r.location?.display_name || 'Schweiz',
+          category:     r.category?.label?.replace(' Jobs', '') || category || 'Sonstiges',
+          description:  r.description?.replace(/<[^>]*>/g, '').slice(0, 220) + '…' || '',
+          url:          r.redirect_url,
+          ats_keywords: (r.description || '')
+            .match(/\b[A-Z][a-zA-Z+#.]{2,}\b/g)
+            ?.slice(0, 5) || [],
+          salary_min:   r.salary_min,
+          salary_max:   r.salary_max,
+        }));
+
+        return res.json({ jobs, live: true, source: 'adzuna', total: adzData.count || jobs.length });
+      } catch (err: any) {
+        console.error('[ADZUNA ERROR]', err.message);
+        // fall through to Gemini fallback
+      }
+    }
+
+    // ── 2. Gemini + Google Search (fallback when no Adzuna keys) ──────────
+    const geminiKey = process.env.GEMINI_API_KEY;
+    if (!geminiKey) {
+      return res.status(500).json({ error: "Keine Job-API konfiguriert. Bitte ADZUNA_APP_ID und ADZUNA_APP_KEY in Vercel setzen." });
     }
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
-
-      const searchQuery = [
-        keyword && `"${keyword}"`,
-        category && category,
-        location ? `in ${location} Schweiz` : 'in der Schweiz',
-        'Stelle Job Stellenangebot 2025'
-      ].filter(Boolean).join(' ');
-
+      const ai = new GoogleGenAI({ apiKey: geminiKey });
       const prompt = `Suche nach aktuellen Stellenangeboten in der Schweiz.
-Suchbegriff: ${keyword || 'alle Berufe'}, ${category || 'alle Branchen'}, Ort: ${location || 'ganze Schweiz'}.
-
-Gib mir exakt 10 echte, aktuelle Stellenangebote zurück als JSON-Array (KEIN Markdown, KEIN Erklärungstext, NUR das JSON-Array).
-Jedes Objekt muss folgende Felder haben:
-{
-  "id": "unique-id-string",
-  "title": "Stellentitel",
-  "company": "Firmenname",
-  "location": "Stadt, Schweiz",
-  "category": "IT|Marketing|Finance|Banking|Engineering|HR|Healthcare|Pharma|Logistik|Sonstiges",
-  "description": "Kurze 2-Satz Beschreibung der Stelle",
-  "url": "https://www.jobs.ch/de/vakanzen/?term=suchbegriff",
-  "ats_keywords": ["keyword1", "keyword2", "keyword3"]
-}`;
+Suchbegriff: ${keyword || 'alle Berufe'}, Branche: ${category || 'alle'}, Ort: ${location || 'ganze Schweiz'}.
+Gib exakt 10 echte aktuelle Stellenangebote zurück als reines JSON-Array ohne Markdown.
+Felder pro Objekt: id (string), title, company, location ("Stadt, Schweiz"), category, description (2 Sätze), url (echter Link), ats_keywords (array 3 strings).`;
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash",
+        model: 'gemini-2.0-flash',
         contents: prompt,
-        config: {
-          tools: [{ googleSearch: {} }],
-          temperature: 0.2
-        }
+        config: { tools: [{ googleSearch: {} }], temperature: 0.2 },
       });
 
       const text = response.text || '';
-      // Extract JSON array from response
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       if (jsonMatch) {
         const jobs = JSON.parse(jsonMatch[0]);
-        return res.json({ jobs, live: true });
+        return res.json({ jobs, live: true, source: 'gemini' });
       }
-      return res.json({ jobs: [], live: true });
+      return res.json({ jobs: [], live: true, source: 'gemini' });
     } catch (error: any) {
-      console.error("[JOBS SEARCH ERROR]", error);
+      console.error('[JOBS GEMINI ERROR]', error);
       return res.status(500).json({ error: error.message });
     }
   });
