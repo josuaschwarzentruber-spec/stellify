@@ -478,8 +478,8 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
               <p>Verantwortlich für die Datenbearbeitung im Sinne des Schweizer Datenschutzgesetzes (DSG) und der Europäischen Datenschutz-Grundverordnung (DSGVO) ist:</p>
               <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1">
                 <p>JTSP</p>
-                <p>{placeholder('[STRASSE UND HAUSNUMMER]')}</p>
-                <p>{placeholder('[PLZ]')} Zug, Schweiz</p>
+                <p>Postfach</p>
+                <p>6300 Zug, Schweiz</p>
                 <p>E-Mail: support.stellify@gmail.com</p>
               </div>
             </Section>
@@ -605,8 +605,8 @@ const LegalPages = ({ activeView, onBack }: { activeView: string; onBack: () => 
             <Section title="Betreiber und Verantwortlicher">
               <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 font-mono text-xs">
                 <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">JTSP</p>
-                <p>{placeholder('[STRASSE UND HAUSNUMMER]')}</p>
-                <p>{placeholder('[PLZ]')} Zug</p>
+                <p>Postfach</p>
+                <p>6300 Zug</p>
                 <p>Schweiz</p>
               </div>
             </Section>
