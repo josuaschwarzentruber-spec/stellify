@@ -580,6 +580,8 @@ function StellifyApp() {
     const [liveJobs, setLiveJobs] = useState<any[] | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [isLiveResult, setIsLiveResult] = useState(false);
+    const [liveSource, setLiveSource] = useState<'adzuna' | 'gemini' | null>(null);
+    const [liveTotal, setLiveTotal] = useState<number | null>(null);
 
     const localFiltered = (sampleJobs as any[]).filter(job => {
       const kw = jobFilters.keyword.toLowerCase();
@@ -605,6 +607,8 @@ function StellifyApp() {
         if (data.jobs && data.jobs.length > 0) {
           setLiveJobs(data.jobs);
           setIsLiveResult(true);
+          setLiveSource(data.source || null);
+          setLiveTotal(data.total || data.jobs.length);
         } else {
           setLiveJobs([]);
         }
@@ -618,6 +622,8 @@ function StellifyApp() {
     const handleReset = () => {
       setLiveJobs(null);
       setIsLiveResult(false);
+      setLiveSource(null);
+      setLiveTotal(null);
       setJobFilters({ keyword: '', location: '', industry: '' });
     };
 
@@ -696,14 +702,26 @@ function StellifyApp() {
 
         {/* Live result badge */}
         {isLiveResult && (
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
-            <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
-            Live-Ergebnisse via KI-Suche · {displayJobs.length} Stellen gefunden
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
+              Live · {displayJobs.length} Stellen angezeigt{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
+            </div>
+            {liveSource === 'adzuna' && (
+              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                via Adzuna API
+              </span>
+            )}
+            {liveSource === 'gemini' && (
+              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
+                via KI-Suche
+              </span>
+            )}
           </div>
         )}
         {!isLiveResult && (
           <p className="text-[11px] text-[#9A9A94] dark:text-[#5C5C58]">
-            {displayJobs.length} Stellen · Klicke auf <strong>KI-Suche</strong> für Live-Ergebnisse aus dem Netz
+            {displayJobs.length} Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse
           </p>
         )}
 
@@ -730,9 +748,16 @@ function StellifyApp() {
                     {job.category}
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-xs text-[#6B6B66] dark:text-[#9A9A94] mb-4">
-                  <MapPin size={12} />
-                  {job.location}
+                <div className="flex items-center gap-4 text-xs text-[#6B6B66] dark:text-[#9A9A94] mb-4 flex-wrap">
+                  <div className="flex items-center gap-1">
+                    <MapPin size={12} />
+                    {job.location}
+                  </div>
+                  {job.salary_min && (
+                    <div className="flex items-center gap-1 text-[#004225] dark:text-[#00A854] font-medium">
+                      CHF {Math.round(job.salary_min / 1000)}k{job.salary_max ? `–${Math.round(job.salary_max / 1000)}k` : '+'}
+                    </div>
+                  )}
                 </div>
                 <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">{job.description}</p>
                 <div className="flex justify-between items-center">
