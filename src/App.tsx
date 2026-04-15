@@ -527,6 +527,32 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Browser history (back/forward button support)
+  const navigate = (view: 'dashboard' | 'tools' | 'jobs') => {
+    setActiveView(view);
+    setActiveTool(null);
+    window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    const onPop = (e: PopStateEvent) => {
+      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | undefined;
+      if (view) {
+        setActiveView(view);
+        setActiveTool(null);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setActiveView('dashboard');
+        setActiveTool(null);
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    // Set initial history entry so first back-press works
+    window.history.replaceState({ view: activeView }, '', window.location.pathname);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('theme');
@@ -4272,7 +4298,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       <nav className="sticky top-0 z-50 bg-[#FAFAF8]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors duration-300">
         <div className="flex items-center gap-8">
           <button
-            onClick={() => { setActiveTool(null); if (user) setActiveView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity"
           >
             Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
@@ -4281,19 +4307,19 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {user ? (
               <>
                 <button
-                  onClick={() => { setActiveView('dashboard'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => navigate('dashboard')}
                   className={`text-sm font-medium transition-colors ${activeView === 'dashboard' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
                 >
                   {t.dashboard}
                 </button>
                 <button
-                  onClick={() => { setActiveView('tools'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => navigate('tools')}
                   className={`text-sm font-medium transition-colors ${activeView === 'tools' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
                 >
                   {t.tools}
                 </button>
                 <button
-                  onClick={() => { setActiveView('jobs'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                  onClick={() => navigate('jobs')}
                   className={`text-sm font-medium transition-colors ${activeView === 'jobs' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
                 >
                   {t.search_type_job}
@@ -4445,9 +4471,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="flex flex-col gap-4">
               {user ? (
                 <>
-                  <button onClick={() => { setActiveView('dashboard'); setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`text-lg font-medium text-left ${activeView === 'dashboard' ? 'text-[#004225]' : ''}`}>{t.dashboard}</button>
-                  <button onClick={() => { setActiveView('tools'); setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`text-lg font-medium text-left ${activeView === 'tools' ? 'text-[#004225]' : ''}`}>{t.tools}</button>
-                  <button onClick={() => { setActiveView('jobs'); setIsMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className={`text-lg font-medium text-left ${activeView === 'jobs' ? 'text-[#004225]' : ''}`}>{t.search_type_job}</button>
+                  <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'dashboard' ? 'text-[#004225]' : ''}`}>{t.dashboard}</button>
+                  <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'tools' ? 'text-[#004225]' : ''}`}>{t.tools}</button>
+                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'jobs' ? 'text-[#004225]' : ''}`}>{t.search_type_job}</button>
                   <button onClick={() => { setIsMenuOpen(false); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-lg font-medium text-left">{t.pricing}</button>
                 </>
               ) : (
