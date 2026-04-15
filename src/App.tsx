@@ -793,7 +793,7 @@ function StellifyApp() {
                     ))}
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    Öffnen <ArrowRight size={12} />
+                    {t.tool_open} <ArrowRight size={12} />
                   </span>
                 </div>
               </motion.div>
@@ -2851,6 +2851,59 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Premium Optimierung",
+      tracker_title: "Bewerbungs-Tracker",
+      tracker_desc: "Verwalte deine Chancen",
+      tracker_add: "Neu hinzufügen",
+      tracker_company: "Firma",
+      tracker_company_ph: "z.B. Google",
+      tracker_position: "Position",
+      tracker_position_ph: "z.B. Senior Designer",
+      tracker_status: "Status",
+      tracker_location: "Standort",
+      tracker_location_ph: "z.B. Zürich",
+      tracker_salary: "Gehaltsvorstellung",
+      tracker_salary_ph: "z.B. 120'000 CHF",
+      tracker_notes: "Notizen",
+      tracker_notes_ph: "z.B. Kontaktperson: Hans Muster...",
+      tracker_save: "Speichern",
+      tracker_update: "Aktualisieren",
+      tracker_cancel: "Abbrechen",
+      tracker_wishlist: "Wunschliste",
+      tracker_applied: "Beworben",
+      tracker_interview: "Interview",
+      tracker_offer: "Angebot",
+      tracker_rejected: "Abgelehnt",
+      tracker_notes_badge: "Notizen vorhanden",
+      tracker_empty: "Leer",
+      quick_tools: "Quick Tools",
+      all_tools: "Alle Tools",
+      recent_docs: "Deine letzten Dokumente",
+      view_all: "Alle ansehen",
+      time_just_now: "Gerade eben",
+      stella_context_title: "Stella Context",
+      stella_context_cv_ready: "CV analysiert",
+      stella_context_no_cv: "Kein CV hochgeladen",
+      stella_context_focus: "Fokus-Bereiche",
+      stella_roadmap: "Deine Roadmap",
+      stella_roadmap_empty: "Lade dein CV hoch, um deine Roadmap zu sehen.",
+      stella_insights: "Stella Insights",
+      stella_market_score: "Market Score",
+      stella_top_keywords: "Top Keywords",
+      stella_best_match: "Bester Match",
+      stella_ch_corrections: "Sprachliche Korrekturen (CH-Hochdeutsch)",
+      stella_ch_tips: "Schweiz-Spezifische Tipps",
+      stella_short_profile: "Optimiertes Kurzprofil",
+      stella_highlights: "Optimierte Highlights",
+      stella_name: "Stella – KI-Assistentin",
+      stella_online: "Online – bereit zu helfen",
+      stella_input_ph: "Schreibe Stella etwas...",
+      tool_open: "Öffnen",
+      docs_empty: "Noch keine Dokumente generiert. Starte mit einem Tool unten.",
+      stella_raw_json: "Rohdaten (JSON) anzeigen",
+      stella_full_analysis: "Vollständige Analyse",
+      stella_insights_with_cv: "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check.",
+      stella_insights_no_cv: "Sobald du dein CV hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen.",
+      salary_history: "Gehaltsverlauf",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
       swiss_standard_notice_text: "Präzise abgestimmt auf die spezifischen Anforderungen und kulturellen Nuancen des Schweizer Arbeitsmarktes.",
@@ -3263,6 +3316,59 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Gratuit",
       dashboard_cv_optimize: "Optimisation Premium",
+      tracker_title: "Suivi des candidatures",
+      tracker_desc: "Gérez vos opportunités",
+      tracker_add: "Ajouter",
+      tracker_company: "Entreprise",
+      tracker_company_ph: "ex. Google",
+      tracker_position: "Poste",
+      tracker_position_ph: "ex. Designer Senior",
+      tracker_status: "Statut",
+      tracker_location: "Lieu",
+      tracker_location_ph: "ex. Genève",
+      tracker_salary: "Prétentions salariales",
+      tracker_salary_ph: "ex. 120'000 CHF",
+      tracker_notes: "Notes",
+      tracker_notes_ph: "ex. Contact: Jean Dupont...",
+      tracker_save: "Enregistrer",
+      tracker_update: "Mettre à jour",
+      tracker_cancel: "Annuler",
+      tracker_wishlist: "Souhaité",
+      tracker_applied: "Postulé",
+      tracker_interview: "Entretien",
+      tracker_offer: "Offre",
+      tracker_rejected: "Refusé",
+      tracker_notes_badge: "Notes disponibles",
+      tracker_empty: "Vide",
+      quick_tools: "Outils rapides",
+      all_tools: "Tous les outils",
+      recent_docs: "Vos derniers documents",
+      view_all: "Voir tout",
+      time_just_now: "À l'instant",
+      stella_context_title: "Contexte Stella",
+      stella_context_cv_ready: "CV analysé",
+      stella_context_no_cv: "Aucun CV chargé",
+      stella_context_focus: "Domaines ciblés",
+      stella_roadmap: "Votre feuille de route",
+      stella_roadmap_empty: "Chargez votre CV pour voir votre feuille de route.",
+      stella_insights: "Insights Stella",
+      stella_market_score: "Score marché",
+      stella_top_keywords: "Mots-clés principaux",
+      stella_best_match: "Meilleur match",
+      stella_ch_corrections: "Corrections linguistiques (FR suisse)",
+      stella_ch_tips: "Conseils spécifiques Suisse",
+      stella_short_profile: "Profil court optimisé",
+      stella_highlights: "Points forts optimisés",
+      stella_name: "Stella – Assistante IA",
+      stella_online: "En ligne – prête à aider",
+      stella_input_ph: "Écrivez à Stella...",
+      tool_open: "Ouvrir",
+      docs_empty: "Aucun document généré pour l'instant. Commencez avec un outil ci-dessous.",
+      stella_raw_json: "Afficher données brutes (JSON)",
+      stella_full_analysis: "Analyse complète",
+      stella_insights_with_cv: "Stella a analysé votre profil. Votre focus sur la précision correspond parfaitement au marché suisse. Utilisez l'outil d'analyse CV pour un bilan approfondi.",
+      stella_insights_no_cv: "Dès que vous chargez votre CV, je crée ici une analyse personnalisée de vos chances sur le marché.",
+      salary_history: "Historique salarial",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
       swiss_standard_notice_text: "Précisément adapté aux exigences spécifiques et aux nuances culturelles du marché du travail suisse.",
@@ -3555,6 +3661,59 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Ottimizzazione Premium",
+      tracker_title: "Tracker candidature",
+      tracker_desc: "Gestisci le tue opportunità",
+      tracker_add: "Aggiungi",
+      tracker_company: "Azienda",
+      tracker_company_ph: "es. Google",
+      tracker_position: "Posizione",
+      tracker_position_ph: "es. Designer Senior",
+      tracker_status: "Stato",
+      tracker_location: "Luogo",
+      tracker_location_ph: "es. Zurigo",
+      tracker_salary: "Aspettative salariali",
+      tracker_salary_ph: "es. 120'000 CHF",
+      tracker_notes: "Note",
+      tracker_notes_ph: "es. Contatto: Mario Rossi...",
+      tracker_save: "Salva",
+      tracker_update: "Aggiorna",
+      tracker_cancel: "Annulla",
+      tracker_wishlist: "Desiderato",
+      tracker_applied: "Candidato",
+      tracker_interview: "Colloquio",
+      tracker_offer: "Offerta",
+      tracker_rejected: "Rifiutato",
+      tracker_notes_badge: "Note disponibili",
+      tracker_empty: "Vuoto",
+      quick_tools: "Strumenti rapidi",
+      all_tools: "Tutti gli strumenti",
+      recent_docs: "I tuoi ultimi documenti",
+      view_all: "Vedi tutti",
+      time_just_now: "Proprio ora",
+      stella_context_title: "Contesto Stella",
+      stella_context_cv_ready: "CV analizzato",
+      stella_context_no_cv: "Nessun CV caricato",
+      stella_context_focus: "Aree di focus",
+      stella_roadmap: "La tua roadmap",
+      stella_roadmap_empty: "Carica il tuo CV per vedere la tua roadmap.",
+      stella_insights: "Insights Stella",
+      stella_market_score: "Punteggio mercato",
+      stella_top_keywords: "Parole chiave principali",
+      stella_best_match: "Miglior match",
+      stella_ch_corrections: "Correzioni linguistiche (IT svizzero)",
+      stella_ch_tips: "Consigli specifici per la Svizzera",
+      stella_short_profile: "Profilo breve ottimizzato",
+      stella_highlights: "Punti salienti ottimizzati",
+      stella_name: "Stella – Assistente IA",
+      stella_online: "Online – pronta ad aiutare",
+      stella_input_ph: "Scrivi a Stella...",
+      tool_open: "Apri",
+      docs_empty: "Nessun documento generato ancora. Inizia con uno strumento qui sotto.",
+      stella_raw_json: "Mostra dati grezzi (JSON)",
+      stella_full_analysis: "Analisi completa",
+      stella_insights_with_cv: "Stella ha analizzato il tuo profilo. La tua attenzione alla precisione si adatta perfettamente al mercato svizzero. Usa lo strumento di analisi CV per una verifica approfondita.",
+      stella_insights_no_cv: "Non appena carichi il tuo CV, creo qui un'analisi personalizzata delle tue opportunità di mercato.",
+      salary_history: "Cronologia stipendi",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
       swiss_standard_notice_text: "Precisamente adattato ai requisiti specifici e alle sfumature culturali del mercato del lavoro svizzero.",
@@ -3847,6 +4006,59 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_unlimited: "Unlimited",
       dashboard_stat_free: "Free",
       dashboard_cv_optimize: "Premium Optimization",
+      tracker_title: "Application Tracker",
+      tracker_desc: "Manage your opportunities",
+      tracker_add: "Add new",
+      tracker_company: "Company",
+      tracker_company_ph: "e.g. Google",
+      tracker_position: "Position",
+      tracker_position_ph: "e.g. Senior Designer",
+      tracker_status: "Status",
+      tracker_location: "Location",
+      tracker_location_ph: "e.g. Zurich",
+      tracker_salary: "Salary expectation",
+      tracker_salary_ph: "e.g. CHF 120,000",
+      tracker_notes: "Notes",
+      tracker_notes_ph: "e.g. Contact: John Smith...",
+      tracker_save: "Save",
+      tracker_update: "Update",
+      tracker_cancel: "Cancel",
+      tracker_wishlist: "Wishlist",
+      tracker_applied: "Applied",
+      tracker_interview: "Interview",
+      tracker_offer: "Offer",
+      tracker_rejected: "Rejected",
+      tracker_notes_badge: "Notes available",
+      tracker_empty: "Empty",
+      quick_tools: "Quick Tools",
+      all_tools: "All Tools",
+      recent_docs: "Your Recent Documents",
+      view_all: "View all",
+      time_just_now: "Just now",
+      stella_context_title: "Stella Context",
+      stella_context_cv_ready: "CV analyzed",
+      stella_context_no_cv: "No CV uploaded",
+      stella_context_focus: "Focus Areas",
+      stella_roadmap: "Your Roadmap",
+      stella_roadmap_empty: "Upload your CV to see your roadmap.",
+      stella_insights: "Stella Insights",
+      stella_market_score: "Market Score",
+      stella_top_keywords: "Top Keywords",
+      stella_best_match: "Best Match",
+      stella_ch_corrections: "Language Corrections (Swiss German)",
+      stella_ch_tips: "Switzerland-Specific Tips",
+      stella_short_profile: "Optimized Short Profile",
+      stella_highlights: "Optimized Highlights",
+      stella_name: "Stella – AI Assistant",
+      stella_online: "Online – ready to help",
+      stella_input_ph: "Write to Stella...",
+      tool_open: "Open",
+      docs_empty: "No documents generated yet. Start with a tool below.",
+      stella_raw_json: "Show raw data (JSON)",
+      stella_full_analysis: "Full Analysis",
+      stella_insights_with_cv: "Stella has analysed your profile. Your focus on precision fits perfectly with the Swiss market. Use the CV Analysis tool for a deep-dive check.",
+      stella_insights_no_cv: "Once you upload your CV, I'll create a tailored analysis of your market opportunities here.",
+      salary_history: "Salary History",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
       swiss_standard_notice_text: "Precisely tailored to the specific requirements and cultural nuances of the Swiss job market.",
@@ -4680,15 +4892,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-serif">Bewerbungs-Tracker</h2>
-                      <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">Verwalte deine Chancen</p>
+                      <h2 className="text-xl font-serif">{t.tracker_title}</h2>
+                      <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{t.tracker_desc}</p>
                     </div>
                     <button 
                       onClick={() => setIsAddingApp(true)}
                       className="flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
                     >
                       <Plus size={14} />
-                      Neu hinzufügen
+                      {t.tracker_add}
                     </button>
                   </div>
 
@@ -4700,83 +4912,83 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Firma</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
+                          <input
+                            type="text"
                             value={newApp.company}
                             onChange={(e) => setNewApp({...newApp, company: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. Google"
+                            placeholder={t.tracker_company_ph}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Position</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
+                          <input
+                            type="text"
                             value={newApp.position}
                             onChange={(e) => setNewApp({...newApp, position: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. Senior Designer"
+                            placeholder={t.tracker_position_ph}
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Status</label>
-                          <select 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
+                          <select
                             value={newApp.status}
                             onChange={(e) => setNewApp({...newApp, status: e.target.value as any})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           >
-                            <option value="Wishlist">Wunschliste</option>
-                            <option value="Applied">Beworben</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Angebot</option>
-                            <option value="Rejected">Abgelehnt</option>
+                            <option value="Wishlist">{t.tracker_wishlist}</option>
+                            <option value="Applied">{t.tracker_applied}</option>
+                            <option value="Interview">{t.tracker_interview}</option>
+                            <option value="Offer">{t.tracker_offer}</option>
+                            <option value="Rejected">{t.tracker_rejected}</option>
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Standort</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
+                          <input
+                            type="text"
                             value={newApp.location}
                             onChange={(e) => setNewApp({...newApp, location: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. Zürich"
+                            placeholder={t.tracker_location_ph}
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Gehaltsvorstellung</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
+                          <input
+                            type="text"
                             value={newApp.salary}
                             onChange={(e) => setNewApp({...newApp, salary: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
-                            placeholder="z.B. 120'000 CHF"
+                            placeholder={t.tracker_salary_ph}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Notizen</label>
-                        <textarea 
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
+                        <textarea
                           value={newApp.notes}
                           onChange={(e) => setNewApp({...newApp, notes: e.target.value})}
                           className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
-                          placeholder="z.B. Kontaktperson: Hans Muster, Tel: 079..."
+                          placeholder={t.tracker_notes_ph}
                         />
                       </div>
                       <div className="flex justify-end gap-3 pt-2">
-                        <button 
+                        <button
                           onClick={() => setIsAddingApp(false)}
                           className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
                         >
-                          Abbrechen
+                          {t.tracker_cancel}
                         </button>
-                        <button 
+                        <button
                           onClick={addApplication}
                           className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                         >
-                          Speichern
+                          {t.tracker_save}
                         </button>
                       </div>
                     </motion.div>
@@ -4790,18 +5002,18 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     >
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Firma</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
+                          <input
+                            type="text"
                             value={editingApp.company}
                             onChange={(e) => setEditingApp({...editingApp, company: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Position</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
+                          <input
+                            type="text"
                             value={editingApp.position}
                             onChange={(e) => setEditingApp({...editingApp, position: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
@@ -4810,32 +5022,32 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       </div>
                       <div className="grid grid-cols-3 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Status</label>
-                          <select 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
+                          <select
                             value={editingApp.status}
                             onChange={(e) => setEditingApp({...editingApp, status: e.target.value as any})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           >
-                            <option value="Wishlist">Wunschliste</option>
-                            <option value="Applied">Beworben</option>
-                            <option value="Interview">Interview</option>
-                            <option value="Offer">Angebot</option>
-                            <option value="Rejected">Abgelehnt</option>
+                            <option value="Wishlist">{t.tracker_wishlist}</option>
+                            <option value="Applied">{t.tracker_applied}</option>
+                            <option value="Interview">{t.tracker_interview}</option>
+                            <option value="Offer">{t.tracker_offer}</option>
+                            <option value="Rejected">{t.tracker_rejected}</option>
                           </select>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Standort</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
+                          <input
+                            type="text"
                             value={editingApp.location}
                             onChange={(e) => setEditingApp({...editingApp, location: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Gehaltsvorstellung</label>
-                          <input 
-                            type="text" 
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
+                          <input
+                            type="text"
                             value={editingApp.salary}
                             onChange={(e) => setEditingApp({...editingApp, salary: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
@@ -4843,25 +5055,25 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">Notizen</label>
-                        <textarea 
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
+                        <textarea
                           value={editingApp.notes}
                           onChange={(e) => setEditingApp({...editingApp, notes: e.target.value})}
                           className="w-full px-4 py-3 bg-[#FAFAF8] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
                         />
                       </div>
                       <div className="flex justify-end gap-3 pt-2">
-                        <button 
+                        <button
                           onClick={() => setEditingApp(null)}
                           className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
                         >
-                          Abbrechen
+                          {t.tracker_cancel}
                         </button>
-                        <button 
+                        <button
                           onClick={updateApplication}
                           className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                         >
-                          Aktualisieren
+                          {t.tracker_update}
                         </button>
                       </div>
                     </motion.div>
@@ -4872,10 +5084,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       <div key={status} className="space-y-4">
                         <div className="flex items-center justify-between px-1">
                           <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">
-                            {status === 'Wishlist' ? 'Wunschliste' : 
-                             status === 'Applied' ? 'Beworben' : 
-                             status === 'Interview' ? 'Interview' : 
-                             status === 'Offer' ? 'Angebot' : 'Abgelehnt'}
+                            {status === 'Wishlist' ? t.tracker_wishlist :
+                             status === 'Applied' ? t.tracker_applied :
+                             status === 'Interview' ? t.tracker_interview :
+                             status === 'Offer' ? t.tracker_offer : t.tracker_rejected}
                           </h3>
                           <span className="text-[10px] font-mono text-[#9A9A94] bg-black/5 px-2 py-0.5 rounded-full">
                             {applications.filter(a => a.status === status).length}
@@ -4922,7 +5134,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                 {app.notes && (
                                   <div className="flex items-center gap-1 text-[9px] text-[#9A9A94] italic">
                                     <FileText size={10} />
-                                    <span className="truncate max-w-[100px]">Notizen vorhanden</span>
+                                    <span className="truncate max-w-[100px]">{t.tracker_notes_badge}</span>
                                   </div>
                                 )}
                               </div>
@@ -4946,7 +5158,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           ))}
                           {applications.filter(a => a.status === status).length === 0 && (
                             <div className="h-20 border border-dashed border-black/5 flex items-center justify-center">
-                              <span className="text-[9px] text-[#9A9A94] uppercase tracking-widest opacity-30">Leer</span>
+                              <span className="text-[9px] text-[#9A9A94] uppercase tracking-widest opacity-30">{t.tracker_empty}</span>
                             </div>
                           )}
                         </div>
@@ -4958,12 +5170,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 {/* Quick Tools */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <h2 className="text-xl font-serif">Quick Tools</h2>
-                    <button 
+                    <h2 className="text-xl font-serif">{t.quick_tools}</h2>
+                    <button
                       onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                       className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1"
                     >
-                      Alle Tools
+                      {t.all_tools}
                     </button>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
@@ -4991,8 +5203,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 {/* Recent Activity / Documents */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <h2 className="text-xl font-serif">Deine letzten Dokumente</h2>
-                    <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1">Alle ansehen</button>
+                    <h2 className="text-xl font-serif">{t.recent_docs}</h2>
+                    <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1">{t.view_all}</button>
                   </div>
                   <div className="grid gap-4">
                     {toolHistory.length > 0 ? (
@@ -5016,7 +5228,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <div>
                               <h4 className="font-medium group-hover:text-[#004225] transition-colors">{item.toolTitle}</h4>
                               <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">
-                                {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH') : 'Gerade eben'}
+                                {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH') : t.time_just_now}
                               </p>
                             </div>
                           </div>
@@ -5026,7 +5238,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     ) : (
                       <div className="p-12 bg-white border border-dashed border-black/10 text-center space-y-4">
                         <div className="w-12 h-12 bg-[#FAFAF8] flex items-center justify-center text-2xl mx-auto opacity-30">📄</div>
-                        <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94] font-light">Noch keine Dokumente generiert. Starte mit einem Tool unten.</p>
+                        <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.docs_empty}</p>
                       </div>
                     )}
                   </div>
@@ -5036,11 +5248,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               {/* Sidebar / Stella Context */}
               <div className="w-full lg:w-80 space-y-8">
                 <div className="p-8 bg-[#004225] text-white space-y-6">
-                  <h3 className="text-xl font-serif">Stella Context</h3>
+                  <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
-                      <span className="text-xs font-light">{cvContext ? 'CV analysiert' : 'Kein CV hochgeladen'}</span>
+                      <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
                     </div>
                     <div className="flex items-center gap-3 opacity-60">
                       <div className={`w-2 h-2 rounded-full ${backendStatus === 'online' ? 'bg-[#059669]' : backendStatus === 'checking' ? 'bg-yellow-500' : 'bg-red-500'}`} />
@@ -5054,7 +5266,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   </div>
                   {cvContext && (
                     <div className="pt-6 border-t border-white/10">
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">Fokus-Bereiche</p>
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
                       <div className="flex flex-wrap gap-2">
                         {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
                           <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
@@ -5065,7 +5277,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </div>
 
                 <div className="p-8 border border-black/5 bg-white space-y-6">
-                  <h3 className="text-lg font-serif">Deine Roadmap</h3>
+                  <h3 className="text-lg font-serif">{t.stella_roadmap}</h3>
                   <div className="space-y-4">
                     {isGeneratingRoadmap ? (
                       <div className="flex flex-col gap-3">
@@ -5081,22 +5293,22 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         </div>
                       ))
                     ) : (
-                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light italic">Lade dein CV hoch, um deine Roadmap zu sehen.</p>
+                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light italic">{t.stella_roadmap_empty}</p>
                     )}
                   </div>
                 </div>
 
                 <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FAFAF8]/5 space-y-6 transition-colors">
-                  <h3 className="text-lg font-serif text-[#004225] dark:text-[#FAFAF8]">Stella Insights</h3>
+                  <h3 className="text-lg font-serif text-[#004225] dark:text-[#FAFAF8]">{t.stella_insights}</h3>
                   <div className="space-y-4">
                     {latestAnalysis ? (
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Market Score</span>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_market_score}</span>
                           <span className="text-lg font-serif text-[#004225]">{latestAnalysis.score}/100</span>
                         </div>
                         <div className="space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Top Keywords</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_top_keywords}</p>
                           <div className="flex flex-wrap gap-1">
                             {latestAnalysis.keywords.slice(0, 5).map((k: string) => (
                               <span key={k} className="px-2 py-0.5 bg-[#004225]/10 text-[8px] font-medium text-[#004225]">{k}</span>
@@ -5104,7 +5316,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Bester Match</p>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_best_match}</p>
                           <div className="flex items-center gap-2">
                             <p className="text-xs font-light text-[#004225]/80">{latestAnalysis.industryMatch}</p>
                             <span className="px-1 py-0.5 bg-[#004225]/5 border border-[#004225]/10 text-[6px] font-bold uppercase tracking-tighter text-[#004225]/60">NOGA Standard</span>
@@ -5112,7 +5324,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         </div>
                         {latestAnalysis.linguisticFixes && latestAnalysis.linguisticFixes.length > 0 && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Sprachliche Korrekturen (CH-Hochdeutsch)</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_corrections}</p>
                             <ul className="space-y-1">
                               {latestAnalysis.linguisticFixes.map((fix: string, i: number) => (
                                 <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
@@ -5125,7 +5337,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         )}
                         {latestAnalysis.improvements && latestAnalysis.improvements.length > 0 && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Schweiz-Spezifische Tipps</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_tips}</p>
                             <ul className="space-y-1">
                               {latestAnalysis.improvements.map((imp: string, i: number) => (
                                 <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
@@ -5138,7 +5350,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         )}
                         {latestAnalysis.optimizedSummary && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Optimiertes Kurzprofil</p>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_short_profile}</p>
                             <p className="text-[10px] font-light text-[#004225]/80 leading-relaxed italic">
                               "{latestAnalysis.optimizedSummary}"
                             </p>
@@ -5147,7 +5359,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         {latestAnalysis.optimizedHighlights && (
                           <div className="space-y-2 pt-2 border-t border-[#004225]/10">
                             <div className="flex items-center justify-between">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">Optimierte Highlights</p>
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_highlights}</p>
                               <button 
                                 onClick={() => {
                                   const text = latestAnalysis.optimizedHighlights.join('\n');
@@ -5173,7 +5385,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <details className="group">
                             <summary className="text-[8px] font-bold uppercase tracking-widest text-[#004225]/40 cursor-pointer hover:text-[#004225]/60 transition-colors list-none flex items-center gap-1">
                               <span className="group-open:rotate-90 transition-transform">▶</span>
-                              Rohdaten (JSON) anzeigen
+                              {t.stella_raw_json}
                             </summary>
                             <pre className="mt-2 p-2 bg-[#004225]/5 text-[8px] font-mono text-[#004225]/60 overflow-x-auto custom-scrollbar">
                               {JSON.stringify(latestAnalysis, null, 2)}
@@ -5184,14 +5396,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => handleToolClick('cv-analysis')}
                           className="w-full py-2 border border-[#004225]/20 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:bg-[#004225]/5 transition-all"
                         >
-                          Vollständige Analyse
+                          {t.stella_full_analysis}
                         </button>
                       </div>
                     ) : (
                       <p className="text-xs text-[#004225]/70 dark:text-[#FAFAF8]/70 font-light leading-relaxed">
-                        {cvContext 
-                          ? "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check."
-                          : "Sobald du dein CV hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen."}
+                        {cvContext ? t.stella_insights_with_cv : t.stella_insights_no_cv}
                       </p>
                     )}
                   </div>
@@ -5200,7 +5410,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 {salaryCalculations.length > 0 && (
                   <div className="p-8 border border-black/5 bg-white space-y-6">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-serif">Gehaltsverlauf</h3>
+                      <h3 className="text-lg font-serif">{t.salary_history}</h3>
                       <Coins size={18} className="text-[#004225]/40" />
                     </div>
                     <div className="space-y-4">
@@ -5274,7 +5484,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       <h3 className="text-lg md:text-xl font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
                       <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-6 line-clamp-3">{tool.desc}</p>
                       <button className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn">
-                        Öffnen <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                        {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
                       </button>
                     </motion.div>
                   ))}
@@ -5379,10 +5589,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <div className="flex items-center gap-4 mb-8 pb-6 border-b border-black/5 dark:border-white/5">
                 <div className="w-12 h-12 bg-[#004225] flex items-center justify-center text-white font-serif text-xl">S</div>
                 <div>
-                  <h3 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stella – KI-Assistentin</h3>
+                  <h3 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{t.stella_name}</h3>
                   <p className="text-xs text-[#059669] flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
-                    Online – bereit zu helfen
+                    {t.stella_online}
                   </p>
                 </div>
               </div>
@@ -5399,7 +5609,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
               <div className="flex gap-2">
                 <div className="flex-1 h-10 bg-[#FAFAF8] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 px-4 flex items-center text-xs text-[#9A9A94] dark:text-[#5C5C58]">
-                  Schreibe Stella etwas...
+                  {t.stella_input_ph}
                 </div>
                 <div className="w-10 h-10 bg-[#004225] flex items-center justify-center text-white">
                   <Send size={16} />
