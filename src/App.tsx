@@ -5823,7 +5823,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           </div>
           <div className="text-center mt-12">
             <p className="text-sm text-[#9A9A94] font-light">
-              {t.faq_contact} <a href="mailto:support@stellify.ch" className="text-[#004225] font-medium border-b border-[#004225]/20">support@stellify.ch</a>
+              {t.faq_contact} <a href="mailto:support.stellify@gmail.com" className="text-[#004225] font-medium border-b border-[#004225]/20">support.stellify@gmail.com</a>
             </p>
           </div>
         </div>
