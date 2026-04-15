@@ -1763,11 +1763,14 @@ function StellifyApp() {
       }
     } catch (e: any) {
       console.error("Subscription error:", e);
+      const msg = e.message || '';
       setSubscriptionError(
-        language === 'DE' ? '⚠️ Checkout fehlgeschlagen. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.' :
-        language === 'FR' ? '⚠️ Échec du paiement. Veuillez réessayer plus tard oder contacter le support.' :
-        language === 'IT' ? '⚠️ Pagamento fallito. Riprova più tardi o contatta il supporto.' :
-        '⚠️ Checkout failed. Please try again later or contact support.'
+        msg.includes('Konfiguration') || msg.includes('STRIPE_PRICE')
+          ? `⚠️ ${msg} Bitte kontaktiere support.stellify@gmail.com.`
+          : language === 'DE' ? '⚠️ Checkout fehlgeschlagen. Bitte versuche es später noch einmal oder kontaktiere support.stellify@gmail.com.' :
+            language === 'FR' ? '⚠️ Échec du paiement. Réessaie plus tard ou contacte support.stellify@gmail.com.' :
+            language === 'IT' ? '⚠️ Pagamento fallito. Riprova più tardi o contatta support.stellify@gmail.com.' :
+            '⚠️ Checkout failed. Please try again later or contact support.stellify@gmail.com.'
       );
     } finally {
       setIsSubscribing(false);

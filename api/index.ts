@@ -211,8 +211,8 @@ async function startServer() {
 
   // --- STRIPE PAYMENT ENDPOINT ---
   app.post("/api/create-checkout-session", async (req, res) => {
-    const { planId, billingCycle, userId } = req.body;
-    
+    const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body;
+
     if (!planId || !userId || !billingCycle) {
       return res.status(400).json({ error: "Missing planId, userId or billingCycle" });
     }
@@ -220,7 +220,7 @@ async function startServer() {
     try {
       const stripeClient = getStripe();
       const appUrl = process.env.APP_URL || `http://localhost:${PORT}`;
-      
+
       // Map planId and billingCycle to price IDs
       const priceMap: Record<string, string | undefined> = {
         'pro_monthly': process.env.STRIPE_PRICE_PRO_MONTHLY,
@@ -234,35 +234,23 @@ async function startServer() {
 
       if (!priceId) {
         console.error(`[STRIPE] No Price ID found for ${priceKey}`);
-        return res.status(400).json({ 
-          success: false, 
-          error: `Konfigurationsfehler: Keine Preis-ID für ${priceKey} gefunden.` 
+        return res.status(400).json({
+          success: false,
+          error: `Stripe-Konfiguration fehlt: Bitte setze die Umgebungsvariable STRIPE_PRICE_${planId.toUpperCase()}_${billingCycle.toUpperCase()} in Vercel.`
         });
       }
 
       const session = await stripeClient.checkout.sessions.create({
         payment_method_types: ['card'],
-        line_items: [
-          {
-            price: priceId,
-            quantity: 1,
-          },
-        ],
+        line_items: [{ price: priceId, quantity: 1 }],
         mode: 'subscription',
         client_reference_id: userId,
-        metadata: {
-          planId: planId,
-          billingCycle: billingCycle
-        },
-        success_url: `${appUrl}?session_id={CHECKOUT_SESSION_ID}&payment=success`,
-        cancel_url: `${appUrl}?payment=cancel`,
+        metadata: { planId, billingCycle },
+        success_url: successUrl || `${appUrl}?session_id={CHECKOUT_SESSION_ID}&payment=success`,
+        cancel_url: cancelUrl || `${appUrl}?payment=cancel`,
       });
 
-      res.json({
-        success: true,
-        url: session.url,
-        message: "Stripe-Session erstellt."
-      });
+      res.json({ success: true, url: session.url });
     } catch (err: any) {
       console.error(`[STRIPE] Error creating session: ${err.message}`);
       res.status(500).json({ success: false, error: err.message });
