@@ -284,5 +284,83 @@
     "description_it": "Consulenza a imprese nazionali e internazionali su questioni fiscali complesse. Focus sulla strutturazione aziendale e sulle transazioni M&A.",
     "url": "https://ch.indeed.com/jobs?q=steuerexperte+steuerberater&l=Z%C3%BCrich",
     "ats_keywords": ["DBG", "StHG", "MWST", "Transfer Pricing", "M&A", "IFRS"]
+  },
+  {
+    "id": "lehr-1",
+    "title": "Lehrling Kaufmann/Kauffrau EFZ (M/W/D)",
+    "company": "Zurich Insurance Group AG",
+    "location": "Zürich, Schweiz",
+    "category": "Lehrstellen",
+    "description": "Kaufmännische Ausbildung in einem der führenden Versicherungskonzerne der Schweiz. Du durchläufst verschiedene Abteilungen und erhältst einen umfassenden Einblick in die Geschäftsprozesse.",
+    "description_en": "Commercial apprenticeship at one of Switzerland's leading insurance groups. You will rotate through various departments and gain comprehensive insight into business processes.",
+    "description_fr": "Formation commerciale dans l'un des principaux groupes d'assurance suisses. Vous passerez par différents départements et obtiendrez une vision complète des processus métier.",
+    "description_it": "Formazione commerciale in uno dei principali gruppi assicurativi svizzeri. Ruoterai tra vari reparti e acquisirai una visione completa dei processi aziendali.",
+    "url": "https://ch.indeed.com/jobs?q=lehrling+kaufmann&l=Z%C3%BCrich",
+    "ats_keywords": ["Kaufmann EFZ", "Büroarbeit", "MS Office", "Teamarbeit", "Versicherung"]
+  },
+  {
+    "id": "lehr-2",
+    "title": "Informatiker/in EFZ Applikationsentwicklung",
+    "company": "UBS AG",
+    "location": "Zürich, Schweiz",
+    "category": "Lehrstellen",
+    "description": "Informatik-Lehrstelle in der Fachrichtung Applikationsentwicklung bei einer der grössten Schweizer Banken. Programmieren, Testen und Dokumentieren von Software-Lösungen.",
+    "description_en": "IT apprenticeship in application development at one of Switzerland's largest banks. Programming, testing and documenting software solutions.",
+    "description_fr": "Apprentissage en informatique dans le domaine du développement d'applications dans l'une des plus grandes banques suisses. Programmation, tests et documentation de solutions logicielles.",
+    "description_it": "Apprendistato informatico nello sviluppo di applicazioni presso una delle maggiori banche svizzere. Programmazione, test e documentazione di soluzioni software.",
+    "url": "https://ch.indeed.com/jobs?q=informatiker+lehrling&l=Z%C3%BCrich",
+    "ats_keywords": ["Java", "Python", "SQL", "Git", "Agile", "Informatiker EFZ"]
+  },
+  {
+    "id": "lehr-3",
+    "title": "Mediamatiker/in EFZ",
+    "company": "Ringier AG",
+    "location": "Zürich, Schweiz",
+    "category": "Lehrstellen",
+    "description": "Vielseitige Lehre an der Schnittstelle von Medien, Design und Technik. Mitarbeit bei der Gestaltung von Print- und Online-Medien, Video-Produktionen und Social-Media-Kanälen.",
+    "description_en": "Versatile apprenticeship at the interface of media, design and technology. Working on the design of print and online media, video productions and social media channels.",
+    "description_fr": "Apprentissage polyvalent à l'interface des médias, du design et de la technique. Participation à la conception de médias imprimés et en ligne, de productions vidéo et de canaux de médias sociaux.",
+    "description_it": "Apprendistato versatile all'intersezione tra media, design e tecnologia. Collaborazione nella progettazione di media cartacei e online, produzioni video e canali social media.",
+    "url": "https://ch.indeed.com/jobs?q=mediamatiker+lehrling&l=Z%C3%BCrich",
+    "ats_keywords": ["Adobe Creative Suite", "Social Media", "Video", "Design", "Mediamatiker EFZ"]
+  },
+  {
+    "id": "lehr-4",
+    "title": "Detailhandelsfachmann/-frau EFZ",
+    "company": "Migros Genossenschaft Zürich",
+    "location": "Zürich, Schweiz",
+    "category": "Lehrstellen",
+    "description": "Praxisnahe Ausbildung im grössten Schweizer Detailhandelsunternehmen. Kundenberatung, Warenbewirtschaftung, Kassenführung und Visual Merchandising.",
+    "description_en": "Practical training at Switzerland's largest retail company. Customer advice, goods management, cash register operations and visual merchandising.",
+    "description_fr": "Formation pratique dans la plus grande entreprise de commerce de détail suisse. Conseil à la clientèle, gestion des marchandises, tenue de caisse et merchandising visuel.",
+    "description_it": "Formazione pratica nella più grande azienda di commercio al dettaglio svizzera. Consulenza clienti, gestione delle merci, cassa e visual merchandising.",
+    "url": "https://ch.indeed.com/jobs?q=detailhandelsfachmann+lehrling&l=Z%C3%BCrich",
+    "ats_keywords": ["Detailhandel EFZ", "Kundenberatung", "Warenbewirtschaftung", "Kasse", "Teamarbeit"]
+  },
+  {
+    "id": "lehr-5",
+    "title": "Fachmann/-frau Gesundheit (FaGe) EFZ",
+    "company": "Universitätsspital Zürich",
+    "location": "Zürich, Schweiz",
+    "category": "Lehrstellen",
+    "description": "Ausbildung zur Fachperson Gesundheit in einem der renommiertesten Spitäler der Schweiz. Betreuung und Unterstützung von Patientinnen und Patienten in verschiedenen Abteilungen.",
+    "description_en": "Training as a healthcare assistant at one of Switzerland's most renowned hospitals. Care and support of patients in various departments.",
+    "description_fr": "Formation d'assistant en soins et santé communautaire dans l'un des hôpitaux les plus renommés de Suisse. Prise en charge et soutien des patients dans différents services.",
+    "description_it": "Formazione come operatore socio-sanitario in uno degli ospedali più rinomati della Svizzera. Cura e supporto dei pazienti in vari reparti.",
+    "url": "https://ch.indeed.com/jobs?q=fage+lehrling+gesundheit&l=Z%C3%BCrich",
+    "ats_keywords": ["FaGe EFZ", "Pflege", "Patientenbetreuung", "Medizin", "Empathie"]
+  },
+  {
+    "id": "lehr-6",
+    "title": "Polymechaniker/in EFZ",
+    "company": "ABB Ltd",
+    "location": "Baden, Schweiz",
+    "category": "Lehrstellen",
+    "description": "Technische Lehrstelle in einem weltweit führenden Technologieunternehmen. Herstellung und Wartung von Präzisionsbauteilen, Bedienung von CNC-Maschinen.",
+    "description_en": "Technical apprenticeship at a globally leading technology company. Manufacturing and maintenance of precision components, operation of CNC machines.",
+    "description_fr": "Apprentissage technique dans une entreprise technologique de premier plan mondial. Fabrication et maintenance de composants de précision, utilisation de machines CNC.",
+    "description_it": "Apprendistato tecnico in un'azienda tecnologica leader mondiale. Produzione e manutenzione di componenti di precisione, utilizzo di macchine CNC.",
+    "url": "https://ch.indeed.com/jobs?q=polymechaniker+lehrling&l=Baden",
+    "ats_keywords": ["Polymechaniker EFZ", "CNC", "CAD", "Präzisionstechnik", "Mechanik"]
   }
 ]
