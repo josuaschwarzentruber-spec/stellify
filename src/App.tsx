@@ -983,7 +983,8 @@ function StellifyApp() {
     }
   }, [isAuthModalOpen]);
   const [subscriptionError, setSubscriptionError] = useState('');
-  const [authTab, setAuthTab] = useState<'login' | 'register' | 'forgot'>('login');
+  const [authTab, setAuthTab] = useState<'login' | 'register' | 'forgot'>('register');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isStellaOpen, setIsStellaOpen] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
 
@@ -2070,28 +2071,55 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       if (authTab === 'login') {
         await signInWithEmailAndPassword(auth, email, password);
       } else {
+        if (password !== confirmPassword) {
+          setAuthError(
+            language === 'DE' ? 'Die Passwörter stimmen nicht überein.' :
+            language === 'FR' ? 'Les mots de passe ne correspondent pas.' :
+            language === 'IT' ? 'Le password non corrispondono.' :
+            'Passwords do not match.'
+          );
+          setIsAuthLoading(false);
+          return;
+        }
+        if (password.length < 6) {
+          setAuthError(
+            language === 'DE' ? 'Das Passwort muss mindestens 6 Zeichen haben.' :
+            language === 'FR' ? 'Le mot de passe doit comporter au moins 6 caractères.' :
+            language === 'IT' ? 'La password deve avere almeno 6 caratteri.' :
+            'Password must be at least 6 characters.'
+          );
+          setIsAuthLoading(false);
+          return;
+        }
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const firebaseUser = userCredential.user;
-        
-        // Store additional user data in Firestore
+
         const emailPrefix = firebaseUser.email?.split('@')[0] || 'Nutzer';
         const rawName = firstName === 'Gast' ? 'Nutzer' : (firstName || firebaseUser.displayName || emailPrefix);
         const cleanName = rawName.replace(/\./g, ' ');
         const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-        
+
         await setDoc(doc(db, 'users', firebaseUser.uid), {
           uid: firebaseUser.uid,
           email: firebaseUser.email || '',
           firstName: formattedName,
           role: 'client',
           createdAt: serverTimestamp(),
-          cvContext: cvContext || null, // Persist local CV context if it exists
+          cvContext: cvContext || null,
           freeGenerationsUsed: 0
         });
+
+        // Send branded welcome email (fire-and-forget)
+        fetch('/api/send-welcome-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName }),
+        }).catch(console.error);
       }
       setIsAuthModalOpen(false);
       setEmail('');
       setPassword('');
+      setConfirmPassword('');
       setFirstName('');
     } catch (err: any) {
       console.error("Auth Error:", err);
@@ -2150,20 +2178,25 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     
     setIsAuthLoading(true);
     try {
-      await sendPasswordResetEmail(auth, email);
+      await fetch('/api/send-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      // Always show success (don't reveal if email exists)
       setAuthError(
-        language === 'DE' ? 'Passwort-Reset-E-Mail wurde gesendet!' :
-        language === 'FR' ? 'E-mail de réinitialisation envoyé !' :
-        language === 'IT' ? 'Email di ripristino inviata!' :
-        'Password reset email sent!'
+        language === 'DE' ? 'Falls ein Konto mit dieser E-Mail existiert, erhältst du in Kürze eine E-Mail mit einem Link zum Zurücksetzen deines Passworts.' :
+        language === 'FR' ? 'Si un compte avec cet e-mail existe, vous recevrez bientôt un e-mail avec un lien de réinitialisation.' :
+        language === 'IT' ? 'Se esiste un account con questa email, riceverai a breve un\'email con il link per reimpostare la password.' :
+        'If an account with this email exists, you will shortly receive an email with a link to reset your password.'
       );
     } catch (err: any) {
       console.error("Reset Error:", err);
       setAuthError(
-        language === 'DE' ? 'Fehler beim Senden der Reset-E-Mail.' :
-        language === 'FR' ? 'Erreur lors de l\'envoi de l\'e-mail de réinitialisation.' :
-        language === 'IT' ? 'Errore nell\'invio dell\'e-mail di ripristino.' :
-        'Error sending reset email.'
+        language === 'DE' ? 'Fehler beim Senden. Bitte versuche es erneut.' :
+        language === 'FR' ? 'Erreur lors de l\'envoi. Veuillez réessayer.' :
+        language === 'IT' ? 'Errore durante l\'invio. Riprova.' :
+        'Error sending. Please try again.'
       );
     } finally {
       setIsAuthLoading(false);
@@ -8914,7 +8947,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsAuthModalOpen(false)}
+              onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"
             />
             <motion.div 
@@ -8923,8 +8956,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
               className="bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] w-full max-w-md p-10 relative z-20 shadow-2xl"
             >
-              <button 
-                onClick={() => setIsAuthModalOpen(false)}
+              <button
+                onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
                 className="absolute top-4 right-4 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]"
               >
                 <X size={20} />
@@ -9050,7 +9083,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     )}
                     {authTab === 'login' && (
                       <div className="flex justify-end">
-                        <button 
+                        <button
                           type="button"
                           onClick={() => { setAuthTab('forgot'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
@@ -9058,6 +9091,41 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           {t.auth_forgot_password}
                         </button>
                       </div>
+                    )}
+                  </div>
+                )}
+
+                {authTab === 'register' && (
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
+                      {language === 'FR' ? 'Confirmer le mot de passe' : language === 'IT' ? 'Conferma password' : language === 'EN' ? 'Confirm password' : 'Passwort bestätigen'}
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4A4A45] dark:text-[#9A9A94]" size={16} />
+                      <input
+                        type="password"
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className={`w-full bg-white dark:bg-[#2A2A26] border pl-10 pr-4 py-3 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none transition-all ${
+                          confirmPassword && confirmPassword !== password
+                            ? 'border-red-400 focus:border-red-400'
+                            : confirmPassword && confirmPassword === password
+                            ? 'border-green-500 focus:border-green-500'
+                            : 'border-black/10 dark:border-white/10 focus:border-[#004225] dark:focus:border-[#00A854]'
+                        }`}
+                        placeholder="••••••••"
+                      />
+                      {confirmPassword && (
+                        <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold ${confirmPassword === password ? 'text-green-500' : 'text-red-400'}`}>
+                          {confirmPassword === password ? '✓' : '✗'}
+                        </span>
+                      )}
+                    </div>
+                    {confirmPassword && confirmPassword !== password && (
+                      <p className="text-[9px] text-red-400 uppercase tracking-wider">
+                        {language === 'FR' ? 'Les mots de passe ne correspondent pas' : language === 'IT' ? 'Le password non corrispondono' : language === 'EN' ? 'Passwords do not match' : 'Passwörter stimmen nicht überein'}
+                      </p>
                     )}
                   </div>
                 )}
