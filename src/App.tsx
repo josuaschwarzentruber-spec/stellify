@@ -508,7 +508,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Authentifizierung und Kontoverwaltung</li>
                   <li>Abrechnung und Zahlungsabwicklung (via Stripe)</li>
                   <li>Einhaltung gesetzlicher Pflichten</li>
-                  <li>KI-gestützte Karriereberatung (Verarbeitung des CV-Textes durch Google Gemini API)</li>
+                  <li>KI-gestützte Karriereberatung (Verarbeitung des CV-Textes durch einen externen KI-Dienst)</li>
                 </ul>
               </Section>
               <Section title="4. Rechtsgrundlage der Bearbeitung">
@@ -521,7 +521,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Weitergabe an Dritte">
                 <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Google Firebase (Alphabet Inc.)', 'Zweck: Authentifizierung, Datenbankhosting (Firestore). Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['Google Gemini API (Alphabet Inc.)', 'Zweck: KI-Verarbeitung von CV-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden gemäss Google-Nutzungsbedingungen nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Vercel Inc.', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
+                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und CV-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -563,7 +563,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Authentification et gestion des comptes</li>
                   <li>Facturation et traitement des paiements (via Stripe)</li>
                   <li>Respect des obligations légales</li>
-                  <li>Conseil de carrière assisté par IA (traitement du CV via Google Gemini API)</li>
+                  <li>Conseil de carrière assisté par IA (traitement du CV via un service IA externe)</li>
                 </ul>
               </Section>
               <Section title="4. Base légale">
@@ -576,7 +576,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Transfert à des tiers">
                 <p>Nous ne transmettons vos données qu'aux sous-traitants suivants :</p>
                 <div className="mt-3 space-y-4">
-                  {[['Google Firebase (Alphabet Inc.)', 'Finalité : authentification, hébergement de base de données (Firestore). Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Google Gemini API (Alphabet Inc.)', 'Finalité : traitement IA du contenu du CV. Siège : USA. Selon les conditions d\'utilisation de Google, les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Vercel Inc.', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
+                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (Google LLC)', 'Finalité : traitement IA des requêtes et du contenu du CV. Siège : USA. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -614,7 +614,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Autenticazione e gestione degli account</li>
                   <li>Fatturazione ed elaborazione dei pagamenti (via Stripe)</li>
                   <li>Rispetto degli obblighi legali</li>
-                  <li>Consulenza di carriera assistita da IA (elaborazione del CV tramite Google Gemini API)</li>
+                  <li>Consulenza di carriera assistita da IA (elaborazione del CV tramite un servizio IA esterno)</li>
                 </ul>
               </Section>
               <Section title="4. Base giuridica">
@@ -627,7 +627,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Trasferimento a terzi">
                 <p>Trasferiamo i dati solo ai seguenti responsabili del trattamento:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Google Firebase (Alphabet Inc.)', 'Finalità: autenticazione, hosting database (Firestore). Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Google Gemini API (Alphabet Inc.)', 'Finalità: elaborazione IA del contenuto del CV. Sede: USA. I dati non vengono usati per il training secondo i termini Google.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Vercel Inc.', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
+                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (Google LLC)', 'Finalità: elaborazione IA delle richieste e del contenuto del CV. Sede: USA. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -665,7 +665,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Authentication and account management</li>
                   <li>Billing and payment processing (via Stripe)</li>
                   <li>Compliance with legal obligations</li>
-                  <li>AI-powered career advice (processing of CV text via Google Gemini API)</li>
+                  <li>AI-powered career advice (processing of CV text via an external AI service)</li>
                 </ul>
               </Section>
               <Section title="4. Legal Basis">
@@ -678,7 +678,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Third-Party Data Sharing">
                 <p>We only share data with the following processors:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Google Firebase (Alphabet Inc.)', 'Purpose: Authentication, database hosting (Firestore). Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['Google Gemini API (Alphabet Inc.)', 'Purpose: AI processing of CV content and user inputs. Location: USA. Per Google API terms, input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Vercel Inc.', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
+                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (Google LLC)', 'Purpose: AI processing of user requests and CV content. Location: USA. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -1106,7 +1106,8 @@ function StellifyApp() {
       const kw = jobFilters.keyword.toLowerCase();
       const loc = jobFilters.location.toLowerCase();
       const ind = jobFilters.industry.toLowerCase();
-      return (!kw || job.title.toLowerCase().includes(kw) || job.description.toLowerCase().includes(kw) || job.ats_keywords?.some((k: string) => k.toLowerCase().includes(kw)))
+      const jobDesc = ((language === 'EN' && job.description_en) || (language === 'FR' && job.description_fr) || (language === 'IT' && job.description_it) || job.description || '').toLowerCase();
+      return (!kw || job.title.toLowerCase().includes(kw) || jobDesc.includes(kw) || job.ats_keywords?.some((k: string) => k.toLowerCase().includes(kw)))
         && (!loc || job.location.toLowerCase().includes(loc))
         && (!ind || job.category.toLowerCase().includes(ind));
     });
@@ -1174,7 +1175,7 @@ function StellifyApp() {
             <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_location}</label>
             <input
               type="text"
-              placeholder="z.B. Zürich"
+              placeholder={language === 'FR' ? 'p.ex. Zurich' : language === 'IT' ? 'es. Zurigo' : language === 'EN' ? 'e.g. Zurich' : 'z.B. Zürich'}
               className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
               value={jobFilters.location}
               onChange={(e) => { setJobFilters({ ...jobFilters, location: e.target.value }); setLiveJobs(null); }}
@@ -1191,13 +1192,24 @@ function StellifyApp() {
               <option value="">{t.filter_all}</option>
               <option value="IT">IT</option>
               <option value="Marketing">Marketing</option>
-              <option value="Finance">Finance</option>
-              <option value="Pharma">Pharma</option>
-              <option value="Banking">Banking</option>
-              <option value="Engineering">Engineering</option>
-              <option value="HR">HR</option>
-              <option value="Healthcare">Healthcare</option>
-              <option value="Logistik">Logistik</option>
+              <option value="Finance">{language === 'FR' ? 'Finance' : language === 'IT' ? 'Finanza' : language === 'EN' ? 'Finance' : 'Finanzen'}</option>
+              <option value="Banking">{language === 'FR' ? 'Banque' : language === 'IT' ? 'Banca' : language === 'EN' ? 'Banking' : 'Banking'}</option>
+              <option value="Engineering">{language === 'FR' ? 'Ingénierie' : language === 'IT' ? 'Ingegneria' : language === 'EN' ? 'Engineering' : 'Ingenieurwesen'}</option>
+              <option value="HR">{language === 'FR' ? 'RH' : language === 'IT' ? 'HR' : language === 'EN' ? 'HR' : 'HR'}</option>
+              <option value="Healthcare">{language === 'FR' ? 'Santé' : language === 'IT' ? 'Sanità' : language === 'EN' ? 'Healthcare' : 'Gesundheitswesen'}</option>
+              <option value="Pharma">{language === 'FR' ? 'Pharma' : language === 'IT' ? 'Farmaceutica' : language === 'EN' ? 'Pharma' : 'Pharma'}</option>
+              <option value="Logistik">{language === 'FR' ? 'Logistique' : language === 'IT' ? 'Logistica' : language === 'EN' ? 'Logistics' : 'Logistik'}</option>
+              <option value="Consulting">{language === 'FR' ? 'Conseil' : language === 'IT' ? 'Consulenza' : language === 'EN' ? 'Consulting' : 'Beratung'}</option>
+              <option value="Legal">{language === 'FR' ? 'Droit' : language === 'IT' ? 'Diritto' : language === 'EN' ? 'Legal' : 'Recht'}</option>
+              <option value="Education">{language === 'FR' ? 'Éducation' : language === 'IT' ? 'Istruzione' : language === 'EN' ? 'Education' : 'Bildung'}</option>
+              <option value="RealEstate">{language === 'FR' ? 'Immobilier' : language === 'IT' ? 'Immobiliare' : language === 'EN' ? 'Real Estate' : 'Immobilien'}</option>
+              <option value="Retail">{language === 'FR' ? 'Commerce' : language === 'IT' ? 'Commercio' : language === 'EN' ? 'Retail' : 'Handel'}</option>
+              <option value="Hospitality">{language === 'FR' ? 'Hôtellerie' : language === 'IT' ? 'Ospitalità' : language === 'EN' ? 'Hospitality' : 'Gastgewerbe'}</option>
+              <option value="Media">{language === 'FR' ? 'Médias' : language === 'IT' ? 'Media' : language === 'EN' ? 'Media' : 'Medien'}</option>
+              <option value="Energy">{language === 'FR' ? 'Énergie' : language === 'IT' ? 'Energia' : language === 'EN' ? 'Energy' : 'Energie'}</option>
+              <option value="PublicSector">{language === 'FR' ? 'Secteur public' : language === 'IT' ? 'Settore pubblico' : language === 'EN' ? 'Public Sector' : 'Öffentlicher Sektor'}</option>
+              <option value="Transport">{language === 'FR' ? 'Transport' : language === 'IT' ? 'Trasporti' : language === 'EN' ? 'Transport' : 'Transport'}</option>
+              <option value="NonProfit">{language === 'FR' ? 'ONG / Non-profit' : language === 'IT' ? 'ONG / Non-profit' : language === 'EN' ? 'NGO / Non-Profit' : 'NGO / Non-Profit'}</option>
             </select>
           </div>
           {/* Live Search button */}
@@ -1278,7 +1290,7 @@ function StellifyApp() {
                     </div>
                   )}
                 </div>
-                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">{job.description}</p>
+                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">{(language === 'EN' && job.description_en) || (language === 'FR' && job.description_fr) || (language === 'IT' && job.description_it) || job.description}</p>
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2 flex-wrap">
                     {job.ats_keywords?.slice(0, 3).map((kw: string) => (
@@ -8440,7 +8452,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 <div className="space-y-3">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_description}</h4>
                   <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed font-light">
-                    {selectedJob.description}
+                    {(language === 'EN' && selectedJob.description_en) || (language === 'FR' && selectedJob.description_fr) || (language === 'IT' && selectedJob.description_it) || selectedJob.description}
                   </p>
                 </div>
 
