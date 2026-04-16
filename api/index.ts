@@ -101,17 +101,38 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     if (userId && planId && dbAdmin) {
       try {
         const isAnnual = session.metadata?.interval === 'year';
-        const now = new Date();
-        const expiresAt = new Date(now);
+        // Renewal: extend from current expiry if still in the future
+        const userDoc = await dbAdmin.collection("users").doc(userId).get();
+        const currentExpiry = userDoc.exists ? userDoc.data()?.subscriptionExpiresAt : null;
+        const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
+        const expiresAt = new Date(baseDate);
         if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
         else expiresAt.setMonth(expiresAt.getMonth() + 1);
         await dbAdmin.collection("users").doc(userId).update({
           role: normaliseRole(planId),
           subscriptionInterval: isAnnual ? 'annual' : 'monthly',
           subscriptionExpiresAt: expiresAt.toISOString(),
+          stripeCustomerId: session.customer || null,
           updatedAt: FieldValue.serverTimestamp()
         });
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
+        // Send confirmation email
+        const userData = userDoc.data();
+        if (userData?.email) {
+          const emailUser = process.env.EMAIL_USER;
+          const emailPass = process.env.EMAIL_PASS;
+          if (emailUser && emailPass) {
+            const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
+            const planLabel = planId === 'ultimate' ? 'Ultimate' : 'Pro';
+            const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
+            await transporter.sendMail({
+              from: `"Stellify" <${emailUser}>`,
+              to: userData.email,
+              subject: `Willkommen im ${planLabel}-Plan — Dein Stellify-Abo ist aktiv`,
+              text: `Hallo ${userData.firstName || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement! Du hast jetzt Zugriff auf alle ${planLabel}-Funktionen bis zum ${expiresAt.toLocaleDateString('de-CH')}.\n\nViel Erfolg bei deiner Karriere!\nDas Stellify-Team\n\nsupport.stellify@gmail.com`,
+            }).catch(console.error);
+          }
+        }
       } catch (err) {
         console.error(`[WEBHOOK] Firestore update failed:`, err);
       }
@@ -344,12 +365,15 @@ app.post("/api/create-checkout-session", async (req, res) => {
     }
     const key = process.env.STRIPE_SECRET_KEY || '';
     console.log(`[STRIPE] Mode: ${key.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
+    const isAnnual = billingCycle === 'yearly';
     const session = await stripeClient.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       client_reference_id: userId,
-      metadata: { planId, billingCycle },
+      metadata: { planId, billingCycle, interval: isAnnual ? 'year' : 'month' },
+      // No auto-renewal: Stripe subscription will cancel at period end
+      subscription_data: { metadata: { cancel_at_period_end: 'true' } } as any,
       success_url: successUrl || `${req.headers.origin}?payment=success`,
       cancel_url:  cancelUrl  || `${req.headers.origin}?payment=cancel`,
     });
@@ -367,15 +391,24 @@ app.post("/api/create-checkout-session", async (req, res) => {
 
 // ── Simulate payment (test) ───────────────────────────────────────────────────
 app.post("/api/test/simulate-success", async (req, res) => {
-  const { userId, planId } = req.body;
+  const { userId, planId, billingCycle } = req.body;
   if (!userId) return res.status(400).json({ error: "No userId" });
   if (!dbAdmin) return res.status(503).json({ error: "Firebase Admin nicht konfiguriert" });
   try {
+    const isAnnual = billingCycle === 'yearly';
+    const userDoc = await dbAdmin.collection("users").doc(userId).get();
+    const currentExpiry = userDoc.exists ? userDoc.data()?.subscriptionExpiresAt : null;
+    const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
+    const expiresAt = new Date(baseDate);
+    if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+    else expiresAt.setMonth(expiresAt.getMonth() + 1);
     await dbAdmin.collection("users").doc(userId).update({
-      role: normaliseRole(planId),
+      role: normaliseRole(planId || 'pro'),
+      subscriptionInterval: isAnnual ? 'annual' : 'monthly',
+      subscriptionExpiresAt: expiresAt.toISOString(),
       updatedAt: FieldValue.serverTimestamp()
     });
-    res.json({ success: true, message: `Role gesetzt auf '${normaliseRole(planId)}'` });
+    res.json({ success: true, message: `Role gesetzt auf '${normaliseRole(planId || 'pro')}', läuft ab: ${expiresAt.toISOString()}` });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }

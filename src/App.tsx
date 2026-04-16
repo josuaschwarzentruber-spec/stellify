@@ -90,10 +90,14 @@ interface UserData {
   toolUses?: number;
   dailyToolUses?: number;
   lastDailyReset?: string;
+  lastMonthlyReset?: string;
   searchUses?: number;
   cvContext?: string;
   role?: 'client' | 'admin' | 'pro' | 'unlimited';
   hasSeenTutorial?: boolean;
+  subscriptionExpiresAt?: string;
+  subscriptionInterval?: 'monthly' | 'annual';
+  stripeCustomerId?: string;
 }
 
 // --- ERROR BOUNDARY ---
@@ -1418,6 +1422,7 @@ function StellifyApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [expiryBanner, setExpiryBanner] = useState<{ daysLeft: number; interval: 'monthly' | 'annual' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
     setToast({ message, type });
@@ -1519,7 +1524,29 @@ function StellifyApp() {
             const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
             const sanitizedFirstName = formattedName === 'Gast' ? 'Nutzer' : formattedName;
             
-            const newUser = {
+            // ── Subscription expiry check ────────────────────────────────
+            let effectiveRole = userData.role || 'client';
+            const expiresAt = userData.subscriptionExpiresAt ? new Date(userData.subscriptionExpiresAt) : null;
+            const now = new Date();
+            if (expiresAt && (effectiveRole === 'pro' || effectiveRole === 'unlimited')) {
+              const msLeft = expiresAt.getTime() - now.getTime();
+              const daysLeft = Math.ceil(msLeft / 86400000);
+              if (msLeft <= 0) {
+                // Expired → downgrade immediately in Firestore
+                effectiveRole = 'client';
+                updateDoc(userDocRef, { role: 'client', updatedAt: serverTimestamp() }).catch(console.error);
+              } else {
+                // Show expiry banner when approaching expiry
+                const threshold = userData.subscriptionInterval === 'annual' ? 14 : 3;
+                if (daysLeft <= threshold) {
+                  setExpiryBanner({ daysLeft, interval: userData.subscriptionInterval || 'monthly' });
+                } else {
+                  setExpiryBanner(null);
+                }
+              }
+            }
+
+            const newUser: UserData = {
               id: firebaseUser.uid,
               email: firebaseUser.email || '',
               firstName: sanitizedFirstName,
@@ -1527,19 +1554,35 @@ function StellifyApp() {
               toolUses: userData.toolUses || 0,
               dailyToolUses: userData.dailyToolUses || 0,
               lastDailyReset: userData.lastDailyReset || null,
+              lastMonthlyReset: userData.lastMonthlyReset || null,
               cvContext: userData.cvContext || null,
-              role: userData.role || 'client',
-              hasSeenTutorial: userData.hasSeenTutorial || false
+              role: effectiveRole,
+              hasSeenTutorial: userData.hasSeenTutorial || false,
+              subscriptionExpiresAt: userData.subscriptionExpiresAt || undefined,
+              subscriptionInterval: userData.subscriptionInterval || undefined,
+              stripeCustomerId: userData.stripeCustomerId || undefined,
+              searchUses: userData.searchUses || 0
             };
             setUser(newUser);
 
-            // Daily Reset Logic
+            // ── Daily Reset Logic ───────────────────────────────────────
             const today = new Date().toISOString().split('T')[0];
             if (userData.lastDailyReset !== today) {
               updateDoc(userDocRef, {
                 dailyToolUses: 0,
                 lastDailyReset: today
               }).catch(e => console.error("Daily reset error:", e));
+            }
+
+            // ── Monthly Reset for Pro/Unlimited users ───────────────────
+            const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
+            if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && userData.lastMonthlyReset !== currentMonth) {
+              updateDoc(userDocRef, {
+                toolUses: 0,
+                freeGenerationsUsed: 0,
+                searchUses: 0,
+                lastMonthlyReset: currentMonth
+              }).catch(e => console.error("Monthly reset error:", e));
             }
             
             if (!userData.hasSeenTutorial) {
@@ -7519,6 +7562,41 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           </button>
         </div>
       </section>
+
+      {/* --- SUBSCRIPTION EXPIRY BANNER --- */}
+      <AnimatePresence>
+        {expiryBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
+            className="fixed top-0 left-0 right-0 z-[900] bg-amber-500 text-white px-6 py-2.5 flex items-center justify-between gap-4 shadow-lg"
+          >
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <AlertCircle size={16} className="shrink-0" />
+              <p className="text-[11px] font-bold uppercase tracking-wider">
+                {expiryBanner.daysLeft <= 0
+                  ? (language === 'DE' ? 'Dein Abonnement ist abgelaufen. Jetzt verlängern.' : language === 'FR' ? 'Votre abonnement a expiré. Renouvelez maintenant.' : language === 'IT' ? 'Il tuo abbonamento è scaduto. Rinnova ora.' : 'Your subscription has expired. Renew now.')
+                  : expiryBanner.daysLeft === 1
+                    ? (language === 'DE' ? 'Dein Abo läuft morgen ab — jetzt verlängern!' : language === 'FR' ? 'Votre abonnement expire demain — renouvelez maintenant !' : language === 'IT' ? 'Il tuo abbonamento scade domani — rinnova ora!' : 'Your subscription expires tomorrow — renew now!')
+                    : (language === 'DE' ? `Dein Abo läuft in ${expiryBanner.daysLeft} Tagen ab.` : language === 'FR' ? `Votre abonnement expire dans ${expiryBanner.daysLeft} jours.` : language === 'IT' ? `Il tuo abbonamento scade tra ${expiryBanner.daysLeft} giorni.` : `Your subscription expires in ${expiryBanner.daysLeft} days.`)
+                }
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => { setActiveView('pricing'); setExpiryBanner(null); }}
+                className="text-[10px] font-bold uppercase tracking-wider underline hover:no-underline"
+              >
+                {language === 'DE' ? 'Verlängern' : language === 'FR' ? 'Renouveler' : language === 'IT' ? 'Rinnova' : 'Renew'}
+              </button>
+              <button onClick={() => setExpiryBanner(null)} className="opacity-70 hover:opacity-100 transition-opacity">
+                <X size={14} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* --- TOAST NOTIFICATION --- */}
       <AnimatePresence>
