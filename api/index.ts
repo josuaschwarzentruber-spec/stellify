@@ -47,6 +47,44 @@ function normaliseRole(planId: string): string {
 }
 
 // ── Email Helper ──────────────────────────────────────────────────────────────
+function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string) {
+  return `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F5F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F4F0;padding:40px 0;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:560px;width:100%;">
+        <!-- Header -->
+        <tr>
+          <td style="background:#004225;padding:28px 40px;">
+            <span style="font-family:Georgia,serif;font-size:24px;color:#FDFCFB;letter-spacing:-0.5px;">Stell<span style="color:#6FCF97;">ify</span></span>
+          </td>
+        </tr>
+        <!-- Body -->
+        <tr>
+          <td style="padding:40px 40px 32px;">
+            <h1 style="margin:0 0 20px;font-size:20px;font-weight:600;color:#1A1A18;line-height:1.3;">${title}</h1>
+            ${bodyLines.map(l => `<p style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.6;">${l}</p>`).join('')}
+            <div style="margin:32px 0;">
+              <a href="${ctaUrl}" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:14px;font-weight:600;padding:14px 28px;letter-spacing:0.3px;">${ctaText}</a>
+            </div>
+            <p style="margin:0;font-size:13px;color:#9A9A94;">Bei Fragen erreichst du uns unter <a href="mailto:support.stellify@gmail.com" style="color:#004225;">support.stellify@gmail.com</a></p>
+          </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+          <td style="padding:20px 40px;border-top:1px solid #E8E6E0;">
+            <p style="margin:0;font-size:12px;color:#9A9A94;">© ${new Date().getFullYear()} Stellify · Zug, Schweiz · <a href="https://stellify.ch" style="color:#9A9A94;">stellify.ch</a></p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+}
+
 async function sendRenewalReminder(to: string, firstName: string, planType: 'monthly' | 'annual', daysLeft: number) {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
@@ -59,17 +97,40 @@ async function sendRenewalReminder(to: string, firstName: string, planType: 'mon
     auth: { user: emailUser, pass: emailPass },
   });
   const isAnnual = planType === 'annual';
-  const subject = daysLeft > 0
-    ? `Dein Stellify-Abo läuft in ${daysLeft} Tag${daysLeft === 1 ? '' : 'en'} ab`
-    : 'Dein Stellify-Abo ist abgelaufen';
-  const body = daysLeft > 0
-    ? `Hallo ${firstName},\n\ndein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement bei Stellify läuft in ${daysLeft} Tag${daysLeft === 1 ? '' : 'en'} ab. Danach wechselst du automatisch zum kostenlosen Plan.\n\nUm weiter alle Funktionen nutzen zu können, verlängere dein Abo jetzt unter stellify.ch im Bereich «Preise & Pläne».\n\nBei Fragen: support.stellify@gmail.com\n\nDas Stellify-Team`
-    : `Hallo ${firstName},\n\ndein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement bei Stellify ist abgelaufen. Dein Konto wurde automatisch auf den Gratis-Plan umgestellt.\n\nDu kannst dein Abo jederzeit unter stellify.ch im Bereich «Preise & Pläne» erneuern.\n\nBei Fragen: support.stellify@gmail.com\n\nDas Stellify-Team`;
+  const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
+  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+
+  let subject: string;
+  let title: string;
+  let bodyLines: string[];
+  let ctaText: string;
+
+  if (daysLeft > 0) {
+    subject = `Dein Stellify-Abo läuft in ${daysLeft} Tag${daysLeft === 1 ? '' : 'en'} ab`;
+    title = `Dein ${cycleLabel}sabo läuft bald ab`;
+    bodyLines = [
+      `Hallo ${firstName},`,
+      `dein ${cycleLabel}s-Abonnement bei Stellify läuft in <strong>${daysLeft} Tag${daysLeft === 1 ? '' : 'en'}</strong> ab. Danach wird dein Konto automatisch auf den kostenlosen Plan umgestellt — ohne dass du etwas tun musst.`,
+      `Möchtest du weiterhin alle Funktionen nutzen? Verlängere jetzt einfach dein Abonnement — dein Zugang verlängert sich nahtlos um einen weiteren ${isAnnual ? 'Jahr' : 'Monat'}.`,
+    ];
+    ctaText = 'Jetzt verlängern';
+  } else {
+    subject = 'Dein Stellify-Abo ist abgelaufen';
+    title = 'Dein Abonnement ist abgelaufen';
+    bodyLines = [
+      `Hallo ${firstName},`,
+      `dein ${cycleLabel}s-Abonnement bei Stellify ist abgelaufen. Dein Konto wurde automatisch auf den kostenlosen Plan umgestellt.`,
+      `Du kannst jederzeit ein neues Abonnement abschliessen und sofort wieder vollen Zugriff auf alle Funktionen erhalten.`,
+    ];
+    ctaText = 'Neues Abo abschliessen';
+  }
+
   await transporter.sendMail({
     from: `"Stellify" <${emailUser}>`,
     to,
     subject,
-    text: body,
+    text: bodyLines.join('\n\n') + `\n\n${ctaText}: ${siteUrl}/?view=pricing\n\nDas Stellify-Team`,
+    html: buildEmailHtml(title, bodyLines, ctaText, `${siteUrl}/?view=pricing`),
   });
   console.log(`[EMAIL] Renewal reminder sent to ${to}`);
 }
@@ -129,7 +190,17 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
               from: `"Stellify" <${emailUser}>`,
               to: userData.email,
               subject: `Willkommen im ${planLabel}-Plan — Dein Stellify-Abo ist aktiv`,
-              text: `Hallo ${userData.firstName || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement! Du hast jetzt Zugriff auf alle ${planLabel}-Funktionen bis zum ${expiresAt.toLocaleDateString('de-CH')}.\n\nViel Erfolg bei deiner Karriere!\nDas Stellify-Team\n\nsupport.stellify@gmail.com`,
+              text: `Hallo ${userData.firstName || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement! Du hast jetzt Zugriff auf alle ${planLabel}-Funktionen bis zum ${expiresAt.toLocaleDateString('de-CH')}.\n\nViel Erfolg bei deiner Karriere!\nDas Stellify-Team`,
+              html: buildEmailHtml(
+                `Willkommen im ${planLabel}-Plan!`,
+                [
+                  `Hallo ${userData.firstName || 'Nutzer'},`,
+                  `vielen Dank — dein ${cycleLabel}s-Abonnement ist jetzt aktiv. Du hast sofort vollen Zugriff auf alle <strong>${planLabel}-Funktionen</strong>.`,
+                  `Dein Abo ist gültig bis zum <strong>${expiresAt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>. Du findest das Ablaufdatum jederzeit in deinen Kontoeinstellungen.`,
+                ],
+                'Zum Dashboard',
+                (process.env.SITE_URL || 'https://stellify.ch') + '/'
+              ),
             }).catch(console.error);
           }
         }
