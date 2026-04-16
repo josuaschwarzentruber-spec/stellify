@@ -2683,7 +2683,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     const dailyToolUses = user?.dailyToolUses || 0;
     const searchUses = user?.searchUses || 0;
     
-    const isToolLimitReached = (!isPro && toolUses >= 1) || (user?.role === 'pro' && !isUnlimited && toolUses >= 50);
+    const isToolLimitReached = (!isPro && toolUses >= 3) || (user?.role === 'pro' && !isUnlimited && toolUses >= 50);
     const isDailyLimitReached = user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20;
 
     if (isToolLimitReached || isDailyLimitReached) {
@@ -3835,7 +3835,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
       faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung — du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück — ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Ultimate, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Der Gratis-Plan bietet drei Tool-Nutzungen sowie drei Nachrichten im Stella-Chat — ideal, um die Plattform unverbindlich kennenzulernen. Im Pro-Plan stehen dir monatlich 50 Tool-Nutzungen und täglich bis zu 20 Aktionen zur Verfügung. Der Ultimate-Plan bietet unbegrenzte Nutzung aller Funktionen ohne jede Einschränkung.",
+      faq_3_a: "Der Gratis-Plan beinhaltet einmalig drei Tool-Nutzungen sowie drei Nachrichten im Stella-Chat — ideal, um die Plattform unverbindlich kennenzulernen. Diese Nutzungen werden nicht zurückgesetzt. Im Pro-Plan stehen dir monatlich fünfzig Tool-Nutzungen und täglich bis zu zwanzig Aktionen zur Verfügung. Der Ultimate-Plan bietet unbegrenzte Nutzung aller Funktionen ohne jede Einschränkung.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -4393,7 +4393,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
       faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer — vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement — votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Ultimate, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Le plan Gratuit comprend trois utilisations d'outils ainsi que trois messages dans le chat Stella — idéal pour découvrir la plateforme sans engagement. Le plan Pro offre cinquante utilisations d'outils par mois et jusqu'à vingt actions par jour. Le plan Ultimate propose une utilisation illimitée de toutes les fonctionnalités, sans aucune restriction.",
+      faq_3_a: "Le plan Gratuit comprend une seule fois trois utilisations d'outils ainsi que trois messages dans le chat Stella — idéal pour découvrir la plateforme sans engagement. Ces utilisations ne sont pas réinitialisées. Le plan Pro offre cinquante utilisations d'outils par mois et jusqu'à vingt actions par jour. Le plan Ultimate propose une utilisation illimitée de toutes les fonctionnalités, sans aucune restriction.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -4831,7 +4831,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Come funziona l'abbonamento Stellify?",
       faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare — hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento — il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Ultimate, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Il piano Gratuito include tre utilizzi degli strumenti e tre messaggi nella chat Stella — ideale per scoprire la piattaforma senza impegno. Il piano Pro mette a disposizione cinquanta utilizzi degli strumenti al mese e fino a venti azioni al giorno. Il piano Ultimate offre un utilizzo illimitato di tutte le funzionalità, senza alcuna restrizione.",
+      faq_3_a: "Il piano Gratuito include una volta sola tre utilizzi degli strumenti e tre messaggi nella chat Stella — ideale per scoprire la piattaforma senza impegno. Questi utilizzi non vengono ripristinati. Il piano Pro mette a disposizione cinquanta utilizzi degli strumenti al mese e fino a venti azioni al giorno. Il piano Ultimate offre un utilizzo illimitato di tutte le funzionalità, senza alcuna restrizione.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -5269,7 +5269,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "How does the Stellify subscription work?",
       faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required — you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again — your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Ultimate, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "The Free plan includes three tool uses and three messages in the Stella chat — ideal for exploring the platform with no commitment. The Pro plan provides fifty tool uses per month and up to twenty actions per day. The Ultimate plan offers unlimited use of all features with no restrictions whatsoever.",
+      faq_3_a: "The Free plan includes three tool uses and three messages in the Stella chat — ideal for exploring the platform with no commitment. These uses are one-time only and do not reset. The Pro plan provides fifty tool uses per month and up to twenty actions per day. The Ultimate plan offers unlimited use of all features with no restrictions whatsoever.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -6252,16 +6252,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
                                     <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 1</span>
+                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 3</span>
                                   </div>
                                   <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(100, Math.round(((user.toolUses || 0) / 1) * 100))}%` }}
+                                    <div
+                                      className="h-full bg-[#004225] transition-all duration-700"
+                                      style={{ width: `${Math.min(100, Math.round(((user.toolUses || 0) / 3) * 100))}%` }}
                                     />
-                                  </div>
-                                  <div className="flex justify-end">
-                                    <span className="text-[7px] text-[#004225] font-bold uppercase tracking-tighter opacity-60">{t.dashboard_reset_monthly}</span>
                                   </div>
                                 </div>
                               </div>
@@ -8398,13 +8395,15 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94]">
                               {user.role === 'pro'
                                 ? `${50 - (user.toolUses || 0)} ${t.remaining}`
-                                : `${1 - (user.toolUses || 0)} ${t.remaining}`
+                                : `${3 - (user.toolUses || 0)} ${t.remaining}`
                               }
                             </span>
                           </div>
-                          <span className="text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8] opacity-60">
-                            {t.dashboard_reset_monthly}
-                          </span>
+                          {user.role === 'pro' && (
+                            <span className="text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8] opacity-60">
+                              {t.dashboard_reset_monthly}
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -9512,14 +9511,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 1 {t.settings_free_use}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 3 {t.settings_free_use}</p>
                                 </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.toolUses || 0) / 1) * 100))}%</span>
+                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.toolUses || 0) / 3) * 100))}%</span>
                               </div>
                               <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(100, Math.round(((user.toolUses || 0) / 1) * 100))}%` }}
+                                <div
+                                  className="h-full bg-[#004225] transition-all duration-700"
+                                  style={{ width: `${Math.min(100, Math.round(((user.toolUses || 0) / 3) * 100))}%` }}
                                 />
                               </div>
                             </div>
