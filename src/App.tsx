@@ -3572,7 +3572,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Alles was du wissen musst",
       faq_contact: "Noch Fragen?",
       cta_final_title: "Deine Karriere verdient deinen persönlichen Copilot.",
-      cta_final_desc: "Kostenlos starten. 20+ Tools. Schweizer Standard. Jederzeit kündbar.",
+      cta_final_desc: "Kostenlos starten. 20+ Tools. Schweizer Standard. Kein Abo-Risiko.",
       cta_final_btn: "Jetzt kostenlos starten",
       settings_first_name: "Vorname",
       settings_email: "E-Mail",
@@ -3589,10 +3589,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       promo_journey: "Starte deine Reise",
       faq_1_q: "Wie sicher sind meine Daten?",
       faq_1_a: "Deine Daten werden ausschliesslich auf Schweizer Servern verarbeitet und nach modernsten Standards verschlüsselt.",
-      faq_2_q: "Kann ich jederzeit kündigen?",
-      faq_2_a: "Ja, Stellify ist jederzeit kündbar. Bei monatlicher Zahlung zum Ende des Monats.",
-      faq_3_q: "Wie viele Generierungen habe ich?",
-      faq_3_a: "Im Gratis-Plan hast du eine Generierung. Im Pro-Plan sind es 50 pro Monat.",
+      faq_2_q: "Wie läuft mein Abonnement ab?",
+      faq_2_a: "Stellify funktioniert ganz flexibel: Du zahlst einmalig für einen Monat oder ein Jahr — danach läuft das Abo automatisch aus und dein Konto kehrt zum Gratis-Plan zurück. Es gibt keine automatische Verlängerung und keine Kündigung nötig. Möchtest du weitermachen, zahlst du einfach erneut und dein Abo verlängert sich um einen weiteren Monat oder ein weiteres Jahr. Einen Planwechsel (z.B. von Pro auf Ultimate) kannst du vornehmen, sobald dein aktuelles Abo abgelaufen ist. Drei Tage vor Ablauf (monatlich) bzw. 14 Tage (jährlich) erhältst du eine Erinnerungs-E-Mail. Dein genaues Ablaufdatum siehst du jederzeit in deinen Kontoeinstellungen.",
+      faq_3_q: "Wie viele Nutzungen habe ich?",
+      faq_3_a: "Im Gratis-Plan stehen dir 3 Tool-Nutzungen und 3 Stella-Chat-Nachrichten zur Verfügung — ideal zum Ausprobieren. Im Pro-Plan hast du 50 Tool-Nutzungen pro Monat und 20 Aktionen pro Tag. Im Ultimate-Plan sind alle Nutzungen unbegrenzt.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -4130,7 +4130,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Tout ce que vous devez savoir",
       faq_contact: "Encore des questions ?",
       cta_final_title: "Votre carrière mérite votre copilote personnel.",
-      cta_final_desc: "Démarrage gratuit. 20+ outils. Standard suisse. Annulable à tout moment.",
+      cta_final_desc: "Démarrage gratuit. 20+ outils. Standard suisse. Sans risque d'abonnement.",
       cta_final_btn: "Démarrer gratuitement maintenant",
       settings_first_name: "Prénom",
       settings_email: "E-mail",
@@ -4147,10 +4147,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       promo_journey: "Commencez votre voyage",
       faq_1_q: "Mes données sont-elles en sécurité ?",
       faq_1_a: "Vos données sont traitées exclusivement sur des serveurs suisses et cryptées selon les normes les plus modernes.",
-      faq_2_q: "Puis-je annuler à tout moment ?",
-      faq_2_a: "Oui, Stellify peut être annulé à tout moment. Avec un paiement mensuel à la fin du mois.",
-      faq_3_q: "Combien de générations ai-je ?",
-      faq_3_a: "Dans le plan gratuit, vous avez une génération. Dans le plan Pro, il y en a 50 par mois.",
+      faq_2_q: "Comment fonctionne mon abonnement ?",
+      faq_2_a: "Stellify fonctionne de façon totalement flexible : vous payez une fois pour un mois ou un an — ensuite l'abonnement expire automatiquement et votre compte repasse au plan gratuit. Aucune résiliation n'est nécessaire et il n'y a pas de renouvellement automatique. Pour continuer, il vous suffit de payer à nouveau et votre abonnement est prolongé. Un changement de plan (p.ex. de Pro à Ultimate) est possible dès que votre abonnement actuel a expiré. Vous recevrez un e-mail de rappel 3 jours avant expiration (mensuel) ou 14 jours avant (annuel). La date d'expiration exacte est toujours visible dans vos paramètres de compte.",
+      faq_3_q: "Combien d'utilisations ai-je ?",
+      faq_3_a: "Dans le plan gratuit, vous disposez de 3 utilisations d'outils et de 3 messages Stella Chat — idéal pour essayer. Dans le plan Pro, vous avez 50 utilisations d'outils par mois et 20 actions par jour. Dans le plan Ultimate, les utilisations sont illimitées.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -4568,7 +4568,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Tutto quello che devi sapere",
       faq_contact: "Altre domande?",
       cta_final_title: "La tua carriera merita il tuo copilota personale.",
-      cta_final_desc: "Inizia gratuitamente. 20+ strumenti. Standard svizzero. Annullabile in qualsiasi momento.",
+      cta_final_desc: "Inizia gratuitamente. 20+ strumenti. Standard svizzero. Nessun rischio di abbonamento.",
       cta_final_btn: "Inizia ora gratuitamente",
       settings_first_name: "Nome",
       settings_email: "E-mail",
@@ -4585,10 +4585,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       promo_journey: "Inizia il tuo viaggio",
       faq_1_q: "Quanto sono sicuri i miei dati?",
       faq_1_a: "I tuoi dati sono elaborati esclusivamente su server svizzeri e crittografati secondo i più moderni standard.",
-      faq_2_q: "Posso annullare in qualsiasi momento?",
-      faq_2_a: "Sì, Stellify può essere annullato in qualsiasi momento. Con pagamento mensile alla fine del mese.",
-      faq_3_q: "Quante generazioni ho?",
-      faq_3_a: "Nel piano gratuito, hai una generazione. Nel piano Pro, ce ne sono 50 al mese.",
+      faq_2_q: "Come funziona il mio abbonamento?",
+      faq_2_a: "Stellify funziona in modo completamente flessibile: paghi una volta per un mese o un anno — dopodiché l'abbonamento scade automaticamente e il tuo account torna al piano gratuito. Non è necessaria alcuna disdetta e non ci sono rinnovi automatici. Per continuare, basta pagare nuovamente e il tuo abbonamento viene esteso. Un cambio di piano (es. da Pro a Ultimate) è possibile non appena il tuo abbonamento attuale è scaduto. Riceverai un'e-mail di promemoria 3 giorni prima della scadenza (mensile) o 14 giorni prima (annuale). La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
+      faq_3_q: "Quante utilizzazioni ho?",
+      faq_3_a: "Nel piano gratuito hai 3 utilizzi degli strumenti e 3 messaggi Stella Chat — ideale per provare. Nel piano Pro hai 50 utilizzi degli strumenti al mese e 20 azioni al giorno. Nel piano Ultimate gli utilizzi sono illimitati.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -5006,7 +5006,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Everything you need to know",
       faq_contact: "Any questions?",
       cta_final_title: "Your career deserves your personal copilot.",
-      cta_final_desc: "Start for free. 20+ tools. Swiss standard. Cancel anytime.",
+      cta_final_desc: "Start for free. 20+ tools. Swiss standard. No subscription risk.",
       cta_final_btn: "Start for free now",
       settings_first_name: "First Name",
       settings_email: "Email",
@@ -5023,10 +5023,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       promo_journey: "Start Your Journey",
       faq_1_q: "How secure is my data?",
       faq_1_a: "Your data is processed exclusively on Swiss servers and encrypted according to the latest standards.",
-      faq_2_q: "Can I cancel at any time?",
-      faq_2_a: "Yes, Stellify can be cancelled at any time. With monthly payment at the end of the month.",
-      faq_3_q: "How many generations do I have?",
-      faq_3_a: "In the free plan, you have one generation. In the Pro plan, there are 50 per month.",
+      faq_2_q: "How does my subscription work?",
+      faq_2_a: "Stellify works completely flexibly: you pay once for a month or a year — after that, your subscription expires automatically and your account returns to the Free plan. There's no need to cancel and no automatic renewal. To continue, simply pay again and your subscription extends by another month or year. A plan upgrade (e.g. from Pro to Ultimate) is available once your current subscription has expired. You'll receive a reminder email 3 days before expiry (monthly) or 14 days before (annual). Your exact expiry date is always visible in your account settings.",
+      faq_3_q: "How many uses do I have?",
+      faq_3_a: "In the Free plan you have 3 tool uses and 3 Stella Chat messages — perfect for trying out the platform. In the Pro plan you get 50 tool uses per month and 20 actions per day. In the Ultimate plan, usage is unlimited.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -9149,10 +9149,19 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
                 <section className="space-y-4">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.subscription}</h4>
-                  <div className="p-4 bg-[#FDFCFB] border border-black/5 flex justify-between items-center">
+                  <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 flex justify-between items-center">
                     <div>
-                      <p className="text-sm font-medium">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Unlimited' : 'Stellify Gratis'}</p>
-                      <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
+                      <p className="text-sm font-medium dark:text-[#FAFAF8]">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Ultimate' : 'Stellify Gratis'}</p>
+                      {user?.subscriptionExpiresAt && (user?.role === 'pro' || user?.role === 'unlimited') ? (
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">
+                          {language === 'DE' ? 'Gültig bis' : language === 'FR' ? 'Valide jusqu\'au' : language === 'IT' ? 'Valido fino al' : 'Valid until'}{' '}
+                          <span className="font-semibold text-[#004225] dark:text-[#00A854]">
+                            {new Date(user.subscriptionExpiresAt).toLocaleDateString(language === 'DE' ? 'de-CH' : language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </span>
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
+                      )}
                     </div>
                     <button 
                       onClick={() => {
