@@ -1145,6 +1145,17 @@ function StellifyApp() {
     }
   };
 
+  const getAuthToken = async (): Promise<string | null> => {
+    try { return (await auth.currentUser?.getIdToken()) ?? null; } catch { return null; }
+  };
+  const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+    const token = await getAuthToken();
+    return fetch(url, {
+      ...options,
+      headers: { ...((options.headers as Record<string, string>) || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+    });
+  };
+
   // --- JOB BOARD COMPONENT ---
   const JobBoard = () => {
     const [jobFilters, setJobFilters] = useState({ keyword: '', location: '', industry: '' });
@@ -1174,7 +1185,8 @@ function StellifyApp() {
         if (jobFilters.keyword) params.set('keyword', jobFilters.keyword);
         if (jobFilters.location) params.set('location', jobFilters.location);
         if (jobFilters.industry) params.set('category', jobFilters.industry);
-        const res = await fetch(`/api/jobs?${params}`);
+        const token = await getAuthToken();
+        const res = await fetch(`/api/jobs?${params}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
         const data = await res.json();
         if (data.jobs && data.jobs.length > 0) {
           setLiveJobs(data.jobs);
@@ -1900,7 +1912,7 @@ function StellifyApp() {
         const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
         const isPro = user?.role === 'pro' || isUnlimited;
         const model = isPro ? PRO_MODEL : FLASH_MODEL;
-        const res2 = await fetch('/api/process-tool', {
+        const res2 = await authFetch('/api/process-tool', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1976,7 +1988,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   "optimizedSummary": "Kurzprofil-Text"
 }`;
 
-      const res = await fetch('/api/process-tool', {
+      const res = await authFetch('/api/process-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, model })
@@ -2499,7 +2511,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         Candidate: ${user?.firstName || 'User'}.
       `;
 
-      const chatRes = await fetch('/api/chat', {
+      const chatRes = await authFetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2597,7 +2609,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setSubscriptionError('');
     
     try {
-      const res = await fetch('/api/create-checkout-session', {
+      const res = await authFetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3183,7 +3195,7 @@ Bewerte in 3 Kategorien (je 0–100%):
           prompt = "Bitte hilf mir bei meiner Karriere.";
       }
 
-      const toolRes = await fetch('/api/process-tool', {
+      const toolRes = await authFetch('/api/process-tool', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt, model, useSearch, language })
@@ -8480,7 +8492,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                               const q = interviewSession.questions[interviewSession.currentQ];
                               let feedback = '';
                               try {
-                                const evalRes = await fetch('/api/process-tool', {
+                                const evalRes = await authFetch('/api/process-tool', {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({

@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
@@ -143,7 +144,58 @@ const app = express();
 
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(morgan("dev"));
-app.use(cors());
+
+// Restrict CORS to own domain only
+const allowedOrigins = [
+  process.env.SITE_URL || 'https://stellify.ch',
+  'http://localhost:3000',
+  'http://localhost:5173',
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+// Rate limiters
+const aiLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please wait a moment before trying again.' },
+});
+const emailLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many email requests. Please wait 15 minutes.' },
+});
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests.' },
+});
+app.use(generalLimiter);
+
+// Firebase token verification middleware
+const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+  const header = req.headers.authorization;
+  if (!authAdmin || !header?.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const decoded = await authAdmin.verifyIdToken(header.slice(7));
+    (req as any).uid = decoded.uid;
+    next();
+  } catch {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
 
 // ── Stripe Webhook (raw body) ─────────────────────────────────────────────────
 app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, res) => {
@@ -265,7 +317,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
 app.use(express.json());
 
 // ── Gemini Chat ───────────────────────────────────────────────────────────────
-app.post("/api/chat", async (req, res) => {
+app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
   const { messages, userContent, systemInstruction, model } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
@@ -287,7 +339,7 @@ app.post("/api/chat", async (req, res) => {
 });
 
 // ── Gemini Tool ───────────────────────────────────────────────────────────────
-app.post("/api/process-tool", async (req, res) => {
+app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
   const { prompt, model, useSearch, language } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
@@ -324,7 +376,7 @@ app.post("/api/process-tool", async (req, res) => {
 });
 
 // ── Live Job Search ───────────────────────────────────────────────────────────
-app.get("/api/jobs", async (req, res) => {
+app.get("/api/jobs", requireAuth, async (req, res) => {
   const { keyword = '', location = '', category = '', page = '1' } = req.query as Record<string, string>;
   const adzunaAppId  = process.env.ADZUNA_APP_ID;
   const adzunaAppKey = process.env.ADZUNA_APP_KEY;
@@ -385,7 +437,7 @@ app.get("/api/jobs", async (req, res) => {
 });
 
 // ── Password Reset (custom branded email, no Firebase default) ────────────────
-app.post("/api/send-password-reset", express.json(), async (req, res) => {
+app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const emailUser = process.env.EMAIL_USER;
@@ -496,37 +548,9 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// ── Stripe Debug ──────────────────────────────────────────────────────────────
-app.get("/api/stripe-debug", async (_req, res) => {
-  const key = process.env.STRIPE_SECRET_KEY || '';
-  const mode = key.startsWith('sk_live_') ? 'live' : key.startsWith('sk_test_') ? 'test' : 'missing';
-  const prices = {
-    pro_monthly:      process.env.STRIPE_PRICE_PRO_MONTHLY      || '(hardcoded) price_1TIrQNHEswF7knZxM65zPbFJ',
-    pro_yearly:       process.env.STRIPE_PRICE_PRO_YEARLY       || '(hardcoded) price_1TIrRqHEswF7knZxlkJaQa2H',
-    ultimate_monthly: process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || '(hardcoded) price_1TIrSSHEswF7knZxcHQnDDGt',
-    ultimate_yearly:  process.env.STRIPE_PRICE_ULTIMATE_YEARLY  || '(hardcoded) price_1TIrT7HEswF7knZxSTFWGFB2',
-  };
-  let stripeStatus = 'not tested';
-  let stripeError = null;
-  if (mode !== 'missing') {
-    try {
-      const s = getStripe();
-      const firstPrice = Object.values(prices)[0].replace('(hardcoded) ', '');
-      await s.prices.retrieve(firstPrice);
-      stripeStatus = 'ok';
-    } catch (e: any) {
-      stripeStatus = 'error';
-      stripeError = e.message;
-    }
-  }
-  res.json({
-    mode, prices, stripeStatus, stripeError,
-    firebaseAdmin: dbAdmin ? 'initialized' : 'not initialized',
-  });
-});
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", async (req, res) => {
+app.post("/api/create-checkout-session", requireAuth, async (req, res) => {
   const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body;
   if (!planId || !userId || !billingCycle) {
     return res.status(400).json({ error: "Missing planId, userId or billingCycle" });
@@ -570,30 +594,6 @@ app.post("/api/create-checkout-session", async (req, res) => {
   }
 });
 
-// ── Simulate payment (test) ───────────────────────────────────────────────────
-app.post("/api/test/simulate-success", async (req, res) => {
-  const { userId, planId, billingCycle } = req.body;
-  if (!userId) return res.status(400).json({ error: "No userId" });
-  if (!dbAdmin) return res.status(503).json({ error: "Firebase Admin nicht konfiguriert" });
-  try {
-    const isAnnual = billingCycle === 'yearly';
-    const userDoc = await dbAdmin.collection("users").doc(userId).get();
-    const currentExpiry = userDoc.exists ? userDoc.data()?.subscriptionExpiresAt : null;
-    const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
-    const expiresAt = new Date(baseDate);
-    if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-    else expiresAt.setMonth(expiresAt.getMonth() + 1);
-    await dbAdmin.collection("users").doc(userId).update({
-      role: normaliseRole(planId || 'pro'),
-      subscriptionInterval: isAnnual ? 'annual' : 'monthly',
-      subscriptionExpiresAt: expiresAt.toISOString(),
-      updatedAt: FieldValue.serverTimestamp()
-    });
-    res.json({ success: true, message: `Role gesetzt auf '${normaliseRole(planId || 'pro')}', läuft ab: ${expiresAt.toISOString()}` });
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
-  }
-});
 
 // ── LinkedIn OAuth ────────────────────────────────────────────────────────────
 app.get("/api/auth/linkedin/url", (req, res) => {
