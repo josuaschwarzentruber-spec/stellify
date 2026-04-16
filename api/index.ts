@@ -311,13 +311,12 @@ app.get("/api/jobs", async (req, res) => {
 });
 
 // ── Test Email ────────────────────────────────────────────────────────────────
-app.post("/api/send-test-email", express.json(), async (req, res) => {
+async function handleTestEmail(to: string, res: any) {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
   if (!emailUser || !emailPass) {
     return res.status(500).json({ error: 'EMAIL_USER / EMAIL_PASS not configured' });
   }
-  const to = req.body?.to || emailUser;
   try {
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
     await transporter.sendMail({
@@ -332,6 +331,16 @@ app.post("/api/send-test-email", express.json(), async (req, res) => {
     console.error('[EMAIL] Test email failed:', err.message);
     res.status(500).json({ error: err.message });
   }
+}
+app.get("/api/send-test-email", async (req, res) => {
+  const emailUser = process.env.EMAIL_USER;
+  const to = (req.query.to as string) || emailUser || '';
+  await handleTestEmail(to, res);
+});
+app.post("/api/send-test-email", express.json(), async (req, res) => {
+  const emailUser = process.env.EMAIL_USER;
+  const to = req.body?.to || emailUser || '';
+  await handleTestEmail(to, res);
 });
 
 // ── Health ────────────────────────────────────────────────────────────────────
