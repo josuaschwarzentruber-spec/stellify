@@ -8,6 +8,7 @@ import Stripe from "stripe";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { GoogleGenAI } from "@google/genai";
+import nodemailer from "nodemailer";
 
 dotenv.config();
 
@@ -45,6 +46,34 @@ function normaliseRole(planId: string): string {
   return planId;
 }
 
+// ── Email Helper ──────────────────────────────────────────────────────────────
+async function sendRenewalReminder(to: string, firstName: string, planType: 'monthly' | 'annual', daysLeft: number) {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  if (!emailUser || !emailPass) {
+    console.warn('[EMAIL] EMAIL_USER / EMAIL_PASS not set — skipping email.');
+    return;
+  }
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: emailUser, pass: emailPass },
+  });
+  const isAnnual = planType === 'annual';
+  const subject = daysLeft > 0
+    ? `Dein Stellify-Abo läuft in ${daysLeft} Tag${daysLeft === 1 ? '' : 'en'} ab`
+    : 'Dein Stellify-Abo ist abgelaufen';
+  const body = daysLeft > 0
+    ? `Hallo ${firstName},\n\ndein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement bei Stellify läuft in ${daysLeft} Tag${daysLeft === 1 ? '' : 'en'} ab. Danach wechselst du automatisch zum kostenlosen Plan.\n\nUm weiter alle Funktionen nutzen zu können, verlängere dein Abo jetzt unter stellify.ch im Bereich «Preise & Pläne».\n\nBei Fragen: support.stellify@gmail.com\n\nDas Stellify-Team`
+    : `Hallo ${firstName},\n\ndein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement bei Stellify ist abgelaufen. Dein Konto wurde automatisch auf den Gratis-Plan umgestellt.\n\nDu kannst dein Abo jederzeit unter stellify.ch im Bereich «Preise & Pläne» erneuern.\n\nBei Fragen: support.stellify@gmail.com\n\nDas Stellify-Team`;
+  await transporter.sendMail({
+    from: `"Stellify" <${emailUser}>`,
+    to,
+    subject,
+    text: body,
+  });
+  console.log(`[EMAIL] Renewal reminder sent to ${to}`);
+}
+
 // ── Express App ───────────────────────────────────────────────────────────────
 const app = express();
 
@@ -71,16 +100,70 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     const planId = session.metadata?.planId;
     if (userId && planId && dbAdmin) {
       try {
+        const isAnnual = session.metadata?.interval === 'year';
+        const now = new Date();
+        const expiresAt = new Date(now);
+        if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+        else expiresAt.setMonth(expiresAt.getMonth() + 1);
         await dbAdmin.collection("users").doc(userId).update({
           role: normaliseRole(planId),
+          subscriptionInterval: isAnnual ? 'annual' : 'monthly',
+          subscriptionExpiresAt: expiresAt.toISOString(),
           updatedAt: FieldValue.serverTimestamp()
         });
-        console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}`);
+        console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
       } catch (err) {
         console.error(`[WEBHOOK] Firestore update failed:`, err);
       }
     }
   }
+
+  // Subscription expired — downgrade to free and send notification email
+  if (event.type === "customer.subscription.deleted") {
+    const sub = event.data.object as Stripe.Subscription;
+    if (dbAdmin) {
+      try {
+        const snapshot = await dbAdmin.collection("users").where("stripeCustomerId", "==", sub.customer).limit(1).get();
+        if (!snapshot.empty) {
+          const userDoc = snapshot.docs[0];
+          const userData = userDoc.data();
+          await userDoc.ref.update({ role: 'client', updatedAt: FieldValue.serverTimestamp() });
+          console.log(`[WEBHOOK] Downgraded ${userDoc.id} to free after subscription deletion`);
+          if (userData.email) {
+            const planType = userData.subscriptionInterval === 'annual' ? 'annual' : 'monthly';
+            await sendRenewalReminder(userData.email, userData.firstName || 'Nutzer', planType, 0).catch(console.error);
+          }
+        }
+      } catch (err) {
+        console.error(`[WEBHOOK] subscription.deleted handler failed:`, err);
+      }
+    }
+  }
+
+  // Upcoming cancellation reminder (3 days before monthly, 14 days before annual)
+  if (event.type === "customer.subscription.updated") {
+    const sub = event.data.object as Stripe.Subscription;
+    if (sub.cancel_at_period_end && dbAdmin) {
+      try {
+        const snapshot = await dbAdmin.collection("users").where("stripeCustomerId", "==", sub.customer).limit(1).get();
+        if (!snapshot.empty) {
+          const userData = snapshot.docs[0].data();
+          if (userData.email) {
+            const periodEnd = new Date((sub as any).current_period_end * 1000);
+            const daysLeft = Math.ceil((periodEnd.getTime() - Date.now()) / 86400000);
+            const planType = userData.subscriptionInterval === 'annual' ? 'annual' : 'monthly';
+            const threshold = planType === 'annual' ? 14 : 3;
+            if (daysLeft <= threshold) {
+              await sendRenewalReminder(userData.email, userData.firstName || 'Nutzer', planType, daysLeft).catch(console.error);
+            }
+          }
+        }
+      } catch (err) {
+        console.error(`[WEBHOOK] subscription.updated handler failed:`, err);
+      }
+    }
+  }
+
   res.json({ received: true });
 });
 

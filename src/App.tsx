@@ -34,15 +34,19 @@ import {
   Headphones, Radio, ChevronLeft, BarChart3
 } from 'lucide-react';
 import { auth, db } from './firebase';
-import { 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  onAuthStateChanged, 
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
   signOut,
   User as FirebaseUser,
   GoogleAuthProvider,
   signInWithPopup,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  reauthenticateWithCredential,
+  reauthenticateWithPopup,
+  EmailAuthProvider,
+  deleteUser
 } from 'firebase/auth';
 import { 
   doc, 
@@ -521,7 +525,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Weitergabe an Dritte">
                 <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und CV-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
+                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und CV-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -576,7 +580,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Transfert à des tiers">
                 <p>Nous ne transmettons vos données qu'aux sous-traitants suivants :</p>
                 <div className="mt-3 space-y-4">
-                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (Google LLC)', 'Finalité : traitement IA des requêtes et du contenu du CV. Siège : USA. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
+                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (Google LLC)', 'Finalité : traitement IA des requêtes et du contenu du CV. Siège : USA. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -627,7 +631,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Trasferimento a terzi">
                 <p>Trasferiamo i dati solo ai seguenti responsabili del trattamento:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (Google LLC)', 'Finalità: elaborazione IA delle richieste e del contenuto del CV. Sede: USA. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
+                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (Google LLC)', 'Finalità: elaborazione IA delle richieste e del contenuto del CV. Sede: USA. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -678,7 +682,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Third-Party Data Sharing">
                 <p>We only share data with the following processors:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (Google LLC)', 'Purpose: AI processing of user requests and CV content. Location: USA. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
+                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (Google LLC)', 'Purpose: AI processing of user requests and CV content. Location: USA. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -770,18 +774,27 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter JTSP (nachfolgend „Stellify") und registrierten Nutzern der Plattform stellify.ch.</p>
                 <p className="mt-2">Stellify bietet eine KI-gestützte Karriereplattform mit Tools zur Lebenslaufoptimierung, Interview-Vorbereitung, Gehaltsanalyse und weiteren Karriere-Diensten an.</p>
               </Section>
-              <Section title="2. Vertragsschluss und Kontoregistrierung"><p>Der Vertrag kommt durch Registrierung und Annahme dieser AGB zustande. Der Nutzer muss mindestens 16 Jahre alt sein.</p></Section>
+              <Section title="2. Vertragsschluss und Kontoregistrierung">
+                <p>Der Vertrag kommt durch die Nutzung der Plattform oder den Abschluss eines Abonnements zustande. Mit der Registrierung oder dem Abschluss eines Abonnements gilt die Zustimmung zu diesen AGB und der Datenschutzrichtlinie als erteilt.</p>
+                <p className="mt-2">Die Nutzung ist ab einem Mindestalter von <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 Jahren</strong> gestattet. Personen unter 18 Jahren benötigen für den Abschluss eines kostenpflichtigen Abonnements die Zustimmung eines Erziehungsberechtigten. (Rechtliche Grundlage: OR Art. 19; das Mindestalter von 14 Jahren entspricht dem typischen Eintrittsalter für Berufslehren in der Schweiz.)</p>
+              </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['1× Tool-Nutzung','3× Stella Chat-Anfragen','KI-Gehaltsrechner (Basis)','Schweizer Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 199.–/Jahr)', ['50× Tool-Nutzungen/Monat','20× Aktionen/Tag','Zeugnis-Decoder, Interview-Coach','Live Interview-Coach']],['Ultimate-Plan (CHF 39.90/Mo. · CHF 399.–/Jahr)', ['Unbegrenzte Nutzungen ♾️','Alle Pro-Features + exklusive Tools','Deep Analysis Modus','24/7 VIP-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3× Tool-Nutzungen','3× Stella Chat-Anfragen','KI-Gehaltsrechner (Basisversion)','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 199.–/Jahr)', ['50× Tool-Nutzungen/Monat','20× Aktionen/Tag','Zeugnis-Decoder, Interview-Coach, alle Pro-Tools','Prioritärer Support']],['Ultimate-Plan (CHF 39.90/Mo. · CHF 399.–/Jahr)', ['Unbegrenzte Nutzungen ♾️','Alle Pro-Features + exklusive Ultimate-Tools','Deep Analysis Modus','24/7 VIP-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">Alle Preise in CHF, inkl. MwSt. Preisänderungen werden mindestens 30 Tage im Voraus angekündigt.</p>
               </Section>
-              <Section title="4. Zahlung und Abrechnung"><p>Zahlung ausschliesslich via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Abrechnung im Voraus, monatlich oder jährlich. Bei Zahlungsausfall wird der Zugang auf den Gratis-Plan zurückgestuft.</p></Section>
+              <Section title="4. Zahlung und Abrechnung"><p>Zahlung ausschliesslich via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Abrechnung im Voraus, monatlich oder jährlich.</p></Section>
               <Section title="5. Widerrufsrecht"><p>Stellify bietet eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer. Anfragen an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Kündigung und Laufzeit"><ul className="list-disc pl-5 space-y-2"><li>Monatliches Abo: jederzeit kündbar, Zugang bis Ende der Periode.</li><li>Jährliches Abo: Kündigung bis 30 Tage vor Ablauf.</li><li>Kündigung über die Kontoeinstellungen oder per E-Mail.</li></ul></Section>
+              <Section title="6. Laufzeit und Verlängerung">
+                <ul className="list-disc pl-5 space-y-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monatliches Abo:</strong> Gilt genau 1 Monat ab Kaufdatum. Es erfolgt <em>keine</em> automatische Verlängerung. Nach Ablauf wird das Konto automatisch auf den Gratis-Plan zurückgestuft. Drei Tage vor Ablauf erhält der Nutzer eine Erinnerungs-E-Mail mit der Möglichkeit zur Verlängerung.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Jährliches Abo:</strong> Gilt genau 12 Monate ab Kaufdatum. Es erfolgt <em>keine</em> automatische Verlängerung. Nach Ablauf wird das Konto automatisch auf den Gratis-Plan zurückgestuft. 14 Tage vor Ablauf erhält der Nutzer eine Erinnerungs-E-Mail.</li>
+                  <li>Die Verlängerung erfolgt durch erneuten Kauf im Bereich Preise & Pläne.</li>
+                </ul>
+              </Section>
               <Section title="7. Nutzungsbeschränkungen"><ul className="list-disc pl-5 space-y-2"><li>Keine illegale Nutzung oder Täuschung Dritter</li><li>Kein Scraping / Bots</li><li>Keine Weitergabe von Zugangsdaten</li><li>Nutzer ist für die Richtigkeit von KI-Inhalten selbst verantwortlich</li></ul></Section>
               <Section title="8. Geistiges Eigentum"><p>Alle Rechte an Plattform, Code, Design und Marken liegen beim Betreiber. KI-generierte Inhalte dürfen vom Nutzer für eigene Bewerbungsunterlagen verwendet werden.</p></Section>
               <Section title="9. Haftungsbeschränkung"><p>Stellify haftet nur für vorsätzliche oder grob fahrlässige Schäden. Gesamthaftung begrenzt auf den in den letzten 12 Monaten bezahlten Betrag.</p></Section>
@@ -791,18 +804,27 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="13. Streitbeilegung"><p>Kontakt: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU-Schlichtung: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isFR ? <>
               <Section title="1. Objet et champ d'application"><p>Les présentes CGU régissent tous les contrats d'utilisation entre le fournisseur JTSP (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de carrière assistée par IA.</p></Section>
-              <Section title="2. Conclusion du contrat"><p>Le contrat est conclu par inscription et acceptation des présentes CGU. L'utilisateur doit avoir au moins 16 ans.</p></Section>
+              <Section title="2. Conclusion du contrat">
+                <p>Le contrat est conclu par l'utilisation de la plateforme ou la souscription d'un abonnement. En s'inscrivant ou en souscrivant un abonnement, l'utilisateur accepte implicitement les présentes CGU et la politique de confidentialité.</p>
+                <p className="mt-2">L'utilisation est autorisée dès l'âge de <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 ans</strong>. Les personnes mineures (moins de 18 ans) doivent obtenir le consentement d'un représentant légal pour souscrire un abonnement payant.</p>
+              </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['1× utilisation d\'outil','3× requêtes Stella Chat','Calculateur de salaire IA (base)','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 199.–/an)', ['50× utilisations d\'outils/mois','20× actions/jour','Décodeur de certificat, Coach entretien','Coach entretien en direct']],['Plan Ultimate (CHF 39.90/mois · CHF 399.–/an)', ['Utilisations illimitées ♾️','Toutes les fonctionnalités Pro + outils exclusifs','Mode analyse approfondie','Support VIP 24/7']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3× utilisations d\'outil','3× requêtes Stella Chat','Calculateur de salaire IA (base)','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 199.–/an)', ['50× utilisations d\'outils/mois','20× actions/jour','Décodeur de certificat, Coach entretien, tous les outils Pro','Support prioritaire']],['Plan Ultimate (CHF 39.90/mois · CHF 399.–/an)', ['Utilisations illimitées ♾️','Toutes les fonctionnalités Pro + outils Ultimate exclusifs','Mode analyse approfondie','Support VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">Tous les prix en CHF, TVA incluse. Les modifications de prix sont annoncées 30 jours à l'avance.</p>
               </Section>
-              <Section title="4. Paiement"><p>Paiement exclusivement via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Facturation en avance, mensuelle ou annuelle. En cas de défaut de paiement, l'accès est rétrogradé au plan gratuit.</p></Section>
+              <Section title="4. Paiement"><p>Paiement exclusivement via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Facturation en avance, mensuelle ou annuelle.</p></Section>
               <Section title="5. Droit de rétractation"><p>Stellify offre une <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">garantie de remboursement de 7 jours</strong> pour les premiers acheteurs. Demandes à <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Résiliation"><ul className="list-disc pl-5 space-y-2"><li>Abonnement mensuel : résiliable à tout moment, accès jusqu'à la fin de la période.</li><li>Abonnement annuel : résiliation jusqu'à 30 jours avant expiration.</li></ul></Section>
+              <Section title="6. Durée et renouvellement">
+                <ul className="list-disc pl-5 space-y-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement mensuel :</strong> Valable exactement 1 mois à compter de la date d'achat. Aucun renouvellement automatique. À expiration, le compte revient automatiquement au plan gratuit. Un e-mail de rappel est envoyé 3 jours avant l'expiration.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement annuel :</strong> Valable exactement 12 mois à compter de la date d'achat. Aucun renouvellement automatique. À expiration, le compte revient automatiquement au plan gratuit. Un e-mail de rappel est envoyé 14 jours avant l'expiration.</li>
+                  <li>Le renouvellement s'effectue par un nouvel achat dans la section Tarifs & Plans.</li>
+                </ul>
+              </Section>
               <Section title="7. Restrictions d'utilisation"><ul className="list-disc pl-5 space-y-2"><li>Pas d'utilisation illégale ni de tromperie de tiers</li><li>Pas de scraping / bots</li><li>Pas de partage d'identifiants</li><li>L'utilisateur est responsable de l'exactitude des contenus IA</li></ul></Section>
               <Section title="8. Propriété intellectuelle"><p>Tous les droits sur la plateforme, le code, le design et les marques appartiennent à l'exploitant. Les contenus générés par IA peuvent être utilisés par l'utilisateur pour ses dossiers de candidature.</p></Section>
               <Section title="9. Limitation de responsabilité"><p>Stellify n'est responsable que des dommages causés intentionnellement ou par négligence grave. Responsabilité totale limitée aux montants payés au cours des 12 derniers mois.</p></Section>
@@ -812,10 +834,13 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="13. Règlement des litiges"><p>Contact : <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Plateforme de médiation UE : <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isIT ? <>
               <Section title="1. Oggetto e ambito di applicazione"><p>Le presenti CGU disciplinano tutti i contratti d'uso tra il fornitore JTSP (di seguito «Stellify») e gli utenti registrati della piattaforma stellify.ch.</p></Section>
-              <Section title="2. Conclusione del contratto"><p>Il contratto si conclude con la registrazione e l'accettazione delle presenti CGU. L'utente deve avere almeno 16 anni.</p></Section>
+              <Section title="2. Conclusione del contratto">
+                <p>Il contratto si conclude con l'utilizzo della piattaforma o la sottoscrizione di un abbonamento. Registrandosi o sottoscrivendo un abbonamento, l'utente accetta implicitamente le presenti CGU e l'informativa sulla privacy.</p>
+                <p className="mt-2">L'utilizzo è consentito a partire dai <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 anni</strong>. I minorenni (sotto i 18 anni) necessitano del consenso di un rappresentante legale per sottoscrivere un abbonamento a pagamento.</p>
+              </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['1× utilizzo strumento','3× richieste Stella Chat','Calcolatore stipendio IA (base)','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 199.–/anno)', ['50× utilizzi strumenti/mese','20× azioni/giorno','Decodificatore certificato, Coach colloquio','Coach colloquio live']],['Piano Ultimate (CHF 39.90/mese · CHF 399.–/anno)', ['Utilizzi illimitati ♾️','Tutte le funzionalità Pro + strumenti esclusivi','Modalità analisi approfondita','Supporto VIP 24/7']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3× utilizzi strumento','3× richieste Stella Chat','Calcolatore stipendio IA (base)','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 199.–/anno)', ['50× utilizzi strumenti/mese','20× azioni/giorno','Decodificatore certificato, Coach colloquio, tutti gli strumenti Pro','Supporto prioritario']],['Piano Ultimate (CHF 39.90/mese · CHF 399.–/anno)', ['Utilizzi illimitati ♾️','Tutte le funzionalità Pro + strumenti Ultimate esclusivi','Modalità analisi approfondita','Supporto VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -823,7 +848,13 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="4. Pagamento"><p>Pagamento esclusivamente tramite <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Fatturazione anticipata, mensile o annuale.</p></Section>
               <Section title="5. Diritto di recesso"><p>Stellify offre una <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">garanzia di rimborso di 7 giorni</strong> per i nuovi acquirenti. Richieste a <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Disdetta"><ul className="list-disc pl-5 space-y-2"><li>Abbonamento mensile: disdettabile in qualsiasi momento.</li><li>Abbonamento annuale: disdetta entro 30 giorni prima della scadenza.</li></ul></Section>
+              <Section title="6. Durata e rinnovo">
+                <ul className="list-disc pl-5 space-y-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento mensile:</strong> Valido esattamente 1 mese dalla data di acquisto. Nessun rinnovo automatico. Alla scadenza, l'account torna automaticamente al piano gratuito. Un'e-mail di promemoria viene inviata 3 giorni prima della scadenza.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento annuale:</strong> Valido esattamente 12 mesi dalla data di acquisto. Nessun rinnovo automatico. Alla scadenza, l'account torna automaticamente al piano gratuito. Un'e-mail di promemoria viene inviata 14 giorni prima della scadenza.</li>
+                  <li>Il rinnovo avviene tramite un nuovo acquisto nella sezione Prezzi & Piani.</li>
+                </ul>
+              </Section>
               <Section title="7. Restrizioni d'uso"><ul className="list-disc pl-5 space-y-2"><li>Nessun utilizzo illegale né inganno di terzi</li><li>Nessun scraping / bot</li><li>Nessuna condivisione di credenziali</li><li>L'utente è responsabile dell'accuratezza dei contenuti IA</li></ul></Section>
               <Section title="8. Proprietà intellettuale"><p>Tutti i diritti sulla piattaforma, il codice, il design e i marchi appartengono al gestore. I contenuti generati dall'IA possono essere utilizzati dall'utente per i propri documenti di candidatura.</p></Section>
               <Section title="9. Limitazione di responsabilità"><p>Stellify risponde solo per danni causati intenzionalmente o per colpa grave. Responsabilità totale limitata agli importi pagati negli ultimi 12 mesi.</p></Section>
@@ -833,18 +864,27 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="13. Risoluzione delle controversie"><p>Contatto: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Piattaforma di mediazione UE: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : <>
               <Section title="1. Subject Matter and Scope"><p>These Terms govern all usage agreements between the provider JTSP (hereinafter "Stellify") and registered users of stellify.ch. Stellify offers an AI-powered career platform with CV optimisation, interview preparation, salary analysis and other career services.</p></Section>
-              <Section title="2. Contract Formation"><p>The contract is formed upon registration and acceptance of these Terms. Users must be at least 16 years old.</p></Section>
+              <Section title="2. Contract Formation">
+                <p>The contract is formed upon using the platform or subscribing to a plan. By registering or subscribing, users implicitly accept these Terms and the Privacy Policy.</p>
+                <p className="mt-2">Use is permitted from the age of <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 years</strong>. Users under 18 require parental or guardian consent to subscribe to a paid plan. (Legal basis: Swiss CO Art. 19; the minimum age of 14 reflects typical apprenticeship entry age in Switzerland.)</p>
+              </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['1× tool use','3× Stella Chat requests','AI Salary Calculator (basic)','Swiss Standards']],['Pro Plan (CHF 19.90/mo · CHF 199.–/yr)', ['50× tool uses/month','20× actions/day','Certificate Decoder, Interview Coach','Live Interview Coach']],['Ultimate Plan (CHF 39.90/mo · CHF 399.–/yr)', ['Unlimited uses ♾️','All Pro features + exclusive tools','Deep Analysis Mode','24/7 VIP Support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3× tool uses','3× Stella Chat requests','AI Salary Calculator (basic)','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 199.–/yr)', ['50× tool uses/month','20× actions/day','Certificate Decoder, Interview Coach, all Pro tools','Priority support']],['Ultimate Plan (CHF 39.90/mo · CHF 399.–/yr)', ['Unlimited uses ♾️','All Pro features + exclusive Ultimate tools','Deep Analysis Mode','24/7 VIP Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">All prices in CHF, incl. VAT. Price changes announced at least 30 days in advance.</p>
               </Section>
-              <Section title="4. Payment"><p>Payment exclusively via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Billed in advance, monthly or annually. In case of payment failure, access is downgraded to the Free Plan.</p></Section>
+              <Section title="4. Payment"><p>Payment exclusively via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Billed in advance, monthly or annually.</p></Section>
               <Section title="5. Right of Withdrawal"><p>Stellify offers a <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-day money-back guarantee</strong> for first-time buyers. Requests to <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Cancellation"><ul className="list-disc pl-5 space-y-2"><li>Monthly subscription: cancel at any time, access until end of paid period.</li><li>Annual subscription: cancel up to 30 days before expiry, otherwise auto-renews.</li><li>Cancel via account settings or by email.</li></ul></Section>
+              <Section title="6. Duration and Renewal">
+                <ul className="list-disc pl-5 space-y-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monthly subscription:</strong> Valid for exactly 1 month from purchase date. No automatic renewal. After expiry, the account automatically reverts to the Free Plan. A reminder email is sent 3 days before expiry.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Annual subscription:</strong> Valid for exactly 12 months from purchase date. No automatic renewal. After expiry, the account automatically reverts to the Free Plan. A reminder email is sent 14 days before expiry.</li>
+                  <li>To renew, simply purchase again in the Pricing &amp; Plans section.</li>
+                </ul>
+              </Section>
               <Section title="7. Usage Restrictions"><ul className="list-disc pl-5 space-y-2"><li>No illegal use or deception of third parties</li><li>No automated scraping or bots</li><li>No sharing of login credentials</li><li>Users are responsible for verifying the accuracy of AI-generated content</li></ul></Section>
               <Section title="8. Intellectual Property"><p>All rights to the platform, code, design and trademarks belong to the operator. AI-generated content may be used by the user for their own job applications.</p></Section>
               <Section title="9. Limitation of Liability"><p>Stellify is only liable for damages caused by wilful misconduct or gross negligence. Total liability is capped at the amount paid by the user in the last 12 months.</p></Section>
@@ -935,6 +975,10 @@ function StellifyApp() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const authEmailRef = useRef<HTMLInputElement>(null);
+  const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   useEffect(() => {
     if (isAuthModalOpen) {
@@ -2084,6 +2128,49 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       showToast(errorMsg, 'error');
     } finally {
       setIsAuthLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user || !auth.currentUser) return;
+    setIsDeletingAccount(true);
+    setDeleteError('');
+    try {
+      const firebaseUser = auth.currentUser;
+      const isGoogle = firebaseUser.providerData.some(p => p.providerId === 'google.com');
+      if (isGoogle) {
+        const provider = new GoogleAuthProvider();
+        await reauthenticateWithPopup(firebaseUser, provider);
+      } else {
+        if (!deletePassword) {
+          setDeleteError(language === 'DE' ? 'Bitte Passwort eingeben.' : language === 'FR' ? 'Veuillez saisir votre mot de passe.' : language === 'IT' ? 'Inserisci la password.' : 'Please enter your password.');
+          setIsDeletingAccount(false);
+          return;
+        }
+        const credential = EmailAuthProvider.credential(firebaseUser.email!, deletePassword);
+        await reauthenticateWithCredential(firebaseUser, credential);
+      }
+      // Delete Firestore document
+      try {
+        const userRef = doc(db, 'users', user.id);
+        await deleteDoc(userRef);
+      } catch (_) { /* ignore if already deleted */ }
+      // Delete Firebase Auth user
+      await deleteUser(firebaseUser);
+      setIsDeleteAccountOpen(false);
+      setUser(null);
+      showToast(
+        language === 'DE' ? 'Konto erfolgreich gelöscht.' : language === 'FR' ? 'Compte supprimé avec succès.' : language === 'IT' ? 'Account eliminato con successo.' : 'Account deleted successfully.',
+        'success'
+      );
+    } catch (err: any) {
+      console.error('Delete account error:', err);
+      const msg = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'
+        ? (language === 'DE' ? 'Falsches Passwort.' : language === 'FR' ? 'Mot de passe incorrect.' : language === 'IT' ? 'Password errata.' : 'Wrong password.')
+        : (language === 'DE' ? 'Fehler beim Löschen. Bitte erneut versuchen.' : language === 'FR' ? 'Erreur lors de la suppression. Veuillez réessayer.' : language === 'IT' ? 'Errore durante la cancellazione. Riprovare.' : 'Error deleting account. Please try again.');
+      setDeleteError(msg);
+    } finally {
+      setIsDeletingAccount(false);
     }
   };
 
@@ -8602,6 +8689,20 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 <X size={20} />
               </button>
               
+              {/* Language selector */}
+              <div className="flex justify-center gap-1 mb-6">
+                {(['DE','FR','IT','EN'] as const).map(lang => (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => { setLanguage(lang); localStorage.setItem('language', lang); }}
+                    className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest transition-all ${language === lang ? 'bg-[#004225] text-white' : 'text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  >
+                    {lang}
+                  </button>
+                ))}
+              </div>
+
               <div className="text-center mb-8">
                 <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
                 <h3 className="text-xl font-medium mt-4">
@@ -8837,6 +8938,48 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- DELETE ACCOUNT MODAL --- */}
+      <AnimatePresence>
+        {isDeleteAccountOpen && (
+          <div className="fixed inset-0 z-[500] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsDeleteAccountOpen(false)} className="absolute inset-0 bg-black/50 backdrop-blur-sm z-10" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white dark:bg-[#1A1A18] w-full max-w-sm p-8 relative z-20 shadow-2xl">
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <X size={24} className="text-red-500" />
+                </div>
+                <h3 className="text-lg font-serif dark:text-[#FAFAF8]">
+                  {language === 'DE' ? 'Konto löschen' : language === 'FR' ? 'Supprimer le compte' : language === 'IT' ? 'Elimina account' : 'Delete Account'}
+                </h3>
+                <p className="text-xs text-[#9A9A94] mt-2 leading-relaxed">
+                  {language === 'DE' ? 'Diese Aktion ist unwiderruflich. Alle deine Daten werden dauerhaft gelöscht.' : language === 'FR' ? 'Cette action est irréversible. Toutes vos données seront définitivement supprimées.' : language === 'IT' ? 'Questa azione è irreversibile. Tutti i tuoi dati verranno eliminati definitivamente.' : 'This action is irreversible. All your data will be permanently deleted.'}
+                </p>
+              </div>
+              {auth.currentUser && !auth.currentUser.providerData.some(p => p.providerId === 'google.com') && (
+                <div className="space-y-1.5 mb-4">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
+                    {language === 'DE' ? 'Passwort zur Bestätigung' : language === 'FR' ? 'Mot de passe pour confirmer' : language === 'IT' ? 'Password per confermare' : 'Password to confirm'}
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94]" size={15} />
+                    <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} className="w-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 pl-9 pr-4 py-2.5 text-sm outline-none focus:border-red-400 transition-all dark:text-[#FAFAF8]" placeholder="••••••••" />
+                  </div>
+                </div>
+              )}
+              {deleteError && <p className="text-xs text-red-500 text-center mb-3">{deleteError}</p>}
+              <div className="flex gap-3">
+                <button onClick={() => setIsDeleteAccountOpen(false)} className="flex-1 py-2.5 border border-black/10 dark:border-white/10 text-xs font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                  {language === 'DE' ? 'Abbrechen' : language === 'FR' ? 'Annuler' : language === 'IT' ? 'Annulla' : 'Cancel'}
+                </button>
+                <button onClick={handleDeleteAccount} disabled={isDeletingAccount} className="flex-1 py-2.5 bg-red-500 text-white text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
+                  {isDeletingAccount ? <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />{language === 'DE' ? 'Löschen...' : language === 'FR' ? 'Suppression...' : language === 'IT' ? 'Elimina...' : 'Deleting...'}</> : (language === 'DE' ? 'Konto löschen' : language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : 'Delete')}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
@@ -9098,7 +9241,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
                     {t.settings_privacy_desc}
                   </p>
-                  <button className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
+                  <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
                 </section>
               </div>
               <div className="p-6 border-t border-black/5 bg-[#FDFCFB] flex justify-end">
