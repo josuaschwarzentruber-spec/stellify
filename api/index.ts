@@ -482,7 +482,7 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
 });
 
 // ── Welcome Email ─────────────────────────────────────────────────────────────
-app.post("/api/send-welcome-email", express.json(), async (req, res) => {
+app.post("/api/send-welcome-email", emailLimiter, express.json(), async (req, res) => {
   const { email, firstName } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const emailUser = process.env.EMAIL_USER;
@@ -537,11 +537,13 @@ async function handleTestEmail(to: string, res: any) {
   }
 }
 app.get("/api/send-test-email", async (req, res) => {
+  const secret = process.env.ADMIN_SECRET;
+  if (!secret || req.query.secret !== secret) return res.status(401).json({ error: 'Unauthorized' });
   const emailUser = process.env.EMAIL_USER;
   const to = (req.query.to as string) || emailUser || '';
   await handleTestEmail(to, res);
 });
-app.post("/api/send-test-email", express.json(), async (req, res) => {
+app.post("/api/send-test-email", emailLimiter, requireAuth, express.json(), async (req, res) => {
   const emailUser = process.env.EMAIL_USER;
   const to = req.body?.to || emailUser || '';
   await handleTestEmail(to, res);
@@ -576,7 +578,10 @@ app.post("/api/create-checkout-session", requireAuth, async (req, res) => {
     console.log(`[STRIPE] Mode: ${key.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
     const isAnnual = billingCycle === 'yearly';
     const session = await stripeClient.checkout.sessions.create({
-      payment_method_types: ['card'],
+      payment_method_types: ['card', 'twint'],
+      payment_method_options: {
+        card: { request_three_d_secure: 'automatic' },
+      },
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       client_reference_id: userId,
