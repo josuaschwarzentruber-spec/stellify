@@ -1206,6 +1206,23 @@ function StellifyApp() {
 
     return (
       <div className="space-y-8">
+        {/* Lehrstellen banner */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => { setJobFilters({ keyword: '', location: '', industry: '' }); setLiveJobs(null); }}
+            className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-widest border transition-all ${jobFilters.industry === '' || jobFilters.industry !== 'Lehrstellen' ? 'bg-[#004225] text-white border-[#004225]' : 'bg-transparent text-[#004225] dark:text-[#00A854] border-[#004225]/30 hover:border-[#004225]'}`}
+          >
+            {language === 'FR' ? 'Tous les emplois' : language === 'IT' ? 'Tutti i lavori' : language === 'EN' ? 'All Jobs' : 'Alle Stellen'}
+          </button>
+          <button
+            onClick={() => { setJobFilters({ keyword: '', location: '', industry: 'Lehrstellen' }); setLiveJobs(null); }}
+            className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-widest border transition-all flex items-center justify-center gap-2 ${jobFilters.industry === 'Lehrstellen' ? 'bg-[#004225] text-white border-[#004225]' : 'bg-transparent text-[#004225] dark:text-[#00A854] border-[#004225]/30 hover:border-[#004225]'}`}
+          >
+            <GraduationCap size={14} />
+            {language === 'FR' ? 'Apprentissages' : language === 'IT' ? 'Apprendistati' : language === 'EN' ? 'Apprenticeships' : 'Lehrstellen'}
+          </button>
+        </div>
+
         {/* Search bar */}
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 space-y-2">
@@ -1261,6 +1278,7 @@ function StellifyApp() {
               <option value="PublicSector">{language === 'FR' ? 'Secteur public' : language === 'IT' ? 'Settore pubblico' : language === 'EN' ? 'Public Sector' : 'Öffentlicher Sektor'}</option>
               <option value="Transport">{language === 'FR' ? 'Transport' : language === 'IT' ? 'Trasporti' : language === 'EN' ? 'Transport' : 'Transport'}</option>
               <option value="NonProfit">{language === 'FR' ? 'ONG / Non-profit' : language === 'IT' ? 'ONG / Non-profit' : language === 'EN' ? 'NGO / Non-Profit' : 'NGO / Non-Profit'}</option>
+              <option value="Lehrstellen">{language === 'FR' ? 'Apprentissages' : language === 'IT' ? 'Apprendistati' : language === 'EN' ? 'Apprenticeships' : 'Lehrstellen'}</option>
             </select>
           </div>
           {/* Live Search button */}
@@ -3376,81 +3394,221 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
     const margin = 25;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
-    
-    // Header
+    const contentWidth = pageWidth - margin * 2;
+
+    // Header bar
+    doc.setFillColor(0, 66, 37);
+    doc.rect(0, 0, pageWidth, 22, 'F');
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text("STELLIFY | SCHWEIZER KARRIERE-CO-PILOT", margin, 15);
-    doc.text(new Date().toLocaleDateString('de-CH'), pageWidth - margin - 20, 15);
-    
+    doc.setFontSize(7);
+    doc.setTextColor(255, 255, 255);
+    doc.text("STELLIFY | SCHWEIZER KARRIERE-CO-PILOT", margin, 9);
+    doc.setFont("helvetica", "normal");
+    doc.text(new Date().toLocaleDateString('de-CH'), pageWidth - margin, 9, { align: 'right' });
+
     // Title
     doc.setFont("times", "bold");
-    doc.setFontSize(18);
-    doc.setTextColor(0, 66, 37); // #004225
-    doc.text(activeTool.title.toUpperCase(), margin, 30);
-    
-    // Content
-    doc.setFont("times", "normal");
-    doc.setFontSize(11);
-    doc.setTextColor(30, 30, 30);
-    
-    const splitText = doc.splitTextToSize(toolResult, pageWidth - margin * 2);
-    let cursorY = 45;
-    const lineHeight = 7;
-    
-    splitText.forEach((line: string) => {
-      if (cursorY + lineHeight > pageHeight - margin) {
-        doc.addPage();
-        cursorY = margin;
+    doc.setFontSize(20);
+    doc.setTextColor(0, 66, 37);
+    doc.text(activeTool.title, margin, 36);
+
+    // Thin divider
+    doc.setDrawColor(0, 66, 37);
+    doc.setLineWidth(0.3);
+    doc.line(margin, 40, pageWidth - margin, 40);
+
+    let cursorY = 50;
+
+    const addPage = () => {
+      doc.addPage();
+      doc.setFillColor(0, 66, 37);
+      doc.rect(0, 0, pageWidth, 10, 'F');
+      cursorY = 18;
+    };
+
+    const lines = toolResult.split('\n');
+    lines.forEach((line) => {
+      // Detect heading levels
+      const h1 = line.match(/^#{1,2}\s+(.*)/);
+      const h2 = line.match(/^#{3,4}\s+(.*)/);
+      const bullet = line.match(/^[\*\-\+]\s+(.*)/);
+      const numbered = line.match(/^(\d+)\.\s+(.*)/);
+      // Strip inline markdown
+      const clean = line
+        .replace(/^#{1,6}\s+/, '')
+        .replace(/\*\*(.+?)\*\*/g, '$1')
+        .replace(/\*(.+?)\*/g, '$1')
+        .replace(/`(.+?)`/g, '$1')
+        .replace(/\[(.+?)\]\(.+?\)/g, '$1')
+        .trim();
+
+      if (!clean) {
+        cursorY += 3;
+        return;
       }
-      doc.text(line, margin, cursorY);
-      cursorY += lineHeight;
+
+      if (h1) {
+        cursorY += 4;
+        if (cursorY > pageHeight - margin) addPage();
+        doc.setFont("times", "bold");
+        doc.setFontSize(14);
+        doc.setTextColor(0, 66, 37);
+        const wrapped = doc.splitTextToSize(clean, contentWidth);
+        wrapped.forEach((l: string) => {
+          if (cursorY > pageHeight - margin) addPage();
+          doc.text(l, margin, cursorY);
+          cursorY += 7;
+        });
+        doc.setDrawColor(0, 66, 37);
+        doc.setLineWidth(0.2);
+        doc.line(margin, cursorY, margin + contentWidth * 0.4, cursorY);
+        cursorY += 5;
+      } else if (h2) {
+        cursorY += 3;
+        if (cursorY > pageHeight - margin) addPage();
+        doc.setFont("times", "bold");
+        doc.setFontSize(12);
+        doc.setTextColor(40, 40, 40);
+        const wrapped = doc.splitTextToSize(clean, contentWidth);
+        wrapped.forEach((l: string) => {
+          if (cursorY > pageHeight - margin) addPage();
+          doc.text(l, margin, cursorY);
+          cursorY += 6;
+        });
+        cursorY += 2;
+      } else if (bullet) {
+        doc.setFont("times", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(30, 30, 30);
+        const bulletText = bullet[1].replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+        const wrapped = doc.splitTextToSize('•  ' + bulletText, contentWidth - 6);
+        wrapped.forEach((l: string, i: number) => {
+          if (cursorY > pageHeight - margin) addPage();
+          doc.text(l, margin + (i > 0 ? 6 : 0), cursorY);
+          cursorY += 5.5;
+        });
+      } else if (numbered) {
+        doc.setFont("times", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(30, 30, 30);
+        const numText = numbered[2].replace(/\*\*(.+?)\*\*/g, '$1').replace(/\*(.+?)\*/g, '$1');
+        const wrapped = doc.splitTextToSize(`${numbered[1]}.  ${numText}`, contentWidth - 6);
+        wrapped.forEach((l: string, i: number) => {
+          if (cursorY > pageHeight - margin) addPage();
+          doc.text(l, margin + (i > 0 ? 8 : 0), cursorY);
+          cursorY += 5.5;
+        });
+      } else {
+        doc.setFont("times", "normal");
+        doc.setFontSize(11);
+        doc.setTextColor(30, 30, 30);
+        const wrapped = doc.splitTextToSize(clean, contentWidth);
+        wrapped.forEach((l: string) => {
+          if (cursorY > pageHeight - margin) addPage();
+          doc.text(l, margin, cursorY);
+          cursorY += 5.5;
+        });
+      }
     });
-    
-    // Footer
+
+    // Footer on all pages
     const pageCount = (doc as any).internal.getNumberOfPages();
-    for(let i = 1; i <= pageCount; i++) {
+    for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      doc.text(`Seite ${i} von ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: "center" });
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(160, 160, 160);
+      doc.text(`Seite ${i} von ${pageCount}  ·  Erstellt mit Stellify`, pageWidth / 2, pageHeight - 8, { align: 'center' });
     }
-    
+
     doc.save(`stellify-${activeTool.id}.pdf`);
   };
 
   const downloadAsWord = () => {
     if (!toolResult || !activeTool) return;
-    const header = `
-      <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-      <head>
-        <meta charset='utf-8'>
-        <style>
-          @page { size: A4; margin: 2.5cm; }
-          body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.5; color: #1a1a1a; }
-          h1 { color: #004225; font-size: 18pt; margin-bottom: 20pt; border-bottom: 1pt solid #eee; padding-bottom: 10pt; }
-          .header { font-family: Arial, sans-serif; font-size: 8pt; color: #666; margin-bottom: 30pt; text-transform: uppercase; letter-spacing: 1pt; }
-          .footer { font-family: Arial, sans-serif; font-size: 8pt; color: #999; margin-top: 50pt; text-align: center; }
-        </style>
-      </head>
-      <body>
-        <div class="header">Stellify | Schweizer Karriere-Co-Pilot</div>
-        <h1>${activeTool.title}</h1>
-        <div class="content">
-          ${toolResult.replace(/\n/g, '<br>')}
-        </div>
-        <div class="footer">Generiert von Stellify am ${new Date().toLocaleDateString('de-CH')}</div>
-      </body>
-      </html>`;
-    
-    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(header);
-    const fileDownload = document.createElement("a");
-    document.body.appendChild(fileDownload);
-    fileDownload.href = source;
-    fileDownload.download = `stellify-${activeTool.id}.doc`;
-    fileDownload.click();
-    document.body.removeChild(fileDownload);
+
+    const mdToHtml = (text: string): string => {
+      const lines = text.split('\n');
+      let html = '';
+      let inList = false;
+      let inOrderedList = false;
+
+      lines.forEach(line => {
+        const h1 = line.match(/^#{1,2}\s+(.*)/);
+        const h2 = line.match(/^#{3,4}\s+(.*)/);
+        const bullet = line.match(/^[\*\-\+]\s+(.*)/);
+        const numbered = line.match(/^(\d+)\.\s+(.*)/);
+        const inline = (t: string) => t
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/\*(.+?)\*/g, '<em>$1</em>')
+          .replace(/`(.+?)`/g, '<code>$1</code>');
+
+        if (!line.trim()) {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
+          return;
+        }
+        if (h1) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<h2>${inline(h1[1])}</h2>`;
+        } else if (h2) {
+          if (inList) { html += '</ul>'; inList = false; }
+          html += `<h3>${inline(h2[1])}</h3>`;
+        } else if (bullet) {
+          if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
+          if (!inList) { html += '<ul>'; inList = true; }
+          html += `<li>${inline(bullet[1])}</li>`;
+        } else if (numbered) {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (!inOrderedList) { html += '<ol>'; inOrderedList = true; }
+          html += `<li>${inline(numbered[2])}</li>`;
+        } else {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
+          html += `<p>${inline(line)}</p>`;
+        }
+      });
+      if (inList) html += '</ul>';
+      if (inOrderedList) html += '</ol>';
+      return html;
+    };
+
+    const docHtml = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+  <meta charset='utf-8'>
+  <style>
+    @page { size: A4; margin: 2.5cm 2.5cm 3cm 2.5cm; }
+    body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.6; color: #1A1A1A; }
+    .doc-header { font-family: Arial, Helvetica, sans-serif; font-size: 7.5pt; color: #FDFCFB; background: #004225; padding: 6pt 0; margin: -2.5cm -2.5cm 2cm -2.5cm; padding-left: 2.5cm; text-transform: uppercase; letter-spacing: 1.5pt; }
+    h1 { font-family: 'Times New Roman', Times, serif; color: #004225; font-size: 20pt; font-weight: bold; margin: 0 0 6pt 0; border-bottom: 0.5pt solid #004225; padding-bottom: 6pt; }
+    h2 { font-family: 'Times New Roman', Times, serif; color: #004225; font-size: 14pt; font-weight: bold; margin: 16pt 0 4pt 0; }
+    h3 { font-family: 'Times New Roman', Times, serif; color: #2A2A26; font-size: 12pt; font-weight: bold; margin: 12pt 0 3pt 0; }
+    p { margin: 0 0 8pt 0; }
+    ul { margin: 4pt 0 8pt 0; padding-left: 18pt; }
+    ol { margin: 4pt 0 8pt 0; padding-left: 18pt; }
+    li { margin-bottom: 3pt; }
+    strong { font-weight: bold; }
+    em { font-style: italic; }
+    code { font-family: Courier New, monospace; background: #F5F4F0; padding: 0 2pt; }
+    .doc-footer { font-family: Arial, Helvetica, sans-serif; font-size: 7pt; color: #9A9A94; margin-top: 2cm; padding-top: 6pt; border-top: 0.5pt solid #E8E6E0; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="doc-header">Stellify &nbsp;|&nbsp; Schweizer Karriere-Co-Pilot</div>
+  <h1>${activeTool.title}</h1>
+  <div class="content">${mdToHtml(toolResult)}</div>
+  <div class="doc-footer">Erstellt mit Stellify am ${new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })} &nbsp;·&nbsp; stellify.ch</div>
+</body>
+</html>`;
+
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(docHtml);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.href = source;
+    a.download = `stellify-${activeTool.id}.doc`;
+    a.click();
+    document.body.removeChild(a);
   };
 
   // --- RENDER HELPERS ---
@@ -7740,6 +7898,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           showToast(t.search_nav_profile);
                         } else if (result.type === 'tool') {
                           handleToolClick(result.id);
+                        } else if (result.type === 'job') {
+                          handleJobClick(result.id);
                         } else if (result.link) {
                           window.location.hash = result.link;
                         }
@@ -8409,7 +8569,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           </button>
                         </div>
                       </div>
-                      <div className="flex-1 overflow-y-auto font-serif text-lg leading-relaxed whitespace-pre-wrap pr-4 custom-scrollbar markdown-body relative group">
+                      <div className="flex-1 overflow-y-auto font-serif text-lg leading-relaxed pr-4 custom-scrollbar markdown-body relative group">
                         {(activeTool.id === 'cv-premium' || activeTool.id === 'career-roadmap' || activeTool.id === 'zeugnis') && (
                           <div className="mb-8 p-4 bg-[#004225]/5 border border-[#004225]/20 flex items-center justify-between">
                             <div className="flex items-center gap-3">
