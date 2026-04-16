@@ -1039,6 +1039,16 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Handle return from Stripe checkout (?view=pricing redirects back to pricing)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const viewParam = params.get('view');
+    if (viewParam === 'pricing') {
+      setActiveView('pricing');
+      window.history.replaceState({ view: 'pricing' }, '', window.location.pathname);
+    }
+  }, []);
+
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb') => {
     setActiveView(view);
@@ -2528,7 +2538,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           planId: plan,
           billingCycle,
           successUrl: window.location.origin + '?session_id={CHECKOUT_SESSION_ID}',
-          cancelUrl: window.location.origin
+          cancelUrl: window.location.origin + '?view=pricing'
         })
       });
       
