@@ -2201,7 +2201,14 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      if (res.status === 404) {
+      if (res.status === 429) {
+        setAuthError(
+          language === 'DE' ? 'Zu viele Versuche. Bitte warte 15 Minuten und versuche es erneut.' :
+          language === 'FR' ? 'Trop de tentatives. Veuillez attendre 15 minutes et réessayer.' :
+          language === 'IT' ? 'Troppi tentativi. Attendi 15 minuti e riprova.' :
+          'Too many attempts. Please wait 15 minutes and try again.'
+        );
+      } else if (res.status === 404) {
         // Email not registered → switch to register
         setAuthError(
           language === 'DE' ? 'Diese E-Mail-Adresse ist nicht registriert. Bitte erstelle zuerst ein Konto.' :
@@ -2525,6 +2532,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         })
       });
       const chatData = await chatRes.json();
+      if (chatRes.status === 429) throw new Error(chatData.error || 'rate limit');
       if (!chatRes.ok) throw new Error(chatData.error || 'Chat failed');
 
       const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : language === 'FR' ? "Stella est en train de réfléchir. Veuillez réessayer." : language === 'IT' ? "Stella sta riflettendo. Si prega di riprovare." : "Stella is currently thoughtful. Please try again.");
@@ -2550,7 +2558,13 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         : language === 'IT' ? `Stella è occupata in questo momento (Errore: ${err.message || 'Sconosciuto'}). Si prega di riprovare più tardi.`
         : `Stella is busy right now (Error: ${err.message || 'Unknown'}). Please try again later.`;
 
-      if (err.message?.includes('API_KEY_INVALID') || err.message?.includes('API key not valid')) {
+      if (err.message?.includes('rate limit') || err.message?.includes('Too many') || err.message?.includes('Zu viele')) {
+        errorMsg = language === 'DE'
+          ? "Du hast zu viele Nachrichten gesendet. Bitte warte eine Minute und versuche es erneut."
+          : language === 'FR' ? "Vous avez envoyé trop de messages. Veuillez attendre une minute et réessayer."
+          : language === 'IT' ? "Hai inviato troppi messaggi. Attendi un minuto e riprova."
+          : "You've sent too many messages. Please wait a minute and try again.";
+      } else if (err.message?.includes('API_KEY_INVALID') || err.message?.includes('API key not valid')) {
         errorMsg = language === 'DE'
           ? "Stella hat ein Problem mit ihrem Zugangsschlüssel. Bitte kontaktiere den Support."
           : language === 'FR' ? "Stella a un problème avec sa clé d'accès. Veuillez contacter le support."
@@ -3201,6 +3215,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         body: JSON.stringify({ prompt, model, useSearch, language })
       });
       const toolData = await toolRes.json();
+      if (toolRes.status === 429) throw new Error(toolData.error || 'rate limit');
       if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
 
       let resultText = toolData.text;
@@ -3438,11 +3453,17 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
     } catch (e: any) {
       console.error("Tool processing error:", e);
+      const isRateLimit = e?.message?.includes('rate limit') || e?.message?.includes('Too many') || e?.message?.includes('Zu viele');
       setToolResult(
-        language === 'DE' ? '⚠️ KI-Fehler: ' + (e?.message || 'Unbekannter Fehler') :
-        language === 'FR' ? '⚠️ Erreur IA: ' + (e?.message || 'Erreur inconnue') :
-        language === 'IT' ? '⚠️ Errore AI: ' + (e?.message || 'Errore sconosciuto') :
-        '⚠️ AI Error: ' + (e?.message || 'Unknown error')
+        isRateLimit
+          ? (language === 'DE' ? '⚠️ Du hast zu viele Anfragen gesendet. Bitte warte eine Minute und versuche es erneut.' :
+             language === 'FR' ? '⚠️ Vous avez envoyé trop de demandes. Veuillez attendre une minute et réessayer.' :
+             language === 'IT' ? '⚠️ Hai inviato troppe richieste. Attendi un minuto e riprova.' :
+             '⚠️ Too many requests. Please wait a minute and try again.')
+          : (language === 'DE' ? '⚠️ KI-Fehler: ' + (e?.message || 'Unbekannter Fehler') :
+             language === 'FR' ? '⚠️ Erreur IA: ' + (e?.message || 'Erreur inconnue') :
+             language === 'IT' ? '⚠️ Errore AI: ' + (e?.message || 'Errore sconosciuto') :
+             '⚠️ AI Error: ' + (e?.message || 'Unknown error'))
       );
     } finally {
       setIsProcessingTool(false);
