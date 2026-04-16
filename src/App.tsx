@@ -737,14 +737,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </div>
             </Section>
 
-            <Section title={isDE ? 'Unternehmensregistrierung (falls zutreffend)' : isFR ? 'Enregistrement de la société (le cas échéant)' : isIT ? 'Registrazione aziendale (se applicabile)' : 'Company Registration (if applicable)'}>
-              <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 text-sm">
-                <p>UID: {placeholder('[CHE-XXX.XXX.XXX]')} <span className="text-xs text-[#6B6B66]">({isDE ? 'bei eingetragener Firma' : isFR ? 'si société enregistrée' : isIT ? 'se società registrata' : 'if registered company'})</span></p>
-                <p>{isDE ? 'Handelsregister-Nr.' : isFR ? 'N° du registre du commerce' : isIT ? 'N. registro commerciale' : 'Commercial Register No.'}: {placeholder('[HR-Nummer]')}</p>
-              </div>
-            </Section>
-
-            <Section title={isDE ? 'Haftungsausschluss' : isFR ? 'Clause de non-responsabilité' : isIT ? 'Esclusione di responsabilità' : 'Disclaimer'}>
+<Section title={isDE ? 'Haftungsausschluss' : isFR ? 'Clause de non-responsabilité' : isIT ? 'Esclusione di responsabilità' : 'Disclaimer'}>
               <p>{isDE ? 'Die Inhalte dieser Website werden mit grösstmöglicher Sorgfalt erstellt. Der Betreiber übernimmt jedoch keine Gewähr für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten Inhalte. Die KI-generierten Texte dienen ausschliesslich als Hilfsmittel und ersetzen keine professionelle Rechts- oder Karriereberatung.' : isFR ? 'Les contenus de ce site sont créés avec le plus grand soin. L\'exploitant ne garantit cependant pas l\'exactitude, l\'exhaustivité et l\'actualité des contenus fournis. Les textes générés par IA servent uniquement d\'aide et ne remplacent pas un conseil professionnel juridique ou de carrière.' : isIT ? 'I contenuti di questo sito vengono creati con la massima cura. Tuttavia, il gestore non garantisce l\'accuratezza, la completezza e l\'attualità dei contenuti forniti. I testi generati dall\'IA servono esclusivamente come ausilio e non sostituiscono una consulenza professionale legale o di carriera.' : 'The contents of this website are created with the utmost care. However, the operator does not guarantee the accuracy, completeness or timeliness of the content provided. AI-generated texts serve solely as an aid and do not replace professional legal or career advice.'}</p>
             </Section>
 
@@ -5911,7 +5904,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       )}
 
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb') && user ? (
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb') && (user ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
@@ -6851,7 +6844,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
           </motion.div>
         </section>
-      )}
+      ))}
 
       {/* --- MARKETING SECTIONS + FOOTER (hidden on legal pages) --- */}
       {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && <>
