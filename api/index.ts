@@ -310,6 +310,30 @@ app.get("/api/jobs", async (req, res) => {
   }
 });
 
+// ── Test Email ────────────────────────────────────────────────────────────────
+app.post("/api/send-test-email", express.json(), async (req, res) => {
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  if (!emailUser || !emailPass) {
+    return res.status(500).json({ error: 'EMAIL_USER / EMAIL_PASS not configured' });
+  }
+  const to = req.body?.to || emailUser;
+  try {
+    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
+    await transporter.sendMail({
+      from: `"Stellify" <${emailUser}>`,
+      to,
+      subject: 'Stellify – Test-E-Mail',
+      text: `Hallo,\n\ndies ist eine Test-E-Mail von Stellify um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.\n\nDas Stellify-Team`,
+    });
+    console.log(`[EMAIL] Test email sent to ${to}`);
+    res.json({ ok: true, sentTo: to });
+  } catch (err: any) {
+    console.error('[EMAIL] Test email failed:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
