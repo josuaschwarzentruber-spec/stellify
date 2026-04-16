@@ -2123,17 +2123,23 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setFirstName('');
     } catch (err: any) {
       console.error("Auth Error:", err);
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+      if (err.code === 'auth/user-not-found') {
+        // Email not registered at all → go register
         setAuthError(
-          language === 'DE' ? 'Anmeldedaten ungültig. Falls du noch kein Konto in diesem neuen System hast, registriere dich bitte neu.' :
-          language === 'FR' ? 'Identifiants invalides. Si vous n\'avez pas encore de compte, veuillez vous inscrire.' :
-          language === 'IT' ? 'Credenziali non valide. Se non hai ancora un account, registrati.' :
-          'Invalid credentials. If you don\'t have an account yet, please register a new account.'
+          language === 'DE' ? 'Diese E-Mail ist nicht registriert. Bitte erstelle zuerst ein Konto.' :
+          language === 'FR' ? 'Cet e-mail n\'est pas enregistré. Veuillez d\'abord créer un compte.' :
+          language === 'IT' ? 'Questa email non è registrata. Crea prima un account.' :
+          'This email is not registered. Please create an account first.'
         );
-        // If they were trying to login, maybe they need to register
-        if (authTab === 'login') {
-          setAuthTab('register');
-        }
+        setTimeout(() => { setAuthTab('register'); setAuthError(''); }, 2000);
+      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+        // Wrong password → show clear message + link to reset
+        setAuthError(
+          language === 'DE' ? 'Falsches Passwort. Hast du dein Passwort vergessen?' :
+          language === 'FR' ? 'Mot de passe incorrect. Avez-vous oublié votre mot de passe ?' :
+          language === 'IT' ? 'Password errata. Hai dimenticato la password?' :
+          'Wrong password. Did you forget your password?'
+        );
       } else if (err.code === 'auth/email-already-in-use') {
         setAuthError(
           language === 'DE' ? 'Diese E-Mail wird bereits verwendet. Bitte melde dich stattdessen an.' :
@@ -2178,18 +2184,28 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     
     setIsAuthLoading(true);
     try {
-      await fetch('/api/send-password-reset', {
+      const res = await fetch('/api/send-password-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      // Always show success (don't reveal if email exists)
-      setAuthError(
-        language === 'DE' ? 'Falls ein Konto mit dieser E-Mail existiert, erhältst du in Kürze eine E-Mail mit einem Link zum Zurücksetzen deines Passworts.' :
-        language === 'FR' ? 'Si un compte avec cet e-mail existe, vous recevrez bientôt un e-mail avec un lien de réinitialisation.' :
-        language === 'IT' ? 'Se esiste un account con questa email, riceverai a breve un\'email con il link per reimpostare la password.' :
-        'If an account with this email exists, you will shortly receive an email with a link to reset your password.'
-      );
+      if (res.status === 404) {
+        // Email not registered → switch to register
+        setAuthError(
+          language === 'DE' ? 'Diese E-Mail-Adresse ist nicht registriert. Bitte erstelle zuerst ein Konto.' :
+          language === 'FR' ? 'Cette adresse e-mail n\'est pas enregistrée. Veuillez d\'abord créer un compte.' :
+          language === 'IT' ? 'Questo indirizzo email non è registrato. Crea prima un account.' :
+          'This email address is not registered. Please create an account first.'
+        );
+        setTimeout(() => { setAuthTab('register'); setAuthError(''); }, 2000);
+      } else {
+        setAuthError(
+          language === 'DE' ? 'E-Mail gesendet! Schaue in deinem Postfach nach dem Link zum Zurücksetzen deines Passworts.' :
+          language === 'FR' ? 'E-mail envoyé ! Vérifiez votre boîte de réception pour le lien de réinitialisation.' :
+          language === 'IT' ? 'Email inviata! Controlla la tua casella di posta per il link di reimpostazione.' :
+          'Email sent! Check your inbox for the password reset link.'
+        );
+      }
     } catch (err: any) {
       console.error("Reset Error:", err);
       setAuthError(
@@ -9132,21 +9148,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
 
                 {authError && (
                   <div className="space-y-2">
-                    <p className={`text-xs text-center ${authError.includes('gesendet') || authError.includes('sent') ? 'text-green-500' : 'text-red-500'}`}>{authError}</p>
-                    {(authError.includes('registriere dich bitte neu') || authError.includes('register a new account')) && authTab === 'login' && (
+                    <p className={`text-xs text-center ${
+                      authError.includes('gesendet') || authError.includes('sent') || authError.includes('E-Mail gesendet') || authError.includes('envoyé') || authError.includes('inviata')
+                        ? 'text-green-500' : 'text-red-500'
+                    }`}>{authError}</p>
+                    {/* Wrong password → show reset button */}
+                    {(authError.includes('Falsches Passwort') || authError.includes('incorrect') || authError.includes('errata') || authError.includes('Wrong password')) && authTab === 'login' && (
                       <div className="flex justify-center">
-                        <button 
+                        <button
                           type="button"
-                          onClick={() => { setAuthTab('register'); setAuthError(''); }}
+                          onClick={() => { setAuthTab('forgot'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
                         >
-                          {t.auth_register_new}
+                          {t.auth_forgot_password}
                         </button>
                       </div>
                     )}
-                    {(authError.includes('melde dich stattdessen an') || authError.includes('log in instead')) && authTab === 'register' && (
+                    {/* Email already in use → switch to login */}
+                    {(authError.includes('bereits verwendet') || authError.includes('déjà utilisé') || authError.includes('già in uso') || authError.includes('already in use')) && authTab === 'register' && (
                       <div className="flex justify-center">
-                        <button 
+                        <button
                           type="button"
                           onClick={() => { setAuthTab('login'); setAuthError(''); }}
                           className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"

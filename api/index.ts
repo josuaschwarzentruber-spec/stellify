@@ -418,8 +418,10 @@ app.post("/api/send-password-reset", express.json(), async (req, res) => {
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[AUTH] Password reset failed:', err.message);
-    // Don't reveal if email exists or not
-    res.json({ ok: true });
+    if (err.code === 'auth/user-not-found' || err.errorInfo?.code === 'auth/user-not-found') {
+      return res.status(404).json({ error: 'user-not-found' });
+    }
+    res.status(500).json({ error: err.message });
   }
 });
 
