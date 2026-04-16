@@ -7,6 +7,7 @@ import morgan from "morgan";
 import Stripe from "stripe";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
 
@@ -14,6 +15,7 @@ dotenv.config();
 
 // ── Firebase Admin (fault-tolerant) ──────────────────────────────────────────
 let dbAdmin: ReturnType<typeof getFirestore> | null = null;
+let authAdmin: ReturnType<typeof getAdminAuth> | null = null;
 try {
   if (!getApps().length) {
     const projectId   = process.env.FIREBASE_PROJECT_ID;
@@ -26,6 +28,7 @@ try {
     }
   }
   dbAdmin = getFirestore();
+  authAdmin = getAdminAuth();
 } catch (e: any) {
   console.error('[FIREBASE ADMIN] Init failed:', e.message);
 }
@@ -378,6 +381,78 @@ app.get("/api/jobs", async (req, res) => {
     return res.json({ jobs: [], live: true, source: 'gemini' });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
+  }
+});
+
+// ── Password Reset (custom branded email, no Firebase default) ────────────────
+app.post("/api/send-password-reset", express.json(), async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  if (!emailUser || !emailPass) return res.status(500).json({ error: 'Email not configured' });
+  if (!authAdmin) return res.status(500).json({ error: 'Auth not configured' });
+  try {
+    const resetLink = await authAdmin.generatePasswordResetLink(email, {
+      url: `${siteUrl}/`,
+    });
+    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
+    await transporter.sendMail({
+      from: `"Stellify" <${emailUser}>`,
+      to: email,
+      subject: 'Stellify – Passwort zurücksetzen',
+      text: `Hallo,\n\ndu hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.\n\nKlicke auf den folgenden Link um ein neues Passwort festzulegen:\n${resetLink}\n\nDer Link ist 1 Stunde gültig.\n\nWenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.\n\nDas Stellify-Team`,
+      html: buildEmailHtml(
+        'Passwort zurücksetzen',
+        [
+          'Hallo,',
+          'du hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.',
+          'Klicke auf den Button unten um ein neues Passwort festzulegen. Der Link ist <strong>1 Stunde gültig</strong>.',
+          'Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.',
+        ],
+        'Passwort jetzt zurücksetzen',
+        resetLink
+      ),
+    });
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error('[AUTH] Password reset failed:', err.message);
+    // Don't reveal if email exists or not
+    res.json({ ok: true });
+  }
+});
+
+// ── Welcome Email ─────────────────────────────────────────────────────────────
+app.post("/api/send-welcome-email", express.json(), async (req, res) => {
+  const { email, firstName } = req.body;
+  if (!email) return res.status(400).json({ error: 'Email required' });
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  if (!emailUser || !emailPass) return res.json({ ok: true }); // Fail silently
+  try {
+    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
+    await transporter.sendMail({
+      from: `"Stellify" <${emailUser}>`,
+      to: email,
+      subject: 'Willkommen bei Stellify – Dein KI-Karriere-Co-Pilot',
+      html: buildEmailHtml(
+        `Willkommen bei Stellify, ${firstName || ''}!`,
+        [
+          `Hallo ${firstName || ''},`,
+          'dein Konto wurde erfolgreich erstellt. Wir freuen uns, dich als Teil der Stellify-Community begrüssen zu dürfen.',
+          'Mit dem <strong>kostenlosen Plan</strong> kannst du sofort loslegen: Analysiere deinen Lebenslauf, bereite dich auf Interviews vor und finde passende Stellen in der Schweiz.',
+          'Wann immer du bereit bist, mehr zu erreichen, kannst du auf einen Pro- oder Ultimate-Plan upgraden.',
+        ],
+        'Jetzt loslegen',
+        `${siteUrl}/`
+      ),
+    });
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error('[AUTH] Welcome email failed:', err.message);
+    res.json({ ok: true });
   }
 });
 
