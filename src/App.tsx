@@ -7620,7 +7620,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   <div className="min-w-0">
                     <p className="text-red-300 text-sm font-semibold">Zahlung konnte nicht verarbeitet werden</p>
                     <p className="text-red-400/80 text-xs mt-1 break-words">{subscriptionError}</p>
-                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="mailto:support.stellify@gmail.com" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
+                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support.stellify@gmail.com&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
                   </div>
                 </div>
                 <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
