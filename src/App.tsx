@@ -2632,7 +2632,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setSubscriptionError('');
     
     try {
-      const res = await authFetch('/api/create-checkout-session', {
+      const res = await fetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -2643,7 +2643,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           cancelUrl: window.location.origin + '?view=pricing'
         })
       });
-      
+
       const data = await res.json().catch(() => ({ error: 'Server-Fehler' }));
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       if (data.url) {
@@ -2655,8 +2655,12 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       console.error("Subscription error:", e);
       const msg = e.message || '';
       // Always show the actual error so the user/admin can diagnose it
-      setSubscriptionError(`⚠️ ${msg || 'Checkout fehlgeschlagen.'} – support.stellify@gmail.com`
-      );
+      const userMsg = msg.includes('test mode') || msg.includes('live mode')
+        ? 'Stripe-Konfigurationsfehler: Bitte die Preise im richtigen Modus (Test/Live) erstellen.'
+        : msg.includes('No such price') || msg.includes('price')
+        ? 'Ungültige Preis-Konfiguration. Bitte Support kontaktieren.'
+        : msg || 'Checkout konnte nicht gestartet werden.';
+      setSubscriptionError(userMsg);
     } finally {
       setIsSubscribing(false);
     }
@@ -7610,28 +7614,39 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
             
             {subscriptionError && (
-              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium flex items-start justify-between gap-4">
-                <span>⚠️ {subscriptionError.replace('⚠️ ', '')}</span>
+              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="text-red-400 mt-0.5 shrink-0">⚠️</span>
+                  <div>
+                    <p className="text-red-300 text-sm font-semibold mb-0.5">Zahlung konnte nicht verarbeitet werden</p>
+                    <p className="text-red-400/80 text-xs">{subscriptionError}</p>
+                    <p className="text-red-400/60 text-xs mt-1">Hilfe: <span className="underline">support.stellify@gmail.com</span></p>
+                  </div>
+                </div>
                 <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
                   <X size={14} />
                 </button>
               </div>
             )}
 
-            <div className="inline-flex items-center p-1 bg-white/5 rounded-full border border-white/10">
-              <button 
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'monthly' ? 'bg-white text-black' : 'text-white/60'}`}
-              >
-                {t.pricing_monthly}
-              </button>
-              <button 
-                onClick={() => setBillingCycle('yearly')}
-                className={`px-6 py-2 text-xs font-medium rounded-full transition-all flex items-center gap-2 ${billingCycle === 'yearly' ? 'bg-[#004225] text-white' : 'text-white/60'}`}
-              >
-                {t.pricing_yearly} <Sparkles size={12} className="opacity-70" />
-                <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">{t.pricing_save}</span>
-              </button>
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center p-1 bg-white/5 rounded-full border border-white/10">
+                <button
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'monthly' ? 'bg-white text-black' : 'text-white/60'}`}
+                >
+                  {t.pricing_monthly}
+                </button>
+                <button
+                  onClick={() => setBillingCycle('yearly')}
+                  className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'yearly' ? 'bg-[#004225] text-white' : 'text-white/60'}`}
+                >
+                  {t.pricing_yearly}
+                </button>
+              </div>
+              <span className="text-[11px] font-bold bg-[#00A854] text-white px-3 py-1 rounded-full tracking-wide">
+                −17% · {t.pricing_save}
+              </span>
             </div>
           </div>
 

@@ -615,7 +615,7 @@ app.get("/api/health", (_req, res) => {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", requireAuth, async (req, res) => {
+app.post("/api/create-checkout-session", async (req, res) => {
   const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body;
   if (!planId || !userId || !billingCycle) {
     return res.status(400).json({ error: "Missing planId, userId or billingCycle" });
