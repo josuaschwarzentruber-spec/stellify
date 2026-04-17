@@ -7607,8 +7607,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/10 border border-[#004225]/20 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-[10px] font-bold tracking-widest uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse" />
               Live Payment System
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
@@ -7649,7 +7649,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
               <p className="text-[11px] text-white/40 font-light">
                 {billingCycle === 'monthly'
-                  ? (language === 'DE' ? '👆 Jährlich wählen = 2 Monate gratis' : language === 'FR' ? '👆 Annuel = 2 mois gratuits' : language === 'IT' ? '👆 Annuale = 2 mesi gratis' : '👆 Choose yearly = 2 months free')
+                  ? (language === 'DE' ? '→ Jährlich wählen und 2 Monate gratis sparen' : language === 'FR' ? '→ Choisir annuel et économiser 2 mois' : language === 'IT' ? '→ Scegli annuale e risparmia 2 mesi' : '→ Choose yearly and save 2 months')
                   : (language === 'DE' ? '✓ Jahresabo aktiv – du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel – vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale – risparmi 2 mesi' : '✓ Annual plan active – you save 2 months')}
               </p>
             </div>
