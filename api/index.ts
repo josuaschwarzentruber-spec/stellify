@@ -338,7 +338,9 @@ app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
     res.json({ text: response.text });
   } catch (error: any) {
     console.error("[CHAT ERROR]", error);
-    res.status(500).json({ error: error.message });
+    const msg = error.message || '';
+    const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
+    res.status(isOverloaded ? 503 : 500).json({ error: isOverloaded ? 'overloaded' : msg });
   }
 });
 
@@ -375,7 +377,9 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
     res.json({ text: response.text, sources });
   } catch (error: any) {
     console.error("[TOOL ERROR]", error);
-    res.status(500).json({ error: error.message });
+    const msg = error.message || '';
+    const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
+    res.status(isOverloaded ? 503 : 500).json({ error: isOverloaded ? 'overloaded' : msg });
   }
 });
 

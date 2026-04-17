@@ -31,7 +31,7 @@ import {
   Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, GraduationCap, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
-  Headphones, Radio, ChevronLeft, BarChart3
+  Headphones, Radio, ChevronLeft, BarChart3, CreditCard
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -1040,15 +1040,20 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle return from Stripe checkout (?view=pricing redirects back to pricing)
+  // Handle return from Stripe checkout – runs after splash so activeView isn't overwritten
   useEffect(() => {
+    if (!splashDone) return;
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view');
     if (viewParam === 'pricing') {
       setActiveView('pricing');
-      window.history.replaceState({ view: 'pricing' }, '', window.location.pathname);
+      window.history.replaceState({}, '', window.location.pathname);
     }
-  }, []);
+    if (params.get('payment') === 'success' || params.get('session_id')) {
+      setActiveView('pricing');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [splashDone]);
 
   useEffect(() => {
     if (activeView === 'pricing') setSubscriptionError('');
@@ -2560,11 +2565,16 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       }
     } catch (err: any) {
       console.error("Stella Chat Error:", err);
-      let errorMsg = language === 'DE'
-        ? `Stella ist gerade beschäftigt (Fehler: ${err.message || 'Unbekannt'}). Bitte versuche es später noch einmal.`
-        : language === 'FR' ? `Stella est occupée en ce moment (Erreur: ${err.message || 'Inconnue'}). Veuillez réessayer plus tard.`
-        : language === 'IT' ? `Stella è occupata in questo momento (Errore: ${err.message || 'Sconosciuto'}). Si prega di riprovare più tardi.`
-        : `Stella is busy right now (Error: ${err.message || 'Unknown'}). Please try again later.`;
+      const isOverloaded = err.message?.includes('overloaded') || err.message?.includes('503') || err.message?.includes('UNAVAILABLE') || err.message?.includes('high demand');
+      let errorMsg = isOverloaded
+        ? (language === 'DE' ? 'Stella ist gerade sehr gefragt – bitte warte kurz und versuche es in 1–2 Minuten erneut.'
+          : language === 'FR' ? 'Stella est très demandée en ce moment – réessaie dans 1–2 minutes.'
+          : language === 'IT' ? 'Stella è molto richiesta in questo momento – riprova tra 1–2 minuti.'
+          : 'Stella is very busy right now – please try again in 1–2 minutes.')
+        : (language === 'DE' ? 'Stella hat gerade ein technisches Problem. Bitte versuche es später noch einmal.'
+          : language === 'FR' ? 'Stella rencontre un problème technique. Veuillez réessayer plus tard.'
+          : language === 'IT' ? 'Stella ha un problema tecnico. Si prega di riprovare più tardi.'
+          : 'Stella is having a technical issue. Please try again later.');
 
       if (err.message?.includes('rate limit') || err.message?.includes('Too many') || err.message?.includes('Zu viele')) {
         errorMsg = language === 'DE'
@@ -3468,16 +3478,22 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
     } catch (e: any) {
       console.error("Tool processing error:", e);
       const isRateLimit = e?.message?.includes('rate limit') || e?.message?.includes('Too many') || e?.message?.includes('Zu viele');
+      const isOverloaded = e?.message?.includes('overloaded') || e?.message?.includes('503') || e?.message?.includes('UNAVAILABLE') || e?.message?.includes('high demand');
       setToolResult(
         isRateLimit
-          ? (language === 'DE' ? '⚠️ Du hast zu viele Anfragen gesendet. Bitte warte eine Minute und versuche es erneut.' :
-             language === 'FR' ? '⚠️ Vous avez envoyé trop de demandes. Veuillez attendre une minute et réessayer.' :
-             language === 'IT' ? '⚠️ Hai inviato troppe richieste. Attendi un minuto e riprova.' :
-             '⚠️ Too many requests. Please wait a minute and try again.')
-          : (language === 'DE' ? '⚠️ KI-Fehler: ' + (e?.message || 'Unbekannter Fehler') :
-             language === 'FR' ? '⚠️ Erreur IA: ' + (e?.message || 'Erreur inconnue') :
-             language === 'IT' ? '⚠️ Errore AI: ' + (e?.message || 'Errore sconosciuto') :
-             '⚠️ AI Error: ' + (e?.message || 'Unknown error'))
+          ? (language === 'DE' ? '⚠️ Du hast zu viele Anfragen gesendet. Bitte warte eine Minute und versuche es erneut.'
+            : language === 'FR' ? '⚠️ Vous avez envoyé trop de demandes. Veuillez attendre une minute et réessayer.'
+            : language === 'IT' ? '⚠️ Hai inviato troppe richieste. Attendi un minuto e riprova.'
+            : '⚠️ Too many requests. Please wait a minute and try again.')
+          : isOverloaded
+          ? (language === 'DE' ? '⚠️ Die KI ist gerade sehr ausgelastet. Bitte warte 1–2 Minuten und versuche es erneut.'
+            : language === 'FR' ? '⚠️ L\'IA est très sollicitée. Veuillez attendre 1–2 minutes et réessayer.'
+            : language === 'IT' ? '⚠️ L\'IA è molto occupata. Attendi 1–2 minuti e riprova.'
+            : '⚠️ AI is very busy right now. Please wait 1–2 minutes and try again.')
+          : (language === 'DE' ? '⚠️ Ein Fehler ist aufgetreten. Bitte versuche es erneut.'
+            : language === 'FR' ? '⚠️ Une erreur est survenue. Veuillez réessayer.'
+            : language === 'IT' ? '⚠️ Si è verificato un errore. Riprova.'
+            : '⚠️ An error occurred. Please try again.')
       );
     } finally {
       setIsProcessingTool(false);
@@ -3747,7 +3763,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       search_type_tip: "Karrieretipps",
       search_type_faq: "Häufige Fragen",
       stella_placeholder: "Frag Stella etwas...",
-      stella_secure_data: "Sichere Schweizer Datenverarbeitung",
+      stella_secure_data: "SSL-verschlüsselt · Sicher übertragen",
       hero_title: "Von Bewerbung bis Interview – dein KI-Karriere-Coach",
       hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch – präzise, diskret und auf den Schweizer Markt zugeschnitten.",
       cta_free: "Kostenlos starten",
@@ -7607,8 +7623,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/10 border border-[#004225]/20 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-[10px] font-bold tracking-widest uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse" />
               Live Payment System
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
@@ -7649,9 +7665,29 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
               <p className="text-[11px] text-white/40 font-light">
                 {billingCycle === 'monthly'
-                  ? (language === 'DE' ? '👆 Jährlich wählen = 2 Monate gratis' : language === 'FR' ? '👆 Annuel = 2 mois gratuits' : language === 'IT' ? '👆 Annuale = 2 mesi gratis' : '👆 Choose yearly = 2 months free')
+                  ? (language === 'DE' ? '→ Jährlich wählen und 2 Monate gratis sparen' : language === 'FR' ? '→ Choisir annuel et économiser 2 mois' : language === 'IT' ? '→ Scegli annuale e risparmia 2 mesi' : '→ Choose yearly and save 2 months')
                   : (language === 'DE' ? '✓ Jahresabo aktiv – du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel – vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale – risparmi 2 mesi' : '✓ Annual plan active – you save 2 months')}
               </p>
+            </div>
+          </div>
+
+          {/* TRUST BAR */}
+          <div className="flex flex-wrap justify-center gap-6 mb-10">
+            <div className="flex items-center gap-2 text-white/50 text-xs">
+              <Shield size={13} className="text-white/40" />
+              <span>{language === 'DE' ? '7-Tage Geld-zurück-Garantie' : language === 'FR' ? 'Garantie 7 jours' : language === 'IT' ? 'Garanzia 7 giorni' : '7-day money-back guarantee'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/50 text-xs">
+              <Lock size={13} className="text-white/40" />
+              <span>SSL-gesichert · 256-bit</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/50 text-xs">
+              <CreditCard size={13} className="text-white/40" />
+              <span>{language === 'DE' ? 'Sichere Zahlung via Stripe' : language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro via Stripe' : 'Secure payment via Stripe'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/50 text-xs">
+              <CheckCircle2 size={13} className="text-white/40" />
+              <span>{language === 'DE' ? 'Keine automatische Verlängerung' : language === 'FR' ? 'Pas de renouvellement automatique' : language === 'IT' ? 'Nessun rinnovo automatico' : 'No automatic renewal'}</span>
             </div>
           </div>
 
