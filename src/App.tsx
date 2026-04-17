@@ -1050,6 +1050,10 @@ function StellifyApp() {
     }
   }, []);
 
+  useEffect(() => {
+    if (activeView === 'pricing') setSubscriptionError('');
+  }, [activeView]);
+
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb') => {
     setActiveView(view);
@@ -2640,11 +2644,12 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         })
       });
       
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: 'Server-Fehler' }));
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
       if (data.url) {
         window.location.href = data.url;
       } else {
-        throw new Error(data.error || 'Checkout failed');
+        throw new Error(data.error || 'Checkout fehlgeschlagen');
       }
     } catch (e: any) {
       console.error("Subscription error:", e);
@@ -7605,8 +7610,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
             
             {subscriptionError && (
-              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-500 text-sm font-medium animate-shake">
-                {subscriptionError}
+              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium flex items-start justify-between gap-4">
+                <span>⚠️ {subscriptionError.replace('⚠️ ', '')}</span>
+                <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
+                  <X size={14} />
+                </button>
               </div>
             )}
 
@@ -7621,7 +7629,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 onClick={() => setBillingCycle('yearly')}
                 className={`px-6 py-2 text-xs font-medium rounded-full transition-all flex items-center gap-2 ${billingCycle === 'yearly' ? 'bg-[#004225] text-white' : 'text-white/60'}`}
               >
-                {t.pricing_yearly} 🎁
+                {t.pricing_yearly} <Sparkles size={12} className="opacity-70" />
                 <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full">{t.pricing_save}</span>
               </button>
             </div>
