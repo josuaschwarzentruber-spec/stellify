@@ -7614,13 +7614,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
             
             {subscriptionError && (
-              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <span className="text-red-400 mt-0.5 shrink-0">⚠️</span>
-                  <div>
-                    <p className="text-red-300 text-sm font-semibold mb-0.5">Zahlung konnte nicht verarbeitet werden</p>
-                    <p className="text-red-400/80 text-xs">{subscriptionError}</p>
-                    <p className="text-red-400/60 text-xs mt-1">Hilfe: <span className="underline">support.stellify@gmail.com</span></p>
+              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-left flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 min-w-0">
+                  <span className="text-red-400 mt-0.5 shrink-0 text-base">⚠️</span>
+                  <div className="min-w-0">
+                    <p className="text-red-300 text-sm font-semibold">Zahlung konnte nicht verarbeitet werden</p>
+                    <p className="text-red-400/80 text-xs mt-1 break-words">{subscriptionError}</p>
+                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="mailto:support.stellify@gmail.com" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
                   </div>
                 </div>
                 <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
@@ -7629,7 +7629,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
             )}
 
-            <div className="flex items-center gap-3">
+            <div className="flex justify-center">
               <div className="inline-flex items-center p-1 bg-white/5 rounded-full border border-white/10">
                 <button
                   onClick={() => setBillingCycle('monthly')}
@@ -7639,14 +7639,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </button>
                 <button
                   onClick={() => setBillingCycle('yearly')}
-                  className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'yearly' ? 'bg-[#004225] text-white' : 'text-white/60'}`}
+                  className={`px-5 py-2 text-xs font-medium rounded-full transition-all flex items-center gap-2 ${billingCycle === 'yearly' ? 'bg-[#004225] text-white' : 'text-white/60 hover:text-white/80'}`}
                 >
                   {t.pricing_yearly}
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${billingCycle === 'yearly' ? 'bg-white/20 text-white' : 'bg-[#00A854] text-white'}`}>
+                    −17%
+                  </span>
                 </button>
               </div>
-              <span className="text-[11px] font-bold bg-[#00A854] text-white px-3 py-1 rounded-full tracking-wide">
-                −17% · {t.pricing_save}
-              </span>
             </div>
           </div>
 
@@ -7676,12 +7676,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="p-10 bg-[#004225]/10 border-2 border-[#004225] relative flex flex-col">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full">{t.pricing_recommended}</div>
               <div className="mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">Pro</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#00A854]">Pro</span>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif">CHF {prices.pro}</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
-                {billingCycle === 'yearly' && <p className="text-[10px] text-[#004225] mt-1 font-bold">CHF {prices.pro}/Mo. • {language === 'DE' ? 'spare 25%' : language === 'FR' ? 'économisez 25%' : language === 'IT' ? 'risparmia 25%' : 'save 25%'} • CHF 178.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</p>}
+                {billingCycle === 'yearly' && <p className="text-[11px] text-[#4ade80] mt-1.5 font-semibold">✓ {language === 'DE' ? 'spare 17%' : language === 'FR' ? 'économisez 17%' : language === 'IT' ? 'risparmia 17%' : 'save 17%'} · CHF 178.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</p>}
               </div>
               <ul className="space-y-4 mb-12 flex-1">
                 {t.pricing_pro_f.map((f: string, i: number) => (
@@ -7708,7 +7708,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   <span className="text-4xl font-serif">CHF {prices.ultimate}</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
-                {billingCycle === 'yearly' && <p className="text-[10px] text-white/70 mt-1 font-light">CHF {prices.ultimate}/Mo. • {language === 'DE' ? 'spare 20%' : language === 'FR' ? 'économisez 20%' : language === 'IT' ? 'risparmia 20%' : 'save 20%'} • CHF 478.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</p>}
+                {billingCycle === 'yearly' && <p className="text-[11px] text-white/60 mt-1.5 font-light">✓ {language === 'DE' ? 'spare 20%' : language === 'FR' ? 'économisez 20%' : language === 'IT' ? 'risparmia 20%' : 'save 20%'} · CHF 478.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</p>}
               </div>
               <ul className="space-y-4 mb-12 flex-1">
                 {t.pricing_ultimate_f.map((f: string, i: number) => (
