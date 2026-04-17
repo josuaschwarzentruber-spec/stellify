@@ -936,33 +936,33 @@ const CVDropzone = ({ onFileAccepted, isUploading, t }: { onFileAccepted: (file:
       className={`
         relative overflow-hidden group cursor-pointer transition-all duration-500
         border-2 border-dashed p-8 text-center
-        ${isDragActive 
-          ? 'border-[#004225] bg-[#004225]/5 scale-[1.02]' 
-          : 'border-black/10 dark:border-white/10 hover:border-[#004225]/30 dark:hover:border-[#FAFAF8]/30 bg-white/5'
+        ${isDragActive
+          ? 'border-white/60 bg-white/10 scale-[1.02]'
+          : 'border-white/20 hover:border-white/40 bg-white/5'
         }
         ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
       `}
     >
       <input {...getInputProps()} />
       <div className="space-y-4 relative z-10">
-        <div className="w-16 h-16 bg-[#FDFCFB] dark:bg-[#1A1A18] rounded-full flex items-center justify-center mx-auto text-[#004225] dark:text-[#FAFAF8] group-hover:scale-110 transition-transform duration-500 shadow-sm">
+        <div className="w-16 h-16 bg-white/15 rounded-full flex items-center justify-center mx-auto text-white group-hover:scale-110 transition-transform duration-500 shadow-sm">
           {isDragActive ? <FileUp size={32} className="animate-bounce" /> : <Upload size={32} />}
         </div>
         <div className="space-y-1">
-          <p className="text-sm font-serif text-[#1A1A18] dark:text-[#FAFAF8]">
+          <p className="text-sm font-serif text-white">
             {isDragActive ? t.drop_file_here : t.drag_cv_here}
           </p>
-          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold">
+          <p className="text-[10px] text-white/60 uppercase tracking-widest font-bold">
             {t.pdf_only}
           </p>
         </div>
       </div>
       
       {/* Decorative corners */}
-      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#004225]/20" />
-      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#004225]/20" />
-      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#004225]/20" />
-      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#004225]/20" />
+      <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white/30" />
+      <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white/30" />
+      <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-white/30" />
+      <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-white/30" />
     </div>
   );
 };
@@ -2125,7 +2125,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         fetch('/api/send-welcome-email', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName }),
+          body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
         }).catch(console.error);
       }
       setIsAuthModalOpen(false);
@@ -2199,7 +2199,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       const res = await fetch('/api/send-password-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, language }),
       });
       if (res.status === 429) {
         setAuthError(
@@ -4068,7 +4068,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
         { title: "Datenschutz 'Made in CH'", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["1× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
+      pricing_free_f: ["3× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
       pricing_pro_f: ["50× Bewerbungen / Nutzungen pro Monat", "20× Aktionen pro Tag", "Zeugnis-Decoder (Pro)", "Interview-Coach"],
       pricing_ultimate_f: ["Unlimitierte Bewerbungen ♾️", "Alle Pro-Features + Exklusive Tools", "Deep Analysis Modus (KI)", "24/7 VIP-Support"],
       pricing_cta_free: "Kostenlos starten",
@@ -4626,7 +4626,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
       ],
-      pricing_free_f: ["1× candidature ou utilisation d'outil", "3× demandes Stella Chat", "Calculateur de salaire IA (Base)", "Normes suisses"],
+      pricing_free_f: ["3× candidatures ou utilisations d'outil", "3× demandes Stella Chat", "Calculateur de salaire IA (Base)", "Normes suisses"],
       pricing_pro_f: ["50× candidatures / utilisations par mois", "20× actions par jour", "Décodeur de certificats (Pro)", "Coach d'entretien"],
       pricing_ultimate_f: ["Candidatures illimitées ♾️", "Toutes les fonctions Pro", "Coach IA personnel", "Support VIP 24/7"],
       pricing_cta_free: "Démarrer gratuitement",
@@ -5064,7 +5064,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
       ],
-      pricing_free_f: ["Crea 1× candidatura", "Calcolatore di stipendio AI (Base)", "Stella Chat (Limitato)", "Standard svizzeri"],
+      pricing_free_f: ["3× candidature o utilizzi strumenti", "3× messaggi Stella Chat", "Calcolatore di stipendio AI (Base)", "Standard svizzeri"],
       pricing_pro_f: ["50× candidature / mese", "Decodificatore di certificati (Pro)", "Coach per colloqui", "Supporto prioritario"],
       pricing_ultimate_f: ["Candidature illimitate", "Tutte le funzioni Pro", "Coach AI personale", "Supporto VIP 24/7"],
       pricing_cta_free: "Inizia gratuitamente",
@@ -5502,7 +5502,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         { title: "Salary Transparency", desc: "Get precise salary forecasts based on Swiss market data for your specific region and industry.", icon: "Coins" },
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["Create 1× application", "AI Salary Calculator (Base)", "Stella Chat (Limited)", "Swiss Standards"],
+      pricing_free_f: ["3× applications or tool uses", "3× Stella Chat messages", "AI Salary Calculator (Base)", "Swiss Standards"],
       pricing_pro_f: ["50× applications / month", "Certificate Decoder (Pro)", "Interview Coach", "Priority Support"],
       pricing_ultimate_f: ["Unlimited applications", "All Pro features + Exclusive Tools", "Deep Analysis Mode (AI)", "24/7 VIP Support"],
       pricing_cta_free: "Start for free",
@@ -9266,17 +9266,6 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   </>
                 )}
 
-                {authTab === 'forgot' && (
-                  <div className="flex justify-center mt-4">
-                    <button 
-                      type="button"
-                      onClick={() => { setAuthTab('login'); setAuthError(''); }}
-                      className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
-                    >
-                      {t.auth_back_to_login}
-                    </button>
-                  </div>
-                )}
 
                 <p className="text-[10px] text-center text-[#9A9A94] mt-6 leading-relaxed">
                   {t.auth_terms_by_signing}{' '}

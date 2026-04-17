@@ -442,13 +442,43 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
 
 // ── Password Reset (custom branded email, no Firebase default) ────────────────
 app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, res) => {
-  const { email } = req.body;
+  const { email, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
   if (!emailUser || !emailPass) return res.status(500).json({ error: 'Email not configured' });
   if (!authAdmin) return res.status(500).json({ error: 'Auth not configured' });
+
+  const lang = language || 'DE';
+  const resetCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
+    DE: {
+      subject: 'Stellify – Passwort zurücksetzen',
+      title: 'Passwort zurücksetzen',
+      lines: ['Hallo,', 'du hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.', 'Klicke auf den Button unten um ein neues Passwort festzulegen. Der Link ist <strong>1 Stunde gültig</strong>.', 'Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.'],
+      cta: 'Passwort jetzt zurücksetzen',
+    },
+    FR: {
+      subject: 'Stellify – Réinitialiser votre mot de passe',
+      title: 'Réinitialiser votre mot de passe',
+      lines: ['Bonjour,', 'vous avez demandé la réinitialisation de votre mot de passe Stellify.', 'Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe. Le lien est valable <strong>1 heure</strong>.', 'Si vous n\'avez pas fait cette demande, ignorez simplement cet e-mail.'],
+      cta: 'Réinitialiser maintenant',
+    },
+    IT: {
+      subject: 'Stellify – Reimposta la tua password',
+      title: 'Reimposta la password',
+      lines: ['Ciao,', 'hai richiesto il reset della password di Stellify.', 'Clicca sul pulsante qui sotto per impostare una nuova password. Il link è valido per <strong>1 ora</strong>.', 'Se non hai fatto questa richiesta, ignora semplicemente questa email.'],
+      cta: 'Reimposta ora',
+    },
+    EN: {
+      subject: 'Stellify – Reset your password',
+      title: 'Reset your password',
+      lines: ['Hello,', 'you requested a password reset for your Stellify account.', 'Click the button below to set a new password. The link is valid for <strong>1 hour</strong>.', 'If you did not request this, you can safely ignore this email.'],
+      cta: 'Reset password now',
+    },
+  };
+  const copy = resetCopy[lang] || resetCopy['DE'];
+
   try {
     const resetLink = await authAdmin.generatePasswordResetLink(email, {
       url: `${siteUrl}/`,
@@ -457,19 +487,8 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
     await transporter.sendMail({
       from: `"Stellify" <${emailUser}>`,
       to: email,
-      subject: 'Stellify – Passwort zurücksetzen',
-      text: `Hallo,\n\ndu hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.\n\nKlicke auf den folgenden Link um ein neues Passwort festzulegen:\n${resetLink}\n\nDer Link ist 1 Stunde gültig.\n\nWenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.\n\nDas Stellify-Team`,
-      html: buildEmailHtml(
-        'Passwort zurücksetzen',
-        [
-          'Hallo,',
-          'du hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.',
-          'Klicke auf den Button unten um ein neues Passwort festzulegen. Der Link ist <strong>1 Stunde gültig</strong>.',
-          'Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.',
-        ],
-        'Passwort jetzt zurücksetzen',
-        resetLink
-      ),
+      subject: copy.subject,
+      html: buildEmailHtml(copy.title, copy.lines, copy.cta, resetLink),
     });
     res.json({ ok: true });
   } catch (err: any) {
@@ -483,29 +502,48 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
 
 // ── Welcome Email ─────────────────────────────────────────────────────────────
 app.post("/api/send-welcome-email", emailLimiter, express.json(), async (req, res) => {
-  const { email, firstName } = req.body;
+  const { email, firstName, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
-  if (!emailUser || !emailPass) return res.json({ ok: true }); // Fail silently
+  if (!emailUser || !emailPass) return res.json({ ok: true });
+  const name = firstName || '';
+  const lang = language || 'DE';
+  const welcomeCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
+    DE: {
+      subject: 'Willkommen bei Stellify – Dein KI-Karriere-Co-Pilot',
+      title: `Willkommen bei Stellify, ${name}!`,
+      lines: [`Hallo ${name},`, 'dein Konto wurde erfolgreich erstellt. Wir freuen uns, dich als Teil der Stellify-Community begrüssen zu dürfen.', 'Mit dem <strong>kostenlosen Plan</strong> kannst du sofort loslegen: Analysiere deinen Lebenslauf, bereite dich auf Interviews vor und finde passende Stellen in der Schweiz.', 'Wann immer du bereit bist, kannst du auf einen Pro- oder Ultimate-Plan upgraden.'],
+      cta: 'Jetzt loslegen',
+    },
+    FR: {
+      subject: 'Bienvenue sur Stellify – Ton co-pilote carrière IA',
+      title: `Bienvenue sur Stellify, ${name}!`,
+      lines: [`Bonjour ${name},`, 'ton compte a été créé avec succès. Nous sommes ravis de t\'accueillir dans la communauté Stellify.', 'Avec le <strong>plan gratuit</strong>, tu peux démarrer immédiatement: analyse ton CV, prépare-toi aux entretiens et trouve des emplois en Suisse.', 'Quand tu es prêt à aller plus loin, tu peux passer au plan Pro ou Ultimate.'],
+      cta: 'Commencer maintenant',
+    },
+    IT: {
+      subject: 'Benvenuto su Stellify – Il tuo co-pilota carriera AI',
+      title: `Benvenuto su Stellify, ${name}!`,
+      lines: [`Ciao ${name},`, 'il tuo account è stato creato con successo. Siamo felici di averti nella comunità Stellify.', 'Con il <strong>piano gratuito</strong> puoi iniziare subito: analizza il tuo CV, preparati ai colloqui e trova lavoro in Svizzera.', 'Quando sei pronto per fare di più, puoi passare al piano Pro o Ultimate.'],
+      cta: 'Inizia ora',
+    },
+    EN: {
+      subject: 'Welcome to Stellify – Your AI Career Co-Pilot',
+      title: `Welcome to Stellify, ${name}!`,
+      lines: [`Hello ${name},`, 'your account has been successfully created. We\'re thrilled to have you as part of the Stellify community.', 'With the <strong>free plan</strong> you can start right away: analyse your CV, prepare for interviews and find jobs in Switzerland.', 'Whenever you\'re ready to do more, you can upgrade to a Pro or Ultimate plan.'],
+      cta: 'Get started now',
+    },
+  };
+  const copy = welcomeCopy[lang] || welcomeCopy['DE'];
   try {
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
     await transporter.sendMail({
       from: `"Stellify" <${emailUser}>`,
       to: email,
-      subject: 'Willkommen bei Stellify – Dein KI-Karriere-Co-Pilot',
-      html: buildEmailHtml(
-        `Willkommen bei Stellify, ${firstName || ''}!`,
-        [
-          `Hallo ${firstName || ''},`,
-          'dein Konto wurde erfolgreich erstellt. Wir freuen uns, dich als Teil der Stellify-Community begrüssen zu dürfen.',
-          'Mit dem <strong>kostenlosen Plan</strong> kannst du sofort loslegen: Analysiere deinen Lebenslauf, bereite dich auf Interviews vor und finde passende Stellen in der Schweiz.',
-          'Wann immer du bereit bist, mehr zu erreichen, kannst du auf einen Pro- oder Ultimate-Plan upgraden.',
-        ],
-        'Jetzt loslegen',
-        `${siteUrl}/`
-      ),
+      subject: copy.subject,
+      html: buildEmailHtml(copy.title, copy.lines, copy.cta, `${siteUrl}/`),
     });
     res.json({ ok: true });
   } catch (err: any) {
@@ -578,7 +616,7 @@ app.post("/api/create-checkout-session", requireAuth, async (req, res) => {
     console.log(`[STRIPE] Mode: ${key.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
     const isAnnual = billingCycle === 'yearly';
     const session = await stripeClient.checkout.sessions.create({
-      payment_method_types: ['card', 'twint'],
+      payment_method_types: ['card'],
       payment_method_options: {
         card: { request_three_d_secure: 'automatic' },
       },
