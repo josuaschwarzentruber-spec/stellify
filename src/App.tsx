@@ -7614,13 +7614,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
             
             {subscriptionError && (
-              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start justify-between gap-4">
-                <div className="flex items-start gap-3">
-                  <span className="text-red-400 mt-0.5 shrink-0">⚠️</span>
-                  <div>
-                    <p className="text-red-300 text-sm font-semibold mb-0.5">Zahlung konnte nicht verarbeitet werden</p>
-                    <p className="text-red-400/80 text-xs">{subscriptionError}</p>
-                    <p className="text-red-400/60 text-xs mt-1">Hilfe: <span className="underline">support.stellify@gmail.com</span></p>
+              <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-left flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 min-w-0">
+                  <span className="text-red-400 mt-0.5 shrink-0 text-base">⚠️</span>
+                  <div className="min-w-0">
+                    <p className="text-red-300 text-sm font-semibold">Zahlung konnte nicht verarbeitet werden</p>
+                    <p className="text-red-400/80 text-xs mt-1 break-words">{subscriptionError}</p>
+                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support.stellify@gmail.com&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
                   </div>
                 </div>
                 <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
@@ -7629,24 +7629,29 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
             )}
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col items-center gap-3">
               <div className="inline-flex items-center p-1 bg-white/5 rounded-full border border-white/10">
                 <button
                   onClick={() => setBillingCycle('monthly')}
-                  className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'monthly' ? 'bg-white text-black' : 'text-white/60'}`}
+                  className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'monthly' ? 'bg-white text-black' : 'text-white/60 hover:text-white/80'}`}
                 >
                   {t.pricing_monthly}
                 </button>
                 <button
                   onClick={() => setBillingCycle('yearly')}
-                  className={`px-6 py-2 text-xs font-medium rounded-full transition-all ${billingCycle === 'yearly' ? 'bg-[#004225] text-white' : 'text-white/60'}`}
+                  className={`px-5 py-2 text-xs font-medium rounded-full transition-all flex items-center gap-2 ${billingCycle === 'yearly' ? 'bg-white text-black' : 'text-white/60 hover:text-white/80'}`}
                 >
                   {t.pricing_yearly}
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${billingCycle === 'yearly' ? 'bg-black/10 text-black' : 'bg-white/15 text-white'}`}>
+                    −17%
+                  </span>
                 </button>
               </div>
-              <span className="text-[11px] font-bold bg-[#00A854] text-white px-3 py-1 rounded-full tracking-wide">
-                −17% · {t.pricing_save}
-              </span>
+              <p className="text-[11px] text-white/40 font-light">
+                {billingCycle === 'monthly'
+                  ? (language === 'DE' ? '👆 Jährlich wählen = 2 Monate gratis' : language === 'FR' ? '👆 Annuel = 2 mois gratuits' : language === 'IT' ? '👆 Annuale = 2 mesi gratis' : '👆 Choose yearly = 2 months free')
+                  : (language === 'DE' ? '✓ Jahresabo aktiv – du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel – vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale – risparmi 2 mesi' : '✓ Annual plan active – you save 2 months')}
+              </p>
             </div>
           </div>
 
@@ -7654,7 +7659,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {/* GRATIS */}
             <div className="p-10 bg-white/5 border border-white/10 flex flex-col">
               <div className="mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/70">Gratis</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 letter-spacing-widest">Gratis</span>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif">CHF 0</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
@@ -7664,7 +7669,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <ul className="space-y-4 mb-12 flex-1">
                 {t.pricing_free_f.map((f: string, i: number) => (
                   <li key={i} className="flex items-center gap-3 text-sm font-light text-white/70">
-                    <CheckCircle2 size={14} className="text-[#004225]" />
+                    <CheckCircle2 size={14} className="text-white/30 shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -7676,17 +7681,22 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="p-10 bg-[#004225]/10 border-2 border-[#004225] relative flex flex-col">
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full">{t.pricing_recommended}</div>
               <div className="mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">Pro</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Pro</span>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif">CHF {prices.pro}</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
-                {billingCycle === 'yearly' && <p className="text-[10px] text-[#004225] mt-1 font-bold">CHF {prices.pro}/Mo. • {language === 'DE' ? 'spare 25%' : language === 'FR' ? 'économisez 25%' : language === 'IT' ? 'risparmia 25%' : 'save 25%'} • CHF 178.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</p>}
+                {billingCycle === 'yearly' && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
+                    <span className="text-white text-xs font-semibold">−17%</span>
+                    <span className="text-white/70 text-xs">· CHF 178.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</span>
+                  </div>
+                )}
               </div>
               <ul className="space-y-4 mb-12 flex-1">
                 {t.pricing_pro_f.map((f: string, i: number) => (
                   <li key={i} className="flex items-center gap-3 text-sm font-medium text-white">
-                    <CheckCircle2 size={14} className="text-[#004225]" />
+                    <CheckCircle2 size={14} className="text-white/50 shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -7708,7 +7718,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   <span className="text-4xl font-serif">CHF {prices.ultimate}</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
-                {billingCycle === 'yearly' && <p className="text-[10px] text-white/70 mt-1 font-light">CHF {prices.ultimate}/Mo. • {language === 'DE' ? 'spare 20%' : language === 'FR' ? 'économisez 20%' : language === 'IT' ? 'risparmia 20%' : 'save 20%'} • CHF 478.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</p>}
+                {billingCycle === 'yearly' && (
+                  <div className="mt-2 inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full">
+                    <span className="text-white text-xs font-semibold">−20%</span>
+                    <span className="text-white/60 text-xs">· CHF 478.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</span>
+                  </div>
+                )}
               </div>
               <ul className="space-y-4 mb-12 flex-1">
                 {t.pricing_ultimate_f.map((f: string, i: number) => (

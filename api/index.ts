@@ -616,11 +616,16 @@ app.get("/api/health", (_req, res) => {
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
 app.post("/api/create-checkout-session", async (req, res) => {
-  const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body;
-  if (!planId || !userId || !billingCycle) {
-    return res.status(400).json({ error: "Missing planId, userId or billingCycle" });
-  }
   try {
+    const body = req.body || {};
+    const { planId, billingCycle, userId, successUrl, cancelUrl } = body;
+    if (!planId || !userId || !billingCycle) {
+      return res.status(400).json({ error: "Fehlende Parameter: planId, userId oder billingCycle" });
+    }
+    const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+    if (!stripeKey) {
+      return res.status(500).json({ error: "Stripe ist nicht konfiguriert. Bitte STRIPE_SECRET_KEY in Vercel setzen." });
+    }
     const stripeClient = getStripe();
     const priceMap: Record<string, string | undefined> = {
       'pro_monthly':      process.env.STRIPE_PRICE_PRO_MONTHLY      || 'price_1TIrQNHEswF7knZxM65zPbFJ',
@@ -631,10 +636,9 @@ app.post("/api/create-checkout-session", async (req, res) => {
     const priceKey = `${planId}_${billingCycle}`;
     const priceId  = priceMap[priceKey];
     if (!priceId) {
-      return res.status(400).json({ error: `Kein Preis für ${priceKey} konfiguriert` });
+      return res.status(400).json({ error: `Kein Preis für Plan "${priceKey}" konfiguriert` });
     }
-    const key = process.env.STRIPE_SECRET_KEY || '';
-    console.log(`[STRIPE] Mode: ${key.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
+    console.log(`[STRIPE] Mode: ${stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
     const isAnnual = billingCycle === 'yearly';
     const session = await stripeClient.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -642,19 +646,21 @@ app.post("/api/create-checkout-session", async (req, res) => {
       mode: 'subscription',
       client_reference_id: userId,
       metadata: { planId, billingCycle, interval: isAnnual ? 'year' : 'month' },
-      // No auto-renewal: Stripe subscription will cancel at period end
       subscription_data: { metadata: { cancel_at_period_end: 'true' } } as any,
       success_url: successUrl || `${req.headers.origin}?payment=success`,
       cancel_url:  cancelUrl  || `${req.headers.origin}?payment=cancel`,
     });
     res.json({ success: true, url: session.url });
   } catch (err: any) {
-    console.error(`[STRIPE] ${err.message}`);
-    const hint = err.message?.includes('test mode')
-      ? 'Live-Key verwendet, aber Preis-IDs sind im Test-Modus erstellt. Bitte Live-Preise in Stripe erstellen und Env-Variablen in Vercel setzen.'
-      : err.message?.includes('live mode')
-      ? 'Test-Key verwendet, aber Preis-IDs sind im Live-Modus. Bitte Keys angleichen.'
-      : err.message;
+    console.error(`[STRIPE ERROR] ${err.message}`);
+    const msg = err.message || '';
+    const hint = msg.includes('test mode') || msg.includes('a similar object exists in test mode')
+      ? 'Stripe-Konfigurationsfehler: Du verwendest einen Live-Key, aber die Preis-IDs sind im Test-Modus. Bitte erstelle die Preise im Live-Modus in Stripe und setze die Env-Variablen STRIPE_PRICE_* in Vercel.'
+      : msg.includes('live mode') || msg.includes('a similar object exists in live mode')
+      ? 'Stripe-Konfigurationsfehler: Die Preis-IDs sind im Live-Modus, aber ein Test-Key wird verwendet. Bitte Keys angleichen.'
+      : msg.includes('No such price') || msg.includes('resource_missing')
+      ? `Ungültige Preis-ID. Bitte STRIPE_PRICE_* Variablen in Vercel konfigurieren. (${msg})`
+      : msg || 'Unbekannter Stripe-Fehler';
     res.status(500).json({ success: false, error: hint });
   }
 });
