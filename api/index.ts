@@ -440,6 +440,27 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
   }
 });
 
+// ── Live Lehrstellen (Yousty, lehrstellennachweis.ch, berufsberatung.ch) ──────
+app.get("/api/lehrstellen", requireAuth, async (req, res) => {
+  const { keyword = '', location = '', beruf = '' } = req.query as Record<string, string>;
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey) return res.status(500).json({ error: "Gemini API nicht konfiguriert" });
+  try {
+    const ai = new GoogleGenAI({ apiKey: geminiKey });
+    const prompt = `Suche auf yousty.ch, lehrstellennachweis.ch und berufsberatung.ch nach aktuellen Lehrstellen (Berufsausbildung EFZ/EBA) in der Schweiz.${beruf ? ` Beruf: ${beruf}.` : ''}${keyword ? ` Stichwort: ${keyword}.` : ''}${location ? ` Ort/Kanton: ${location}.` : ''} Gib exakt 12 echte aktuelle Lehrstellen zurück als reines JSON-Array ohne Markdown. Felder: id (eindeutig), title (Berufsbezeichnung z.B. "Kaufmann/Kauffrau EFZ"), company (Lehrbetrieb), location (Ort, Kanton), category (immer "Lehrstellen"), description (2 Sätze über die Ausbildung), url (echter Link zu yousty.ch oder lehrstellennachweis.ch), lehrjahr_start (z.B. "August 2025"), abschluss (z.B. "EFZ" oder "EBA"), ats_keywords (3 strings).`;
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash',
+      contents: prompt,
+      config: { tools: [{ googleSearch: {} }], temperature: 0.2 },
+    });
+    const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
+    if (jsonMatch) return res.json({ jobs: JSON.parse(jsonMatch[0]), live: true, source: 'yousty' });
+    return res.json({ jobs: [], live: true, source: 'yousty' });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // ── Password Reset (custom branded email, no Firebase default) ────────────────
 app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, res) => {
   const { email, language } = req.body;

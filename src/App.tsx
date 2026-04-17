@@ -1136,6 +1136,7 @@ function StellifyApp() {
   
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [isJobModalOpen, setIsJobModalOpen] = useState(false);
+  const [jobFilters, setJobFilters] = useState({ keyword: '', location: '', industry: '' });
 
   const handleJobClick = (jobId: string) => {
     const job = sampleJobs.find(j => j.id === jobId);
@@ -1158,7 +1159,6 @@ function StellifyApp() {
 
   // --- JOB BOARD COMPONENT ---
   const JobBoard = () => {
-    const [jobFilters, setJobFilters] = useState({ keyword: '', location: '', industry: '' });
     const [liveJobs, setLiveJobs] = useState<any[] | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [isLiveResult, setIsLiveResult] = useState(false);
@@ -1186,7 +1186,11 @@ function StellifyApp() {
         if (jobFilters.location) params.set('location', jobFilters.location);
         if (jobFilters.industry) params.set('category', jobFilters.industry);
         const token = await getAuthToken();
-        const res = await fetch(`/api/jobs?${params}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+        const isLehrstellen = jobFilters.industry === 'Lehrstellen';
+        const endpoint = isLehrstellen
+          ? `/api/lehrstellen?keyword=${encodeURIComponent(jobFilters.keyword)}&location=${encodeURIComponent(jobFilters.location)}`
+          : `/api/jobs?${params}`;
+        const res = await fetch(endpoint, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
         const data = await res.json();
         if (data.jobs && data.jobs.length > 0) {
           setLiveJobs(data.jobs);
@@ -2606,6 +2610,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     const tool = tools.find(t => t.id === toolId);
     if (!tool) return;
 
+    setActiveView('dashboard');
     setActiveTool(tool);
     setToolInput({});
     setToolResult(null);
@@ -8007,7 +8012,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_popular}</h5>
                     <div className="flex flex-wrap gap-2 mb-8">
                       {['Software', 'Zürich', 'Lohn', 'CV Tipps', 'Interview'].map(tag => (
-                        <button 
+                        <button
                           key={tag}
                           onClick={() => setSearchQuery(tag)}
                           className="px-3 py-1.5 bg-black/5 dark:bg-white/5 text-[11px] font-medium text-[#5C5C58] dark:text-[#FAFAF8] hover:bg-[#004225] hover:text-white transition-all rounded-md"
@@ -8015,6 +8020,16 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           {tag}
                         </button>
                       ))}
+                      <button
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          navigate('jobs');
+                          setJobFilters({ keyword: '', location: '', industry: 'Lehrstellen' });
+                        }}
+                        className="px-3 py-1.5 bg-[#004225] text-white text-[11px] font-bold hover:bg-[#00331d] transition-all rounded-md flex items-center gap-1.5"
+                      >
+                        🎓 Lehrstellen
+                      </button>
                     </div>
 
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_quick}</h5>
