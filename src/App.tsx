@@ -6363,7 +6363,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={newApp.company}
                             onChange={(e) => setNewApp({...newApp, company: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                             placeholder={t.tracker_company_ph}
                           />
                         </div>
@@ -6373,7 +6373,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={newApp.position}
                             onChange={(e) => setNewApp({...newApp, position: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                             placeholder={t.tracker_position_ph}
                           />
                         </div>
@@ -6384,7 +6384,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <select
                             value={newApp.status}
                             onChange={(e) => setNewApp({...newApp, status: e.target.value as any})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           >
                             <option value="Wishlist">{t.tracker_wishlist}</option>
                             <option value="Applied">{t.tracker_applied}</option>
@@ -6399,7 +6399,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={newApp.location}
                             onChange={(e) => setNewApp({...newApp, location: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                             placeholder={t.tracker_location_ph}
                           />
                         </div>
@@ -6409,7 +6409,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={newApp.salary}
                             onChange={(e) => setNewApp({...newApp, salary: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                             placeholder={t.tracker_salary_ph}
                           />
                         </div>
@@ -6419,7 +6419,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <textarea
                           value={newApp.notes}
                           onChange={(e) => setNewApp({...newApp, notes: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
+                          className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all min-h-[80px]"
                           placeholder={t.tracker_notes_ph}
                         />
                       </div>
@@ -6453,7 +6453,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={editingApp.company}
                             onChange={(e) => setEditingApp({...editingApp, company: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-2">
@@ -6462,7 +6462,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={editingApp.position}
                             onChange={(e) => setEditingApp({...editingApp, position: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           />
                         </div>
                       </div>
@@ -6472,7 +6472,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           <select
                             value={editingApp.status}
                             onChange={(e) => setEditingApp({...editingApp, status: e.target.value as any})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           >
                             <option value="Wishlist">{t.tracker_wishlist}</option>
                             <option value="Applied">{t.tracker_applied}</option>
@@ -6487,7 +6487,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={editingApp.location}
                             onChange={(e) => setEditingApp({...editingApp, location: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           />
                         </div>
                         <div className="space-y-2">
@@ -6496,7 +6496,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={editingApp.salary}
                             onChange={(e) => setEditingApp({...editingApp, salary: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all"
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           />
                         </div>
                       </div>
@@ -6505,7 +6505,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                         <textarea
                           value={editingApp.notes}
                           onChange={(e) => setEditingApp({...editingApp, notes: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#FDFCFB] border border-black/5 text-sm focus:border-[#004225] outline-none transition-all min-h-[80px]"
+                          className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all min-h-[80px]"
                         />
                       </div>
                       <div className="flex justify-end gap-3 pt-2">
@@ -7191,12 +7191,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   { title: t.security_item_3_t, desc: t.security_item_3_d, icon: <Shield size={20} /> }
                 ].map((item, i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="w-10 h-10 bg-white border border-black/5 flex items-center justify-center text-[#004225] shrink-0">
+                    <div className="w-10 h-10 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0">
                       {item.icon}
                     </div>
                     <div>
-                      <h4 className="font-medium mb-1">{item.title}</h4>
-                      <p className="text-sm text-[#5C5C58] font-light">{item.desc}</p>
+                      <h4 className="font-medium mb-1 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h4>
+                      <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">{item.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -7204,7 +7204,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             </div>
             <div className="relative">
               <div className="aspect-square bg-[#004225]/5 border border-[#004225]/10 flex items-center justify-center p-12">
-                <div className="w-full h-full border border-[#004225]/20 flex flex-col items-center justify-center space-y-6 bg-white shadow-2xl p-8">
+                <div className="w-full h-full border border-[#004225]/20 flex flex-col items-center justify-center space-y-6 bg-white dark:bg-[#1A1A18] shadow-2xl p-8">
                   <Shield size={64} className="text-[#004225]" />
                   <div className="text-center space-y-2">
                     <p className="text-xl font-serif">Swiss Data Safe</p>
@@ -7423,11 +7423,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- SUCCESS STORIES SECTION --- */}
-      <section id="success" className="px-6 lg:px-12 py-24 bg-[#FDFCFB]">
+      <section id="success" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4">{t.success_title}</h2>
-            <p className="text-[#5C5C58] font-light max-w-2xl mx-auto">{t.success_desc}</p>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.success_title}</h2>
+            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl mx-auto">{t.success_desc}</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -7466,7 +7466,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <motion.div 
                 key={i}
                 whileHover={{ y: -5 }}
-                className="p-8 bg-white border border-black/5 shadow-xl rounded-2xl space-y-6 relative overflow-hidden group"
+                className="p-8 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-xl rounded-2xl space-y-6 relative overflow-hidden group"
               >
                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                   <Quote size={48} />
@@ -7479,7 +7479,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-bold text-[#1A1A18]">{story.name}</h4>
+                    <h4 className="font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{story.name}</h4>
                     <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{story.role}</p>
                     <p className="text-[9px] text-[#004225] font-bold uppercase tracking-widest">{story.city}</p>
                   </div>
@@ -7498,7 +7498,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- TOOLS GRID --- */}
-      <section id="features" className="px-6 lg:px-12 py-24 bg-[#FDFCFB]">
+      <section id="features" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-16">
             <div>
@@ -7516,7 +7516,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 key={tool.id}
                 whileHover={{ y: -5 }}
                 onClick={() => handleToolClick(tool.id)}
-                className="p-6 md:p-8 bg-white border border-black/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm"
+                className="p-6 md:p-8 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#004225]/40 transition-all group cursor-pointer shadow-sm"
               >
                 <div className="flex justify-between items-start mb-6">
                   <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
@@ -7557,7 +7557,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- MARKET POTENTIAL --- */}
-      <section className="px-6 lg:px-12 py-24 bg-white">
+      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
@@ -7567,14 +7567,16 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: t.market_1_t, desc: t.market_1_d, icon: '📈' },
-              { title: t.market_2_t, desc: t.market_2_d, icon: '⏰' },
-              { title: t.market_3_t, desc: t.market_3_d, icon: '🤖' },
-              { title: t.market_4_t, desc: t.market_4_d, icon: '🇨🇭' }
+              { title: t.market_1_t, desc: t.market_1_d, icon: <TrendingUp size={22} /> },
+              { title: t.market_2_t, desc: t.market_2_d, icon: <Activity size={22} /> },
+              { title: t.market_3_t, desc: t.market_3_d, icon: <Cpu size={22} /> },
+              { title: t.market_4_t, desc: t.market_4_d, icon: <Shield size={22} /> }
             ].map((item, i) => (
-              <div key={i} className="p-8 bg-[#FDFCFB] border border-black/5">
-                <div className="text-3xl mb-6">{item.icon}</div>
-                <h4 className="font-medium mb-3">{item.title}</h4>
+              <div key={i} className="p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 transition-colors">
+                <div className="w-10 h-10 bg-[#004225]/8 dark:bg-[#004225]/20 flex items-center justify-center text-[#004225] dark:text-[#00A854] mb-6">
+                  {item.icon}
+                </div>
+                <h4 className="font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h4>
                 <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">{item.desc}</p>
               </div>
             ))}
@@ -7737,7 +7739,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- HOW IT WORKS --- */}
-      <section id="how" className="px-6 lg:px-12 py-24 bg-white">
+      <section id="how" className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
@@ -7748,17 +7750,17 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               {t.how_desc}
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-12">
             {[
               { step: '01', title: t.how_1_t, desc: t.how_1_d },
               { step: '02', title: t.how_2_t, desc: t.how_2_d },
               { step: '03', title: t.how_3_t, desc: t.how_3_d }
             ].map((item, i) => (
-              <div key={i} className="relative p-8 bg-[#FDFCFB] border border-black/5 group hover:border-[#004225]/30 transition-all">
-                <div className="text-5xl font-serif text-[#004225]/10 mb-6 group-hover:text-[#004225]/20 transition-all">{item.step}</div>
-                <h3 className="text-xl font-medium mb-4">{item.title}</h3>
-                <p className="text-sm text-[#5C5C58] font-light leading-relaxed">{item.desc}</p>
+              <div key={i} className="relative p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 group hover:border-[#004225]/30 dark:hover:border-[#004225]/40 transition-all">
+                <div className="text-5xl font-serif text-[#004225]/10 dark:text-[#004225]/20 mb-6 group-hover:text-[#004225]/20 dark:group-hover:text-[#004225]/40 transition-all">{item.step}</div>
+                <h3 className="text-xl font-medium mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h3>
+                <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -7766,7 +7768,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- FAQ SECTION --- */}
-      <section className="px-6 lg:px-12 py-24 bg-white">
+      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
@@ -7776,12 +7778,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           </div>
           <div className="space-y-4">
             {faqs.map((faq, i) => (
-              <details key={i} className="group border-b border-black/5 pb-4">
+              <details key={i} className="group border-b border-black/5 dark:border-white/5 pb-4">
                 <summary className="flex justify-between items-center cursor-pointer list-none py-4">
-                  <span className="text-lg font-medium group-open:text-[#004225] transition-colors">{faq.q}</span>
-                  <span className="text-2xl font-light group-open:rotate-45 transition-transform">+</span>
+                  <span className="text-lg font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-open:text-[#004225] dark:group-open:text-[#00A854] transition-colors">{faq.q}</span>
+                  <span className="text-2xl font-light text-[#1A1A18] dark:text-[#FAFAF8] group-open:rotate-45 transition-transform">+</span>
                 </summary>
-                <p className="text-[#5C5C58] font-light leading-relaxed pb-4">{faq.a}</p>
+                <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed pb-4">{faq.a}</p>
               </details>
             ))}
           </div>
