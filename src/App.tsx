@@ -916,7 +916,7 @@ export default function App() {
 }
 
 // --- COMPONENTS ---
-const CVDropzone = ({ onFileAccepted, isUploading, t }: { onFileAccepted: (file: File) => void, isUploading: boolean, t: any }) => {
+const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark' }: { onFileAccepted: (file: File) => void, isUploading: boolean, t: any, variant?: 'dark' | 'light' }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
@@ -930,9 +930,44 @@ const CVDropzone = ({ onFileAccepted, isUploading, t }: { onFileAccepted: (file:
     disabled: isUploading
   });
 
+  if (variant === 'light') {
+    return (
+      <div
+        {...getRootProps()}
+        className={`
+          relative group cursor-pointer transition-all duration-300
+          border-2 border-dashed rounded-sm p-6 text-center
+          ${isDragActive
+            ? 'border-[#004225] bg-[#004225]/8 scale-[1.01]'
+            : 'border-[#004225]/30 hover:border-[#004225] bg-[#004225]/3 hover:bg-[#004225]/6'
+          }
+          ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
+        `}
+      >
+        <input {...getInputProps()} />
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-[#004225]/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:bg-[#004225]/20 transition-colors">
+            {isDragActive ? <FileUp size={22} className="text-[#004225] animate-bounce" /> : <Upload size={22} className="text-[#004225]" />}
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">
+              {isDragActive ? (t.drop_file_here || 'Datei hier ablegen …') : (t.upload_cv || 'Lebenslauf hochladen')}
+            </p>
+            <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] mt-0.5">
+              PDF · Kostenlos & sicher analysieren lassen
+            </p>
+          </div>
+          <div className="ml-auto text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/20 px-2 py-1 flex-shrink-0">
+            PDF
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div 
-      {...getRootProps()} 
+    <div
+      {...getRootProps()}
       className={`
         relative overflow-hidden group cursor-pointer transition-all duration-500
         border-2 border-dashed p-8 text-center
@@ -957,7 +992,7 @@ const CVDropzone = ({ onFileAccepted, isUploading, t }: { onFileAccepted: (file:
           </p>
         </div>
       </div>
-      
+
       {/* Decorative corners */}
       <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-white/30" />
       <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-white/30" />
@@ -7105,7 +7140,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">{t.cv_info}</p>
             )}
             <div className="flex flex-col gap-5 w-full max-w-md">
-              <CVDropzone onFileAccepted={processFile} isUploading={isUploading} t={t} />
+              <CVDropzone onFileAccepted={processFile} isUploading={isUploading} t={t} variant="light" />
 
               {/* Primary CTA */}
               <button
