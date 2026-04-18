@@ -321,10 +321,13 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
 app.use(express.json());
 
 // ── Gemini retry helper ───────────────────────────────────────────────────────
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
-async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 3): Promise<any> {
+const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 3, preferredModel?: string): Promise<any> {
+  const modelsToTry = preferredModel
+    ? [preferredModel, ...FALLBACK_MODELS.filter(m => m !== preferredModel)]
+    : FALLBACK_MODELS;
   for (let i = 0; i < maxAttempts; i++) {
-    const model = MODELS[Math.min(i, MODELS.length - 1)];
+    const model = modelsToTry[Math.min(i, modelsToTry.length - 1)];
     try {
       const result = await fn(model);
       if (!result?.text) throw new Error('EMPTY_RESPONSE');
@@ -382,7 +385,7 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
         contents: prompt,
         config: { systemInstruction, temperature: 0.4, tools: useSearch ? [{ googleSearch: {} }] : undefined }
       })
-    );
+    , 3, model);
     let sources: string[] = [];
     if (useSearch) {
       const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];

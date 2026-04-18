@@ -5963,7 +5963,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
   if (!isAuthReady || !splashDone) {
-    const features = ['CV-Analyse', 'Interview-Coach', 'KI-Karriere-Copilot'];
+    const features = ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
 
