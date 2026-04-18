@@ -3853,9 +3853,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     DE: {
       welcome: "Willkommen zurück,",
       stella_greeting: "Grüezi, {name}! Ich bin Stella, deine KI-Karriere-Assistentin. Wie kann ich dir heute helfen?",
-      drag_cv_here: "CV hierher ziehen oder klicken",
+      drag_cv_here: "Lebenslauf (CV) hierher ziehen oder klicken",
       drop_file_here: "Datei hier loslassen",
-      pdf_only: "Nur PDF-Dateien akzeptiert",
+      pdf_only: "PDF & Word akzeptiert",
       search_placeholder: "Jobs oder Tipps suchen...",
       search_popular: "Beliebte Suchen",
       search_quick: "Schnellzugriff",
@@ -3943,7 +3943,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       auth_back_to_login: "Zurück zum Login",
       auth_placeholder_name: "Max",
       auth_placeholder_email: "dein@email.ch",
-      tool_no_cv: "⚠️ Kein CV hochgeladen. Die KI nutzt allgemeine Informationen. Lade dein CV hoch für bessere Resultate.",
+      tool_no_cv: "⚠️ Kein Lebenslauf (CV) hochgeladen. Die KI nutzt allgemeine Informationen. Lade deinen Lebenslauf hoch für bessere Resultate.",
       tool_process: "Verarbeite...",
       tool_generate: "Generieren",
       tool_analyzing: "Stella analysiert...",
@@ -4071,10 +4071,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       time_just_now: "Gerade eben",
       stella_context_title: "Stella Context",
       stella_context_cv_ready: "CV analysiert",
-      stella_context_no_cv: "Kein CV hochgeladen",
+      stella_context_no_cv: "Kein Lebenslauf hochgeladen",
       stella_context_focus: "Fokus-Bereiche",
       stella_roadmap: "Deine Roadmap",
-      stella_roadmap_empty: "Lade dein CV hoch, um deine Roadmap zu sehen.",
+      stella_roadmap_empty: "Lade deinen Lebenslauf hoch, um deine Roadmap zu sehen.",
       stella_insights: "Stella Insights",
       stella_market_score: "Market Score",
       stella_top_keywords: "Top Keywords",
@@ -4091,7 +4091,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_raw_json: "Rohdaten (JSON) anzeigen",
       stella_full_analysis: "Vollständige Analyse",
       stella_insights_with_cv: "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check.",
-      stella_insights_no_cv: "Sobald du dein CV hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen.",
+      stella_insights_no_cv: "Sobald du deinen Lebenslauf hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen.",
       salary_history: "Gehaltsverlauf",
       hero_precision: "Schweizer KI-Präzision",
       upload_analyzing: "Analysiere Dokumentenstruktur...",
@@ -4413,7 +4413,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_greeting: "Salut, {name}! Je suis Stella, votre assistante de carrière IA. Comment puis-je vous aider aujourd'hui?",
       drag_cv_here: "Glissez votre CV ici ou cliquez",
       drop_file_here: "Relâchez le fichier ici",
-      pdf_only: "Seuls les fichiers PDF sont acceptés",
+      pdf_only: "PDF & Word acceptés",
       search_placeholder: "Rechercher des jobs ou des conseils...",
       search_popular: "Recherches populaires",
       search_quick: "Accès rapide",
@@ -4851,7 +4851,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_greeting: "Ciao, {name}! Sono Stella, la tua assistente di carriera AI. Come posso aiutarti oggi?",
       drag_cv_here: "Trascina il CV qui o clicca",
       drop_file_here: "Rilascia il file qui",
-      pdf_only: "Sono accettati solo file PDF",
+      pdf_only: "PDF & Word accettati",
       search_placeholder: "Cerca lavori o consigli...",
       search_popular: "Ricerche popolari",
       search_quick: "Accesso rapido",
@@ -5289,7 +5289,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_greeting: "Hello, {name}! I'm Stella, your AI career assistant. How can I help you today?",
       drag_cv_here: "Drag CV here or click",
       drop_file_here: "Drop file here",
-      pdf_only: "Only PDF files accepted",
+      pdf_only: "PDF & Word accepted",
       search_placeholder: "Search jobs or tips...",
       search_popular: "Popular Searches",
       search_quick: "Quick Access",
@@ -6473,10 +6473,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {stat.label === t.dashboard_stat_cv_status && !cvContext && (
                         <button
                           onClick={() => fileInputRef.current?.click()}
-                          className="mt-3 w-full py-2 border border-[#004225] text-[#004225] dark:border-[#00A854] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225] hover:text-white transition-all flex items-center justify-center gap-2"
+                          className="mt-4 w-full py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-2 shadow-sm"
                         >
-                          <Upload size={12} />
-                          Lebenslauf (CV) hochladen
+                          <Upload size={14} />
+                          Lebenslauf hochladen
                         </button>
                       )}
                     </motion.div>
