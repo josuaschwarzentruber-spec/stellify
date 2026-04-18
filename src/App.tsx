@@ -6470,11 +6470,45 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {t.dashboard_cv_optimize}
                         </button>
                       )}
+                      {stat.label === t.dashboard_stat_cv_status && !cvContext && (
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          className="mt-3 w-full py-2 border border-[#004225] text-[#004225] dark:border-[#00A854] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225] hover:text-white transition-all flex items-center justify-center gap-2"
+                        >
+                          <Upload size={12} />
+                          CV hochladen
+                        </button>
+                      )}
                     </motion.div>
                   ))}
                 </div>
 
                 {/* TEST TOOLS (Only for Owner) */}
+                {/* CV Upload Banner — shown when no CV uploaded */}
+                {!cvContext && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="p-6 bg-gradient-to-r from-[#004225]/8 to-[#00A854]/5 dark:from-[#004225]/20 dark:to-[#00A854]/10 border border-[#004225]/20 dark:border-[#00A854]/20 flex flex-col md:flex-row items-start md:items-center gap-4"
+                  >
+                    <div className="w-10 h-10 bg-[#004225] flex items-center justify-center flex-shrink-0">
+                      <FileUp size={18} className="text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Lade deinen Lebenslauf hoch für personalisierte KI-Analysen</p>
+                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen CV abgestimmt</p>
+                    </div>
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex-shrink-0 px-6 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center gap-2"
+                    >
+                      <Upload size={12} />
+                      CV hochladen
+                    </button>
+                  </motion.div>
+                )}
+
                 {import.meta.env.DEV && user?.email === 'weare2bc@gmail.com' && (
                   <div className="p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
                     <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
@@ -8197,8 +8231,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-24">
             <div className="col-span-2 lg:col-span-2 space-y-6">
-              <a href="#" className="text-2xl font-serif tracking-tight text-white">
-                Stell<span className="text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-white/25 tracking-widest align-super ml-0.5">.ch</span>
+              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-serif tracking-tight text-white">
+                Stell<span className="text-[#00A854]">ify</span>
               </a>
               <p className="text-sm font-light leading-relaxed max-w-xs">
                 {t.footer_desc}
@@ -8213,15 +8247,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <a href="https://twitter.com/stellify_ch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
                   <Twitter size={16} />
                 </a>
+                <a href="https://www.tiktok.com/@stellify.ch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.73a4.85 4.85 0 01-1.01-.04z"/></svg>
+                </a>
               </div>
             </div>
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{t.features}</h4>
               <ul className="space-y-4 text-sm font-light">
-                <li><a href="#" className="hover:text-white transition-colors">CV Optimizer</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">ATS Simulator</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Salary Check</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Interview Coach</a></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'cv-optimizer') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">CV Optimizer</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'ats-sim') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">ATS Simulator</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'salary-calc') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">Salary Check</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'interview') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">Interview Coach</button></li>
               </ul>
             </div>
             <div>
@@ -8229,7 +8266,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <ul className="space-y-4 text-sm font-light">
                 <li><a href="#success" className="hover:text-white transition-colors">{t.success_stories}</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">{t.pricing}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
+                <li><a href="mailto:support.stellify@gmail.com" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
               </ul>
             </div>
             <div>
@@ -10116,7 +10153,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         type="file"
         ref={fileInputRef}
         className="hidden"
-        accept=".pdf"
+        accept=".pdf,.doc,.docx"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) processFile(file);
