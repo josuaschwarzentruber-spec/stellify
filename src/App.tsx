@@ -1981,6 +1981,7 @@ function StellifyApp() {
           })
         });
         const data2 = await res2.json();
+        if (!res2.ok) throw new Error(data2.error || 'Roadmap-Generierung fehlgeschlagen');
         const steps = (data2.text || '').split('\n').filter((s: string) => s.trim()).slice(0, 3);
         if (steps.length > 0) setCareerRoadmap(steps);
       }
@@ -2084,6 +2085,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         body: JSON.stringify({ prompt, model })
       });
       const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'CV-Analyse fehlgeschlagen');
       const jsonMatch = (data.text || '').match(/\{[\s\S]*\}/);
       if (!jsonMatch) return;
       const analysisData = JSON.parse(jsonMatch[0]);
@@ -2918,7 +2920,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             2. BRANCHENSPEZIFISCHE SCHLÜSSELWÖRTER:
                - Integriere Begriffe, die in Schweizer Unternehmen (z.B. Pharma, Banking, Tech, MEM-Industrie) hoch im Kurs stehen.
                - Achte auf lokale Bezeichnungen (z.B. "Lehre", "Weiterbildung", "Fachausweis", "Diplom").
-               ${toolInput.section.toLowerCase().includes('keyword') || toolInput.section.toLowerCase().includes('schlüsselwörter') ? `
+               ${(toolInput.section || '').toLowerCase().includes('keyword') || (toolInput.section || '').toLowerCase().includes('schlüsselwörter') ? `
                - SPEZIAL-FOKUS KEYWORDS: Gruppiere Keywords in logische Kategorien (z.B. Fachkompetenz, Methodenkompetenz). Priorisiere Schweizer Standards wie HERMES (Projektmanagement) oder spezifische ISO-Normen.
                ` : ''}
             3. IMPACT-DRIVEN LANGUAGE (ERGEBNIS-FOKUS):
@@ -2978,7 +2980,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'salary-calc':
           prompt = `
             HANDLUNGSANWEISUNG: Berechne den Marktwert in der Schweiz mit höchster Präzision.
-            INPUT: Job: ${toolInput.jobTitle}, Branche: ${toolInput.industry}, Erfahrung: ${toolInput.experience} Jahre, Kanton: ${toolInput.canton}.
+            INPUT: Job: ${toolInput.jobTitle || 'Nicht angegeben'}, Branche: ${toolInput.industry || 'Nicht angegeben'}, Erfahrung: ${toolInput.experience || '0'} Jahre, Kanton: ${toolInput.canton || 'Schweiz'}.
             DEINE ROLLE: Du bist ein Experte für Schweizer Lohnstrukturen (BFS/Salarium-Standard).
             
             ANALYSE-KRITERIEN:
@@ -2989,17 +2991,17 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             
             AUSGABE-FORMAT (JSON):
             {
-              "jobTitle": "${toolInput.jobTitle}",
-              "industry": "${toolInput.industry}",
-              "experience": "${toolInput.experience}",
-              "canton": "${toolInput.canton}",
+              "jobTitle": "${toolInput.jobTitle || 'Nicht angegeben'}",
+              "industry": "${toolInput.industry || 'Nicht angegeben'}",
+              "experience": "${toolInput.experience || '0'}",
+              "canton": "${toolInput.canton || 'Schweiz'}",
               "minSalary": 0,
               "maxSalary": 0,
               "medianSalary": 0,
               "insights": [
-                "Regionale Marktanalyse für ${toolInput.canton}",
-                "Branchen-Benchmark für ${toolInput.industry}",
-                "Verhandlungstipp basierend auf ${toolInput.experience} Jahren Erfahrung"
+                "Regionale Marktanalyse für ${toolInput.canton || 'Schweiz'}",
+                "Branchen-Benchmark für ${toolInput.industry || 'Ihre Branche'}",
+                "Verhandlungstipp basierend auf ${toolInput.experience || '0'} Jahren Erfahrung"
               ]
             }
             Antworte NUR mit dem JSON-Objekt.
@@ -3148,7 +3150,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'linkedin-posts':
           prompt = `
             HANDLUNGSANWEISUNG: Generiere 3 massgeschneiderte LinkedIn-Posts im Schweizer Stil.
-            THEMA/FOKUS: ${toolInput.topic}.
+            THEMA/FOKUS: ${toolInput.topic || 'Allgemeine Karriere in der Schweiz'}.
             KONTEXT: CV des Kandidaten: ${cvContext || 'Nicht vorhanden'}.
             ANFORDERUNGEN:
             - STIL: Professionell, authentisch, "Swiss Premium" (keine übertriebenen US-Marketing-Floskeln).
@@ -3165,7 +3167,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'skill-gap':
           prompt = `
             HANDLUNGSANWEISUNG: Skill-Gap Analyse.
-            VERGLEICH: CV (${cvContext}) vs. Ziel-Job (${toolInput.targetJob}).
+            VERGLEICH: CV (${cvContext || 'Kein CV vorhanden'}) vs. Ziel-Job (${toolInput.targetJob || 'Nicht angegeben'}).
             OUTPUT:
             - TOP 5 MISSING SKILLS: Welche harten und weichen Faktoren fehlen?
             - LERNPFAD: Konkrete Kurse (z.B. auf LinkedIn Learning, Coursera oder Schweizer Instituten wie ZHAW/HSG).
@@ -3174,7 +3176,7 @@ Bewerte in 3 Kategorien (je 0–100%):
           break;
         case 'lehrstellen':
           prompt = `
-            Suche nach passenden Lehrstellen in der Schweiz für: "${toolInput.interest}".
+            Suche nach passenden Lehrstellen in der Schweiz für: "${toolInput.interest || 'Allgemeine Lehrstelle'}".
             Region: ${toolInput.location || 'Ganze Schweiz'}.
             Analysiere die Eignung basierend auf dem CV: ${cvContext || 'Kein CV vorhanden'}.
             Gib die Top 5 Resultate aus mit:
@@ -3187,8 +3189,8 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'berufseinstieg':
           prompt = `
             HANDLUNGSANWEISUNG: Erstelle einen Guide für den Berufseinstieg in der Schweiz.
-            ABSCHLUSS: ${toolInput.education}.
-            KONTEXT: CV: ${cvContext}.
+            ABSCHLUSS: ${toolInput.education || 'Nicht angegeben'}.
+            KONTEXT: CV: ${cvContext || 'Kein CV vorhanden'}.
             INHALT:
             - Die 3 wichtigsten Branchen für diesen Abschluss in der Schweiz.
             - Lohn-Erwartungen für Einsteiger.
@@ -3198,8 +3200,8 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'erfahrung-plus':
           prompt = `
             HANDLUNGSANWEISUNG: Strategie für Ü50-Bewerber in der Schweiz.
-            STÄRKE: ${toolInput.experience}.
-            KONTEXT: CV: ${cvContext}.
+            STÄRKE: ${toolInput.experience || 'Langjährige Berufserfahrung'}.
+            KONTEXT: CV: ${cvContext || 'Kein CV vorhanden'}.
             INHALT:
             - Wie man "Seniorität" als "Stabilität und Mentoring" verkauft.
             - Umgang mit dem Thema "Lohnkosten" im Interview.
@@ -3220,8 +3222,8 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'karriere-checkup':
           prompt = `
             HANDLUNGSANWEISUNG: Karriere-Checkup.
-            AKTUELLER JOB: ${toolInput.currentJob}.
-            KONTEXT: CV: ${cvContext}.
+            AKTUELLER JOB: ${toolInput.currentJob || 'Nicht angegeben'}.
+            KONTEXT: CV: ${cvContext || 'Kein CV vorhanden'}.
             INHALT:
             - Aktueller Marktwert-Check.
             - Nächste logische Karriereschritte in der Schweiz.
@@ -3425,7 +3427,7 @@ Bewerte in 3 Kategorien (je 0–100%):
 ### 📊 Swiss Market Readiness Score: ${analysisData.score}/100
 
 #### 🔑 ${cvLabels.keywords}:
-${analysisData.keywords.map((k: string) => `- ${k}`).join('\n')}
+${(analysisData.keywords || []).map((k: string) => `- ${k}`).join('\n')}
 
 #### 🏢 ${cvLabels.industry}:
 ${analysisData.industryMatch}
@@ -3434,7 +3436,7 @@ ${analysisData.industryMatch}
 ${analysisData.linguisticFixes?.map((f: string) => `- ${f}`).join('\n') || cvLabels.noFixes}
 
 #### 🚀 ${cvLabels.improvements}:
-${analysisData.improvements.map((i: string) => `- ${i}`).join('\n')}
+${(analysisData.improvements || []).map((i: string) => `- ${i}`).join('\n')}
 
 #### ✨ ${cvLabels.highlights}:
 ${analysisData.optimizedHighlights?.map((h: string) => `- ${h}`).join('\n') || cvLabels.noHighlights}
@@ -3451,6 +3453,7 @@ ${JSON.stringify(analysisData, null, 2)}
           }
         } catch (e) {
           console.error("Error parsing CV analysis JSON:", e);
+          setToolResult(resultText || 'Ein Fehler bei der Auswertung ist aufgetreten. Bitte versuche es erneut.');
         }
       }
 
@@ -3510,12 +3513,12 @@ ${JSON.stringify(analysisData, null, 2)}
 **${salaryLabels.canton}:** ${salaryData.canton}
 
 #### 📊 ${salaryLabels.salaryHeader}:
-- **${salaryLabels.min}:** CHF ${salaryData.minSalary.toLocaleString('de-CH')}
-- **${salaryLabels.median}:** CHF ${salaryData.medianSalary.toLocaleString('de-CH')}
-- **${salaryLabels.max}:** CHF ${salaryData.maxSalary.toLocaleString('de-CH')}
+- **${salaryLabels.min}:** CHF ${(salaryData.minSalary || 0).toLocaleString('de-CH')}
+- **${salaryLabels.median}:** CHF ${(salaryData.medianSalary || 0).toLocaleString('de-CH')}
+- **${salaryLabels.max}:** CHF ${(salaryData.maxSalary || 0).toLocaleString('de-CH')}
 
 #### 💡 ${salaryLabels.insights}:
-${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
+${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
 ---
 *${salaryLabels.disclaimer}*
@@ -3523,6 +3526,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           }
         } catch (e) {
           console.error("Error parsing Salary calculation JSON:", e);
+          setToolResult(resultText || 'Gehaltsberechnung konnte nicht ausgewertet werden. Bitte versuche es erneut.');
         }
       }
       
@@ -6043,7 +6047,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="text-7xl md:text-8xl font-serif tracking-tight text-[#FAFAF8]"
           >
-            Stell<span className="text-[#00A854]">ify</span>
+            Stell<span className="text-[#00A854]">ify</span><span className="text-[#FAFAF8]/25 text-5xl md:text-6xl">.ch</span>
           </motion.div>
 
           {/* Tagline */}
@@ -6132,7 +6136,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity"
           >
-            Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
+            Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-[#1A1A18]/30 dark:text-[#FAFAF8]/30 tracking-widest align-super ml-0.5">.ch</span>
           </button>
           <div className="hidden md:flex items-center gap-6">
             {user ? (
@@ -8194,7 +8198,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-24">
             <div className="col-span-2 lg:col-span-2 space-y-6">
               <a href="#" className="text-2xl font-serif tracking-tight text-white">
-                Stell<span className="text-[#00A854]">ify</span>
+                Stell<span className="text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-white/25 tracking-widest align-super ml-0.5">.ch</span>
               </a>
               <p className="text-sm font-light leading-relaxed max-w-xs">
                 {t.footer_desc}
@@ -9438,7 +9442,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="text-center mb-8">
-                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
+                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-[#1A1A18]/30 dark:text-[#FAFAF8]/30 tracking-widest align-super ml-0.5">.ch</span></span>
                 <h3 className="text-xl font-medium mt-4">
                   {authTab === 'login' ? t.auth_welcome : authTab === 'register' ? t.auth_create : t.auth_reset_password_title}
                 </h3>
