@@ -285,7 +285,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       </AnimatePresence>
 
       {/* Progress Indicators */}
-      <div className="mt-24 flex gap-3">
+      <div className="mt-24 flex gap-3 justify-center w-full">
         {steps.map((_, i) => (
           <div 
             key={i}
