@@ -6193,10 +6193,12 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               >
                 {t.nav_login}
               </button>
-              <button 
+              <button
                 onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
-                className="bg-[#004225] text-white text-sm font-medium px-5 py-2.5 rounded-none hover:bg-[#00331d] transition-all flex items-center gap-2"
+                className="relative bg-[#004225] text-white text-sm font-bold px-5 py-2.5 hover:bg-[#00331d] transition-all flex items-center gap-2 shadow-md shadow-[#004225]/30 uppercase tracking-wider"
               >
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00A854] rounded-full animate-ping opacity-75" />
+                <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00A854] rounded-full" />
                 {t.nav_register}
                 <ArrowRight size={14} />
               </button>
@@ -7085,29 +7087,48 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <div className="p-4 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border-l-4 border-[#004225] dark:border-[#FAFAF8] text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light italic">
               {t.cv_info}
             </div>
-            <div className="flex flex-col items-center gap-6 w-full max-w-md">
-              <div className="w-full">
-                <CVDropzone 
-                  onFileAccepted={processFile} 
-                  isUploading={isUploading} 
-                  t={t} 
-                />
+            <div className="flex flex-col gap-5 w-full max-w-md">
+              <CVDropzone onFileAccepted={processFile} isUploading={isUploading} t={t} />
+
+              {/* Primary CTA */}
+              <button
+                onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
+                className="w-full bg-[#004225] text-white px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-3 group shadow-lg shadow-[#004225]/20"
+              >
+                {t.cta_free}
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* 3-step funnel */}
+              <div className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest">
+                <span className="flex items-center gap-1.5 text-[#004225] dark:text-[#00A854]">
+                  <span className="w-4 h-4 bg-[#004225] dark:bg-[#00A854] text-white text-[8px] flex items-center justify-center rounded-full font-bold">1</span>
+                  Gratis anmelden
+                </span>
+                <ArrowRight size={9} className="text-[#9A9A94]" />
+                <span className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]">
+                  <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">2</span>
+                  Plan wählen
+                </span>
+                <ArrowRight size={9} className="text-[#9A9A94]" />
+                <span className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]">
+                  <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">3</span>
+                  Karriere starten
+                </span>
               </div>
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
-                <button 
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className="flex-1 w-full bg-[#004225] text-white px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-3 group"
+
+              {/* Secondary links */}
+              <div className="flex items-center justify-center gap-4 text-xs text-[#9A9A94]">
+                <button
+                  onClick={() => { setAuthTab('login'); setIsAuthModalOpen(true); }}
+                  className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors"
                 >
-                  {t.cta_free}
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  {t.nav_login}
                 </button>
-                <button 
-                  onClick={handleLinkedInConnect}
-                  className={`flex-1 w-full px-8 py-4 text-sm font-bold uppercase tracking-widest border border-black/10 dark:border-white/10 text-[#1A1A18] dark:text-[#FAFAF8] hover:border-[#0077b5] dark:hover:border-[#0077b5] hover:text-[#0077b5] dark:hover:text-[#0077b5] transition-all flex items-center justify-center gap-3 ${linkedinProfile ? 'bg-[#0077b5]/5 border-[#0077b5]/20 text-[#0077b5]' : ''}`}
-                >
-                  {linkedinProfile ? t.linkedin_connected : t.linkedin_connect}
-                  <Linkedin size={18} />
-                </button>
+                <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
+                <a href="#pricing" className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
+                  Ab CHF 29/Mo — Pläne ansehen →
+                </a>
               </div>
             </div>
 
@@ -8521,7 +8542,10 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                 <option key={opt} value={opt} />
                               ))}
                             </datalist>
-                            <p className="mt-1 text-[9px] text-[#9A9A94] dark:text-[#5C5C58]">Wähle aus der Liste oder tippe eigenen Text</p>
+                            <p className="mt-1.5 text-[10px] text-[#004225] dark:text-[#00A854] flex items-center gap-1.5 font-medium">
+                              <span>✎</span>
+                              Vorschläge wählen <span className="text-[#9A9A94] dark:text-[#5C5C58] font-normal">oder eigenen Text eintippen</span>
+                            </p>
                           </div>
                         ) : (
                           <input
