@@ -289,7 +289,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
         {steps.map((_, i) => (
           <div 
             key={i}
-            className={`h-1 transition-all duration-500 rounded-full ${i === step ? 'w-12 bg-[#004225]' : 'w-4 bg-white/10'}`}
+            className={`h-0.5 transition-all duration-500 rounded-full ${i === step ? 'w-12 bg-white' : 'w-4 bg-white/25'}`}
           />
         ))}
       </div>
