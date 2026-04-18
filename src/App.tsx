@@ -1112,6 +1112,8 @@ function StellifyApp() {
   const [activeTool, setActiveTool] = useState<any | null>(null);
   const [toolInput, setToolInput] = useState<any>({});
   const [toolResult, setToolResult] = useState<string | null>(null);
+  const [toolResultEditable, setToolResultEditable] = useState<string>('');
+  const [isEditingToolResult, setIsEditingToolResult] = useState(false);
   const [parsedSalaryResult, setParsedSalaryResult] = useState<any | null>(null);
   const [interviewSession, setInterviewSession] = useState<{
     questions: Array<{q: string; tip: string; model: string; mistakes: string}>;
@@ -1224,9 +1226,13 @@ function StellifyApp() {
       setJobFilters({ keyword: '', location: '', industry: '' });
     };
 
-    const handleOpenJob = (url: string) => {
-      if (url && url !== '#') {
+    const handleOpenJob = (url: string, job?: any) => {
+      if (url && url !== '#' && url.startsWith('http')) {
         window.open(url, '_blank', 'noopener,noreferrer');
+      } else if (job) {
+        const query = encodeURIComponent(`${job.title} ${job.company}`);
+        const loc = encodeURIComponent('Schweiz');
+        window.open(`https://ch.indeed.com/jobs?q=${query}&l=${loc}`, '_blank', 'noopener,noreferrer');
       }
     };
 
@@ -1362,7 +1368,7 @@ function StellifyApp() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ delay: i * 0.04 }}
                 whileHover={{ y: -3 }}
-                onClick={() => handleOpenJob(job.url)}
+                onClick={() => handleOpenJob(job.url, job)}
                 className="bg-white dark:bg-[#2A2A26] p-6 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
               >
                 <div className="flex justify-between items-start mb-4">
@@ -2628,6 +2634,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setActiveTool(tool);
     setToolInput({});
     setToolResult(null);
+    setToolResultEditable('');
+    setIsEditingToolResult(false);
   };
 
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -2681,6 +2689,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     
     setIsProcessingTool(true);
     setToolResult(null);
+    setToolResultEditable('');
+    setIsEditingToolResult(false);
     setParsedSalaryResult(null);
 
     const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
@@ -2754,10 +2764,16 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'cv-premium':
           prompt = `
             HANDLUNGSANWEISUNG: Führe ein vollständiges "Premium CV-Rewrite" durch.
-            KONTEXT: Aktueller CV-Text: ${toolInput.cvText || cvContext}.
-            
+            KONTEXT:
+            - Name des Kandidaten: ${toolInput.firstName || ''} ${toolInput.lastName || ''}
+            - Art der Bewerbung: ${toolInput.applicationType || 'Nicht angegeben'}
+            - Dauer in aktueller Position: ${toolInput.duration || 'Nicht angegeben'}
+            - Qualifikationen: ${toolInput.qualifications || 'Nicht angegeben'}
+            - Aktueller CV-Text: ${toolInput.cvText || cvContext || 'Nicht vorhanden'}
+            - Besondere Wünsche: ${toolInput.description || 'Keine'}
+
             DEINE ROLLE: Du bist ein Elite-Karrierecoach für den Schweizer Markt.
-            
+
             OPTIMIERUNGS-STRATEGIE (SCHWEIZER PREMIUM):
             1. SPRACHLICHE PERFEKTION:
                - Konsequentes Schweizer Hochdeutsch (KEIN "ß", verwende "ss").
@@ -2771,35 +2787,36 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
                - Nutze starke, aktive Verben am Satzanfang.
             4. KEYWORD-INTEGRATION:
                - Bette branchenspezifische Schlüsselwörter (z.B. für Pharma, Banking, Tech) natürlich in den Text ein.
-            
-            AUSGABE:
-            Gib den vollständig optimierten Text des Lebenslaufs zurück, unterteilt in die klassischen Sektionen (Persönliches, Profil, Berufserfahrung, Ausbildung, Skills).
-            Füge am Ende eine Sektion "🇨🇭 Schweizer Premium-Check" hinzu, in der du kurz erklärst, warum diese Version nun perfekt für den Schweizer Markt ist.
+
+            AUSGABE: Schreibe den vollständig optimierten Lebenslauf als fliessenden, professionellen Text in klar getrennten Abschnitten (Persönliches, Profil, Berufserfahrung, Ausbildung, Skills).
+            WICHTIG: Verwende KEINE Sternchen (*), KEINE Aufzählungszeichen (-, •) und KEINE Hashtags (#). Schreibe ausschliesslich in ganzen Sätzen und Absätzen.
+            Füge am Ende eine kurze Sektion "Schweizer Premium-Check" hinzu.
           `;
           break;
         case 'career-roadmap':
           prompt = `
-            HANDLUNGSANWEISUNG: Erstelle eine detaillierte, personalisierte "Schweizer Karriere-Roadmap".
-            KONTEXT: 
-            - CV des Nutzers: ${cvContext || 'Nicht vorhanden'}.
-            - Karriereziel: ${toolInput.goal || 'Nicht spezifiziert'}.
+            HANDLUNGSANWEISUNG: Erstelle eine detaillierte, personalisierte Schweizer Karriere-Roadmap.
+            KONTEXT:
+            - Name: ${toolInput.firstName || ''} ${toolInput.lastName || ''}
+            - Art der Bewerbung: ${toolInput.applicationType || 'Nicht angegeben'}
+            - Dauer in aktueller Position: ${toolInput.duration || 'Nicht angegeben'}
+            - Qualifikationen: ${toolInput.qualifications || 'Nicht angegeben'}
+            - CV: ${cvContext || 'Nicht vorhanden'}
+            - Karriereziel: ${toolInput.goal || 'Nicht spezifiziert'}
+            - Besondere Wünsche: ${toolInput.description || 'Keine'}
 
             DEINE ROLLE: Du bist ein Senior Career Strategist für den Schweizer Markt.
 
             STRUKTUR DER ROADMAP:
             1. STATUS QUO ANALYSE: Wo steht der Nutzer aktuell im Vergleich zum Schweizer Marktstandard?
-            2. WEITERBILDUNGS-PFAD (SCHWEIZ-SPEZIFISCH):
-               - Schlage konkrete Schweizer Abschlüsse vor (z.B. CAS/DAS/MAS an Fachhochschulen/Unis, Eidg. Fachausweise, Diplome).
-               - Nenne relevante Institutionen (z.B. ZHAW, HSG, ETH, KV Business School).
-            3. JOB-SUCH-STRATEGIE:
-               - Welche Schweizer Jobportale sind am relevantesten (z.B. Jobs.ch, LinkedIn, NZZ Jobs, spezialisierte Portale)?
-               - Empfehlungen für Headhunter/Personalvermittler in der Schweiz.
-            4. NETZWERK-BOOST: Konkrete Tipps für das Networking in der Schweiz (Events, Verbände).
+            2. WEITERBILDUNGS-PFAD (SCHWEIZ-SPEZIFISCH): Konkrete Schweizer Abschlüsse (CAS/DAS/MAS, Eidg. Fachausweise) und Institutionen (ZHAW, HSG, ETH, KV Business School).
+            3. JOB-SUCH-STRATEGIE: Relevante Schweizer Jobportale und Empfehlungen für Headhunter.
+            4. NETZWERK-BOOST: Konkrete Tipps für Networking in der Schweiz.
             5. ZEITPLAN: Ein realistischer 12-Monats-Plan.
 
-            AUSGABE:
-            Verwende eine motivierende, professionelle Sprache (Schweizer Hochdeutsch, kein "ß").
-            Füge am Ende eine Sektion "🇨🇭 Insider-Tipp" hinzu.
+            AUSGABE: Schreibe die Roadmap als fliessenden, motivierenden Text in klar benannten Abschnitten. Schweizer Hochdeutsch, kein "ß".
+            WICHTIG: Verwende KEINE Sternchen (*), KEINE Aufzählungszeichen (-, •) und KEINE Hashtags (#). Schreibe ausschliesslich in ganzen Sätzen und Absätzen.
+            Füge am Ende einen kurzen "Insider-Tipp" hinzu.
           `;
           break;
         case 'cv-optimizer':
@@ -2836,27 +2853,42 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'cv-gen':
           prompt = `
             HANDLUNGSANWEISUNG: Erstelle ein hochprofessionelles Schweizer Motivationsschreiben.
-            KONTEXT: 
+            KONTEXT:
+            - Name des Kandidaten: ${toolInput.firstName || ''} ${toolInput.lastName || ''}
+            - Art der Bewerbung: ${toolInput.applicationType || 'Allgemeine Bewerbung'}
+            - Dauer in aktueller Position: ${toolInput.duration || 'Nicht angegeben'}
+            - Qualifikationen: ${toolInput.qualifications || 'Nicht angegeben'}
             - CV des Kandidaten: ${cvContext || 'Nicht vorhanden'}
             - Stelleninserat/Zusatzinfos: ${toolInput.jobAd || 'Allgemeine Initiativbewerbung'}
+            - Besondere Wünsche: ${toolInput.description || 'Keine'}
+
             ANFORDERUNGEN:
             - Sprache: Schweizer Hochdeutsch (KEIN "ß", verwende "ss").
             - Struktur: Absender, Empfänger, Ort/Datum, Betreff, Anrede, Einleitung, Hauptteil (Warum ich? Warum ihr?), Schluss, Grussformel.
             - Stil: Selbstbewusst, präzise, keine Floskeln wie "hiermit bewerbe ich mich".
             - Fokus: Hebe spezifische Erfolge hervor, die zum Inserat passen.
+            WICHTIG: Verwende KEINE Sternchen (*), KEINE Aufzählungszeichen (-, •) und KEINE Hashtags (#). Schreibe als fliessenden Brieftext in ganzen Absätzen.
           `;
           break;
         case 'linkedin-job':
           prompt = `
-            HANDLUNGSANWEISUNG: Erstelle ein "Application Package" für LinkedIn.
+            HANDLUNGSANWEISUNG: Erstelle ein vollständiges Application Package für LinkedIn.
             KONTEXT:
+            - Name: ${toolInput.firstName || ''} ${toolInput.lastName || ''}
+            - Art der Bewerbung: ${toolInput.applicationType || 'Nicht angegeben'}
+            - Dauer in aktueller Position: ${toolInput.duration || 'Nicht angegeben'}
+            - Qualifikationen: ${toolInput.qualifications || 'Nicht angegeben'}
             - Profil/CV: ${toolInput.linkedinProfile || cvContext || 'Nicht vorhanden'}
-            - Stelleninserat: ${toolInput.jobAd}
-            OUTPUT-STRUKTUR:
-            1. Motivationsschreiben (Schweizer Standard, kein ß).
-            2. CV-Anpassungsvorschläge (Welche Keywords fehlen?).
-            3. "Elevator Pitch" für die Nachricht an den Recruiter auf LinkedIn.
-            4. Die 3 stärksten Argumente, warum der Kandidat perfekt passt.
+            - Stelleninserat: ${toolInput.jobAd || 'Nicht vorhanden'}
+            - Besondere Wünsche: ${toolInput.description || 'Keine'}
+
+            OUTPUT-STRUKTUR (als fliessender Text, keine Aufzählungspunkte):
+            1. Motivationsschreiben (Schweizer Standard, kein ß) — vollständiger Brieftext.
+            2. CV-Anpassungsvorschläge — als Fliesstext erklärt.
+            3. Elevator Pitch für die LinkedIn-Recruiter-Nachricht — als fertiger Nachrichtentext.
+            4. Die drei stärksten Argumente, warum der Kandidat perfekt passt — als Absätze formuliert.
+
+            WICHTIG: Verwende KEINE Sternchen (*), KEINE Aufzählungszeichen (-, •) und KEINE Hashtags (#). Schreibe jeden Abschnitt als zusammenhängenden Fliesstext.
           `;
           break;
         case 'salary-calc':
@@ -3444,6 +3476,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       }
 
       setToolResult(resultText);
+      setToolResultEditable(resultText);
+      setIsEditingToolResult(false);
 
       // Save to history
       if (user) {
@@ -5634,22 +5668,38 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       inputs: [{ key: 'section', label: t.tools_data['cv-optimizer'].input_label, type: 'text', placeholder: t.tools_data['cv-optimizer'].input_placeholder }]
     },
     {
-      id: 'cv-premium', 
-      title: t.tools_data['cv-premium'].title, 
-      desc: t.tools_data['cv-premium'].desc, 
-      icon: <Sparkles size={20} />, 
-      badge: 'Premium', 
+      id: 'cv-premium',
+      title: t.tools_data['cv-premium'].title,
+      desc: t.tools_data['cv-premium'].desc,
+      icon: <Sparkles size={20} />,
+      badge: 'Premium',
       type: 'ultimate',
-      inputs: [{ key: 'cvText', label: t.tools_data['cv-premium'].input_label, type: 'textarea', placeholder: t.tools_data['cv-premium'].input_placeholder }] 
+      inputs: [
+        { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
+        { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
+        { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
+        { key: 'cvText', label: t.tools_data['cv-premium'].input_label, type: 'textarea', placeholder: t.tools_data['cv-premium'].input_placeholder },
+        { key: 'description', label: 'Beschreibung / Wünsche', type: 'textarea', placeholder: 'Was soll das Dokument beinhalten? Besondere Wünsche, Schwerpunkte...' },
+      ]
     },
-    { 
-      id: 'career-roadmap', 
-      title: t.tools_data['career-roadmap'].title, 
-      desc: t.tools_data['career-roadmap'].desc, 
-      icon: <Compass size={20} />, 
-      badge: 'Strategy', 
+    {
+      id: 'career-roadmap',
+      title: t.tools_data['career-roadmap'].title,
+      desc: t.tools_data['career-roadmap'].desc,
+      icon: <Compass size={20} />,
+      badge: 'Strategy',
       type: 'ultimate',
-      inputs: [{ key: 'goal', label: t.tools_data['career-roadmap'].input_label, type: 'text', placeholder: t.tools_data['career-roadmap'].input_placeholder }] 
+      inputs: [
+        { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
+        { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
+        { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
+        { key: 'goal', label: t.tools_data['career-roadmap'].input_label, type: 'text', placeholder: t.tools_data['career-roadmap'].input_placeholder },
+        { key: 'description', label: 'Beschreibung / Wünsche', type: 'textarea', placeholder: 'Was soll das Dokument beinhalten? Besondere Wünsche, Schwerpunkte...' },
+      ]
     },
     {
       id: 'salary-calc', 
@@ -5665,14 +5715,22 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         { key: 'canton', label: t.tools_data['salary-calc'].input_canton, type: 'text', placeholder: t.tools_data['salary-calc'].input_canton_placeholder }
       ] 
     },
-    { 
-      id: 'cv-gen', 
-      title: t.tools_data['cv-gen'].title, 
-      desc: t.tools_data['cv-gen'].desc, 
-      icon: <Sparkles size={20} />, 
-      badge: '60s Gen', 
+    {
+      id: 'cv-gen',
+      title: t.tools_data['cv-gen'].title,
+      desc: t.tools_data['cv-gen'].desc,
+      icon: <Sparkles size={20} />,
+      badge: '60s Gen',
       type: 'gratis',
-      inputs: [{ key: 'jobAd', label: t.tools_data['cv-gen'].input_label, type: 'textarea', placeholder: t.tools_data['cv-gen'].input_placeholder }] 
+      inputs: [
+        { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
+        { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
+        { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
+        { key: 'jobAd', label: t.tools_data['cv-gen'].input_label, type: 'textarea', placeholder: t.tools_data['cv-gen'].input_placeholder },
+        { key: 'description', label: 'Beschreibung / Wünsche', type: 'textarea', placeholder: 'Was soll das Dokument beinhalten? Besondere Wünsche, Schwerpunkte...' },
+      ]
     },
     { 
       id: 'ats-sim', 
@@ -5767,17 +5825,23 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       type: 'pro',
       inputs: [{ key: 'currentJob', label: t.tools_data['karriere-checkup'].input_label, type: 'text', placeholder: t.tools_data['karriere-checkup'].input_placeholder }] 
     },
-    { 
-      id: 'linkedin-job', 
-      title: t.tools_data['linkedin-job'].title, 
-      desc: t.tools_data['linkedin-job'].desc, 
-      icon: <Linkedin size={20} />, 
-      badge: 'Direct Match', 
+    {
+      id: 'linkedin-job',
+      title: t.tools_data['linkedin-job'].title,
+      desc: t.tools_data['linkedin-job'].desc,
+      icon: <Linkedin size={20} />,
+      badge: 'Direct Match',
       type: 'pro',
       inputs: [
+        { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
+        { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
+        { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
         { key: 'linkedinProfile', label: t.tools_data['linkedin-job'].input_profile, type: 'textarea', placeholder: t.tools_data['linkedin-job'].input_profile_placeholder },
-        { key: 'jobAd', label: t.tools_data['linkedin-job'].input_ad, type: 'textarea', placeholder: t.tools_data['linkedin-job'].input_ad_placeholder }
-      ] 
+        { key: 'jobAd', label: t.tools_data['linkedin-job'].input_ad, type: 'textarea', placeholder: t.tools_data['linkedin-job'].input_ad_placeholder },
+        { key: 'description', label: 'Beschreibung / Wünsche', type: 'textarea', placeholder: 'Was soll das Dokument beinhalten? Besondere Wünsche, Schwerpunkte...' },
+      ]
     },
     {
       id: 'linkedin-posts',
@@ -8429,14 +8493,25 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                           )}
                         </div>
                         {input.type === 'textarea' ? (
-                          <textarea 
+                          <textarea
                             className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all min-h-[120px] font-light text-[#1A1A18] dark:text-[#FAFAF8]"
                             placeholder={input.placeholder}
                             value={toolInput[input.key] || ''}
                             onChange={(e) => setToolInput({ ...toolInput, [input.key]: e.target.value })}
                           />
+                        ) : input.type === 'select' ? (
+                          <select
+                            className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all font-light text-[#1A1A18] dark:text-[#FAFAF8]"
+                            value={toolInput[input.key] || ''}
+                            onChange={(e) => setToolInput({ ...toolInput, [input.key]: e.target.value })}
+                          >
+                            <option value="">{input.placeholder}</option>
+                            {input.options?.map((opt: string) => (
+                              <option key={opt} value={opt}>{opt}</option>
+                            ))}
+                          </select>
                         ) : (
-                          <input 
+                          <input
                             type={input.type}
                             className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all font-light text-[#1A1A18] dark:text-[#FAFAF8]"
                             placeholder={input.placeholder}
@@ -8833,7 +8908,38 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             </div>
                           </div>
                         ) : (
-                          <Markdown>{toolResult}</Markdown>
+                          <div className="space-y-3">
+                            <div className="flex justify-end gap-2">
+                              <button
+                                onClick={() => {
+                                  if (isEditingToolResult) {
+                                    setToolResult(toolResultEditable);
+                                  }
+                                  setIsEditingToolResult(!isEditingToolResult);
+                                }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-[#4A4A45] dark:text-[#9A9A94]"
+                              >
+                                {isEditingToolResult ? <><CheckCircle2 size={11} /> Speichern</> : <><FileText size={11} /> Bearbeiten</>}
+                              </button>
+                              {isEditingToolResult && (
+                                <button
+                                  onClick={() => { setToolResultEditable(toolResult || ''); setIsEditingToolResult(false); }}
+                                  className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-[#4A4A45] dark:text-[#9A9A94]"
+                                >
+                                  Abbrechen
+                                </button>
+                              )}
+                            </div>
+                            {isEditingToolResult ? (
+                              <textarea
+                                className="w-full min-h-[400px] p-4 bg-white dark:bg-[#1A1A18] border border-[#004225]/30 dark:border-[#FAFAF8]/20 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] focus:outline-none focus:border-[#004225] transition-all leading-relaxed resize-y"
+                                value={toolResultEditable}
+                                onChange={(e) => setToolResultEditable(e.target.value)}
+                              />
+                            ) : (
+                              <Markdown>{toolResult}</Markdown>
+                            )}
+                          </div>
                         )}
                         <div className="absolute bottom-4 right-4 text-[8px] text-[#9A9A94] font-bold uppercase tracking-widest opacity-40">
                           {t.ai_notice}
