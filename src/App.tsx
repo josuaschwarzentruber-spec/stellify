@@ -2066,6 +2066,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
   const processFile = async (file: File) => {
     if (!file) return;
+    if (!user) {
+      setAuthTab('register');
+      setIsAuthModalOpen(true);
+      return;
+    }
 
     setIsUploading(true);
     setUploadProgress(0);
@@ -2463,10 +2468,17 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (!userContent.trim() || isTyping) return;
 
     const userMsg: Message = { role: 'user', content: userContent };
-    
-    // If not logged in, just update local state
+
     if (!user) {
-      setMessages(prev => [...prev, userMsg]);
+      setMessages(prev => [
+        ...prev,
+        userMsg,
+        { role: 'assistant', content: 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts – es dauert nur 30 Sekunden! 🚀' }
+      ]);
+      if (!overrideContent) setInput('');
+      setAuthTab('register');
+      setIsAuthModalOpen(true);
+      return;
     } else {
       try {
         await addDoc(collection(db, 'users', user.id, 'messages'), {
@@ -7122,7 +7134,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {language === 'DE' ? (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
                 {([
-                  ['1', 'CV hochladen'],
+                  ['1', 'Lebenslauf (CV)'],
                   ['2', 'KI-Analyse'],
                   ['3', 'Bewerbung optimieren'],
                   ['4', 'Interview meistern'],
