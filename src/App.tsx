@@ -6473,10 +6473,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {stat.label === t.dashboard_stat_cv_status && !cvContext && (
                         <button
                           onClick={() => fileInputRef.current?.click()}
-                          className="mt-4 w-full py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-2 shadow-sm"
+                          className="mt-4 w-full group"
                         >
-                          <Upload size={14} />
-                          Lebenslauf hochladen
+                          <div className="border border-dashed border-[#004225]/30 dark:border-[#00A854]/30 hover:border-[#004225] dark:hover:border-[#00A854] transition-all duration-200 p-3 flex flex-col items-center gap-2">
+                            <div className="w-8 h-8 bg-[#004225]/8 dark:bg-[#00A854]/10 group-hover:bg-[#004225]/15 dark:group-hover:bg-[#00A854]/20 transition-all flex items-center justify-center">
+                              <Upload size={14} className="text-[#004225] dark:text-[#00A854]" />
+                            </div>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">Hochladen</span>
+                          </div>
                         </button>
                       )}
                     </motion.div>
