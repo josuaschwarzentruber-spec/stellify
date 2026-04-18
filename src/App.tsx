@@ -8500,16 +8500,21 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             onChange={(e) => setToolInput({ ...toolInput, [input.key]: e.target.value })}
                           />
                         ) : input.type === 'select' ? (
-                          <select
-                            className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all font-light text-[#1A1A18] dark:text-[#FAFAF8]"
-                            value={toolInput[input.key] || ''}
-                            onChange={(e) => setToolInput({ ...toolInput, [input.key]: e.target.value })}
-                          >
-                            <option value="">{input.placeholder}</option>
-                            {input.options?.map((opt: string) => (
-                              <option key={opt} value={opt}>{opt}</option>
-                            ))}
-                          </select>
+                          <>
+                            <input
+                              type="text"
+                              list={`datalist-${input.key}`}
+                              className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all font-light text-[#1A1A18] dark:text-[#FAFAF8]"
+                              placeholder={input.placeholder}
+                              value={toolInput[input.key] || ''}
+                              onChange={(e) => setToolInput({ ...toolInput, [input.key]: e.target.value })}
+                            />
+                            <datalist id={`datalist-${input.key}`}>
+                              {input.options?.map((opt: string) => (
+                                <option key={opt} value={opt} />
+                              ))}
+                            </datalist>
+                          </>
                         ) : (
                           <input
                             type={input.type}
