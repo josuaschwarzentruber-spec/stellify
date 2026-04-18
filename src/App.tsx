@@ -6048,6 +6048,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             className="text-7xl md:text-8xl font-serif tracking-tight text-[#FAFAF8]"
           >
             Stell<span className="text-[#00A854]">ify</span><span className="text-[#FAFAF8]/25 text-5xl md:text-6xl">.ch</span>
+          </motion.div>
 
           {/* Tagline */}
           <motion.p
