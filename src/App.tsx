@@ -7084,9 +7084,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             <p className="text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
               {t.hero_desc}
             </p>
-            <div className="p-4 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border-l-4 border-[#004225] dark:border-[#FAFAF8] text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light italic">
-              {t.cv_info}
-            </div>
+            {language === 'DE' ? (
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+                {([
+                  ['1', 'CV hochladen'],
+                  ['2', 'KI-Analyse'],
+                  ['3', 'Bewerbung optimieren'],
+                  ['4', 'Interview meistern'],
+                ] as [string, string][]).map(([num, label], i, arr) => (
+                  <React.Fragment key={num}>
+                    <div className="flex items-center gap-1.5">
+                      <span className="w-5 h-5 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
+                      <span className="text-xs font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{label}</span>
+                    </div>
+                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-xs select-none">→</span>}
+                  </React.Fragment>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">{t.cv_info}</p>
+            )}
             <div className="flex flex-col gap-5 w-full max-w-md">
               <CVDropzone onFileAccepted={processFile} isUploading={isUploading} t={t} />
 
