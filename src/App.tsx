@@ -7127,7 +7127,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </button>
                 <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
                 <a href="#pricing" className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
-                  Ab CHF 29/Mo — Pläne ansehen →
+                  Ab CHF 19.90/Mo — Pläne ansehen →
                 </a>
               </div>
             </div>
