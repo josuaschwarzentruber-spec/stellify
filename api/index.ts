@@ -344,7 +344,7 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
 
 // ── Gemini Chat ───────────────────────────────────────────────────────────────
 app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
-  const { messages, userContent, systemInstruction } = req.body;
+  const { messages, userContent, systemInstruction, model } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   try {
@@ -352,10 +352,10 @@ app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
     const contents = messages?.length
       ? [...messages, { role: "user", parts: [{ text: userContent }] }]
       : [{ role: "user", parts: [{ text: userContent }] }];
-    const response = await geminiWithRetry((model) =>
-      ai.models.generateContent({ model, contents, config: { systemInstruction, temperature: 0.7 } })
-    );
-    res.json({ text: response.text });
+    const response = await geminiWithRetry((mdl) =>
+      ai.models.generateContent({ model: mdl, contents, config: { systemInstruction, temperature: 0.7 } })
+    , 3, model);
+    res.json({ text: response.text ?? '' });
   } catch (error: any) {
     console.error("[CHAT ERROR]", error);
     const msg = error.message || '';
