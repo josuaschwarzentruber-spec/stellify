@@ -7239,8 +7239,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             )}
             <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-12">
               <div>
-                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">4'200+</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.stat_members}</span>
+                <span className="block text-3xl font-serif text-[#004225] dark:text-[#00A854]">CH</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Swiss Made</span>
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">89%</span>
