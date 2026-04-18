@@ -31,7 +31,7 @@ import {
   Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, GraduationCap, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
-  Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Twitter, Image as ImageIcon
+  Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -4033,7 +4033,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_pro: "Karriere-Profi",
       dashboard_desc: "Dein Copilot Stella ist bereit. Analysiere neue Stellen, optimiere dein Profil oder bereite dich auf dein nächstes Interview vor.",
       dashboard_stat_analyses: "Analysen",
-      dashboard_stat_cv_status: "CV Status",
+      dashboard_stat_cv_status: "Lebenslauf (CV)",
       dashboard_stat_ready: "Bereit",
       dashboard_stat_missing: "Fehlt",
       dashboard_stat_chat: "Stella Chat",
@@ -5466,7 +5466,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_pro: "Career Professional",
       dashboard_desc: "Your copilot Stella is ready. Analyze new jobs, optimize your profile, or prepare for your next interview.",
       dashboard_stat_analyses: "Analyses",
-      dashboard_stat_cv_status: "CV Status",
+      dashboard_stat_cv_status: "Lebenslauf (CV)",
       dashboard_stat_ready: "Ready",
       dashboard_stat_missing: "Missing",
       dashboard_stat_chat: "Stella Chat",
@@ -6476,7 +6476,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           className="mt-3 w-full py-2 border border-[#004225] text-[#004225] dark:border-[#00A854] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225] hover:text-white transition-all flex items-center justify-center gap-2"
                         >
                           <Upload size={12} />
-                          CV hochladen
+                          Lebenslauf (CV) hochladen
                         </button>
                       )}
                     </motion.div>
@@ -6497,14 +6497,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Lade deinen Lebenslauf hoch für personalisierte KI-Analysen</p>
-                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen CV abgestimmt</p>
+                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen Lebenslauf abgestimmt</p>
                     </div>
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       className="flex-shrink-0 px-6 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center gap-2"
                     >
                       <Upload size={12} />
-                      CV hochladen
+                      Lebenslauf (CV) hochladen
                     </button>
                   </motion.div>
                 )}
@@ -8243,9 +8243,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </a>
                 <a href="https://www.instagram.com/stellify.ch/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-[#E1306C] hover:bg-white/10 transition-colors">
                   <Instagram size={16} />
-                </a>
-                <a href="https://twitter.com/stellify_ch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
-                  <Twitter size={16} />
                 </a>
                 <a href="https://www.tiktok.com/@stellify.ch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.73a4.85 4.85 0 01-1.01-.04z"/></svg>
