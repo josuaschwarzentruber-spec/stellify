@@ -6047,8 +6047,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="text-7xl md:text-8xl font-serif tracking-tight text-[#FAFAF8]"
           >
-            Stell<span className="text-[#00A854]">ify</span>
-          </motion.div>
+            Stell<span className="text-[#00A854]">ify</span><span className="text-[#FAFAF8]/25 text-5xl md:text-6xl">.ch</span>
 
           {/* Tagline */}
           <motion.p
@@ -6136,7 +6135,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
             className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity"
           >
-            Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
+            Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-[#1A1A18]/30 dark:text-[#FAFAF8]/30 tracking-widest align-super ml-0.5">.ch</span>
           </button>
           <div className="hidden md:flex items-center gap-6">
             {user ? (
@@ -8198,7 +8197,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-24">
             <div className="col-span-2 lg:col-span-2 space-y-6">
               <a href="#" className="text-2xl font-serif tracking-tight text-white">
-                Stell<span className="text-[#00A854]">ify</span>
+                Stell<span className="text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-white/25 tracking-widest align-super ml-0.5">.ch</span>
               </a>
               <p className="text-sm font-light leading-relaxed max-w-xs">
                 {t.footer_desc}
@@ -9442,7 +9441,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="text-center mb-8">
-                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
+                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span><span className="text-[10px] font-sans font-bold text-[#1A1A18]/30 dark:text-[#FAFAF8]/30 tracking-widest align-super ml-0.5">.ch</span></span>
                 <h3 className="text-xl font-medium mt-4">
                   {authTab === 'login' ? t.auth_welcome : authTab === 'register' ? t.auth_create : t.auth_reset_password_title}
                 </h3>
