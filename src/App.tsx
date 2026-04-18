@@ -917,7 +917,7 @@ export default function App() {
 }
 
 // --- COMPONENTS ---
-const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark' }: { onFileAccepted: (file: File) => void, isUploading: boolean, t: any, variant?: 'dark' | 'light' }) => {
+const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark', onClickOverride }: { onFileAccepted: (file: File) => void, isUploading: boolean, t: any, variant?: 'dark' | 'light', onClickOverride?: () => void }) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
@@ -929,13 +929,15 @@ const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark' }: { onFi
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     multiple: false,
-    disabled: isUploading
+    disabled: isUploading,
+    noClick: !!onClickOverride,
   });
 
   if (variant === 'light') {
     return (
       <div
         {...getRootProps()}
+        onClick={onClickOverride ?? getRootProps().onClick}
         className={`
           relative group cursor-pointer transition-all duration-300
           border-2 border-dashed rounded-sm p-6 text-center
@@ -7143,7 +7145,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               {t.hero_desc}
             </p>
             {language === 'DE' ? (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+              <div className="flex flex-nowrap items-center gap-x-1 overflow-x-auto">
                 {([
                   ['1', 'Lebenslauf (CV) hochladen'],
                   ['2', 'KI-Analyse'],
@@ -7151,11 +7153,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                   ['4', 'Interview meistern'],
                 ] as [string, string][]).map(([num, label], i, arr) => (
                   <React.Fragment key={num}>
-                    <div className="flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
-                      <span className="text-xs font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{label}</span>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <span className="w-4 h-4 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
+                      <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] whitespace-nowrap">{label}</span>
                     </div>
-                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-xs select-none">→</span>}
+                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5">→</span>}
                   </React.Fragment>
                 ))}
               </div>
@@ -7163,7 +7165,13 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">{t.cv_info}</p>
             )}
             <div className="flex flex-col gap-5 w-full max-w-md">
-              <CVDropzone onFileAccepted={processFile} isUploading={isUploading} t={t} variant="light" />
+              <CVDropzone
+                onFileAccepted={processFile}
+                isUploading={isUploading}
+                t={t}
+                variant="light"
+                onClickOverride={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
+              />
 
               {/* Primary CTA */}
               <button
