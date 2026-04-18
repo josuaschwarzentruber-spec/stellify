@@ -320,9 +320,25 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
 
 app.use(express.json());
 
+// ── Gemini retry helper ───────────────────────────────────────────────────────
+const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 3): Promise<any> {
+  for (let i = 0; i < maxAttempts; i++) {
+    const model = MODELS[Math.min(i, MODELS.length - 1)];
+    try {
+      return await fn(model);
+    } catch (err: any) {
+      const msg = err.message || '';
+      const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
+      if (!isOverloaded || i === maxAttempts - 1) throw err;
+      await new Promise(r => setTimeout(r, (i + 1) * 1000));
+    }
+  }
+}
+
 // ── Gemini Chat ───────────────────────────────────────────────────────────────
 app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
-  const { messages, userContent, systemInstruction, model } = req.body;
+  const { messages, userContent, systemInstruction } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   try {
@@ -330,11 +346,9 @@ app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
     const contents = messages?.length
       ? [...messages, { role: "user", parts: [{ text: userContent }] }]
       : [{ role: "user", parts: [{ text: userContent }] }];
-    const response = await ai.models.generateContent({
-      model: model || "gemini-2.0-flash",
-      contents,
-      config: { systemInstruction, temperature: 0.7 }
-    });
+    const response = await geminiWithRetry((model) =>
+      ai.models.generateContent({ model, contents, config: { systemInstruction, temperature: 0.7 } })
+    );
     res.json({ text: response.text });
   } catch (error: any) {
     console.error("[CHAT ERROR]", error);
@@ -360,15 +374,13 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
 
   try {
     const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model: model || "gemini-2.0-flash",
-      contents: prompt,
-      config: {
-        systemInstruction,
-        temperature: 0.4,
-        tools: useSearch ? [{ googleSearch: {} }] : undefined
-      }
-    });
+    const response = await geminiWithRetry((mdl) =>
+      ai.models.generateContent({
+        model: mdl,
+        contents: prompt,
+        config: { systemInstruction, temperature: 0.4, tools: useSearch ? [{ googleSearch: {} }] : undefined }
+      })
+    );
     let sources: string[] = [];
     if (useSearch) {
       const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];
