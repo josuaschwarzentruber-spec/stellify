@@ -326,12 +326,14 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
   for (let i = 0; i < maxAttempts; i++) {
     const model = MODELS[Math.min(i, MODELS.length - 1)];
     try {
-      return await fn(model);
+      const result = await fn(model);
+      if (!result?.text) throw new Error('EMPTY_RESPONSE');
+      return result;
     } catch (err: any) {
       const msg = err.message || '';
-      const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
-      if (!isOverloaded || i === maxAttempts - 1) throw err;
-      await new Promise(r => setTimeout(r, (i + 1) * 1000));
+      const isRetryable = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand') || msg.includes('500') || msg.includes('INTERNAL') || msg.includes('EMPTY_RESPONSE');
+      if (!isRetryable || i === maxAttempts - 1) throw err;
+      await new Promise(r => setTimeout(r, (i + 1) * 1500));
     }
   }
 }

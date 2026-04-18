@@ -3043,22 +3043,21 @@ Bewerte in 3 Kategorien (je 0–100%):
 → Gesamtscore + 2 wichtigste Verbesserungshinweise.`;
 
           prompt = `
-            HANDLUNGSANWEISUNG: Simuliere ein professionelles Vorstellungsgespräch für die Position: ${toolInput.jobTitle}.
-            KONTEXT: CV des Kandidaten: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards'}.
+            HANDLUNGSANWEISUNG: Bereite ${toolInput.firstName || 'den Kandidaten'}${toolInput.lastName ? ' ' + toolInput.lastName : ''} auf ein professionelles Vorstellungsgespräch vor.
+            POSITION: ${toolInput.jobTitle || 'Nicht angegeben'}.
+            ART DER BEWERBUNG: ${toolInput.applicationType || 'Allgemeine Bewerbung'}.
+            QUALIFIKATIONEN: ${toolInput.qualifications || 'Keine angegeben'}.
+            FOKUS/WÜNSCHE: ${toolInput.description || 'Allgemeines Interview-Training'}.
+            CV: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards'}.
             SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
 
-            MODUS: Erstelle 5 hochrelevante, anspruchsvolle Fragen, die typischerweise bei Schweizer Unternehmen (Banken, Pharma, KMU, Versicherungen) gestellt werden.
-
-            FÜR JEDE FRAGE:
-            1. Die Frage selbst (klar und präzise formuliert)
-            2. Was der Recruiter wirklich wissen will (Hintergrund)
-            3. Optimale Antwort-Strategie (STAR-Methode wenn sinnvoll)
-            4. Konkreter Formulierungsvorschlag (Musterantwort in Schweizer Hochdeutsch)
-            5. Häufige Fehler, die Kandidaten bei dieser Frage machen
+            AUFGABE: Erstelle 5 massgeschneiderte, anspruchsvolle Interviewfragen für Schweizer Unternehmen.
+            Für jede Frage: die Frage selbst, was der Recruiter wissen will, optimale Antwortstrategie, Musterantwort auf Schweizer Hochdeutsch, häufige Fehler.
 
             ${scoringGrid}
 
-            ABSCHLUSS: Gib 3 konkrete Tipps speziell für ein Interview in der Schweiz (Pünktlichkeit, Unterlagen, Kultur etc.).
+            ABSCHLUSS: 3 konkrete Schweizer Interview-Tipps (Pünktlichkeit, Unterlagen, Kultur).
+            WICHTIG: Schreibe als fliessenden, strukturierten Text ohne Sternchen oder Aufzählungszeichen.
           `;
           break;
         }
@@ -5647,7 +5646,14 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       icon: <Mic size={20} />,
       badge: 'Coach',
       type: 'gratis',
-      inputs: [{ key: 'jobTitle', label: t.tools_data['interview'].input_label, type: 'text', placeholder: t.tools_data['interview'].input_placeholder }]
+      inputs: [
+        { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
+        { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
+        { key: 'jobTitle', label: t.tools_data['interview'].input_label, type: 'text', placeholder: t.tools_data['interview'].input_placeholder },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
+        { key: 'description', label: 'Beschreibung / Wünsche', type: 'textarea', placeholder: 'Worauf soll das Interview-Training fokussieren?' },
+      ]
     },
     {
       id: 'cv-analysis',
@@ -8408,21 +8414,21 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
       {/* --- TOOL MODAL --- */}
       <AnimatePresence>
         {activeTool && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-[#1A1A18] w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors"
+          <div className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 40 }}
+              className="bg-white dark:bg-[#1A1A18] w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors sm:rounded-none"
             >
-              <div className="p-4 md:p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
-                <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                  <div className="w-10 h-10 shrink-0 bg-[#004225] text-white flex items-center justify-center">
+              <div className="p-3 sm:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26] shrink-0">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 bg-[#004225] text-white flex items-center justify-center">
                     {activeTool.icon}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-lg md:text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] truncate leading-tight">{activeTool.title}</h3>
-                    <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold opacity-80">{activeTool.badge}</p>
+                    <h3 className="text-base sm:text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] truncate leading-tight">{activeTool.title}</h3>
+                    <p className="text-[9px] sm:text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold opacity-80">{activeTool.badge}</p>
                   </div>
                 </div>
                 <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
@@ -8430,9 +8436,9 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto flex flex-col lg:flex-row relative">
+              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
                 {/* Inputs */}
-                <div className={`w-full lg:w-1/3 p-6 md:p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border-r border-black/5 dark:border-white/5 transition-colors relative`}>
+                <div className={`w-full lg:w-[340px] lg:shrink-0 p-4 sm:p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/5 transition-colors relative overflow-y-auto max-h-[45vh] lg:max-h-none`}>
                   {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                     (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
                     <div className="absolute inset-0 z-50 bg-white/80 dark:bg-[#1A1A18]/80 backdrop-blur-md flex flex-col items-center justify-start pt-12 p-8 text-center">
@@ -8500,10 +8506,11 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                             onChange={(e) => setToolInput({ ...toolInput, [input.key]: e.target.value })}
                           />
                         ) : input.type === 'select' ? (
-                          <>
+                          <div>
                             <input
                               type="text"
                               list={`datalist-${input.key}`}
+                              autoComplete="off"
                               className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all font-light text-[#1A1A18] dark:text-[#FAFAF8]"
                               placeholder={input.placeholder}
                               value={toolInput[input.key] || ''}
@@ -8514,7 +8521,8 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                                 <option key={opt} value={opt} />
                               ))}
                             </datalist>
-                          </>
+                            <p className="mt-1 text-[9px] text-[#9A9A94] dark:text-[#5C5C58]">Wähle aus der Liste oder tippe eigenen Text</p>
+                          </div>
                         ) : (
                           <input
                             type={input.type}
@@ -8582,7 +8590,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                 </div>
 
                 {/* Results */}
-                <div className="flex-1 p-6 md:p-8 bg-white dark:bg-[#1A1A18] relative transition-colors overflow-y-auto custom-scrollbar">
+                <div className="flex-1 p-4 sm:p-6 bg-white dark:bg-[#1A1A18] relative transition-colors overflow-y-auto custom-scrollbar min-h-[200px]">
                   {/* INTERACTIVE INTERVIEW SESSION */}
                   {activeTool.id === 'interview-live' && interviewSession && !isProcessingTool ? (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col gap-6">
