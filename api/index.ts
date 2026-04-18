@@ -321,10 +321,14 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
 app.use(express.json());
 
 // ── Gemini retry helper ───────────────────────────────────────────────────────
-const MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
-async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 3): Promise<any> {
+const PRO_MODEL = 'gemini-2.5-pro';
+const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 3, preferredModel?: string): Promise<any> {
+  const modelsToTry = preferredModel
+    ? [preferredModel, ...FALLBACK_MODELS.filter(m => m !== preferredModel)]
+    : FALLBACK_MODELS;
   for (let i = 0; i < maxAttempts; i++) {
-    const model = MODELS[Math.min(i, MODELS.length - 1)];
+    const model = modelsToTry[Math.min(i, modelsToTry.length - 1)];
     try {
       const result = await fn(model);
       if (!result?.text) throw new Error('EMPTY_RESPONSE');
@@ -382,7 +386,7 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
         contents: prompt,
         config: { systemInstruction, temperature: 0.4, tools: useSearch ? [{ googleSearch: {} }] : undefined }
       })
-    );
+    , 3, model);
     let sources: string[] = [];
     if (useSearch) {
       const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];
@@ -394,6 +398,35 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
     const msg = error.message || '';
     const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
     res.status(isOverloaded ? 503 : 500).json({ error: isOverloaded ? 'overloaded' : msg });
+  }
+});
+
+// ── LinkedIn Screenshot / Image Text Extraction ───────────────────────────────
+app.post("/api/extract-image", aiLimiter, requireAuth, async (req, res) => {
+  const { base64, mimeType } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
+  if (!base64) return res.status(400).json({ error: "base64 fehlt" });
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await geminiWithRetry((mdl) =>
+      ai.models.generateContent({
+        model: mdl,
+        contents: [{
+          role: 'user',
+          parts: [
+            { inlineData: { mimeType: mimeType || 'image/jpeg', data: base64 } },
+            { text: 'Extrahiere alle sichtbaren Textinformationen aus diesem LinkedIn-Profil-Screenshot. Gib Name, Berufsbezeichnung, Unternehmen, Ausbildung, Fähigkeiten und alle anderen relevanten Karriereinformationen als strukturierten Text zurück. Nur den extrahierten Text, keine Erklärungen.' }
+          ]
+        }],
+        config: { temperature: 0.1 }
+      })
+    , 3, PRO_MODEL);
+    res.json({ text: response.text });
+  } catch (error: any) {
+    console.error("[IMAGE EXTRACT ERROR]", error);
+    res.status(500).json({ error: error.message || 'Bildanalyse fehlgeschlagen' });
   }
 });
 
