@@ -67,6 +67,7 @@ import { searchData, SearchItem } from './data/searchData';
 import sampleJobs from './data/sampleJobs.json';
 import * as pdfjsLib from 'pdfjs-dist';
 import { jsPDF } from 'jspdf';
+import mammoth from 'mammoth';
 
 import Markdown from 'react-markdown';
 
@@ -924,7 +925,8 @@ const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark' }: { onFi
       }
     },
     accept: {
-      'application/pdf': ['.pdf']
+      'application/pdf': ['.pdf'],
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx'],
     },
     multiple: false,
     disabled: isUploading
@@ -954,11 +956,11 @@ const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark' }: { onFi
               {isDragActive ? (t.drop_file_here || 'Datei hier ablegen …') : (t.upload_cv || 'Lebenslauf hochladen')}
             </p>
             <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] mt-0.5">
-              PDF · Kostenlos & sicher analysieren lassen
+              PDF oder Word · Kostenlos & sicher analysieren lassen
             </p>
           </div>
           <div className="ml-auto text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/20 px-2 py-1 flex-shrink-0">
-            PDF
+            PDF / Word
           </div>
         </div>
       </div>
@@ -2012,7 +2014,7 @@ function StellifyApp() {
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = '';
-    
+
     for (let i = 1; i <= pdf.numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
@@ -2020,8 +2022,16 @@ function StellifyApp() {
       fullText += pageText + '\n';
       setUploadProgress(Math.round((i / pdf.numPages) * 100));
     }
-    
+
     return fullText;
+  };
+
+  const extractTextFromDocx = async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer();
+    setUploadProgress(50);
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    setUploadProgress(100);
+    return result.value;
   };
 
   const analyzeCV = async (text: string) => {
@@ -2079,9 +2089,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       let text = '';
       if (file.type === 'application/pdf') {
         text = await extractTextFromPDF(file);
+      } else if (file.name.endsWith('.docx') || file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+        text = await extractTextFromDocx(file);
       } else {
-        // Fallback for non-PDF files (just a placeholder for now)
-        text = `Inhalt von ${file.name} (Text-Extraktion nur für PDF implementiert)`;
+        text = `Inhalt von ${file.name}`;
         setUploadProgress(100);
       }
       
@@ -7134,7 +7145,7 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
             {language === 'DE' ? (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
                 {([
-                  ['1', 'Lebenslauf (CV)'],
+                  ['1', 'Lebenslauf (CV) hochladen'],
                   ['2', 'KI-Analyse'],
                   ['3', 'Bewerbung optimieren'],
                   ['4', 'Interview meistern'],
