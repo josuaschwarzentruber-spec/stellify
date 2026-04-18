@@ -31,7 +31,7 @@ import {
   Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, GraduationCap, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
-  Headphones, Radio, ChevronLeft, BarChart3, CreditCard
+  Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Twitter, Image as ImageIcon
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -1540,7 +1540,9 @@ function StellifyApp() {
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const linkedinImageInputRef = useRef<HTMLInputElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
+  const [isExtractingImage, setIsExtractingImage] = useState(false);
 
   // --- EFFECTS ---
   useEffect(() => {
@@ -2034,6 +2036,28 @@ function StellifyApp() {
     const result = await mammoth.extractRawText({ arrayBuffer });
     setUploadProgress(100);
     return result.value;
+  };
+
+  const extractTextFromImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const base64 = (e.target?.result as string).split(',')[1];
+          const mimeType = file.type || 'image/jpeg';
+          const idToken = await auth.currentUser?.getIdToken();
+          const r = await fetch('/api/extract-image', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
+            body: JSON.stringify({ base64, mimeType }),
+          });
+          if (!r.ok) throw new Error('Bildanalyse fehlgeschlagen');
+          const data = await r.json();
+          resolve(data.text || '');
+        } catch (err) { reject(err); }
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const analyzeCV = async (text: string) => {
@@ -8175,13 +8199,16 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
               <p className="text-sm font-light leading-relaxed max-w-xs">
                 {t.footer_desc}
               </p>
-              <div className="flex gap-4">
-                <div className="w-8 h-8 bg-white/5 flex items-center justify-center text-white/40 hover:text-[#004225] transition-colors cursor-pointer">
-                  <Globe size={16} />
-                </div>
-                <div className="w-8 h-8 bg-white/5 flex items-center justify-center text-white/40 hover:text-[#004225] transition-colors cursor-pointer">
-                  <Shield size={16} />
-                </div>
+              <div className="flex gap-3">
+                <a href="https://www.linkedin.com/company/stellify" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-[#0A66C2] hover:bg-white/10 transition-colors">
+                  <Linkedin size={16} />
+                </a>
+                <a href="https://www.instagram.com/stellify.ch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-[#E1306C] hover:bg-white/10 transition-colors">
+                  <Instagram size={16} />
+                </a>
+                <a href="https://twitter.com/stellify_ch" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-colors">
+                  <Twitter size={16} />
+                </a>
               </div>
             </div>
             <div>
@@ -8648,15 +8675,27 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
                       <div key={input.key}>
                         <div className="flex justify-between items-center mb-2">
                           <label className="block text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{input.label}</label>
-                          {input.type === 'textarea' && (
-                            <button 
-                              onClick={() => fileInputRef.current?.click()}
-                              className="text-[10px] font-bold text-[#004225] dark:text-[#FAFAF8] flex items-center gap-1 hover:underline"
-                            >
-                              <FileText size={10} />
-                              {t.tool_load_file}
-                            </button>
-                          )}
+                          <div className="flex items-center gap-3">
+                            {input.key === 'linkedinProfile' && (
+                              <button
+                                onClick={() => linkedinImageInputRef.current?.click()}
+                                disabled={isExtractingImage}
+                                className="text-[10px] font-bold text-[#0A66C2] flex items-center gap-1 hover:underline disabled:opacity-50"
+                              >
+                                {isExtractingImage ? <RefreshCw size={10} className="animate-spin" /> : <ImageIcon size={10} />}
+                                {isExtractingImage ? 'Wird analysiert...' : 'Screenshot'}
+                              </button>
+                            )}
+                            {input.type === 'textarea' && (
+                              <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="text-[10px] font-bold text-[#004225] dark:text-[#FAFAF8] flex items-center gap-1 hover:underline"
+                              >
+                                <FileText size={10} />
+                                {t.tool_load_file}
+                              </button>
+                            )}
+                          </div>
                         </div>
                         {input.type === 'textarea' ? (
                           <textarea
@@ -10077,6 +10116,26 @@ ${salaryData.insights.map((i: string) => `- ${i}`).join('\n')}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) processFile(file);
+        }}
+      />
+      <input
+        type="file"
+        ref={linkedinImageInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={async (e) => {
+          const file = e.target.files?.[0];
+          if (!file) return;
+          e.target.value = '';
+          setIsExtractingImage(true);
+          try {
+            const extracted = await extractTextFromImage(file);
+            setToolInput((prev: any) => ({ ...prev, linkedinProfile: extracted }));
+          } catch {
+            alert('Screenshot konnte nicht analysiert werden. Bitte Text manuell einfügen.');
+          } finally {
+            setIsExtractingImage(false);
+          }
         }}
       />
     </div>
