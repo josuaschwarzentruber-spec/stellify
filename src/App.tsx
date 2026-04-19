@@ -4104,7 +4104,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Datei laden",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
-      swiss_standard_notice_text: "Präzise abgestimmt auf die spezifischen Anforderungen und kulturellen Nuancen des Schweizer Arbeitsmarktes.",
+      swiss_standard_notice_text: "Präzise auf den Schweizer Arbeitsmarkt ausgerichtet – von der Sprache bis zur Bewerbungsstruktur.",
       footer_rights: "Alle Rechte vorbehalten.",
       footer_privacy: "Datenschutz",
       footer_terms: "AGB",
@@ -4120,6 +4120,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_members: "Mitglieder",
       hero_intro: "Dein persönlicher",
       badge_new: "NEU",
+      tools_section_badge: "21 KI-Tools",
+      tools_section_title: "Alles, was du für deine Karriere brauchst",
+      tools_section_desc: "Von der CV-Analyse bis zur Lohnverhandlung – Stellify begleitet dich durch jeden Schritt.",
+      tools_section_cta: "Alle 21 Tools ansehen →",
+      testimonial_verified: "Verifiziert",
+      cv_banner_title: "Lade deinen Lebenslauf hoch für personalisierte KI-Analysen",
+      cv_banner_desc: "PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen Lebenslauf abgestimmt",
+      cv_banner_btn: "Lebenslauf (CV) hochladen",
+      cv_stat_upload: "Hochladen",
+      testimonials: [
+        { name: 'Lukas B.', role: 'Polymechaniker EFZ', city: 'Winterthur', quote: 'Nach meiner Ausbildung wusste ich nicht genau, wie ich meine Praxiserfahrungen am besten im CV verkaufe. Stellify half mir, meine Projekte präzise zu beschreiben. Jetzt habe ich einen tollen Job bei einem grossen Industrieunternehmen.' },
+        { name: 'Sarah W.', role: 'HR-Fachfrau', city: 'Zürich', quote: 'Ich sehe täglich hunderte Bewerbungen. Der Zeugnis-Decoder von Stellify ist erschreckend präzise. Er hilft mir nicht nur privat, er gibt mir auch eine neue Perspektive auf den Schweizer Arbeitsmarkt.' },
+        { name: 'Hans-Peter K.', role: 'Logistikleiter', city: 'Olten', quote: 'Mit über 50 nochmal neu anfangen war eine Herausforderung. Stellify hat meine jahrzehntelange Erfahrung in moderne, ATS-optimierte Sprache übersetzt. Das öffnete mir Türen, die ich schon für geschlossen hielt.' }
+      ],
       interview_live_promo: "Übe dein nächstes Interview – per Text oder Mikrofon",
       remaining: "verbleibend",
       search_close_label: "Schliessen",
@@ -4232,7 +4246,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Zeugnis nicht verstanden = falscher Job",
         "Ein schlechter ATS-Score = CV wird nie gelesen",
         "Eine schlechte Bewerbung = verpasste Stelle",
-        "1 erfolgreiche Bewerbung = Abo hat sich gerechnet",
+        "Mit einer besseren Stelle amortisiert sich das Abo sofort",
         "Stellify spart dir 3–5 Std. pro Bewerbung"
       ],
       tools_data: {
@@ -4662,7 +4676,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Charger fichier",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
-      swiss_standard_notice_text: "Précisément adapté aux exigences spécifiques et aux nuances culturelles du marché du travail suisse.",
+      swiss_standard_notice_text: "Précisément aligné sur le marché du travail suisse – de la langue à la structure de candidature.",
       footer_rights: "Tous droits réservés.",
       footer_privacy: "Confidentialité",
       footer_terms: "CGV",
@@ -4678,6 +4692,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_members: "Membres",
       hero_intro: "Votre",
       badge_new: "NOUVEAU",
+      tools_section_badge: "21 Outils IA",
+      tools_section_title: "Tout ce dont vous avez besoin pour votre carrière",
+      tools_section_desc: "De l'analyse CV à la négociation salariale – Stellify vous guide à chaque étape.",
+      tools_section_cta: "Voir les 21 outils →",
+      testimonial_verified: "Vérifié",
+      cv_banner_title: "Téléchargez votre CV pour des analyses IA personnalisées",
+      cv_banner_desc: "PDF ou Word · Gratuit · Les 21 outils adaptés à votre CV",
+      cv_banner_btn: "Télécharger le CV",
+      cv_stat_upload: "Télécharger",
+      testimonials: [
+        { name: 'Lukas B.', role: 'Polyméchanicien CFC', city: 'Winterthur', quote: "Après mon apprentissage, je ne savais pas exactement comment mettre en valeur mon expérience pratique dans mon CV. Stellify m'a aidé à décrire mes projets avec précision. J'ai maintenant un excellent emploi dans une grande entreprise industrielle." },
+        { name: 'Sarah W.', role: 'Spécialiste RH', city: 'Zurich', quote: "Je vois des centaines de candidatures chaque jour. Le décodeur de certificats de Stellify est terriblement précis. Il m'aide non seulement dans ma vie privée, mais me donne aussi une nouvelle perspective sur le marché du travail suisse." },
+        { name: 'Hans-Peter K.', role: 'Chef de logistique', city: 'Olten', quote: "Recommencer à plus de 50 ans était un défi. Stellify a traduit mes nombreuses années d'expérience en un langage moderne et optimisé. Cela m'a ouvert des portes que je croyais déjà fermées." }
+      ],
       interview_live_promo: "Entraînez-vous – par texte ou micro",
       remaining: "restants",
       search_close_label: "Fermer",
@@ -4790,7 +4818,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Certificat non compris = mauvais emploi",
         "Un mauvais score ATS = le CV n'est jamais lu",
         "Une mauvaise candidature = poste manqué",
-        "1 candidature réussie = l'abonnement est rentabilisé",
+        "Un meilleur poste rembourse l'abonnement immédiatement",
         "Stellify vous fait gagner 3–5 h par candidature"
       ],
       tools_data: {
@@ -5100,7 +5128,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Carica file",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
-      swiss_standard_notice_text: "Precisamente adattato ai requisiti specifici e alle sfumature culturali del mercato del lavoro svizzero.",
+      swiss_standard_notice_text: "Precisamente allineato con il mercato del lavoro svizzero – dalla lingua alla struttura della candidatura.",
       footer_rights: "Tutti i diritti riservati.",
       footer_privacy: "Privacy",
       footer_terms: "CGU",
@@ -5116,6 +5144,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_members: "Membri",
       hero_intro: "Il tuo",
       badge_new: "NUOVO",
+      tools_section_badge: "21 Strumenti AI",
+      tools_section_title: "Tutto ciò di cui hai bisogno per la tua carriera",
+      tools_section_desc: "Dall'analisi del CV alla negoziazione salariale – Stellify ti guida in ogni fase.",
+      tools_section_cta: "Vedi tutti i 21 strumenti →",
+      testimonial_verified: "Verificato",
+      cv_banner_title: "Carica il tuo CV per analisi AI personalizzate",
+      cv_banner_desc: "PDF o Word · Gratuito · Tutti i 21 strumenti adattati al tuo CV",
+      cv_banner_btn: "Carica CV",
+      cv_stat_upload: "Carica",
+      testimonials: [
+        { name: 'Lukas B.', role: 'Polimeccanico AFC', city: 'Winterthur', quote: "Dopo il mio tirocinio, non sapevo esattamente come valorizzare la mia esperienza pratica nel CV. Stellify mi ha aiutato a descrivere i miei progetti con precisione. Ora ho un ottimo lavoro in una grande azienda industriale." },
+        { name: 'Sarah W.', role: 'Specialista HR', city: 'Zurigo', quote: "Vedo centinaia di candidature ogni giorno. Il decodificatore di certificati di Stellify è terribilmente preciso. Non solo mi aiuta nella vita privata, ma mi dà anche una nuova prospettiva sul mercato del lavoro svizzero." },
+        { name: 'Hans-Peter K.', role: 'Responsabile logistica', city: 'Olten', quote: "Ricominciare a oltre 50 anni era una sfida. Stellify ha tradotto i miei tanti anni di esperienza in un linguaggio moderno e ottimizzato per l'ATS. Questo mi ha aperto porte che pensavo già chiuse." }
+      ],
       interview_live_promo: "Pratica il tuo colloquio – testo o microfono",
       remaining: "rimanenti",
       search_close_label: "Chiudi",
@@ -5228,7 +5270,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Certificato non compreso = lavoro sbagliato",
         "Un cattivo punteggio ATS = il CV non viene mai letto",
         "Una cattiva candidatura = posto mancato",
-        "1 candidatura di successo = l'abbonamento è ripagato",
+        "Con un posto migliore l'abbonamento si ripaga subito",
         "Stellify ti fa risparmiare 3–5 ore per candidatura"
       ],
       tools_data: {
@@ -5538,7 +5580,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Load file",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
-      swiss_standard_notice_text: "Precisely tailored to the specific requirements and cultural nuances of the Swiss job market.",
+      swiss_standard_notice_text: "Precisely aligned with the Swiss job market – from language to application structure.",
       footer_rights: "All rights reserved.",
       footer_privacy: "Privacy",
       footer_terms: "Terms",
@@ -5554,6 +5596,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_members: "Members",
       hero_intro: "Your Personal",
       badge_new: "NEW",
+      tools_section_badge: "21 AI Tools",
+      tools_section_title: "Everything you need for your career",
+      tools_section_desc: "From CV analysis to salary negotiation – Stellify guides you every step of the way.",
+      tools_section_cta: "View all 21 tools →",
+      testimonial_verified: "Verified",
+      cv_banner_title: "Upload your CV for personalised AI analyses",
+      cv_banner_desc: "PDF or Word · Free · All 21 tools tailored to your CV",
+      cv_banner_btn: "Upload CV",
+      cv_stat_upload: "Upload",
+      testimonials: [
+        { name: 'Lukas B.', role: 'Polymechanic EFZ', city: 'Winterthur', quote: "After my apprenticeship, I didn't know exactly how to best sell my practical skills in my CV. Stellify helped me describe my projects precisely. Now I have a great job at a large industrial company." },
+        { name: 'Sarah W.', role: 'HR Specialist', city: 'Zurich', quote: "I see hundreds of applications every day. Stellify's certificate decoder is frighteningly accurate. It not only helps me privately but also gives me a new perspective on the Swiss job market." },
+        { name: 'Hans-Peter K.', role: 'Logistics Manager', city: 'Olten', quote: "Starting over at over 50 was a challenge. Stellify translated my many years of experience into modern, ATS-optimized language. This opened doors for me that I already thought were closed." }
+      ],
       interview_live_promo: "Practice your next interview – text or microphone",
       remaining: "remaining",
       search_close_label: "Close",
@@ -5666,7 +5722,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Certificate not understood = wrong job",
         "A bad ATS score = CV is never read",
         "A bad application = missed position",
-        "1 successful application = subscription paid off",
+        "One better job offer covers the entire subscription cost",
         "Stellify saves you 3–5 hours per application"
       ],
       tools_data: {
@@ -6479,7 +6535,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <div className="w-8 h-8 bg-[#004225]/8 dark:bg-[#00A854]/10 group-hover:bg-[#004225]/15 dark:group-hover:bg-[#00A854]/20 transition-all flex items-center justify-center">
                               <Upload size={14} className="text-[#004225] dark:text-[#00A854]" />
                             </div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">Hochladen</span>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">{t.cv_stat_upload}</span>
                           </div>
                         </button>
                       )}
@@ -6500,15 +6556,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <FileUp size={18} className="text-white" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Lade deinen Lebenslauf hoch für personalisierte KI-Analysen</p>
-                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen Lebenslauf abgestimmt</p>
+                      <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{t.cv_banner_title}</p>
+                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">{t.cv_banner_desc}</p>
                     </div>
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       className="flex-shrink-0 px-6 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center gap-2"
                     >
                       <Upload size={12} />
-                      Lebenslauf (CV) hochladen
+                      {t.cv_banner_btn}
                     </button>
                   </motion.div>
                 )}
@@ -7371,30 +7427,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
-              21 KI-Tools
+              {t.tools_section_badge}
             </div>
             <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-3">
-              Alles, was du für deine Karriere brauchst
+              {t.tools_section_title}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl mx-auto">
-              Von der CV-Analyse bis zur Lohnverhandlung – Stellify begleitet dich durch jeden Schritt.
+              {t.tools_section_desc}
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
             {([
-              { icon: <Search size={18} />, title: 'CV-Analyse', desc: 'Keywords, Branche-Fit & Score', pro: false },
-              { icon: <Mic size={18} />, title: 'Interview-Coach', desc: '5 echte Fragen + Bewertung 0–100', pro: false },
-              { icon: <FileText size={18} />, title: 'Bewerbungsschreiben', desc: 'Motivationsschreiben in 60 Sek.', pro: false },
-              { icon: <Coins size={18} />, title: 'Gehaltsrechner', desc: 'Marktwert im Schweizer Markt', pro: false },
-              { icon: <Sparkles size={18} />, title: 'CV Premium Rewrite', desc: 'Komplette CV-Optimierung', pro: true },
-              { icon: <Shield size={18} />, title: 'Zeugnis-Decoder', desc: 'Versteckte Botschaften lesen', pro: true },
-              { icon: <Linkedin size={18} />, title: 'LinkedIn → Bewerbung', desc: 'Profil + Inserat → Brief', pro: false },
-              { icon: <Compass size={18} />, title: 'Karriere-Roadmap', desc: 'Persönlicher KI-Karriereplan', pro: false },
-            ] as { icon: React.ReactNode; title: string; desc: string; pro: boolean }[]).map((tool, i) => (
+              { id: 'cv-analysis', icon: <Search size={18} />, pro: false },
+              { id: 'interview', icon: <Mic size={18} />, pro: false },
+              { id: 'cv-gen', icon: <FileText size={18} />, pro: false },
+              { id: 'salary-calc', icon: <Coins size={18} />, pro: false },
+              { id: 'cv-premium', icon: <Sparkles size={18} />, pro: true },
+              { id: 'zeugnis', icon: <Shield size={18} />, pro: true },
+              { id: 'linkedin-job', icon: <Linkedin size={18} />, pro: false },
+              { id: 'career-roadmap', icon: <Compass size={18} />, pro: false },
+            ] as { id: string; icon: React.ReactNode; pro: boolean }[]).map((tool, i) => (
               <div
                 key={i}
-                onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
+                onClick={() => user ? handleToolClick(tool.id) : (setAuthTab('register'), setIsAuthModalOpen(true))}
                 className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 p-5 hover:border-[#004225]/40 hover:shadow-md transition-all cursor-pointer group"
               >
                 <div className="flex items-start justify-between mb-3">
@@ -7405,18 +7461,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <span className="text-[9px] font-bold uppercase tracking-wider text-[#004225] dark:text-[#00A854] border border-[#004225]/20 dark:border-[#00A854]/30 px-1.5 py-0.5">Pro</span>
                   )}
                 </div>
-                <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{tool.title}</p>
-                <p className="text-xs text-[#9A9A94] font-light leading-relaxed">{tool.desc}</p>
+                <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{t.tools_data[tool.id]?.title}</p>
+                <p className="text-xs text-[#9A9A94] font-light leading-relaxed">{t.tools_data[tool.id]?.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="text-center">
             <button
-              onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
+              onClick={() => user ? setActiveView('tools') : (setAuthTab('register'), setIsAuthModalOpen(true))}
               className="text-sm text-[#004225] dark:text-[#00A854] font-medium hover:underline underline-offset-4 transition-all"
             >
-              Alle 21 Tools nach der Registrierung ansehen →
+              {t.tools_section_cta}
             </button>
           </div>
         </div>
@@ -7752,38 +7808,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { 
-                name: 'Lukas B.', 
-                role: 'Polymechaniker EFZ', 
-                city: 'Winterthur', 
-                quote: language === 'DE' ? 'Nach meiner Lehre wusste ich nicht genau, wie ich meine praktischen Fähigkeiten im CV am besten verkaufe. Stellify hat mir geholfen, meine Projekte präzise zu beschreiben. Jetzt habe ich eine super Stelle bei einem grossen Industrieunternehmen.' : 
-                       language === 'FR' ? 'Après mon apprentissage, je ne savais pas exactement comment mettre en avant mes compétences pratiques dans mon CV. Stellify m\'a aidé à décrire mes projets avec précision. J\'ai maintenant un super poste dans une grande entreprise industrielle.' :
-                       language === 'IT' ? 'Dopo il mio apprendistato, non sapevo esattamente come vendere al meglio le mie abilità pratiche nel mio CV. Stellify mi ha aiutato a descrivere i miei progetti con precisione. Ora ho un ottimo posto in una grande azienda industriale.' :
-                       'After my apprenticeship, I didn\'t know exactly how to best sell my practical skills in my CV. Stellify helped me describe my projects precisely. Now I have a great job at a large industrial company.', 
-                img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200' 
-              },
-              { 
-                name: 'Sarah W.', 
-                role: 'HR-Fachfrau', 
-                city: 'Zürich', 
-                quote: language === 'DE' ? 'Ich sehe täglich hunderte Bewerbungen. Der Zeugnis-Decoder von Stellify ist erschreckend genau. Er hilft mir nicht nur privat, sondern gibt mir auch eine neue Perspektive auf die Nuancen im Schweizer Arbeitsmarkt.' : 
-                       language === 'FR' ? 'Je vois des centaines de candidatures chaque jour. Le décodeur de certificats de Stellify est d\'une précision redoutable. Il m\'aide non seulement à titre privé, mais me donne aussi une nouvelle perspective sur les nuances du marché du travail suisse.' :
-                       language === 'IT' ? 'Vedo centinaia di candidature ogni giorno. Il decodificatore di certificati di Stellify è incredibilmente preciso. Mi aiuta non solo privatamente, ma mi dà anche una nuova prospettiva sulle sfumature del mercato del lavoro svizzero.' :
-                       'I see hundreds of applications every day. Stellify\'s certificate decoder is frighteningly accurate. It not only helps me privately but also gives me a new perspective on the nuances of the Swiss job market.', 
-                img: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200' 
-              },
-              { 
-                name: 'Hans-Peter K.', 
-                role: 'Logistikleiter', 
-                city: 'Olten', 
-                quote: language === 'DE' ? 'Mit über 50 nochmals neu anzufangen war eine Herausforderung. Stellify hat meine langjährige Erfahrung in moderne, ATS-optimierte Sprache übersetzt. Das hat mir Türen geöffnet, die ich schon für verschlossen hielt.' : 
-                       language === 'FR' ? 'Recommencer à plus de 50 ans était un défi. Stellify a traduit ma longue expérience dans un langage moderne et optimisé pour les ATS. Cela m\'a ouvert des portes que je pensais déjà fermées.' :
-                       language === 'IT' ? 'Ricominciare a più di 50 anni è stata una sfida. Stellify ha tradotto la mia lunga esperienza in un linguaggio moderno e ottimizzato per l\'ATS. Questo mi ha aperto porte che pensavo fossero già chiuse.' :
-                       'Starting over at over 50 was a challenge. Stellify translated my many years of experience into modern, ATS-optimized language. This opened doors for me that I already thought were closed.', 
-                img: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200' 
-              }
-            ].map((story, i) => (
+            {(t.testimonials as { name: string; role: string; city: string; quote: string }[]).map((story, i) => (
               <motion.div 
                 key={i}
                 whileHover={{ y: -5 }}
@@ -7794,7 +7819,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="relative">
-                    <Avatar name={story.name} color={i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-rose-500' : 'bg-amber-500'} src={story.img} />
+                    <Avatar name={story.name} color={i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-rose-500' : 'bg-amber-500'} src={[
+                      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200',
+                      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200',
+                      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200'
+                    ][i]} />
                     <div className="absolute -bottom-1 -right-1 bg-[#004225] text-white rounded-full p-0.5 border-2 border-white">
                       <CheckCircle2 size={10} />
                     </div>
@@ -7810,7 +7839,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map(s => <Star key={s} size={12} className="text-[#004225]" fill="currentColor" />)}
                   </div>
-                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#004225]/40">Verifiziert</span>
+                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#004225]/40">{t.testimonial_verified}</span>
                 </div>
               </motion.div>
             ))}
@@ -7828,7 +7857,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
               <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
             </div>
-            <button className="hidden md:block text-sm font-medium text-[#004225] border-b border-[#004225] pb-1">{t.tools_view_all}</button>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hidden md:block text-sm font-medium text-[#004225] dark:text-[#00A854] border-b border-[#004225] dark:border-[#00A854] pb-1 hover:opacity-70 transition-opacity"
+            >{t.tools_view_all}</button>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -7868,7 +7900,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   }}
                   className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn"
                 >
-                  {isGeneratingApp && tool.id === 'cv-gen' ? 'Wird generiert...' : 'Öffnen'}
+                  {isGeneratingApp && tool.id === 'cv-gen' ? (language === 'DE' ? 'Wird generiert...' : language === 'FR' ? 'En cours...' : language === 'IT' ? 'Generazione...' : 'Generating...') : t.tool_open}
                   <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
                 </button>
               </motion.div>
