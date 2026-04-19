@@ -8038,7 +8038,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </li>
                 ))}
               </ul>
-              <button className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium">{t.pricing_cta_free}</button>
+              <button
+                onClick={() => user ? setActiveView('dashboard') : (setAuthTab('register'), setIsAuthModalOpen(true))}
+                className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium"
+              >{user ? t.dashboard : t.pricing_cta_free}</button>
             </div>
 
             {/* PRO */}
@@ -8202,11 +8205,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="max-w-4xl mx-auto space-y-8">
           <h2 className="text-5xl lg:text-7xl font-serif tracking-tight leading-tight">{t.cta_final_title}</h2>
           <p className="text-white/60 font-light text-lg">{t.cta_final_desc}</p>
-          <button 
-            onClick={() => setIsAuthModalOpen(true)}
+          <button
+            onClick={() => user ? setActiveView('dashboard') : setIsAuthModalOpen(true)}
             className="bg-white text-[#004225] px-10 py-5 text-xl font-medium hover:bg-[#FDFCFB] transition-all inline-flex items-center gap-3 group"
           >
-            {t.cta_final_btn}
+            {user ? t.dashboard : t.cta_final_btn}
             <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
