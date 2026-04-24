@@ -1494,17 +1494,16 @@ function StellifyApp() {
     let unsubscribeUser: (() => void) | null = null;
 
     const processUserData = (rawData: any, supaUser: any) => {
-      if (!rawData) return;
-      if (rawData.language && rawData.language !== language) setLanguage(rawData.language);
-      if (rawData.theme && rawData.theme !== theme) setTheme(rawData.theme);
+      if (rawData?.language && rawData.language !== language) setLanguage(rawData.language);
+      if (rawData?.theme && rawData.theme !== theme) setTheme(rawData.theme);
 
-      const rawName = rawData.first_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
+      const rawName = rawData?.first_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
       const cleanName = rawName.replace(/\./g, ' ');
       const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
       const sanitizedFirstName = formattedName === 'Gast' ? 'Nutzer' : formattedName;
 
-      let effectiveRole = rawData.role || 'client';
-      const expiresAt = rawData.subscription_expires_at ? new Date(rawData.subscription_expires_at) : null;
+      let effectiveRole = rawData?.role || 'client';
+      const expiresAt = rawData?.subscription_expires_at ? new Date(rawData.subscription_expires_at) : null;
       const now = new Date();
       if (expiresAt && (effectiveRole === 'pro' || effectiveRole === 'unlimited')) {
         const msLeft = expiresAt.getTime() - now.getTime();
@@ -1523,33 +1522,35 @@ function StellifyApp() {
         id: supaUser.id,
         email: supaUser.email || '',
         firstName: sanitizedFirstName,
-        freeGenerationsUsed: rawData.free_generations_used || 0,
-        toolUses: rawData.tool_uses || 0,
-        dailyToolUses: rawData.daily_tool_uses || 0,
-        lastDailyReset: rawData.last_daily_reset || null,
-        lastMonthlyReset: rawData.last_monthly_reset || null,
-        cvContext: rawData.cv_context || null,
+        freeGenerationsUsed: rawData?.free_generations_used || 0,
+        toolUses: rawData?.tool_uses || 0,
+        dailyToolUses: rawData?.daily_tool_uses || 0,
+        lastDailyReset: rawData?.last_daily_reset || null,
+        lastMonthlyReset: rawData?.last_monthly_reset || null,
+        cvContext: rawData?.cv_context || null,
         role: effectiveRole,
-        hasSeenTutorial: rawData.has_seen_tutorial || false,
-        subscriptionExpiresAt: rawData.subscription_expires_at || undefined,
-        subscriptionInterval: rawData.subscription_interval || undefined,
-        stripeCustomerId: rawData.stripe_customer_id || undefined,
-        searchUses: rawData.search_uses || 0,
+        hasSeenTutorial: rawData?.has_seen_tutorial || false,
+        subscriptionExpiresAt: rawData?.subscription_expires_at || undefined,
+        subscriptionInterval: rawData?.subscription_interval || undefined,
+        stripeCustomerId: rawData?.stripe_customer_id || undefined,
+        searchUses: rawData?.search_uses || 0,
       };
       setUser(newUser);
 
-      const today = new Date().toISOString().split('T')[0];
-      if (rawData.last_daily_reset !== today) {
-        supabase.from('users').update({ daily_tool_uses: 0, last_daily_reset: today }).eq('id', supaUser.id).then(null, console.error);
-      }
+      if (rawData) {
+        const today = new Date().toISOString().split('T')[0];
+        if (rawData.last_daily_reset !== today) {
+          supabase.from('users').update({ daily_tool_uses: 0, last_daily_reset: today }).eq('id', supaUser.id).then(null, console.error);
+        }
 
-      const currentMonth = new Date().toISOString().substring(0, 7);
-      if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && rawData.last_monthly_reset !== currentMonth) {
-        supabase.from('users').update({ tool_uses: 0, free_generations_used: 0, search_uses: 0, last_monthly_reset: currentMonth }).eq('id', supaUser.id).then(null, console.error);
-      }
+        const currentMonth = new Date().toISOString().substring(0, 7);
+        if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && rawData.last_monthly_reset !== currentMonth) {
+          supabase.from('users').update({ tool_uses: 0, free_generations_used: 0, search_uses: 0, last_monthly_reset: currentMonth }).eq('id', supaUser.id).then(null, console.error);
+        }
 
-      if (!rawData.has_seen_tutorial) setIsTutorialOpen(true);
-      if (rawData.cv_context) setCvContext(rawData.cv_context);
+        if (!rawData.has_seen_tutorial) setIsTutorialOpen(true);
+        if (rawData.cv_context) setCvContext(rawData.cv_context);
+      }
     };
 
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -1564,7 +1565,7 @@ function StellifyApp() {
             const rawName = supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
             const cleanName = rawName.replace(/\./g, ' ');
             const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            await supabase.from('users').insert({
+            const { error: insertError } = await supabase.from('users').insert({
               id: supaUser.id,
               email: supaUser.email || '',
               first_name: formattedName,
@@ -1578,6 +1579,7 @@ function StellifyApp() {
               theme,
               cv_context: cvContext || null,
             });
+            if (insertError) console.error('Error creating user profile:', insertError);
             if (event === 'SIGNED_IN' && supaUser.app_metadata?.provider !== 'email') {
               fetch('/api/send-welcome-email', {
                 method: 'POST',
