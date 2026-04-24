@@ -1630,10 +1630,12 @@ function StellifyApp() {
 
         unsubscribeUser = () => { supabase.removeChannel(userChannel); };
       } else {
-        // If INITIAL_SESSION fires with no session but OAuth tokens are already in
-        // the URL hash, Supabase is still processing them — SIGNED_IN will follow
-        // momentarily. Don't dismiss the splash or reset user state yet.
-        if (event === 'INITIAL_SESSION' && window.location.hash.includes('access_token=')) return;
+        // If INITIAL_SESSION fires before Supabase finishes processing an OAuth
+        // redirect (implicit hash tokens OR PKCE code in query), wait for SIGNED_IN.
+        const hash = window.location.hash;
+        const search = window.location.search;
+        const isOAuthReturn = hash.includes('access_token=') || new URLSearchParams(search).has('code');
+        if (event === 'INITIAL_SESSION' && isOAuthReturn) return;
         setUser(null);
         setIsAuthReady(true);
       }
@@ -2212,99 +2214,23 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
-  const openOAuthPopup = (url: string, name: string) => {
-    const w = 500, h = 650;
-    const left = window.screenX + (window.outerWidth - w) / 2;
-    const top = window.screenY + (window.outerHeight - h) / 2;
-    return window.open(url, name, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`);
-  };
-
-  const handleOAuthWithPopup = async (provider: 'google' | 'linkedin_oidc', errorMsgs: Record<string, string>) => {
+  const handleGoogleAuth = async () => {
     setAuthError('');
     setIsAuthLoading(true);
-
-    // Open popup SYNCHRONOUSLY (within user gesture) so browsers don't block it.
-    const popup = openOAuthPopup('about:blank', `${provider}-oauth`);
-
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: { redirectTo: `${window.location.origin}/`, skipBrowserRedirect: true },
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: `${window.location.origin}/` },
       });
       if (error) throw error;
-      if (!data.url) throw new Error('No URL returned');
-
-      if (popup && !popup.closed) {
-        popup.location.href = data.url;
-      } else {
-        // Popup was blocked – fall back to full-page redirect
-        window.location.href = data.url;
-        return;
-      }
-
-      setIsAuthModalOpen(false);
-      localStorage.removeItem('stellify_oauth_result');
-
-      const applySession = async (access_token: string, refresh_token: string) => {
-        const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token: refresh_token || '' });
-        if (sessionError) console.error('setSession error:', sessionError);
-      };
-
-      // Fast path: postMessage (works when COOP allows window.opener)
-      const onMessage = (event: MessageEvent) => {
-        if (event.origin !== window.location.origin) return;
-        if (event.data?.type !== 'SUPABASE_OAUTH_POPUP_SUCCESS') return;
-        cleanup();
-        applySession(event.data.access_token, event.data.refresh_token);
-      };
-
-      // Fallback: localStorage storage event (works even when COOP nulls window.opener)
-      const onStorage = (event: StorageEvent) => {
-        if (event.key !== 'stellify_oauth_result' || !event.newValue) return;
-        try {
-          const { access_token, refresh_token } = JSON.parse(event.newValue);
-          if (!access_token) return;
-          cleanup();
-          localStorage.removeItem('stellify_oauth_result');
-          applySession(access_token, refresh_token);
-        } catch (_) {}
-      };
-
-      // Safety: give up after 5 minutes
-      const timeout = setTimeout(() => cleanup(), 5 * 60 * 1000);
-
-      const cleanup = () => {
-        window.removeEventListener('message', onMessage);
-        window.removeEventListener('storage', onStorage);
-        clearTimeout(timeout);
-      };
-
-      window.addEventListener('message', onMessage);
-      window.addEventListener('storage', onStorage);
     } catch (err: any) {
-      if (popup && !popup.closed) popup.close();
-      console.error(`${provider} Auth Error:`, err);
-      const msg = errorMsgs[language] || errorMsgs['EN'];
+      console.error('Google Auth Error:', err);
+      const msg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
       setAuthError(msg);
       showToast(msg, 'error');
-    } finally {
       setIsAuthLoading(false);
     }
   };
-
-  const handleLinkedInAuth = () => handleOAuthWithPopup('linkedin_oidc', {
-    DE: 'LinkedIn-Anmeldung fehlgeschlagen.',
-    FR: 'Échec de la connexion LinkedIn.',
-    IT: 'Accesso LinkedIn fallito.',
-    EN: 'LinkedIn authentication failed.',
-  });
-
-  const handleGoogleAuth = () => handleOAuthWithPopup('google', {
-    DE: 'Google-Anmeldung fehlgeschlagen.',
-    FR: 'Échec de la connexion Google.',
-    IT: 'Accesso Google fallito.',
-    EN: 'Google authentication failed.',
-  });
 
   const handleDeleteAccount = async () => {
     if (!user) return;
