@@ -1019,9 +1019,9 @@ function StellifyApp() {
     setSplashDone(true);
   }, []);
 
-  // Safety net: if auth hasn't resolved in 10s (e.g. network error), dismiss splash
+  // Safety net: if auth hasn't resolved in 2s (e.g. network error), dismiss splash
   useEffect(() => {
-    const timer = setTimeout(() => setIsAuthReady(true), 10000);
+    const timer = setTimeout(() => setIsAuthReady(true), 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1574,8 +1574,6 @@ function StellifyApp() {
       if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
 
       if (session?.user) {
-        // Clear OAuth-return flag now that auth has resolved successfully
-        try { sessionStorage.removeItem('stellify_oauth_returning'); } catch(_) {}
         const supaUser = session.user;
 
         try {
@@ -1631,15 +1629,12 @@ function StellifyApp() {
         unsubscribeUser = () => { supabase.removeChannel(userChannel); };
       } else {
         // If INITIAL_SESSION fires before Supabase finishes processing the OAuth
-        // redirect, skip null-session handling and wait for the SIGNED_IN event.
-        // We check both the live hash/query AND a sessionStorage flag set by
-        // index.html (before Supabase clears the hash) to cover all timing scenarios.
+        // redirect (implicit hash or PKCE code), wait for SIGNED_IN.
         const hash = window.location.hash;
         const search = window.location.search;
         const isOAuthReturn =
           hash.includes('access_token=') ||
-          new URLSearchParams(search).has('code') ||
-          sessionStorage.getItem('stellify_oauth_returning') === '1';
+          new URLSearchParams(search).has('code');
         if (event === 'INITIAL_SESSION' && isOAuthReturn) return;
         setUser(null);
         setIsAuthReady(true);
