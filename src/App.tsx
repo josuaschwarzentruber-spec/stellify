@@ -1659,7 +1659,7 @@ function StellifyApp() {
   useEffect(() => {
     const handleOAuthMessage = (event: MessageEvent) => {
       const origin = event.origin;
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost')) return;
+      if (origin !== window.location.origin) return;
 
       if (event.data?.type === 'OAUTH_AUTH_SUCCESS' && event.data?.provider === 'linkedin') {
         const profile = event.data.profile;

@@ -731,7 +731,10 @@ app.get("/api/auth/linkedin/callback", async (req, res) => {
   const { code, error, error_description } = req.query;
   const clientId = process.env.LINKEDIN_CLIENT_ID;
   const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
-  const origin = req.headers.origin || 'http://localhost:3000';
+  // Derive origin reliably — GET redirects from LinkedIn carry no Origin header
+  const proto = ((req.headers['x-forwarded-proto'] as string) || req.protocol).split(',')[0].trim();
+  const host = req.get('host') || 'localhost:3000';
+  const origin = `${proto}://${host}`;
   if (error) return res.status(400).send(`LinkedIn Error: ${error_description || error}`);
   if (!code) return res.status(400).send("No code");
   try {
@@ -749,7 +752,7 @@ app.get("/api/auth/linkedin/callback", async (req, res) => {
       headers: { Authorization: `Bearer ${access_token}` },
     });
     const profileData = await profileRes.json();
-    res.send(`<html><body><script>window.opener?.postMessage({type:'OAUTH_AUTH_SUCCESS',provider:'linkedin',profile:${JSON.stringify(profileData)}},'*');setTimeout(()=>window.close(),2000);</script><p>Verbunden! Fenster schliesst sich...</p></body></html>`);
+    res.send(`<html><body><script>window.opener?.postMessage({type:'OAUTH_AUTH_SUCCESS',provider:'linkedin',profile:${JSON.stringify(profileData)}},${JSON.stringify(origin)});setTimeout(()=>window.close(),2000);</script><p>Verbunden! Fenster schliesst sich...</p></body></html>`);
   } catch (err: any) {
     res.status(500).send(`Auth failed: ${err.message}`);
   }
