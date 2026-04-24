@@ -1620,11 +1620,10 @@ function StellifyApp() {
 
         unsubscribeUser = () => { supabase.removeChannel(userChannel); };
       } else {
-        // With PKCE flow, Supabase exchanges the ?code= param asynchronously.
-        // INITIAL_SESSION may fire with null before the exchange completes.
-        // Wait for SIGNED_IN instead of setting the user to null prematurely.
-        const search = window.location.search;
-        if (event === 'INITIAL_SESSION' && new URLSearchParams(search).has('code')) return;
+        // INITIAL_SESSION can fire before Supabase has processed the OAuth
+        // redirect (hash tokens for implicit flow). Wait for SIGNED_IN instead.
+        const hash = window.location.hash;
+        if (event === 'INITIAL_SESSION' && hash.includes('access_token=')) return;
         setUser(null);
         setIsAuthReady(true);
       }
