@@ -820,29 +820,45 @@ app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
   }
 });
 
-// ── LinkedIn OAuth ────────────────────────────────────────────────────────────
+// ── LinkedIn Profile Import OAuth (separate from Supabase login) ──────────────
+// Generates a random state token per request to prevent CSRF
+const linkedInStates = new Map<string, number>();
+
 app.get("/api/auth/linkedin/url", (req, res) => {
   const clientId = process.env.LINKEDIN_CLIENT_ID;
-  const origin = req.headers.origin || 'http://localhost:3000';
+  const proto = ((req.headers['x-forwarded-proto'] as string) || 'https').split(',')[0].trim();
+  const host = req.get('host') || 'localhost:3000';
+  const origin = `${proto}://${host}`;
   if (!clientId) return res.status(500).json({ error: "LINKEDIN_CLIENT_ID fehlt" });
+
+  const state = require('crypto').randomBytes(16).toString('hex');
+  linkedInStates.set(state, Date.now());
+  // Purge states older than 10 minutes
+  for (const [k, t] of linkedInStates) { if (Date.now() - t > 600_000) linkedInStates.delete(k); }
+
   const params = new URLSearchParams({
     response_type: "code", client_id: clientId,
     redirect_uri: `${origin}/api/auth/linkedin/callback`,
-    state: "state", scope: "openid profile email",
+    state, scope: "openid profile email",
   });
   res.json({ url: `https://www.linkedin.com/oauth/v2/authorization?${params}` });
 });
 
 app.get("/api/auth/linkedin/callback", async (req, res) => {
-  const { code, error, error_description } = req.query;
+  const { code, state, error, error_description } = req.query;
   const clientId = process.env.LINKEDIN_CLIENT_ID;
   const clientSecret = process.env.LINKEDIN_CLIENT_SECRET;
-  // Derive origin reliably — GET redirects from LinkedIn carry no Origin header
   const proto = ((req.headers['x-forwarded-proto'] as string) || req.protocol).split(',')[0].trim();
   const host = req.get('host') || 'localhost:3000';
   const origin = `${proto}://${host}`;
+
   if (error) return res.status(400).send(`LinkedIn Error: ${error_description || error}`);
   if (!code) return res.status(400).send("No code");
+  if (!state || !linkedInStates.has(state as string)) {
+    return res.status(400).send("Invalid or expired state. Please try again.");
+  }
+  linkedInStates.delete(state as string);
+
   try {
     const tokenRes = await fetch("https://www.linkedin.com/oauth/v2/accessToken", {
       method: "POST",
@@ -853,14 +869,24 @@ app.get("/api/auth/linkedin/callback", async (req, res) => {
         redirect_uri: `${origin}/api/auth/linkedin/callback`,
       }),
     });
-    const { access_token } = await tokenRes.json();
+    const tokenData = await tokenRes.json();
+    if (!tokenRes.ok || !tokenData.access_token) {
+      throw new Error(tokenData.error_description || tokenData.error || 'Token-Austausch fehlgeschlagen');
+    }
+
     const profileRes = await fetch("https://api.linkedin.com/v2/userinfo", {
-      headers: { Authorization: `Bearer ${access_token}` },
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
     });
+    if (!profileRes.ok) throw new Error('Profil konnte nicht geladen werden');
     const profileData = await profileRes.json();
-    res.send(`<html><body><script>window.opener?.postMessage({type:'OAUTH_AUTH_SUCCESS',provider:'linkedin',profile:${JSON.stringify(profileData)}},${JSON.stringify(origin)});setTimeout(()=>window.close(),2000);</script><p>Verbunden! Fenster schliesst sich...</p></body></html>`);
+
+    res.send(`<html><body><script>
+      try { window.opener?.postMessage({type:'OAUTH_AUTH_SUCCESS',provider:'linkedin',profile:${JSON.stringify(profileData)}},${JSON.stringify(origin)}); } catch(e){}
+      setTimeout(()=>window.close(),1000);
+    </script><p>Verbunden! Fenster schliesst sich...</p></body></html>`);
   } catch (err: any) {
-    res.status(500).send(`Auth failed: ${err.message}`);
+    console.error('[LINKEDIN CALLBACK ERROR]', err.message);
+    res.status(500).send(`<html><body><p>Fehler: ${err.message}</p><button onclick="window.close()">Schliessen</button></body></html>`);
   }
 });
 
