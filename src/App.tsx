@@ -992,7 +992,7 @@ function StellifyApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [splashDone, setSplashDone] = useState(false);
+  const [splashMinDone, setSplashMinDone] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
@@ -1015,15 +1015,15 @@ function StellifyApp() {
     }
   }, [language, user]);
 
-  // Minimum splash screen duration (3.2s for professional feel)
+  // Safety net: if auth hasn't resolved in 2s (e.g. network error), dismiss splash
   useEffect(() => {
-    const timer = setTimeout(() => setSplashDone(true), 3200);
+    const timer = setTimeout(() => setIsAuthReady(true), 2000);
     return () => clearTimeout(timer);
   }, []);
 
-  // Safety net: if auth hasn't resolved in 10s (e.g. network error), dismiss splash
+  // Minimum splash duration: 4.5s for a professional brand moment
   useEffect(() => {
-    const timer = setTimeout(() => setIsAuthReady(true), 10000);
+    const timer = setTimeout(() => setSplashMinDone(true), 4500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1040,9 +1040,8 @@ function StellifyApp() {
     }
   }, []);
 
-  // Handle return from Stripe checkout – runs after splash so activeView isn't overwritten
+  // Handle return from Stripe checkout
   useEffect(() => {
-    if (!splashDone) return;
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view');
     if (viewParam === 'pricing') {
@@ -1053,7 +1052,7 @@ function StellifyApp() {
       setActiveView('pricing');
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [splashDone]);
+  }, []);
 
   useEffect(() => {
     if (activeView === 'pricing') setSubscriptionError('');
@@ -1453,24 +1452,15 @@ function StellifyApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [hasPromoOpened, setHasPromoOpened] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!hasPromoOpened) {
-        setIsPromoOpen(true);
-        setHasPromoOpened(true);
-      }
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [hasPromoOpened]);
+  // Show promo banner 6s after page load (only once per browser)
   useEffect(() => {
     const hasSeenPromo = localStorage.getItem('hasSeenPromo');
     if (!hasSeenPromo) {
       const timer = setTimeout(() => {
         setIsPromoOpen(true);
         localStorage.setItem('hasSeenPromo', 'true');
-      }, 2000);
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -2011,29 +2001,40 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       }
       
       setCvContext(text);
-      
-      // Trigger AI Analysis
+
+      // Trigger AI Analysis (frontend, no auth needed for basic analysis)
       analyzeCV(text);
-      
-      // Call backend for metadata analysis
-      try {
-        await fetch('/api/analyze-cv', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text.substring(0, 1000) })
-        });
-      } catch (e) {
-        console.warn("Backend analysis failed, continuing with frontend only.");
-      }
-      
-      // Persist CV context if user is logged in
-      if (user) {
-        try {
-          await supabase.from('users').update({ cv_context: text }).eq('id', user.id);
-        } catch (error) {
-          handleDbError(error, 'db', `users/${user.id}`);
-        }
-      }
+
+      // Upload file to Supabase Storage + backend metadata analysis (parallel)
+      const token = await getAuthToken();
+      await Promise.allSettled([
+        // Store actual file in Supabase Storage via backend
+        (async () => {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+            await fetch('/api/upload-cv', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              body: JSON.stringify({ base64, fileName: file.name, mimeType: file.type }),
+            });
+          } catch (e) { console.warn("CV file upload failed, text-only mode."); }
+        })(),
+        // Backend metadata analysis
+        (async () => {
+          try {
+            await fetch('/api/analyze-cv', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              body: JSON.stringify({ text: text.substring(0, 1000) }),
+            });
+          } catch (e) { console.warn("Backend CV analysis failed."); }
+        })(),
+        // Persist CV text in DB
+        supabase.from('users').update({ cv_context: text }).eq('id', user.id).then(
+          null, (e) => handleDbError(e, 'db', `users/${user.id}`)
+        ),
+      ]);
 
       setMessages(prev => [...prev, { 
         role: 'ai', 
@@ -5883,7 +5884,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
-  if (!isAuthReady || !splashDone) {
+  if (!isAuthReady || !splashMinDone) {
     const features = ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">

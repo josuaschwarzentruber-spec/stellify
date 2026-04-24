@@ -714,6 +714,112 @@ app.post("/api/create-checkout-session", async (req, res) => {
 });
 
 
+// ── CV Analysis ──────────────────────────────────────────────────────────────
+app.post("/api/analyze-cv", aiLimiter, requireAuth, async (req, res) => {
+  const { text } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
+  if (!text) return res.status(400).json({ error: "text fehlt" });
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await geminiWithRetry((mdl) =>
+      ai.models.generateContent({
+        model: mdl,
+        contents: [{
+          role: 'user',
+          parts: [{ text: `Analysiere diesen Lebenslauf für den Schweizer Arbeitsmarkt und antworte NUR mit einem validen JSON-Objekt ohne Markdown:
+{
+  "keywords": ["keyword1", "keyword2"],
+  "industryMatch": "Branche",
+  "score": 75,
+  "improvements": ["punkt1", "punkt2", "punkt3"]
+}
+
+CV: ${text.substring(0, 2000)}` }]
+        }],
+        config: { temperature: 0.2 }
+      })
+    , 3);
+
+    const jsonMatch = (response.text || '').match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return res.json({ success: true, metadata: {} });
+    const metadata = JSON.parse(jsonMatch[0]);
+
+    const uid = (req as any).uid;
+    if (uid) {
+      await supabaseAdmin.from('cv_analyses').insert({ user_id: uid, data: metadata }).catch(console.error);
+    }
+
+    res.json({ success: true, metadata });
+  } catch (error: any) {
+    console.error("[ANALYZE CV ERROR]", error);
+    res.status(500).json({ error: error.message || 'CV-Analyse fehlgeschlagen' });
+  }
+});
+
+// ── Career Roadmap Generation ─────────────────────────────────────────────────
+app.post("/api/generate-roadmap", aiLimiter, requireAuth, async (req, res) => {
+  const { profile } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
+  if (!profile?.text) return res.status(400).json({ error: "profile.text fehlt" });
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const response = await geminiWithRetry((mdl) =>
+      ai.models.generateContent({
+        model: mdl,
+        contents: [{
+          role: 'user',
+          parts: [{ text: `Basierend auf diesem CV, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Arbeitsmarkt.
+Antworte NUR mit einem validen JSON-Array ohne Markdown:
+["Schritt 1: ...", "Schritt 2: ...", "Schritt 3: ..."]
+
+CV: ${profile.text.substring(0, 1000)}` }]
+        }],
+        config: { temperature: 0.4 }
+      })
+    , 3);
+
+    const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
+    if (!jsonMatch) return res.json({ success: false, roadmap: [] });
+    const roadmap = JSON.parse(jsonMatch[0]);
+
+    res.json({ success: true, roadmap: Array.isArray(roadmap) ? roadmap.slice(0, 3) : [] });
+  } catch (error: any) {
+    console.error("[ROADMAP ERROR]", error);
+    res.status(500).json({ success: false, error: error.message || 'Roadmap-Generierung fehlgeschlagen' });
+  }
+});
+
+// ── CV File Storage (Supabase Storage) ───────────────────────────────────────
+app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
+  const { base64, fileName, mimeType } = req.body;
+  const uid = (req as any).uid;
+  if (!base64 || !fileName) return res.status(400).json({ error: "base64 und fileName erforderlich" });
+
+  try {
+    const buffer = Buffer.from(base64, 'base64');
+    const safeName = `${uid}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+
+    const { error } = await supabaseAdmin.storage
+      .from('cv-files')
+      .upload(safeName, buffer, { contentType: mimeType || 'application/octet-stream', upsert: true });
+
+    if (error) throw error;
+
+    const { data: { publicUrl } } = supabaseAdmin.storage.from('cv-files').getPublicUrl(safeName);
+
+    await supabaseAdmin.from('users').update({ cv_file_path: safeName }).eq('id', uid).catch(console.error);
+
+    res.json({ success: true, path: safeName, url: publicUrl });
+  } catch (error: any) {
+    console.error("[CV UPLOAD ERROR]", error);
+    res.status(500).json({ error: error.message || 'Upload fehlgeschlagen' });
+  }
+});
+
 // ── LinkedIn OAuth ────────────────────────────────────────────────────────────
 app.get("/api/auth/linkedin/url", (req, res) => {
   const clientId = process.env.LINKEDIN_CLIENT_ID;

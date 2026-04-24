@@ -23,8 +23,12 @@ CREATE TABLE public.users (
   subscription_expires_at TIMESTAMPTZ,
   subscription_interval TEXT CHECK (subscription_interval IN ('monthly', 'annual')),
   stripe_customer_id TEXT,
-  search_uses INT DEFAULT 0
+  search_uses INT DEFAULT 0,
+  cv_file_path TEXT
 );
+
+-- Migration: add cv_file_path to existing deployments
+-- ALTER TABLE public.users ADD COLUMN IF NOT EXISTS cv_file_path TEXT;
 
 -- ── Messages table ────────────────────────────────────────────────────────────
 CREATE TABLE public.messages (
@@ -107,6 +111,28 @@ CREATE POLICY "Users can insert own salary_calculations" ON public.salary_calcul
 -- Tool Results
 CREATE POLICY "Users can view own tool_results" ON public.tool_results FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert own tool_results" ON public.tool_results FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- ── Supabase Storage: CV Files ────────────────────────────────────────────────
+-- 1. Go to Supabase Dashboard → Storage → New bucket
+-- 2. Name: cv-files, toggle OFF "Public bucket" (private), Save
+-- 3. Run the policies below:
+
+-- Allow backend (service role) to upload – handled via service role key, no policy needed.
+
+-- Allow authenticated users to read their own files
+CREATE POLICY "Users can read own CV files"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'cv-files' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- Allow authenticated users to upload their own files
+CREATE POLICY "Users can upload own CV files"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'cv-files' AND auth.uid()::text = (storage.foldername(name))[1]);
+
+-- Allow authenticated users to delete their own files
+CREATE POLICY "Users can delete own CV files"
+  ON storage.objects FOR DELETE
+  USING (bucket_id = 'cv-files' AND auth.uid()::text = (storage.foldername(name))[1]);
 
 -- ── Enable Realtime ───────────────────────────────────────────────────────────
 -- Run in Supabase Dashboard → Database → Replication → enable for:
