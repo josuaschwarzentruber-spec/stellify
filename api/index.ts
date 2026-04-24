@@ -6,33 +6,18 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { getAuth as getAdminAuth } from "firebase-admin/auth";
+import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
 
 dotenv.config();
 
-// ── Firebase Admin (fault-tolerant) ──────────────────────────────────────────
-let dbAdmin: ReturnType<typeof getFirestore> | null = null;
-let authAdmin: ReturnType<typeof getAdminAuth> | null = null;
-try {
-  if (!getApps().length) {
-    const projectId   = process.env.FIREBASE_PROJECT_ID;
-    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey  = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-    if (projectId && clientEmail && privateKey) {
-      initializeApp({ credential: cert({ projectId, clientEmail, privateKey }) });
-    } else {
-      initializeApp();
-    }
-  }
-  dbAdmin = getFirestore();
-  authAdmin = getAdminAuth();
-} catch (e: any) {
-  console.error('[FIREBASE ADMIN] Init failed:', e.message);
-}
+// ── Supabase Admin ────────────────────────────────────────────────────────────
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 // ── Stripe (lazy) ────────────────────────────────────────────────────────────
 let stripe: Stripe | null = null;
@@ -186,15 +171,17 @@ const generalLimiter = rateLimit({
 });
 app.use(generalLimiter);
 
-// Firebase token verification middleware
+// Supabase token verification middleware
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
-  if (!authAdmin || !header?.startsWith('Bearer ')) {
+  if (!header?.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
-    const decoded = await authAdmin.verifyIdToken(header.slice(7));
-    (req as any).uid = decoded.uid;
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(header.slice(7));
+    if (error || !user) return res.status(401).json({ error: 'Invalid or expired token' });
+    (req as any).uid = user.id;
+    (req as any).userEmail = user.email;
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });
@@ -218,27 +205,23 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     const session = event.data.object as Stripe.Checkout.Session;
     const userId = session.client_reference_id;
     const planId = session.metadata?.planId;
-    if (userId && planId && dbAdmin) {
+    if (userId && planId) {
       try {
         const isAnnual = session.metadata?.interval === 'year';
-        // Renewal: extend from current expiry if still in the future
-        const userDoc = await dbAdmin.collection("users").doc(userId).get();
-        const currentExpiry = userDoc.exists ? userDoc.data()?.subscriptionExpiresAt : null;
+        const { data: existingUser } = await supabaseAdmin.from('users').select('subscription_expires_at, email, first_name').eq('id', userId).single();
+        const currentExpiry = existingUser?.subscription_expires_at;
         const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
         const expiresAt = new Date(baseDate);
         if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
         else expiresAt.setMonth(expiresAt.getMonth() + 1);
-        await dbAdmin.collection("users").doc(userId).update({
+        await supabaseAdmin.from('users').update({
           role: normaliseRole(planId),
-          subscriptionInterval: isAnnual ? 'annual' : 'monthly',
-          subscriptionExpiresAt: expiresAt.toISOString(),
-          stripeCustomerId: session.customer || null,
-          updatedAt: FieldValue.serverTimestamp()
-        });
+          subscription_interval: isAnnual ? 'annual' : 'monthly',
+          subscription_expires_at: expiresAt.toISOString(),
+          stripe_customer_id: session.customer || null,
+        }).eq('id', userId);
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
-        // Send confirmation email
-        const userData = userDoc.data();
-        if (userData?.email) {
+        if (existingUser?.email) {
           const emailUser = process.env.EMAIL_USER;
           const emailPass = process.env.EMAIL_PASS;
           if (emailUser && emailPass) {
@@ -247,15 +230,15 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
             const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
             await transporter.sendMail({
               from: `"Stellify" <${emailUser}>`,
-              to: userData.email,
+              to: existingUser.email,
               subject: `Willkommen im ${planLabel}-Plan — Dein Stellify-Abo ist aktiv`,
-              text: `Hallo ${userData.firstName || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement! Du hast jetzt Zugriff auf alle ${planLabel}-Funktionen bis zum ${expiresAt.toLocaleDateString('de-CH')}.\n\nViel Erfolg bei deiner Karriere!\nDas Stellify-Team`,
+              text: `Hallo ${existingUser.first_name || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement!\n\nDas Stellify-Team`,
               html: buildEmailHtml(
                 `Willkommen im ${planLabel}-Plan!`,
                 [
-                  `Hallo ${userData.firstName || 'Nutzer'},`,
-                  `vielen Dank — dein ${cycleLabel}s-Abonnement ist jetzt aktiv. Du hast sofort vollen Zugriff auf alle <strong>${planLabel}-Funktionen</strong>.`,
-                  `Dein Abo ist gültig bis zum <strong>${expiresAt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>. Du findest das Ablaufdatum jederzeit in deinen Kontoeinstellungen.`,
+                  `Hallo ${existingUser.first_name || 'Nutzer'},`,
+                  `vielen Dank — dein ${cycleLabel}s-Abonnement ist jetzt aktiv.`,
+                  `Dein Abo ist gültig bis zum <strong>${expiresAt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.`,
                 ],
                 'Zum Dashboard',
                 (process.env.SITE_URL || 'https://stellify.ch') + '/'
@@ -264,48 +247,43 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           }
         }
       } catch (err) {
-        console.error(`[WEBHOOK] Firestore update failed:`, err);
+        console.error(`[WEBHOOK] Supabase update failed:`, err);
       }
     }
   }
 
-  // Subscription expired — downgrade to free and send notification email
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription;
-    if (dbAdmin) {
-      try {
-        const snapshot = await dbAdmin.collection("users").where("stripeCustomerId", "==", sub.customer).limit(1).get();
-        if (!snapshot.empty) {
-          const userDoc = snapshot.docs[0];
-          const userData = userDoc.data();
-          await userDoc.ref.update({ role: 'client', updatedAt: FieldValue.serverTimestamp() });
-          console.log(`[WEBHOOK] Downgraded ${userDoc.id} to free after subscription deletion`);
-          if (userData.email) {
-            const planType = userData.subscriptionInterval === 'annual' ? 'annual' : 'monthly';
-            await sendRenewalReminder(userData.email, userData.firstName || 'Nutzer', planType, 0).catch(console.error);
-          }
+    try {
+      const { data: users } = await supabaseAdmin.from('users').select('id, email, first_name, subscription_interval').eq('stripe_customer_id', sub.customer as string).limit(1);
+      if (users?.length) {
+        const u = users[0];
+        await supabaseAdmin.from('users').update({ role: 'client' }).eq('id', u.id);
+        console.log(`[WEBHOOK] Downgraded ${u.id} to free after subscription deletion`);
+        if (u.email) {
+          const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
+          await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, 0).catch(console.error);
         }
-      } catch (err) {
-        console.error(`[WEBHOOK] subscription.deleted handler failed:`, err);
       }
+    } catch (err) {
+      console.error(`[WEBHOOK] subscription.deleted handler failed:`, err);
     }
   }
 
-  // Upcoming cancellation reminder (3 days before monthly, 14 days before annual)
   if (event.type === "customer.subscription.updated") {
     const sub = event.data.object as Stripe.Subscription;
-    if (sub.cancel_at_period_end && dbAdmin) {
+    if (sub.cancel_at_period_end) {
       try {
-        const snapshot = await dbAdmin.collection("users").where("stripeCustomerId", "==", sub.customer).limit(1).get();
-        if (!snapshot.empty) {
-          const userData = snapshot.docs[0].data();
-          if (userData.email) {
+        const { data: users } = await supabaseAdmin.from('users').select('email, first_name, subscription_interval').eq('stripe_customer_id', sub.customer as string).limit(1);
+        if (users?.length) {
+          const u = users[0];
+          if (u.email) {
             const periodEnd = new Date((sub as any).current_period_end * 1000);
             const daysLeft = Math.ceil((periodEnd.getTime() - Date.now()) / 86400000);
-            const planType = userData.subscriptionInterval === 'annual' ? 'annual' : 'monthly';
+            const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
             const threshold = planType === 'annual' ? 14 : 3;
             if (daysLeft <= threshold) {
-              await sendRenewalReminder(userData.email, userData.firstName || 'Nutzer', planType, daysLeft).catch(console.error);
+              await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, daysLeft).catch(console.error);
             }
           }
         }
@@ -512,7 +490,7 @@ app.get("/api/lehrstellen", requireAuth, async (req, res) => {
   }
 });
 
-// ── Password Reset (custom branded email, no Firebase default) ────────────────
+// ── Password Reset (custom branded email) ────────────────────────────────────
 app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, res) => {
   const { email, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
@@ -520,7 +498,6 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
   const emailPass = process.env.EMAIL_PASS;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
   if (!emailUser || !emailPass) return res.status(500).json({ error: 'Email not configured' });
-  if (!authAdmin) return res.status(500).json({ error: 'Auth not configured' });
 
   const lang = language || 'DE';
   const resetCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
@@ -552,9 +529,18 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
   const copy = resetCopy[lang] || resetCopy['DE'];
 
   try {
-    const resetLink = await authAdmin.generatePasswordResetLink(email, {
-      url: `${siteUrl}/`,
+    const { data, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+      options: { redirectTo: `${siteUrl}/` },
     });
+    if (linkError) {
+      if (linkError.message.includes('not found') || linkError.message.includes('User not found')) {
+        return res.status(404).json({ error: 'user-not-found' });
+      }
+      throw linkError;
+    }
+    const resetLink = data.properties?.action_link || `${siteUrl}/`;
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
     await transporter.sendMail({
       from: `"Stellify" <${emailUser}>`,
@@ -565,9 +551,20 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[AUTH] Password reset failed:', err.message);
-    if (err.code === 'auth/user-not-found' || err.errorInfo?.code === 'auth/user-not-found') {
-      return res.status(404).json({ error: 'user-not-found' });
-    }
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ── Delete Account ────────────────────────────────────────────────────────────
+app.post("/api/delete-account", requireAuth, async (req, res) => {
+  const uid = (req as any).uid;
+  try {
+    await supabaseAdmin.from('users').delete().eq('id', uid);
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(uid);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error('[DELETE ACCOUNT]', err.message);
     res.status(500).json({ error: err.message });
   }
 });
