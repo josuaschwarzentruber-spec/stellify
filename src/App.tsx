@@ -479,7 +479,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookies und lokale Speicherung">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session Cookie – Authentifizierung</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Supabase Auth Session Cookie – Authentifizierung</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p><p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv.</p></div>
                 </div>
               </Section>
@@ -492,7 +492,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
                 <p className="mt-4">Kontakt: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
               </Section>
-              <Section title="9. Datensicherheit"><ul className="list-disc pl-5 space-y-2"><li>TLS/HTTPS-Verschlüsselung</li><li>Firebase Security Rules</li><li>Keine Klartextpasswörter</li><li>Zugriff nur für autorisierte Personen</li></ul></Section>
+              <Section title="9. Datensicherheit"><ul className="list-disc pl-5 space-y-2"><li>TLS/HTTPS-Verschlüsselung</li><li>Supabase Row Level Security (RLS)</li><li>Keine Klartextpasswörter</li><li>Zugriff nur für autorisierte Personen</li></ul></Section>
               <Section title="10. Änderungen dieser Richtlinie"><p>Wir behalten uns vor, diese Richtlinie jederzeit anzupassen. Bei wesentlichen Änderungen informieren wir per E-Mail.</p></Section>
             </> : isFR ? <>
               <Section title="1. Responsable du traitement">
@@ -534,7 +534,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookies et stockage local">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies nécessaires (toujours actifs)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Cookie de session Firebase Auth</li><li>localStorage : <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies nécessaires (toujours actifs)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Cookie de session Supabase Auth</li><li>localStorage : <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies d'analyse optionnels (avec consentement uniquement)</p><p className="text-xs mt-1">Aucun service d'analyse tiers actuellement actif.</p></div>
                 </div>
               </Section>
@@ -543,7 +543,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Vous disposez des droits suivants selon la LPD et le RGPD : accès, rectification, suppression, portabilité, opposition, retrait du consentement, réclamation auprès du PFPDT (edoeb.admin.ch).</p>
                 <p className="mt-4">Contact : <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
               </Section>
-              <Section title="9. Sécurité des données"><ul className="list-disc pl-5 space-y-2"><li>Chiffrement TLS/HTTPS</li><li>Règles de sécurité Firebase</li><li>Aucun mot de passe en clair</li><li>Accès réservé aux personnes autorisées</li></ul></Section>
+              <Section title="9. Sécurité des données"><ul className="list-disc pl-5 space-y-2"><li>Chiffrement TLS/HTTPS</li><li>Supabase Row Level Security (RLS)</li><li>Aucun mot de passe en clair</li><li>Accès réservé aux personnes autorisées</li></ul></Section>
               <Section title="10. Modifications"><p>Nous nous réservons le droit de modifier cette politique à tout moment. Les utilisateurs inscrits seront informés par e-mail en cas de changements importants.</p></Section>
             </> : isIT ? <>
               <Section title="1. Titolare del trattamento">
@@ -585,7 +585,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookie e memorizzazione locale">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie necessari (sempre attivi)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Cookie sessione Firebase Auth</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie necessari (sempre attivi)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Cookie sessione Supabase Auth</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie analitici opzionali (solo con consenso)</p><p className="text-xs mt-1">Nessun servizio di analisi di terze parti attualmente attivo.</p></div>
                 </div>
               </Section>
@@ -594,7 +594,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Hai i seguenti diritti ai sensi della LPD e del GDPR: accesso, rettifica, cancellazione, portabilità, opposizione, revoca del consenso, reclamo all'IFPDT (edoeb.admin.ch).</p>
                 <p className="mt-4">Contatto: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
               </Section>
-              <Section title="9. Sicurezza dei dati"><ul className="list-disc pl-5 space-y-2"><li>Crittografia TLS/HTTPS</li><li>Regole di sicurezza Firebase</li><li>Nessuna password in chiaro</li><li>Accesso solo per persone autorizzate</li></ul></Section>
+              <Section title="9. Sicurezza dei dati"><ul className="list-disc pl-5 space-y-2"><li>Crittografia TLS/HTTPS</li><li>Supabase Row Level Security (RLS)</li><li>Nessuna password in chiaro</li><li>Accesso solo per persone autorizzate</li></ul></Section>
               <Section title="10. Modifiche"><p>Ci riserviamo il diritto di modificare questa informativa in qualsiasi momento. Gli utenti registrati saranno informati via e-mail in caso di modifiche sostanziali.</p></Section>
             </> : <>
               <Section title="1. Data Controller">
@@ -636,7 +636,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookies and Local Storage">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Necessary cookies (always active)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session Cookie – authentication</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code> – user preferences</li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Necessary cookies (always active)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Supabase Auth Session Cookie – authentication</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code> – user preferences</li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optional analytics cookies (consent required)</p><p className="text-xs mt-1">No third-party analytics services are currently active.</p></div>
                 </div>
               </Section>
@@ -645,7 +645,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Under Swiss FADP and GDPR, you have the right to: access, rectification, erasure, data portability, objection, withdrawal of consent, and to lodge a complaint with the FDPIC (edoeb.admin.ch).</p>
                 <p className="mt-4">Contact: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
               </Section>
-              <Section title="9. Data Security"><ul className="list-disc pl-5 space-y-2"><li>TLS/HTTPS encryption for all data transfers</li><li>Firebase Security Rules for database access control</li><li>No plaintext password storage (Firebase Authentication)</li><li>Production database access restricted to authorised personnel</li></ul></Section>
+              <Section title="9. Data Security"><ul className="list-disc pl-5 space-y-2"><li>TLS/HTTPS encryption for all data transfers</li><li>Supabase Row Level Security (RLS) for database access control</li><li>No plaintext password storage (Supabase Authentication)</li><li>Production database access restricted to authorised personnel</li></ul></Section>
               <Section title="10. Changes to This Policy"><p>We reserve the right to update this Privacy Policy at any time. Registered users will be notified by email of material changes. The current version is always available on this page.</p></Section>
             </>}
           </article>
@@ -738,7 +738,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="7. Nutzungsbeschränkungen"><ul className="list-disc pl-5 space-y-2"><li>Keine illegale Nutzung oder Täuschung Dritter</li><li>Kein Scraping / Bots</li><li>Keine Weitergabe von Zugangsdaten</li><li>Nutzer ist für die Richtigkeit von KI-Inhalten selbst verantwortlich</li></ul></Section>
               <Section title="8. Geistiges Eigentum"><p>Alle Rechte an Plattform, Code, Design und Marken liegen beim Betreiber. KI-generierte Inhalte dürfen vom Nutzer für eigene Bewerbungsunterlagen verwendet werden.</p></Section>
               <Section title="9. Haftungsbeschränkung"><p>Stellify haftet nur für vorsätzliche oder grob fahrlässige Schäden. Gesamthaftung begrenzt auf den in den letzten 12 Monaten bezahlten Betrag.</p></Section>
-              <Section title="10. Verfügbarkeit"><p>Keine Garantie auf unterbrechungsfreie Verfügbarkeit. Ausfälle von Firebase, Stripe oder Google AI liegen ausserhalb unseres Einflussbereichs.</p></Section>
+              <Section title="10. Verfügbarkeit"><p>Keine Garantie auf unterbrechungsfreie Verfügbarkeit. Ausfälle von Supabase, Stripe oder Google AI liegen ausserhalb unseres Einflussbereichs.</p></Section>
               <Section title="11. Änderungen"><p>Anpassungen mit 30 Tagen Frist. Wesentliche Änderungen per E-Mail. Fortgesetzte Nutzung gilt als Zustimmung.</p></Section>
               <Section title="12. Anwendbares Recht"><p>Ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>. Gerichtsstand: Zug, Schweiz.</p></Section>
               <Section title="13. Streitbeilegung"><p>Kontakt: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU-Schlichtung: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
@@ -768,7 +768,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="7. Restrictions d'utilisation"><ul className="list-disc pl-5 space-y-2"><li>Pas d'utilisation illégale ni de tromperie de tiers</li><li>Pas de scraping / bots</li><li>Pas de partage d'identifiants</li><li>L'utilisateur est responsable de l'exactitude des contenus IA</li></ul></Section>
               <Section title="8. Propriété intellectuelle"><p>Tous les droits sur la plateforme, le code, le design et les marques appartiennent à l'exploitant. Les contenus générés par IA peuvent être utilisés par l'utilisateur pour ses dossiers de candidature.</p></Section>
               <Section title="9. Limitation de responsabilité"><p>Stellify n'est responsable que des dommages causés intentionnellement ou par négligence grave. Responsabilité totale limitée aux montants payés au cours des 12 derniers mois.</p></Section>
-              <Section title="10. Disponibilité"><p>Aucune garantie de disponibilité ininterrompue. Les pannes de Firebase, Stripe ou Google AI échappent à notre contrôle.</p></Section>
+              <Section title="10. Disponibilité"><p>Aucune garantie de disponibilité ininterrompue. Les pannes de Supabase, Stripe ou Google AI échappent à notre contrôle.</p></Section>
               <Section title="11. Modifications"><p>Modifications avec un préavis de 30 jours. Changements importants communiqués par e-mail.</p></Section>
               <Section title="12. Droit applicable"><p>Le <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">droit suisse</strong> s'applique exclusivement. For juridique : Zoug, Suisse.</p></Section>
               <Section title="13. Règlement des litiges"><p>Contact : <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Plateforme de médiation UE : <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
@@ -798,7 +798,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="7. Restrizioni d'uso"><ul className="list-disc pl-5 space-y-2"><li>Nessun utilizzo illegale né inganno di terzi</li><li>Nessun scraping / bot</li><li>Nessuna condivisione di credenziali</li><li>L'utente è responsabile dell'accuratezza dei contenuti IA</li></ul></Section>
               <Section title="8. Proprietà intellettuale"><p>Tutti i diritti sulla piattaforma, il codice, il design e i marchi appartengono al gestore. I contenuti generati dall'IA possono essere utilizzati dall'utente per i propri documenti di candidatura.</p></Section>
               <Section title="9. Limitazione di responsabilità"><p>Stellify risponde solo per danni causati intenzionalmente o per colpa grave. Responsabilità totale limitata agli importi pagati negli ultimi 12 mesi.</p></Section>
-              <Section title="10. Disponibilità"><p>Nessuna garanzia di disponibilità ininterrotta. I guasti di Firebase, Stripe o Google AI esulano dal nostro controllo.</p></Section>
+              <Section title="10. Disponibilità"><p>Nessuna garanzia di disponibilità ininterrotta. I guasti di Supabase, Stripe o Google AI esulano dal nostro controllo.</p></Section>
               <Section title="11. Modifiche"><p>Modifiche con 30 giorni di preavviso. Cambiamenti sostanziali comunicati via e-mail.</p></Section>
               <Section title="12. Diritto applicabile"><p>Si applica esclusivamente il <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">diritto svizzero</strong>. Foro competente: Zugo, Svizzera.</p></Section>
               <Section title="13. Risoluzione delle controversie"><p>Contatto: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Piattaforma di mediazione UE: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
@@ -828,7 +828,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="7. Usage Restrictions"><ul className="list-disc pl-5 space-y-2"><li>No illegal use or deception of third parties</li><li>No automated scraping or bots</li><li>No sharing of login credentials</li><li>Users are responsible for verifying the accuracy of AI-generated content</li></ul></Section>
               <Section title="8. Intellectual Property"><p>All rights to the platform, code, design and trademarks belong to the operator. AI-generated content may be used by the user for their own job applications.</p></Section>
               <Section title="9. Limitation of Liability"><p>Stellify is only liable for damages caused by wilful misconduct or gross negligence. Total liability is capped at the amount paid by the user in the last 12 months.</p></Section>
-              <Section title="10. Availability"><p>No guarantee of uninterrupted availability. Outages of Firebase, Stripe or Google AI are outside our control.</p></Section>
+              <Section title="10. Availability"><p>No guarantee of uninterrupted availability. Outages of Supabase, Stripe or Google AI are outside our control.</p></Section>
               <Section title="11. Changes"><p>Changes to these Terms with 30 days' notice. Material changes communicated by email. Continued use constitutes acceptance.</p></Section>
               <Section title="12. Applicable Law"><p>Exclusively <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Swiss law</strong> applies. Place of jurisdiction: Zug, Switzerland.</p></Section>
               <Section title="13. Dispute Resolution"><p>Contact: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU dispute resolution: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
