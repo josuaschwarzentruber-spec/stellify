@@ -33,36 +33,7 @@ import {
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon
 } from 'lucide-react';
-import { auth, db } from './firebase';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,
-  User as FirebaseUser,
-  GoogleAuthProvider,
-  signInWithPopup,
-  sendPasswordResetEmail,
-  reauthenticateWithCredential,
-  reauthenticateWithPopup,
-  EmailAuthProvider,
-  deleteUser
-} from 'firebase/auth';
-import { 
-  doc, 
-  setDoc, 
-  updateDoc,
-  getDoc, 
-  serverTimestamp,
-  increment,
-  collection,
-  addDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  onSnapshot,
-  limit
-} from 'firebase/firestore';
+import { supabase } from './supabase';
 import { searchData, SearchItem } from './data/searchData';
 import sampleJobs from './data/sampleJobs.json';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -131,37 +102,8 @@ class ErrorBoundary extends React.Component<any, any> {
   }
 }
 
-// --- FIRESTORE ERROR HANDLING ---
-enum OperationType {
-  CREATE = 'create',
-  UPDATE = 'update',
-  DELETE = 'delete',
-  LIST = 'list',
-  GET = 'get',
-  WRITE = 'write',
-}
-
-interface FirestoreErrorInfo {
-  error: string;
-  operationType: OperationType;
-  path: string | null;
-  authInfo: any;
-}
-
-
-function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
-  const errInfo: FirestoreErrorInfo = {
-    error: error instanceof Error ? error.message : String(error),
-    authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-    },
-    operationType,
-    path
-  };
-  console.error('Firestore Error (non-fatal):', JSON.stringify(errInfo));
+function handleDbError(error: unknown, operation: string, path: string | null) {
+  console.error(`DB Error (non-fatal) [${operation}] ${path}:`, error instanceof Error ? error.message : String(error));
 }
 
 // --- LAZY COMPONENTS ---
@@ -1069,7 +1011,7 @@ function StellifyApp() {
   useEffect(() => {
     localStorage.setItem('language', language);
     if (user) {
-      updateDoc(doc(db, 'users', user.id), { language }).catch(e => console.error("Error updating language in DB:", e));
+      supabase.from('users').update({ language }).eq('id', user.id).then(null, e => console.error("Error updating language in DB:", e));
     }
   }, [language, user]);
 
@@ -1143,7 +1085,7 @@ function StellifyApp() {
     }
     localStorage.setItem('theme', theme);
     if (user) {
-      updateDoc(doc(db, 'users', user.id), { theme }).catch(e => console.error("Error updating theme in DB:", e));
+      supabase.from('users').update({ theme }).eq('id', user.id).then(null, e => console.error("Error updating theme in DB:", e));
     }
   }, [theme, user]);
   
@@ -1197,7 +1139,10 @@ function StellifyApp() {
   };
 
   const getAuthToken = async (): Promise<string | null> => {
-    try { return (await auth.currentUser?.getIdToken()) ?? null; } catch { return null; }
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session?.access_token ?? null;
+    } catch { return null; }
   };
   const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
     const token = await getAuthToken();
@@ -1548,156 +1493,108 @@ function StellifyApp() {
   useEffect(() => {
     let unsubscribeUser: (() => void) | null = null;
 
-    // Test connection to Firestore
-    const testConnection = async () => {
-      try {
-        const { getDocFromServer, doc } = await import('firebase/firestore');
-        await getDocFromServer(doc(db, '_connection_test_', 'ping'));
-      } catch (error: any) {
-        if (error?.message?.includes('the client is offline') || error?.code === 'permission-denied') {
-          console.warn("Firestore connection test: Expected or minor issue", error.message);
+    const processUserData = (rawData: any, supaUser: any) => {
+      if (!rawData) return;
+      if (rawData.language && rawData.language !== language) setLanguage(rawData.language);
+      if (rawData.theme && rawData.theme !== theme) setTheme(rawData.theme);
+
+      const rawName = rawData.first_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
+      const cleanName = rawName.replace(/\./g, ' ');
+      const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+      const sanitizedFirstName = formattedName === 'Gast' ? 'Nutzer' : formattedName;
+
+      let effectiveRole = rawData.role || 'client';
+      const expiresAt = rawData.subscription_expires_at ? new Date(rawData.subscription_expires_at) : null;
+      const now = new Date();
+      if (expiresAt && (effectiveRole === 'pro' || effectiveRole === 'unlimited')) {
+        const msLeft = expiresAt.getTime() - now.getTime();
+        const daysLeft = Math.ceil(msLeft / 86400000);
+        if (msLeft <= 0) {
+          effectiveRole = 'client';
+          supabase.from('users').update({ role: 'client' }).eq('id', supaUser.id).then(null, console.error);
+        } else {
+          const threshold = rawData.subscription_interval === 'annual' ? 14 : 3;
+          if (daysLeft <= threshold) setExpiryBanner({ daysLeft, interval: rawData.subscription_interval || 'monthly' });
+          else setExpiryBanner(null);
         }
       }
-    };
-    testConnection();
 
-    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
-      // Clean up previous listener if it exists
-      if (unsubscribeUser) {
-        unsubscribeUser();
-        unsubscribeUser = null;
+      const newUser: UserData = {
+        id: supaUser.id,
+        email: supaUser.email || '',
+        firstName: sanitizedFirstName,
+        freeGenerationsUsed: rawData.free_generations_used || 0,
+        toolUses: rawData.tool_uses || 0,
+        dailyToolUses: rawData.daily_tool_uses || 0,
+        lastDailyReset: rawData.last_daily_reset || null,
+        lastMonthlyReset: rawData.last_monthly_reset || null,
+        cvContext: rawData.cv_context || null,
+        role: effectiveRole,
+        hasSeenTutorial: rawData.has_seen_tutorial || false,
+        subscriptionExpiresAt: rawData.subscription_expires_at || undefined,
+        subscriptionInterval: rawData.subscription_interval || undefined,
+        stripeCustomerId: rawData.stripe_customer_id || undefined,
+        searchUses: rawData.search_uses || 0,
+      };
+      setUser(newUser);
+
+      const today = new Date().toISOString().split('T')[0];
+      if (rawData.last_daily_reset !== today) {
+        supabase.from('users').update({ daily_tool_uses: 0, last_daily_reset: today }).eq('id', supaUser.id).then(null, console.error);
       }
 
-      if (firebaseUser) {
-        const userDocRef = doc(db, 'users', firebaseUser.uid);
-        let isFirstFetch = true;
-        
-        // Initial check and creation if needed
+      const currentMonth = new Date().toISOString().substring(0, 7);
+      if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && rawData.last_monthly_reset !== currentMonth) {
+        supabase.from('users').update({ tool_uses: 0, free_generations_used: 0, search_uses: 0, last_monthly_reset: currentMonth }).eq('id', supaUser.id).then(null, console.error);
+      }
+
+      if (!rawData.has_seen_tutorial) setIsTutorialOpen(true);
+      if (rawData.cv_context) setCvContext(rawData.cv_context);
+    };
+
+    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
+
+      if (session?.user) {
+        const supaUser = session.user;
+
         try {
-          const docSnap = await getDoc(userDocRef);
-          if (!docSnap.exists()) {
-            const rawName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
+          const { data: existingUser } = await supabase.from('users').select('id').eq('id', supaUser.id).single();
+          if (!existingUser) {
+            const rawName = supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
             const cleanName = rawName.replace(/\./g, ' ');
-            const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-            
-            await setDoc(userDocRef, {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              firstName: formattedName,
+            const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+            await supabase.from('users').insert({
+              id: supaUser.id,
+              email: supaUser.email || '',
+              first_name: formattedName,
               role: 'client',
-              createdAt: serverTimestamp(),
-              freeGenerationsUsed: 0,
-              toolUses: 0,
-              dailyToolUses: 0,
-              lastDailyReset: new Date().toISOString().split('T')[0],
-              hasSeenTutorial: false,
-              language: language,
-              theme: theme,
-              cvContext: cvContext || null
+              free_generations_used: 0,
+              tool_uses: 0,
+              daily_tool_uses: 0,
+              last_daily_reset: new Date().toISOString().split('T')[0],
+              has_seen_tutorial: false,
+              language,
+              theme,
+              cv_context: cvContext || null,
             });
           }
         } catch (e) {
-          console.error("Error ensuring user document exists:", e);
+          console.error('Error ensuring user exists:', e);
         }
 
-        // Real-time listener for user data
-        unsubscribeUser = onSnapshot(userDocRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            
-            // Sync language and theme if they exist in DB
-            if (userData.language && userData.language !== language) {
-              setLanguage(userData.language);
-            }
-            if (userData.theme && userData.theme !== theme) {
-              setTheme(userData.theme);
-            }
+        const { data: userData } = await supabase.from('users').select('*').eq('id', supaUser.id).single();
+        processUserData(userData, supaUser);
+        setIsAuthReady(true);
 
-            const rawName = userData.firstName || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
-            const cleanName = rawName.replace(/\./g, ' ');
-            const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-            const sanitizedFirstName = formattedName === 'Gast' ? 'Nutzer' : formattedName;
-            
-            // ── Subscription expiry check ────────────────────────────────
-            let effectiveRole = userData.role || 'client';
-            const expiresAt = userData.subscriptionExpiresAt ? new Date(userData.subscriptionExpiresAt) : null;
-            const now = new Date();
-            if (expiresAt && (effectiveRole === 'pro' || effectiveRole === 'unlimited')) {
-              const msLeft = expiresAt.getTime() - now.getTime();
-              const daysLeft = Math.ceil(msLeft / 86400000);
-              if (msLeft <= 0) {
-                // Expired → downgrade immediately in Firestore
-                effectiveRole = 'client';
-                updateDoc(userDocRef, { role: 'client', updatedAt: serverTimestamp() }).catch(console.error);
-              } else {
-                // Show expiry banner when approaching expiry
-                const threshold = userData.subscriptionInterval === 'annual' ? 14 : 3;
-                if (daysLeft <= threshold) {
-                  setExpiryBanner({ daysLeft, interval: userData.subscriptionInterval || 'monthly' });
-                } else {
-                  setExpiryBanner(null);
-                }
-              }
-            }
+        const userChannel = supabase
+          .channel(`user-${supaUser.id}`)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${supaUser.id}` } as any, (payload: any) => {
+            processUserData(payload.new, supaUser);
+          })
+          .subscribe();
 
-            const newUser: UserData = {
-              id: firebaseUser.uid,
-              email: firebaseUser.email || '',
-              firstName: sanitizedFirstName,
-              freeGenerationsUsed: userData.freeGenerationsUsed || 0,
-              toolUses: userData.toolUses || 0,
-              dailyToolUses: userData.dailyToolUses || 0,
-              lastDailyReset: userData.lastDailyReset || null,
-              lastMonthlyReset: userData.lastMonthlyReset || null,
-              cvContext: userData.cvContext || null,
-              role: effectiveRole,
-              hasSeenTutorial: userData.hasSeenTutorial || false,
-              subscriptionExpiresAt: userData.subscriptionExpiresAt || undefined,
-              subscriptionInterval: userData.subscriptionInterval || undefined,
-              stripeCustomerId: userData.stripeCustomerId || undefined,
-              searchUses: userData.searchUses || 0
-            };
-            setUser(newUser);
-
-            // ── Daily Reset Logic ───────────────────────────────────────
-            const today = new Date().toISOString().split('T')[0];
-            if (userData.lastDailyReset !== today) {
-              updateDoc(userDocRef, {
-                dailyToolUses: 0,
-                lastDailyReset: today
-              }).catch(e => console.error("Daily reset error:", e));
-            }
-
-            // ── Monthly Reset for Pro/Unlimited users ───────────────────
-            const currentMonth = new Date().toISOString().substring(0, 7); // YYYY-MM
-            if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && userData.lastMonthlyReset !== currentMonth) {
-              updateDoc(userDocRef, {
-                toolUses: 0,
-                freeGenerationsUsed: 0,
-                searchUses: 0,
-                lastMonthlyReset: currentMonth
-              }).catch(e => console.error("Monthly reset error:", e));
-            }
-            
-            if (!userData.hasSeenTutorial) {
-              setIsTutorialOpen(true);
-            }
-
-            if (userData.cvContext) {
-              setCvContext(userData.cvContext);
-            }
-          }
-          if (isFirstFetch) {
-            setIsAuthReady(true);
-            isFirstFetch = false;
-          }
-        }, (error) => {
-          handleFirestoreError(error, OperationType.GET, `users/${firebaseUser.uid}`);
-          if (isFirstFetch) {
-            setIsAuthReady(true);
-            isFirstFetch = false;
-          }
-        });
+        unsubscribeUser = () => { supabase.removeChannel(userChannel); };
       } else {
         setUser(null);
         setIsAuthReady(true);
@@ -1705,7 +1602,7 @@ function StellifyApp() {
     });
 
     return () => {
-      unsubscribeAuth();
+      authSubscription.unsubscribe();
       if (unsubscribeUser) unsubscribeUser();
     };
   }, []);
@@ -1716,29 +1613,22 @@ function StellifyApp() {
       return;
     }
 
-    const q = query(
-      collection(db, 'users', user.id, 'messages'),
-      orderBy('createdAt', 'asc'),
-      limit(50)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs: Message[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        msgs.push({ role: data.role, content: data.content });
-      });
-      
-      if (msgs.length > 0) {
-        setMessages(msgs);
+    supabase.from('messages').select('role, content').eq('user_id', user.id).order('created_at', { ascending: true }).limit(50).then(({ data: msgs }) => {
+      if (msgs && msgs.length > 0) {
+        setMessages(msgs as Message[]);
       } else {
         setMessages([{ role: 'ai', content: t.stella_greeting.replace('{name}', user.firstName) }]);
       }
-    }, (error) => {
-      handleFirestoreError(error, OperationType.GET, `users/${user.id}/messages`);
     });
 
-    return () => unsubscribe();
+    const msgChannel = supabase
+      .channel(`messages-${user.id}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `user_id=eq.${user.id}` } as any, (payload: any) => {
+        setMessages(prev => [...prev, { role: payload.new.role, content: payload.new.content }]);
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(msgChannel); };
   }, [user]);
 
   useEffect(() => {
@@ -1773,8 +1663,8 @@ function StellifyApp() {
           
           // Save to Firestore if user is logged in
           if (user) {
-            setDoc(doc(db, 'users', user.id), { cvContext: importedContext }, { merge: true })
-              .catch(err => handleFirestoreError(err, OperationType.WRITE, `users/${user.id}`));
+            supabase.from('users').update({ cv_context: importedContext }).eq('id', user.id)
+              .then(null, err => handleDbError(err, 'db', 'users'));
           }
         }
         
@@ -1860,58 +1750,30 @@ function StellifyApp() {
   }, [searchQuery]);
 
   useEffect(() => {
-    if (user) {
-      const q = query(
-        collection(db, 'users', user.id, 'applications'),
-        orderBy('createdAt', 'desc')
-      );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const apps = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as any[];
-        setApplications(apps);
-      }, (error) => {
-        handleFirestoreError(error, OperationType.GET, `users/${user.id}/applications`);
-      });
-      return () => unsubscribe();
-    }
+    if (!user) return;
+    supabase.from('applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => {
+      if (data) setApplications(data);
+    });
+    const appChannel = supabase.channel(`apps-${user.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'applications', filter: `user_id=eq.${user.id}` } as any, () => {
+        supabase.from('applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => { if (data) setApplications(data); });
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(appChannel); };
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      const q = query(
-        collection(db, 'users', user.id, 'cv_analyses'),
-        orderBy('createdAt', 'desc'),
-        limit(1)
-      );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        if (!snapshot.empty) {
-          setLatestAnalysis(snapshot.docs[0].data());
-        }
-      });
-      return () => unsubscribe();
-    }
+    if (!user) return;
+    supabase.from('cv_analyses').select('data').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).then(({ data }) => {
+      if (data?.[0]) setLatestAnalysis(data[0].data);
+    });
   }, [user]);
 
   useEffect(() => {
-    if (user) {
-      const q = query(
-        collection(db, 'users', user.id, 'toolResults'),
-        orderBy('createdAt', 'desc'),
-        limit(10)
-      );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const history = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as any[];
-        setToolHistory(history);
-      }, (error) => {
-        handleFirestoreError(error, OperationType.GET, `users/${user.id}/toolResults`);
-      });
-      return () => unsubscribe();
-    }
+    if (!user) return;
+    supabase.from('tool_results').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10).then(({ data }) => {
+      if (data) setToolHistory(data);
+    });
   }, [user]);
 
   const [careerRoadmap, setCareerRoadmap] = useState<string[]>([]);
@@ -1921,23 +1783,10 @@ function StellifyApp() {
   const [backendStatus, setBackendStatus] = useState<'online' | 'offline' | 'checking'>('checking');
 
   useEffect(() => {
-    if (user) {
-      const q = query(
-        collection(db, 'users', user.id, 'salary_calculations'),
-        orderBy('createdAt', 'desc'),
-        limit(5)
-      );
-      const unsubscribe = onSnapshot(q, (snapshot) => {
-        const calcs = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as any[];
-        setSalaryCalculations(calcs);
-      }, (error) => {
-        handleFirestoreError(error, OperationType.GET, `users/${user.id}/salary_calculations`);
-      });
-      return () => unsubscribe();
-    }
+    if (!user) return;
+    supabase.from('salary_calculations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5).then(({ data }) => {
+      if (data) setSalaryCalculations(data);
+    });
   }, [user]);
 
   useEffect(() => {
@@ -2046,7 +1895,7 @@ function StellifyApp() {
         try {
           const base64 = (e.target?.result as string).split(',')[1];
           const mimeType = file.type || 'image/jpeg';
-          const idToken = await auth.currentUser?.getIdToken();
+          const idToken = await getAuthToken();
           const r = await fetch('/api/extract-image', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
@@ -2092,10 +1941,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setLatestAnalysis(analysisData);
       
       if (user) {
-        await addDoc(collection(db, 'users', user.id, 'cv_analyses'), {
-          ...analysisData,
-          createdAt: serverTimestamp()
-        });
+        await supabase.from('cv_analyses').insert({ user_id: user.id, data: analysisData });
       }
     } catch (e) {
       console.error("CV Analysis Error:", e);
@@ -2143,9 +1989,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       // Persist CV context if user is logged in
       if (user) {
         try {
-          await setDoc(doc(db, 'users', user.id), { cvContext: text }, { merge: true });
+          await supabase.from('users').update({ cv_context: text }).eq('id', user.id);
         } catch (error) {
-          handleFirestoreError(error, OperationType.UPDATE, `users/${user.id}`);
+          handleDbError(error, 'db', `users/${user.id}`);
         }
       }
 
@@ -2179,7 +2025,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
     try {
       if (authTab === 'login') {
-        await signInWithEmailAndPassword(auth, email, password);
+        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
       } else {
         if (password !== confirmPassword) {
           setAuthError(
@@ -2201,30 +2048,33 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           setIsAuthLoading(false);
           return;
         }
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const firebaseUser = userCredential.user;
-
-        const emailPrefix = firebaseUser.email?.split('@')[0] || 'Nutzer';
-        const rawName = firstName === 'Gast' ? 'Nutzer' : (firstName || firebaseUser.displayName || emailPrefix);
+        const emailPrefix = email.split('@')[0] || 'Nutzer';
+        const rawName = firstName === 'Gast' ? 'Nutzer' : (firstName || emailPrefix);
         const cleanName = rawName.replace(/\./g, ' ');
         const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 
-        await setDoc(doc(db, 'users', firebaseUser.uid), {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email || '',
-          firstName: formattedName,
-          role: 'client',
-          createdAt: serverTimestamp(),
-          cvContext: cvContext || null,
-          freeGenerationsUsed: 0
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: formattedName } }
         });
+        if (signUpError) throw signUpError;
 
-        // Send branded welcome email (fire-and-forget)
-        fetch('/api/send-welcome-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
-        }).catch(console.error);
+        if (signUpData.user) {
+          await supabase.from('users').insert({
+            id: signUpData.user.id,
+            email: signUpData.user.email || '',
+            first_name: formattedName,
+            role: 'client',
+            cv_context: cvContext || null,
+            free_generations_used: 0,
+          });
+          fetch('/api/send-welcome-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: signUpData.user.email, firstName: formattedName, language }),
+          }).then(null, console.error);
+        }
       }
       setIsAuthModalOpen(false);
       setEmail('');
@@ -2233,35 +2083,23 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setFirstName('');
     } catch (err: any) {
       console.error("Auth Error:", err);
-      if (err.code === 'auth/user-not-found') {
-        // Email not registered at all → go register
+      const msg: string = err.message || '';
+      if (msg.includes('Invalid login credentials')) {
         setAuthError(
-          language === 'DE' ? 'Diese E-Mail ist nicht registriert. Bitte erstelle zuerst ein Konto.' :
-          language === 'FR' ? 'Cet e-mail n\'est pas enregistré. Veuillez d\'abord créer un compte.' :
-          language === 'IT' ? 'Questa email non è registrata. Crea prima un account.' :
-          'This email is not registered. Please create an account first.'
+          language === 'DE' ? 'Ungültige Anmeldedaten. Bitte überprüfe E-Mail und Passwort.' :
+          language === 'FR' ? 'Identifiants invalides. Veuillez vérifier votre e-mail et mot de passe.' :
+          language === 'IT' ? 'Credenziali non valide. Verifica email e password.' :
+          'Invalid credentials. Please check your email and password.'
         );
-        setTimeout(() => { setAuthTab('register'); setAuthError(''); }, 2000);
-      } else if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-        // Wrong password → show clear message + link to reset
-        setAuthError(
-          language === 'DE' ? 'Falsches Passwort. Hast du dein Passwort vergessen?' :
-          language === 'FR' ? 'Mot de passe incorrect. Avez-vous oublié votre mot de passe ?' :
-          language === 'IT' ? 'Password errata. Hai dimenticato la password?' :
-          'Wrong password. Did you forget your password?'
-        );
-      } else if (err.code === 'auth/email-already-in-use') {
+      } else if (msg.includes('User already registered') || msg.includes('already exists')) {
         setAuthError(
           language === 'DE' ? 'Diese E-Mail wird bereits verwendet. Bitte melde dich stattdessen an.' :
           language === 'FR' ? 'Cet e-mail est déjà utilisé. Veuillez vous connecter à la place.' :
           language === 'IT' ? 'Questa email è già in uso. Accedi invece.' :
           'This email is already in use. Please log in instead.'
         );
-        // If they were trying to register, they should login
-        if (authTab === 'register') {
-          setAuthTab('login');
-        }
-      } else if (err.code === 'auth/weak-password') {
+        if (authTab === 'register') setAuthTab('login');
+      } else if (msg.includes('Password should be')) {
         setAuthError(
           language === 'DE' ? 'Das Passwort ist zu schwach (mind. 6 Zeichen)' :
           language === 'FR' ? 'Le mot de passe est trop faible' :
@@ -2340,20 +2178,15 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setAuthError('');
     setIsAuthLoading(true);
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(auth, provider);
-      if (result.user) {
-        setIsAuthModalOpen(false);
-        showToast(language === 'DE' ? 'Erfolgreich mit Google angemeldet!' : language === 'FR' ? 'Connecté avec Google avec succès !' : language === 'IT' ? 'Accesso con Google riuscito!' : 'Successfully signed in with Google!', 'success');
-      }
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      setIsAuthModalOpen(false);
     } catch (err: any) {
       console.error("Google Auth Error:", err);
-      let errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
-      if (err.code === 'auth/unauthorized-domain') {
-        errorMsg = language === 'DE' ? 'Diese Domain ist nicht für Google Login autorisiert.' : language === 'FR' ? 'Ce domaine n\'est pas autorisé pour la connexion Google.' : language === 'IT' ? 'Questo dominio non è autorizzato per il login Google.' : 'This domain is not authorized for Google Login.';
-      } else if (err.code === 'auth/popup-blocked') {
-        errorMsg = language === 'DE' ? 'Das Popup wurde blockiert. Bitte erlaube Popups.' : language === 'FR' ? 'La fenêtre popup a été bloquée. Veuillez autoriser les popups.' : language === 'IT' ? 'Il popup è stato bloccato. Si prega di consentire i popup.' : 'Popup was blocked. Please allow popups.';
-      }
+      const errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
       setAuthError(errorMsg);
       showToast(errorMsg, 'error');
     } finally {
@@ -2362,31 +2195,20 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   };
 
   const handleDeleteAccount = async () => {
-    if (!user || !auth.currentUser) return;
+    if (!user) return;
     setIsDeletingAccount(true);
     setDeleteError('');
     try {
-      const firebaseUser = auth.currentUser;
-      const isGoogle = firebaseUser.providerData.some(p => p.providerId === 'google.com');
-      if (isGoogle) {
-        const provider = new GoogleAuthProvider();
-        await reauthenticateWithPopup(firebaseUser, provider);
-      } else {
-        if (!deletePassword) {
-          setDeleteError(language === 'DE' ? 'Bitte Passwort eingeben.' : language === 'FR' ? 'Veuillez saisir votre mot de passe.' : language === 'IT' ? 'Inserisci la password.' : 'Please enter your password.');
-          setIsDeletingAccount(false);
-          return;
-        }
-        const credential = EmailAuthProvider.credential(firebaseUser.email!, deletePassword);
-        await reauthenticateWithCredential(firebaseUser, credential);
+      const token = await getAuthToken();
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Delete failed');
       }
-      // Delete Firestore document
-      try {
-        const userRef = doc(db, 'users', user.id);
-        await deleteDoc(userRef);
-      } catch (_) { /* ignore if already deleted */ }
-      // Delete Firebase Auth user
-      await deleteUser(firebaseUser);
+      await supabase.auth.signOut();
       setIsDeleteAccountOpen(false);
       setUser(null);
       showToast(
@@ -2395,10 +2217,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       );
     } catch (err: any) {
       console.error('Delete account error:', err);
-      const msg = err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'
-        ? (language === 'DE' ? 'Falsches Passwort.' : language === 'FR' ? 'Mot de passe incorrect.' : language === 'IT' ? 'Password errata.' : 'Wrong password.')
-        : (language === 'DE' ? 'Fehler beim Löschen. Bitte erneut versuchen.' : language === 'FR' ? 'Erreur lors de la suppression. Veuillez réessayer.' : language === 'IT' ? 'Errore durante la cancellazione. Riprovare.' : 'Error deleting account. Please try again.');
-      setDeleteError(msg);
+      setDeleteError(language === 'DE' ? 'Fehler beim Löschen. Bitte erneut versuchen.' : language === 'FR' ? 'Erreur lors de la suppression. Veuillez réessayer.' : language === 'IT' ? 'Errore durante la cancellazione. Riprovare.' : 'Error deleting account. Please try again.');
     } finally {
       setIsDeletingAccount(false);
     }
@@ -2411,9 +2230,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       const cleanName = newName.trim().replace(/\./g, ' ');
       const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
       
-      await updateDoc(doc(db, 'users', user.id), {
-        firstName: formattedName
-      });
+      await supabase.from('users').update({ first_name: formattedName }).eq('id', user.id);
       setIsEditingName(false);
     } catch (error) {
       console.error("Error updating name:", error);
@@ -2424,7 +2241,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
   const handleLogout = async () => {
     try {
-      await signOut(auth);
+      await supabase.auth.signOut();
       setUser(null);
     } catch (err) {
       console.error("Logout Error:", err);
@@ -2456,49 +2273,40 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const addApplication = async () => {
     if (!user || !newApp.company || !newApp.position) return;
     try {
-      await addDoc(collection(db, 'users', user.id, 'applications'), {
-        ...newApp,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+      await supabase.from('applications').insert({ ...newApp, user_id: user.id });
       setIsAddingApp(false);
       setNewApp({ company: '', position: '', status: 'Applied', location: '', salary: '', notes: '' });
     } catch (e) {
-      handleFirestoreError(e, OperationType.CREATE, `users/${user.id}/applications`);
+      handleDbError(e, 'db', `applications`);
     }
   };
 
   const updateApplication = async () => {
     if (!user || !editingApp || !editingApp.company || !editingApp.position) return;
     try {
-      await updateDoc(doc(db, 'users', user.id, 'applications', editingApp.id), {
-        ...editingApp,
-        updatedAt: serverTimestamp()
-      });
+      const { id, user_id, created_at, ...fields } = editingApp;
+      await supabase.from('applications').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', editingApp.id).eq('user_id', user.id);
       setEditingApp(null);
     } catch (e) {
-      handleFirestoreError(e, OperationType.UPDATE, `users/${user.id}/applications/${editingApp.id}`);
+      handleDbError(e, 'db', `applications/${editingApp.id}`);
     }
   };
 
   const updateApplicationStatus = async (appId: string, newStatus: string) => {
     if (!user) return;
     try {
-      await updateDoc(doc(db, 'users', user.id, 'applications', appId), {
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      });
+      await supabase.from('applications').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', appId).eq('user_id', user.id);
     } catch (e) {
-      handleFirestoreError(e, OperationType.UPDATE, `users/${user.id}/applications/${appId}`);
+      handleDbError(e, 'db', `applications/${appId}`);
     }
   };
 
   const deleteApplication = async (appId: string) => {
     if (!user) return;
     try {
-      await deleteDoc(doc(db, 'users', user.id, 'applications', appId));
+      await supabase.from('applications').delete().eq('id', appId).eq('user_id', user.id);
     } catch (e) {
-      handleFirestoreError(e, OperationType.DELETE, `users/${user.id}/applications/${appId}`);
+      handleDbError(e, 'db', `applications/${appId}`);
     }
   };
 
@@ -2512,7 +2320,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setMessages(prev => [
         ...prev,
         userMsg,
-        { role: 'assistant', content: 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts – es dauert nur 30 Sekunden! 🚀' }
+        { role: 'ai', content: 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts – es dauert nur 30 Sekunden! 🚀' }
       ]);
       if (!overrideContent) setInput('');
       setAuthTab('register');
@@ -2520,13 +2328,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       return;
     } else {
       try {
-        await addDoc(collection(db, 'users', user.id, 'messages'), {
-          role: 'user',
-          content: userContent,
-          createdAt: serverTimestamp()
-        });
+        await supabase.from('messages').insert({ user_id: user.id, role: 'user', content: userContent });
       } catch (error) {
-        handleFirestoreError(error, OperationType.CREATE, `users/${user.id}/messages`);
+        handleDbError(error, 'db', 'messages');
       }
     }
 
@@ -2557,13 +2361,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         setMessages(prev => [...prev, { role: 'ai', content: limitMsg }]);
       } else {
         try {
-          await addDoc(collection(db, 'users', user.id, 'messages'), {
-            role: 'ai',
-            content: limitMsg,
-            createdAt: serverTimestamp()
-          });
+          await supabase.from('messages').insert({ user_id: user.id, role: 'ai', content: limitMsg });
         } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, `users/${user.id}/messages`);
+          handleDbError(error, 'db', 'messages');
         }
       }
       setIsTyping(false);
@@ -2573,11 +2373,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     // Increment usage for non-unlimited users
     if (user && !isUnlimited) {
       try {
-        const userRef = doc(db, 'users', user.id);
-        await updateDoc(userRef, { 
-          freeGenerationsUsed: increment(1),
-          dailyToolUses: increment(1)
-        });
+        await supabase.from('users').update({
+          free_generations_used: (user.freeGenerationsUsed || 0) + 1,
+          daily_tool_uses: (user.dailyToolUses || 0) + 1,
+        }).eq('id', user.id);
       } catch (e) {
         console.error("Error incrementing message count:", e);
       }
@@ -2646,13 +2445,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         setMessages(prev => [...prev, { role: 'ai', content: reply }]);
       } else {
         try {
-          await addDoc(collection(db, 'users', user.id, 'messages'), {
-            role: 'ai',
-            content: reply,
-            createdAt: serverTimestamp()
-          });
+          await supabase.from('messages').insert({ user_id: user.id, role: 'ai', content: reply });
         } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, `users/${user.id}/messages`);
+          handleDbError(error, 'db', 'messages');
         }
       }
     } catch (err: any) {
@@ -2692,13 +2487,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         setMessages(prev => [...prev, { role: 'ai', content: errorMsg }]);
       } else {
         try {
-          await addDoc(collection(db, 'users', user.id, 'messages'), {
-            role: 'ai',
-            content: errorMsg,
-            createdAt: serverTimestamp()
-          });
+          await supabase.from('messages').insert({ user_id: user.id, role: 'ai', content: errorMsg });
         } catch (error) {
-          handleFirestoreError(error, OperationType.CREATE, `users/${user.id}/messages`);
+          handleDbError(error, 'db', 'messages');
         }
       }
     } finally {
@@ -3371,12 +3162,9 @@ Bewerte in 3 Kategorien (je 0–100%):
             
             // Save to dedicated collection
             if (user) {
-              await addDoc(collection(db, 'users', user.id, 'cv_analyses'), {
-                ...analysisData,
-                createdAt: serverTimestamp()
-              });
+              await supabase.from('cv_analyses').insert({ user_id: user.id, data: analysisData });
             }
-            
+
             // Format for display
             const cvLabels = language === 'FR' ? {
               keywords: 'Mots-clés principaux du CV',
@@ -3466,10 +3254,7 @@ ${JSON.stringify(analysisData, null, 2)}
             
             // Save to dedicated collection
             if (user) {
-              await addDoc(collection(db, 'users', user.id, 'salary_calculations'), {
-                ...salaryData,
-                createdAt: serverTimestamp()
-              });
+              await supabase.from('salary_calculations').insert({ user_id: user.id, data: salaryData });
             }
             
             setParsedSalaryResult(salaryData);
@@ -3569,30 +3354,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       // Save to history
       if (user) {
         try {
-          await addDoc(collection(db, 'users', user.id, 'toolResults'), {
-            toolId: activeTool.id,
-            toolTitle: activeTool.title,
+          await supabase.from('tool_results').insert({
+            user_id: user.id,
+            tool_id: activeTool.id,
+            tool_title: activeTool.title,
             input: toolInput,
             result: resultText,
-            createdAt: serverTimestamp()
           });
-          
+
           // Increment usage for non-unlimited users
           if (!isUnlimited) {
-            const userRef = doc(db, 'users', user.id);
-            await updateDoc(userRef, { 
-              toolUses: increment(1),
-              dailyToolUses: increment(1)
-            });
-          }
-
-          // Increment search usage if search was used
-          if (useSearch) {
-            const userRef = doc(db, 'users', user.id);
-            await updateDoc(userRef, { searchUses: increment(1) });
+            await supabase.from('users').update({
+              tool_uses: (user.toolUses || 0) + 1,
+              daily_tool_uses: (user.dailyToolUses || 0) + 1,
+              ...(useSearch ? { search_uses: (user.searchUses || 0) + 1 } : {}),
+            }).eq('id', user.id);
+          } else if (useSearch) {
+            await supabase.from('users').update({ search_uses: (user.searchUses || 0) + 1 }).eq('id', user.id);
           }
         } catch (e) {
-          handleFirestoreError(e, OperationType.WRITE, `users/${user.id}`);
+          handleDbError(e, 'db', `users/${user.id}`);
         }
       }
 
@@ -6579,7 +6360,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <button 
                         onClick={async () => {
                           try {
-                            await setDoc(doc(db, 'users', user.id), { role: 'pro' }, { merge: true });
+                            await supabase.from('users').update({ role: 'pro' }).eq('id', user.id);
                             setMessages(prev => [...prev, { role: 'ai', content: 'Test-Upgrade: Du bist jetzt PRO-Nutzer! ✨' }]);
                           } catch (e) { console.error(e); }
                         }}
@@ -6590,7 +6371,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <button 
                         onClick={async () => {
                           try {
-                            await setDoc(doc(db, 'users', user.id), { role: 'client' }, { merge: true });
+                            await supabase.from('users').update({ role: 'client' }).eq('id', user.id);
                             setMessages(prev => [...prev, { role: 'ai', content: 'Test-Downgrade: Du bist wieder FREE-Nutzer.' }]);
                           } catch (e) { console.error(e); }
                         }}
@@ -9768,7 +9549,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <button 
                     type="button"
                     onClick={async () => {
-                      await auth.signOut();
+                      await supabase.auth.signOut();
                       window.localStorage.clear();
                       window.location.reload();
                     }}
@@ -9800,7 +9581,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {language === 'DE' ? 'Diese Aktion ist unwiderruflich. Alle deine Daten werden dauerhaft gelöscht.' : language === 'FR' ? 'Cette action est irréversible. Toutes vos données seront définitivement supprimées.' : language === 'IT' ? 'Questa azione è irreversibile. Tutti i tuoi dati verranno eliminati definitivamente.' : 'This action is irreversible. All your data will be permanently deleted.'}
                 </p>
               </div>
-              {auth.currentUser && !auth.currentUser.providerData.some(p => p.providerId === 'google.com') && (
+              {user && (
                 <div className="space-y-1.5 mb-4">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
                     {language === 'DE' ? 'Passwort zur Bestätigung' : language === 'FR' ? 'Mot de passe pour confirmer' : language === 'IT' ? 'Password per confermare' : 'Password to confirm'}
@@ -10042,7 +9823,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={async () => {
                             if (!user?.id) return;
                             try {
-                              await updateDoc(doc(db, 'users', user.id), { role: 'client' });
+                              await supabase.from('users').update({ role: 'client' }).eq('id', user.id);
                               window.location.reload();
                             } catch (e) {
                               console.error(e);
@@ -10056,7 +9837,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={async () => {
                             if (!user?.id) return;
                             try {
-                              await updateDoc(doc(db, 'users', user.id), { role: 'pro' });
+                              await supabase.from('users').update({ role: 'pro' }).eq('id', user.id);
                               window.location.reload();
                             } catch (e) {
                               console.error(e);
@@ -10070,7 +9851,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={async () => {
                             if (!user?.id) return;
                             try {
-                              await updateDoc(doc(db, 'users', user.id), { role: 'unlimited' });
+                              await supabase.from('users').update({ role: 'unlimited' }).eq('id', user.id);
                               window.location.reload();
                             } catch (e) {
                               console.error(e);
@@ -10165,7 +9946,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               setIsTutorialOpen(false);
               if (user?.id) {
                 try {
-                  await updateDoc(doc(db, 'users', user.id), { hasSeenTutorial: true });
+                  await supabase.from('users').update({ has_seen_tutorial: true }).eq('id', user.id);
                 } catch (e) {
                   console.error("Error updating tutorial status:", e);
                 }
