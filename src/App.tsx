@@ -992,6 +992,7 @@ function StellifyApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [splashMinDone, setSplashMinDone] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
@@ -1017,6 +1018,12 @@ function StellifyApp() {
   // Safety net: if auth hasn't resolved in 2s (e.g. network error), dismiss splash
   useEffect(() => {
     const timer = setTimeout(() => setIsAuthReady(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Minimum splash duration: 4.5s for a professional brand moment
+  useEffect(() => {
+    const timer = setTimeout(() => setSplashMinDone(true), 4500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1445,24 +1452,15 @@ function StellifyApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [hasPromoOpened, setHasPromoOpened] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (!hasPromoOpened) {
-        setIsPromoOpen(true);
-        setHasPromoOpened(true);
-      }
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [hasPromoOpened]);
+  // Show promo banner 6s after page load (only once per browser)
   useEffect(() => {
     const hasSeenPromo = localStorage.getItem('hasSeenPromo');
     if (!hasSeenPromo) {
       const timer = setTimeout(() => {
         setIsPromoOpen(true);
         localStorage.setItem('hasSeenPromo', 'true');
-      }, 2000);
+      }, 6000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -5877,7 +5875,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
-  if (!isAuthReady) {
+  if (!isAuthReady || !splashMinDone) {
     const features = ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
