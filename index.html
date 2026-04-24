@@ -17,6 +17,25 @@
         } catch(e) {}
       })();
     </script>
+    <!-- OAUTH POPUP CALLBACK: if this page loaded inside the OAuth popup, relay tokens to parent immediately -->
+    <script>
+      (function() {
+        try {
+          if (!window.opener) return;
+          var hash = window.location.hash;
+          if (!hash || hash.indexOf('access_token=') === -1) return;
+          var params = new URLSearchParams(hash.slice(1));
+          var access_token = params.get('access_token');
+          var refresh_token = params.get('refresh_token') || '';
+          if (!access_token) return;
+          window.opener.postMessage(
+            { type: 'SUPABASE_OAUTH_POPUP_SUCCESS', access_token: access_token, refresh_token: refresh_token },
+            window.location.origin
+          );
+          window.close();
+        } catch(e) {}
+      })();
+    </script>
     <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner – auf Deutsch, Französisch und Italienisch.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Stellify – Dein KI-Karriere-Copilot">

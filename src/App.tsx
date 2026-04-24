@@ -1027,20 +1027,6 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Popup OAuth callback: if this window was opened as a popup, relay tokens to parent and close
-  useEffect(() => {
-    if (!window.opener) return;
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
-    const access_token = hashParams.get('access_token');
-    const refresh_token = hashParams.get('refresh_token');
-    if (access_token) {
-      window.opener.postMessage(
-        { type: 'SUPABASE_OAUTH_POPUP_SUCCESS', access_token, refresh_token },
-        window.location.origin
-      );
-      setTimeout(() => window.close(), 300);
-    }
-  }, []);
 
   // Detect OAuth errors returned in URL after redirect
   useEffect(() => {
@@ -2237,6 +2223,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const handleOAuthWithPopup = async (provider: 'google' | 'linkedin_oidc', errorMsgs: Record<string, string>) => {
     setAuthError('');
     setIsAuthLoading(true);
+
+    // Open popup SYNCHRONOUSLY here (still within the user gesture) so browsers
+    // don't block it. We navigate it to the real URL once we have it.
+    const popup = openOAuthPopup('about:blank', `${provider}-oauth`);
+
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -2245,16 +2236,17 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       if (error) throw error;
       if (!data.url) throw new Error('No URL returned');
 
-      const popup = openOAuthPopup(data.url, `${provider}-oauth`);
-      setIsAuthModalOpen(false);
-
-      if (!popup || popup.closed) {
-        // Popup blocked – fall back to redirect
+      if (popup && !popup.closed) {
+        popup.location.href = data.url;
+      } else {
+        // Popup was blocked or closed – fall back to redirect
         window.location.href = data.url;
         return;
       }
 
-      // Listen for the popup to relay the session tokens back
+      setIsAuthModalOpen(false);
+
+      // Listen for the popup to relay the session tokens back (handled in index.html)
       const handlePopupMessage = async (event: MessageEvent) => {
         if (event.origin !== window.location.origin) return;
         if (event.data?.type !== 'SUPABASE_OAUTH_POPUP_SUCCESS') return;
@@ -2267,6 +2259,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       };
       window.addEventListener('message', handlePopupMessage);
     } catch (err: any) {
+      if (popup && !popup.closed) popup.close();
       console.error(`${provider} Auth Error:`, err);
       const msg = errorMsgs[language] || errorMsgs['EN'];
       setAuthError(msg);
