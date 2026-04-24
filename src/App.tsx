@@ -2236,8 +2236,6 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       if (!data.url) throw new Error('No URL returned');
 
       if (popup && !popup.closed) {
-        // Mark the popup so the index.html callback script knows to act
-        try { popup.sessionStorage.setItem('stellify_oauth_popup', '1'); } catch (_) {}
         popup.location.href = data.url;
       } else {
         // Popup was blocked – fall back to full-page redirect
