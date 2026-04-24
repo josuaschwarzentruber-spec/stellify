@@ -1021,6 +1021,19 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Detect OAuth errors returned in URL after redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const oauthError = params.get('error') || hashParams.get('error');
+    const oauthDesc = params.get('error_description') || hashParams.get('error_description');
+    if (oauthError) {
+      console.error('OAuth callback error:', oauthError, oauthDesc);
+      showToast(oauthDesc ? decodeURIComponent(oauthDesc.replace(/\+/g, ' ')) : oauthError, 'error');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   // Handle return from Stripe checkout – runs after splash so activeView isn't overwritten
   useEffect(() => {
     if (!splashDone) return;
@@ -2189,7 +2202,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'linkedin_oidc',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: `${window.location.origin}/` },
       });
       if (error) throw error;
       setIsAuthModalOpen(false);
@@ -2209,7 +2222,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: `${window.location.origin}/` },
       });
       if (error) throw error;
       setIsAuthModalOpen(false);
