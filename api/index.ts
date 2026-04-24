@@ -714,6 +714,47 @@ app.post("/api/create-checkout-session", async (req, res) => {
 });
 
 
+// ── LinkedIn Post ─────────────────────────────────────────────────────────────
+app.post("/api/linkedin/post", requireAuth, async (req: AuthRequest, res: Response) => {
+  const { text, accessToken, memberId } = req.body;
+  if (!text || !accessToken || !memberId) {
+    return res.status(400).json({ error: "text, accessToken und memberId sind erforderlich" });
+  }
+  if (text.length > 3000) {
+    return res.status(400).json({ error: "Post darf maximal 3000 Zeichen haben" });
+  }
+  try {
+    const liRes = await fetch("https://api.linkedin.com/v2/ugcPosts", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+        "X-Restli-Protocol-Version": "2.0.0",
+      },
+      body: JSON.stringify({
+        author: `urn:li:person:${memberId}`,
+        lifecycleState: "PUBLISHED",
+        specificContent: {
+          "com.linkedin.ugc.ShareContent": {
+            shareCommentary: { text },
+            shareMediaCategory: "NONE",
+          },
+        },
+        visibility: { "com.linkedin.ugc.MemberNetworkVisibility": "PUBLIC" },
+      }),
+    });
+    if (!liRes.ok) {
+      const errData = await liRes.json().catch(() => ({}));
+      return res.status(liRes.status).json({ error: errData.message || "LinkedIn API Fehler" });
+    }
+    const data = await liRes.json();
+    res.json({ success: true, id: data.id });
+  } catch (err: any) {
+    console.error("LinkedIn post error:", err);
+    res.status(500).json({ error: "Fehler beim Posten auf LinkedIn" });
+  }
+});
+
 // ── LinkedIn OAuth ────────────────────────────────────────────────────────────
 app.get("/api/auth/linkedin/url", (req, res) => {
   const clientId = process.env.LINKEDIN_CLIENT_ID;

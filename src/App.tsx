@@ -1095,6 +1095,10 @@ function StellifyApp() {
   const [toolResult, setToolResult] = useState<string | null>(null);
   const [toolResultEditable, setToolResultEditable] = useState<string>('');
   const [isEditingToolResult, setIsEditingToolResult] = useState(false);
+  const [linkedinImportConsent, setLinkedinImportConsent] = useState<{name: string; email: string; picture?: string; sub: string} | null>(null);
+  const [linkedinPostModal, setLinkedinPostModal] = useState(false);
+  const [linkedinPostText, setLinkedinPostText] = useState('');
+  const [isPostingLinkedIn, setIsPostingLinkedIn] = useState(false);
   const [parsedSalaryResult, setParsedSalaryResult] = useState<any | null>(null);
   const [interviewSession, setInterviewSession] = useState<{
     questions: Array<{q: string; tip: string; model: string; mistakes: string}>;
@@ -1584,6 +1588,17 @@ function StellifyApp() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: supaUser.email, firstName: formattedName, language }),
               }).then(null, console.error);
+            }
+            if (event === 'SIGNED_IN' && supaUser.app_metadata?.provider === 'linkedin_oidc') {
+              const meta = supaUser.user_metadata || {};
+              if (meta.full_name || meta.email) {
+                setLinkedinImportConsent({
+                  name: meta.full_name || meta.name || formattedName,
+                  email: meta.email || supaUser.email || '',
+                  picture: meta.picture || meta.avatar_url,
+                  sub: meta.sub || supaUser.id,
+                });
+              }
             }
           }
         } catch (e) {
@@ -2187,7 +2202,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'linkedin_oidc',
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: window.location.origin, scopes: 'openid profile email w_member_social' },
       });
       if (error) throw error;
       setIsAuthModalOpen(false);
@@ -2272,6 +2287,50 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setUser(null);
     } catch (err) {
       console.error("Logout Error:", err);
+    }
+  };
+
+  const handleLinkedInProfileImport = (consent: {name: string; email: string; picture?: string; sub: string}) => {
+    const importedContext = `Name: ${consent.name}\nE-Mail: ${consent.email}\nLinkedIn Profil importiert.`;
+    setCvContext(importedContext);
+    if (user) {
+      supabase.from('users').update({ cv_context: importedContext }).eq('id', user.id)
+        .then(null, err => handleDbError(err, 'db', 'users'));
+    }
+    setLinkedinImportConsent(null);
+    showToast(language === 'DE' ? 'LinkedIn-Profil importiert!' : language === 'FR' ? 'Profil LinkedIn importé!' : language === 'IT' ? 'Profilo LinkedIn importato!' : 'LinkedIn profile imported!', 'success');
+  };
+
+  const handlePostToLinkedIn = async () => {
+    if (!linkedinPostText.trim()) return;
+    setIsPostingLinkedIn(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const providerToken = session?.provider_token;
+      const memberId = session?.user?.user_metadata?.sub;
+      if (!providerToken || !memberId) {
+        showToast(language === 'DE' ? 'Bitte melde dich erneut mit LinkedIn an.' : 'Please sign in with LinkedIn again.', 'error');
+        setLinkedinPostModal(false);
+        return;
+      }
+      const authToken = await getAuthToken();
+      const res = await fetch('/api/linkedin/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({ text: linkedinPostText, accessToken: providerToken, memberId }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Post fehlgeschlagen');
+      }
+      showToast(language === 'DE' ? 'Post auf LinkedIn veröffentlicht!' : language === 'FR' ? 'Post publié sur LinkedIn!' : language === 'IT' ? 'Post pubblicato su LinkedIn!' : 'Post published on LinkedIn!', 'success');
+      setLinkedinPostModal(false);
+      setLinkedinPostText('');
+    } catch (err: any) {
+      console.error('LinkedIn post error:', err);
+      showToast(err.message || 'Fehler beim Posten.', 'error');
+    } finally {
+      setIsPostingLinkedIn(false);
     }
   };
 
@@ -8905,7 +8964,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <FileUp size={12} />
                             Word
                           </button>
-                          <button 
+                          <button
                             onClick={() => {
                               navigator.clipboard.writeText(toolResult);
                               showToast(t.tool_copied);
@@ -8914,6 +8973,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           >
                             {t.tool_copy}
                           </button>
+                          {activeTool?.id === 'linkedin-posts' && (
+                            <button
+                              onClick={() => { setLinkedinPostText(toolResult || ''); setLinkedinPostModal(true); }}
+                              className="text-[10px] font-bold uppercase tracking-widest text-[#0A66C2] hover:text-[#004225] transition-colors flex items-center gap-1"
+                            >
+                              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect width="24" height="24" rx="2"/><path d="M7 9H5v10h2V9zm-1-1.5A1.25 1.25 0 1 0 6 5a1.25 1.25 0 0 0 0 2.5zM19 13.2c0-2.3-1.1-4.2-3.4-4.2a3.2 3.2 0 0 0-2.6 1.3V9H11v10h2v-5.4c0-1.4.7-2.3 1.9-2.3 1.1 0 1.6.8 1.6 2.2V19h2v-5.8z" fill="white"/></svg>
+                              Post
+                            </button>
+                          )}
                         </div>
                       </div>
                       <div className="flex-1 overflow-y-auto font-serif text-lg leading-relaxed pr-4 custom-scrollbar markdown-body relative group">
@@ -9602,6 +9670,97 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- LINKEDIN PROFILE IMPORT CONSENT --- */}
+      <AnimatePresence>
+        {linkedinImportConsent && (
+          <div className="fixed inset-0 z-[500] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setLinkedinImportConsent(null)} className="absolute inset-0 bg-black/50 backdrop-blur-sm z-10" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white dark:bg-[#1A1A18] w-full max-w-sm p-8 relative z-20 shadow-2xl">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-10 h-10 rounded-full bg-[#0A66C2] flex items-center justify-center shrink-0">
+                  {linkedinImportConsent.picture
+                    ? <img src={linkedinImportConsent.picture} alt="" className="w-10 h-10 rounded-full object-cover" />
+                    : <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><rect width="24" height="24" rx="2"/><path d="M7 9H5v10h2V9zm-1-1.5A1.25 1.25 0 1 0 6 5a1.25 1.25 0 0 0 0 2.5zM19 13.2c0-2.3-1.1-4.2-3.4-4.2a3.2 3.2 0 0 0-2.6 1.3V9H11v10h2v-5.4c0-1.4.7-2.3 1.9-2.3 1.1 0 1.6.8 1.6 2.2V19h2v-5.8z" fill="white"/></svg>
+                  }
+                </div>
+                <div>
+                  <p className="font-medium text-sm dark:text-[#FAFAF8]">{linkedinImportConsent.name}</p>
+                  <p className="text-xs text-[#9A9A94]">{linkedinImportConsent.email}</p>
+                </div>
+              </div>
+              <h3 className="text-base font-serif mb-2 dark:text-[#FAFAF8]">
+                {language === 'DE' ? 'LinkedIn-Profil importieren?' : language === 'FR' ? 'Importer le profil LinkedIn?' : language === 'IT' ? 'Importare il profilo LinkedIn?' : 'Import LinkedIn profile?'}
+              </h3>
+              <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed mb-6">
+                {language === 'DE'
+                  ? 'Dein Name und deine E-Mail werden in den CV-Kontext importiert. Diese Daten werden nur in deinem Stellify-Konto gespeichert und niemals an Dritte weitergegeben.'
+                  : language === 'FR'
+                  ? 'Votre nom et e-mail seront importés dans le contexte CV. Ces données sont stockées uniquement dans votre compte Stellify et ne sont jamais partagées avec des tiers.'
+                  : language === 'IT'
+                  ? 'Il tuo nome e la tua email verranno importati nel contesto CV. Questi dati vengono archiviati solo nel tuo account Stellify e non vengono mai condivisi con terze parti.'
+                  : 'Your name and email will be imported into the CV context. This data is stored only in your Stellify account and never shared with third parties.'}
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => handleLinkedInProfileImport(linkedinImportConsent)} className="flex-1 bg-[#004225] text-white text-xs font-bold uppercase tracking-widest py-3 hover:bg-[#003018] transition-colors">
+                  {language === 'DE' ? 'Importieren' : language === 'FR' ? 'Importer' : language === 'IT' ? 'Importa' : 'Import'}
+                </button>
+                <button onClick={() => setLinkedinImportConsent(null)} className="flex-1 border border-black/10 dark:border-white/10 text-xs font-bold uppercase tracking-widest py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors dark:text-[#FAFAF8]">
+                  {language === 'DE' ? 'Überspringen' : language === 'FR' ? 'Ignorer' : language === 'IT' ? 'Salta' : 'Skip'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* --- LINKEDIN POST MODAL --- */}
+      <AnimatePresence>
+        {linkedinPostModal && (
+          <div className="fixed inset-0 z-[500] flex items-center justify-center p-6">
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => !isPostingLinkedIn && setLinkedinPostModal(false)} className="absolute inset-0 bg-black/50 backdrop-blur-sm z-10" />
+            <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="bg-white dark:bg-[#1A1A18] w-full max-w-lg p-8 relative z-20 shadow-2xl">
+              <div className="flex items-center gap-3 mb-5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#0A66C2"><rect width="24" height="24" rx="2"/><path d="M7 9H5v10h2V9zm-1-1.5A1.25 1.25 0 1 0 6 5a1.25 1.25 0 0 0 0 2.5zM19 13.2c0-2.3-1.1-4.2-3.4-4.2a3.2 3.2 0 0 0-2.6 1.3V9H11v10h2v-5.4c0-1.4.7-2.3 1.9-2.3 1.1 0 1.6.8 1.6 2.2V19h2v-5.8z" fill="white"/></svg>
+                <h3 className="text-base font-serif dark:text-[#FAFAF8]">
+                  {language === 'DE' ? 'Auf LinkedIn posten' : language === 'FR' ? 'Publier sur LinkedIn' : language === 'IT' ? 'Pubblica su LinkedIn' : 'Post to LinkedIn'}
+                </h3>
+              </div>
+              <p className="text-[10px] text-[#9A9A94] mb-3 leading-relaxed">
+                {language === 'DE'
+                  ? 'Wähle einen der generierten Posts aus, bearbeite ihn nach Bedarf und veröffentliche ihn direkt auf deinem LinkedIn-Profil. Dein Zugriffstoken wird nur für diesen Vorgang verwendet und nicht gespeichert.'
+                  : language === 'FR'
+                  ? 'Sélectionnez un des posts générés, modifiez-le si nécessaire et publiez-le directement sur votre profil LinkedIn. Votre jeton d\'accès est utilisé uniquement pour cette opération et n\'est pas stocké.'
+                  : language === 'IT'
+                  ? 'Seleziona uno dei post generati, modificalo se necessario e pubblicalo direttamente sul tuo profilo LinkedIn. Il tuo token di accesso viene utilizzato solo per questa operazione e non viene memorizzato.'
+                  : 'Select one of the generated posts, edit it as needed, and publish it directly to your LinkedIn profile. Your access token is used only for this operation and is not stored.'}
+              </p>
+              <textarea
+                value={linkedinPostText}
+                onChange={e => setLinkedinPostText(e.target.value)}
+                rows={10}
+                className="w-full p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:outline-none focus:border-[#004225] transition-all resize-y leading-relaxed"
+                placeholder={language === 'DE' ? 'Post-Text hier einfügen oder bearbeiten...' : 'Paste or edit post text here...'}
+              />
+              <p className="text-[9px] text-[#9A9A94] mt-2 mb-5">{linkedinPostText.length} / 3000</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handlePostToLinkedIn}
+                  disabled={isPostingLinkedIn || !linkedinPostText.trim() || linkedinPostText.length > 3000}
+                  className="flex-1 bg-[#0A66C2] text-white text-xs font-bold uppercase tracking-widest py-3 hover:bg-[#004182] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isPostingLinkedIn
+                    ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    : (language === 'DE' ? 'Jetzt posten' : language === 'FR' ? 'Publier' : language === 'IT' ? 'Pubblica' : 'Post now')}
+                </button>
+                <button onClick={() => setLinkedinPostModal(false)} disabled={isPostingLinkedIn} className="flex-1 border border-black/10 dark:border-white/10 text-xs font-bold uppercase tracking-widest py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors dark:text-[#FAFAF8] disabled:opacity-50">
+                  {language === 'DE' ? 'Abbrechen' : language === 'FR' ? 'Annuler' : language === 'IT' ? 'Annulla' : 'Cancel'}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
