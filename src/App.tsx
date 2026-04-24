@@ -2000,29 +2000,40 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       }
       
       setCvContext(text);
-      
-      // Trigger AI Analysis
+
+      // Trigger AI Analysis (frontend, no auth needed for basic analysis)
       analyzeCV(text);
-      
-      // Call backend for metadata analysis
-      try {
-        await fetch('/api/analyze-cv', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: text.substring(0, 1000) })
-        });
-      } catch (e) {
-        console.warn("Backend analysis failed, continuing with frontend only.");
-      }
-      
-      // Persist CV context if user is logged in
-      if (user) {
-        try {
-          await supabase.from('users').update({ cv_context: text }).eq('id', user.id);
-        } catch (error) {
-          handleDbError(error, 'db', `users/${user.id}`);
-        }
-      }
+
+      // Upload file to Supabase Storage + backend metadata analysis (parallel)
+      const token = await getAuthToken();
+      await Promise.allSettled([
+        // Store actual file in Supabase Storage via backend
+        (async () => {
+          try {
+            const arrayBuffer = await file.arrayBuffer();
+            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+            await fetch('/api/upload-cv', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              body: JSON.stringify({ base64, fileName: file.name, mimeType: file.type }),
+            });
+          } catch (e) { console.warn("CV file upload failed, text-only mode."); }
+        })(),
+        // Backend metadata analysis
+        (async () => {
+          try {
+            await fetch('/api/analyze-cv', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+              body: JSON.stringify({ text: text.substring(0, 1000) }),
+            });
+          } catch (e) { console.warn("Backend CV analysis failed."); }
+        })(),
+        // Persist CV text in DB
+        supabase.from('users').update({ cv_context: text }).eq('id', user.id).then(
+          null, (e) => handleDbError(e, 'db', `users/${user.id}`)
+        ),
+      ]);
 
       setMessages(prev => [...prev, { 
         role: 'ai', 
