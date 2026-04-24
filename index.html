@@ -17,35 +17,23 @@
         } catch(e) {}
       })();
     </script>
-    <!-- OAUTH POPUP CALLBACK: fires before React loads; relays tokens and closes the popup -->
+    <!-- OAUTH RETURN DETECTION: runs before React/Supabase so the flag is set
+         before Supabase clears the hash. App.tsx reads this flag in the
+         INITIAL_SESSION handler to avoid a premature setUser(null). -->
     <script>
       (function() {
         try {
           var hash = window.location.hash;
-          if (!hash || hash.indexOf('access_token=') === -1) return;
-          var params = new URLSearchParams(hash.slice(1));
-          var access_token = params.get('access_token');
-          var refresh_token = params.get('refresh_token') || '';
-          if (!access_token) return;
-          // Always write to localStorage — main window picks this up via storage event
-          // even when COOP headers have nulled window.opener
-          localStorage.setItem('stellify_oauth_result', JSON.stringify({
-            access_token: access_token, refresh_token: refresh_token, ts: Date.now()
-          }));
-          // Fast path: postMessage when opener is reachable
-          try { if (window.opener) window.opener.postMessage(
-            { type: 'SUPABASE_OAUTH_POPUP_SUCCESS', access_token: access_token, refresh_token: refresh_token },
-            window.location.origin
-          ); } catch(e2) {}
-          // Close popup — works for script-opened windows; Chrome/Safari silently ignore on normal tabs
-          window.close();
+          if (hash && hash.indexOf('access_token=') !== -1) {
+            sessionStorage.setItem('stellify_oauth_returning', '1');
+          }
         } catch(e) {}
       })();
     </script>
     <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner – auf Deutsch, Französisch und Italienisch.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Stellify – Dein KI-Karriere-Copilot">
-    <meta property="og:description" content="CV-Optimierung, Interview-Coach 
+    <meta property="og:description" content="CV-Optimierung, Interview-Coach
       und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="de_CH">
