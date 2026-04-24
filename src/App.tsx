@@ -1668,7 +1668,7 @@ function StellifyApp() {
           const importedContext = `Name: ${profile.name}\nEmail: ${profile.email}\nLinkedIn Import: ${JSON.stringify(profile)}`;
           setCvContext(importedContext);
           
-          // Save to Firestore if user is logged in
+          // Save to Supabase if user is logged in
           if (user) {
             supabase.from('users').update({ cv_context: importedContext }).eq('id', user.id)
               .then(null, err => handleDbError(err, 'db', 'users'));
