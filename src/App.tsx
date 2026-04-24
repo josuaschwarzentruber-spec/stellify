@@ -2181,6 +2181,26 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
+  const handleLinkedInAuth = async () => {
+    setAuthError('');
+    setIsAuthLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'linkedin_oidc',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      setIsAuthModalOpen(false);
+    } catch (err: any) {
+      console.error("LinkedIn Auth Error:", err);
+      const errorMsg = language === 'DE' ? 'LinkedIn-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion LinkedIn.' : language === 'IT' ? 'Accesso LinkedIn fallito.' : 'LinkedIn authentication failed.';
+      setAuthError(errorMsg);
+      showToast(errorMsg, 'error');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
   const handleGoogleAuth = async () => {
     setAuthError('');
     setIsAuthLoading(true);
@@ -9523,7 +9543,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </div>
                     </div>
 
-                    <button 
+                    <button
                       type="button"
                       onClick={handleGoogleAuth}
                       disabled={isAuthLoading}
@@ -9535,10 +9555,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
                         <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                       </svg>
-                      {language === 'DE' ? 'Mit Google anmelden' : 
-                       language === 'FR' ? 'Se connecter avec Google' : 
-                       language === 'IT' ? 'Accedi con Google' : 
+                      {language === 'DE' ? 'Mit Google anmelden' :
+                       language === 'FR' ? 'Se connecter avec Google' :
+                       language === 'IT' ? 'Accedi con Google' :
                        'Sign in with Google'}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleLinkedInAuth}
+                      disabled={isAuthLoading}
+                      className="w-full border border-black/10 dark:border-white/10 py-3 text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-3 disabled:opacity-70 mt-3"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="24" height="24" rx="2" fill="#0A66C2"/>
+                        <path d="M7 9H5v10h2V9zm-1-1.5A1.25 1.25 0 1 0 6 5a1.25 1.25 0 0 0 0 2.5zM19 13.2c0-2.3-1.1-4.2-3.4-4.2a3.2 3.2 0 0 0-2.6 1.3V9H11v10h2v-5.4c0-1.4.7-2.3 1.9-2.3 1.1 0 1.6.8 1.6 2.2V19h2v-5.8z" fill="white"/>
+                      </svg>
+                      {language === 'DE' ? 'Mit LinkedIn anmelden' :
+                       language === 'FR' ? 'Se connecter avec LinkedIn' :
+                       language === 'IT' ? 'Accedi con LinkedIn' :
+                       'Sign in with LinkedIn'}
                     </button>
                   </>
                 )}
