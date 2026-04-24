@@ -17,21 +17,26 @@
         } catch(e) {}
       })();
     </script>
-    <!-- OAUTH POPUP CALLBACK: if this page loaded inside the OAuth popup, relay tokens to parent immediately -->
+    <!-- OAUTH POPUP CALLBACK: relay tokens to opener via localStorage (works even when COOP nulls window.opener) -->
     <script>
       (function() {
         try {
-          if (!window.opener) return;
+          if (!window.opener && !sessionStorage.getItem('stellify_oauth_popup')) return;
           var hash = window.location.hash;
           if (!hash || hash.indexOf('access_token=') === -1) return;
           var params = new URLSearchParams(hash.slice(1));
           var access_token = params.get('access_token');
           var refresh_token = params.get('refresh_token') || '';
           if (!access_token) return;
-          window.opener.postMessage(
+          // Write to localStorage so any same-origin window picks it up via storage event
+          localStorage.setItem('stellify_oauth_result', JSON.stringify({
+            access_token: access_token, refresh_token: refresh_token, ts: Date.now()
+          }));
+          // Also try postMessage for the fast path
+          try { window.opener && window.opener.postMessage(
             { type: 'SUPABASE_OAUTH_POPUP_SUCCESS', access_token: access_token, refresh_token: refresh_token },
             window.location.origin
-          );
+          ); } catch(e2) {}
           window.close();
         } catch(e) {}
       })();

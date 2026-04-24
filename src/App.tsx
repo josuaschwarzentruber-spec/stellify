@@ -2224,8 +2224,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setAuthError('');
     setIsAuthLoading(true);
 
-    // Open popup SYNCHRONOUSLY here (still within the user gesture) so browsers
-    // don't block it. We navigate it to the real URL once we have it.
+    // Open popup SYNCHRONOUSLY (within user gesture) so browsers don't block it.
     const popup = openOAuthPopup('about:blank', `${provider}-oauth`);
 
     try {
@@ -2237,27 +2236,54 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       if (!data.url) throw new Error('No URL returned');
 
       if (popup && !popup.closed) {
+        // Mark the popup so the index.html callback script knows to act
+        try { popup.sessionStorage.setItem('stellify_oauth_popup', '1'); } catch (_) {}
         popup.location.href = data.url;
       } else {
-        // Popup was blocked or closed – fall back to redirect
+        // Popup was blocked – fall back to full-page redirect
         window.location.href = data.url;
         return;
       }
 
       setIsAuthModalOpen(false);
+      localStorage.removeItem('stellify_oauth_result');
 
-      // Listen for the popup to relay the session tokens back (handled in index.html)
-      const handlePopupMessage = async (event: MessageEvent) => {
+      const applySession = async (access_token: string, refresh_token: string) => {
+        const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token: refresh_token || '' });
+        if (sessionError) console.error('setSession error:', sessionError);
+      };
+
+      // Fast path: postMessage (works when COOP allows window.opener)
+      const onMessage = (event: MessageEvent) => {
         if (event.origin !== window.location.origin) return;
         if (event.data?.type !== 'SUPABASE_OAUTH_POPUP_SUCCESS') return;
-        window.removeEventListener('message', handlePopupMessage);
-        const { access_token, refresh_token } = event.data;
-        if (access_token) {
-          const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token: refresh_token || '' });
-          if (sessionError) console.error('setSession error:', sessionError);
-        }
+        cleanup();
+        applySession(event.data.access_token, event.data.refresh_token);
       };
-      window.addEventListener('message', handlePopupMessage);
+
+      // Fallback: localStorage storage event (works even when COOP nulls window.opener)
+      const onStorage = (event: StorageEvent) => {
+        if (event.key !== 'stellify_oauth_result' || !event.newValue) return;
+        try {
+          const { access_token, refresh_token } = JSON.parse(event.newValue);
+          if (!access_token) return;
+          cleanup();
+          localStorage.removeItem('stellify_oauth_result');
+          applySession(access_token, refresh_token);
+        } catch (_) {}
+      };
+
+      // Safety: give up after 5 minutes
+      const timeout = setTimeout(() => cleanup(), 5 * 60 * 1000);
+
+      const cleanup = () => {
+        window.removeEventListener('message', onMessage);
+        window.removeEventListener('storage', onStorage);
+        clearTimeout(timeout);
+      };
+
+      window.addEventListener('message', onMessage);
+      window.addEventListener('storage', onStorage);
     } catch (err: any) {
       if (popup && !popup.closed) popup.close();
       console.error(`${provider} Auth Error:`, err);
