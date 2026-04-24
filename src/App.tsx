@@ -992,7 +992,6 @@ function StellifyApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [splashDone, setSplashDone] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
@@ -1015,10 +1014,6 @@ function StellifyApp() {
     }
   }, [language, user]);
 
-  useEffect(() => {
-    setSplashDone(true);
-  }, []);
-
   // Safety net: if auth hasn't resolved in 2s (e.g. network error), dismiss splash
   useEffect(() => {
     const timer = setTimeout(() => setIsAuthReady(true), 2000);
@@ -1038,9 +1033,8 @@ function StellifyApp() {
     }
   }, []);
 
-  // Handle return from Stripe checkout – runs after splash so activeView isn't overwritten
+  // Handle return from Stripe checkout
   useEffect(() => {
-    if (!splashDone) return;
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view');
     if (viewParam === 'pricing') {
@@ -1051,7 +1045,7 @@ function StellifyApp() {
       setActiveView('pricing');
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, [splashDone]);
+  }, []);
 
   useEffect(() => {
     if (activeView === 'pricing') setSubscriptionError('');
@@ -5883,7 +5877,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
-  if (!isAuthReady || !splashDone) {
+  if (!isAuthReady) {
     const features = ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
