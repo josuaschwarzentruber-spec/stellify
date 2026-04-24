@@ -1578,6 +1578,13 @@ function StellifyApp() {
               theme,
               cv_context: cvContext || null,
             });
+            if (event === 'SIGNED_IN' && supaUser.app_metadata?.provider !== 'email') {
+              fetch('/api/send-welcome-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: supaUser.email, firstName: formattedName, language }),
+              }).then(null, console.error);
+            }
           }
         } catch (e) {
           console.error('Error ensuring user exists:', e);
