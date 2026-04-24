@@ -17,6 +17,31 @@
         } catch(e) {}
       })();
     </script>
+    <!-- OAUTH POPUP CALLBACK: fires before React loads; relays tokens and closes the popup -->
+    <script>
+      (function() {
+        try {
+          var hash = window.location.hash;
+          if (!hash || hash.indexOf('access_token=') === -1) return;
+          var params = new URLSearchParams(hash.slice(1));
+          var access_token = params.get('access_token');
+          var refresh_token = params.get('refresh_token') || '';
+          if (!access_token) return;
+          // Always write to localStorage — main window picks this up via storage event
+          // even when COOP headers have nulled window.opener
+          localStorage.setItem('stellify_oauth_result', JSON.stringify({
+            access_token: access_token, refresh_token: refresh_token, ts: Date.now()
+          }));
+          // Fast path: postMessage when opener is reachable
+          try { if (window.opener) window.opener.postMessage(
+            { type: 'SUPABASE_OAUTH_POPUP_SUCCESS', access_token: access_token, refresh_token: refresh_token },
+            window.location.origin
+          ); } catch(e2) {}
+          // Close popup — works for script-opened windows; Chrome/Safari silently ignore on normal tabs
+          window.close();
+        } catch(e) {}
+      })();
+    </script>
     <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner – auf Deutsch, Französisch und Italienisch.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Stellify – Dein KI-Karriere-Copilot">
