@@ -1027,6 +1027,21 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Popup OAuth callback: if this window was opened as a popup, relay tokens to parent and close
+  useEffect(() => {
+    if (!window.opener) return;
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const access_token = hashParams.get('access_token');
+    const refresh_token = hashParams.get('refresh_token');
+    if (access_token) {
+      window.opener.postMessage(
+        { type: 'SUPABASE_OAUTH_POPUP_SUCCESS', access_token, refresh_token },
+        window.location.origin
+      );
+      setTimeout(() => window.close(), 300);
+    }
+  }, []);
+
   // Detect OAuth errors returned in URL after redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -2212,45 +2227,68 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
-  const handleLinkedInAuth = async () => {
+  const openOAuthPopup = (url: string, name: string) => {
+    const w = 500, h = 650;
+    const left = window.screenX + (window.outerWidth - w) / 2;
+    const top = window.screenY + (window.outerHeight - h) / 2;
+    return window.open(url, name, `width=${w},height=${h},left=${left},top=${top},scrollbars=yes,resizable=yes`);
+  };
+
+  const handleOAuthWithPopup = async (provider: 'google' | 'linkedin_oidc', errorMsgs: Record<string, string>) => {
     setAuthError('');
     setIsAuthLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc',
-        options: { redirectTo: `${window.location.origin}/` },
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: `${window.location.origin}/`, skipBrowserRedirect: true },
       });
       if (error) throw error;
+      if (!data.url) throw new Error('No URL returned');
+
+      const popup = openOAuthPopup(data.url, `${provider}-oauth`);
       setIsAuthModalOpen(false);
+
+      if (!popup || popup.closed) {
+        // Popup blocked – fall back to redirect
+        window.location.href = data.url;
+        return;
+      }
+
+      // Listen for the popup to relay the session tokens back
+      const handlePopupMessage = async (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) return;
+        if (event.data?.type !== 'SUPABASE_OAUTH_POPUP_SUCCESS') return;
+        window.removeEventListener('message', handlePopupMessage);
+        const { access_token, refresh_token } = event.data;
+        if (access_token) {
+          const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token: refresh_token || '' });
+          if (sessionError) console.error('setSession error:', sessionError);
+        }
+      };
+      window.addEventListener('message', handlePopupMessage);
     } catch (err: any) {
-      console.error("LinkedIn Auth Error:", err);
-      const errorMsg = language === 'DE' ? 'LinkedIn-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion LinkedIn.' : language === 'IT' ? 'Accesso LinkedIn fallito.' : 'LinkedIn authentication failed.';
-      setAuthError(errorMsg);
-      showToast(errorMsg, 'error');
+      console.error(`${provider} Auth Error:`, err);
+      const msg = errorMsgs[language] || errorMsgs['EN'];
+      setAuthError(msg);
+      showToast(msg, 'error');
     } finally {
       setIsAuthLoading(false);
     }
   };
 
-  const handleGoogleAuth = async () => {
-    setAuthError('');
-    setIsAuthLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: `${window.location.origin}/` },
-      });
-      if (error) throw error;
-      setIsAuthModalOpen(false);
-    } catch (err: any) {
-      console.error("Google Auth Error:", err);
-      const errorMsg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
-      setAuthError(errorMsg);
-      showToast(errorMsg, 'error');
-    } finally {
-      setIsAuthLoading(false);
-    }
-  };
+  const handleLinkedInAuth = () => handleOAuthWithPopup('linkedin_oidc', {
+    DE: 'LinkedIn-Anmeldung fehlgeschlagen.',
+    FR: 'Échec de la connexion LinkedIn.',
+    IT: 'Accesso LinkedIn fallito.',
+    EN: 'LinkedIn authentication failed.',
+  });
+
+  const handleGoogleAuth = () => handleOAuthWithPopup('google', {
+    DE: 'Google-Anmeldung fehlgeschlagen.',
+    FR: 'Échec de la connexion Google.',
+    IT: 'Accesso Google fallito.',
+    EN: 'Google authentication failed.',
+  });
 
   const handleDeleteAccount = async () => {
     if (!user) return;
