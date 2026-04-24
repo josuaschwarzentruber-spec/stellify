@@ -1027,7 +1027,6 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
-
   // Detect OAuth errors returned in URL after redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
