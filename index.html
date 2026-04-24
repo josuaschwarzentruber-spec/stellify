@@ -17,19 +17,6 @@
         } catch(e) {}
       })();
     </script>
-    <!-- OAUTH RETURN DETECTION: runs before React/Supabase so the flag is set
-         before Supabase clears the hash. App.tsx reads this flag in the
-         INITIAL_SESSION handler to avoid a premature setUser(null). -->
-    <script>
-      (function() {
-        try {
-          var hash = window.location.hash;
-          if (hash && hash.indexOf('access_token=') !== -1) {
-            sessionStorage.setItem('stellify_oauth_returning', '1');
-          }
-        } catch(e) {}
-      })();
-    </script>
     <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner – auf Deutsch, Französisch und Italienisch.">
     <meta name="robots" content="index, follow">
     <meta property="og:title" content="Stellify – Dein KI-Karriere-Copilot">
