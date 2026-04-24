@@ -1021,6 +1021,12 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Safety net: if auth hasn't resolved in 10s (e.g. network error), dismiss splash
+  useEffect(() => {
+    const timer = setTimeout(() => setIsAuthReady(true), 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
   // Detect OAuth errors returned in URL after redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -1605,9 +1611,15 @@ function StellifyApp() {
           console.error('Error ensuring user exists:', e);
         }
 
-        const { data: userData } = await supabase.from('users').select('*').eq('id', supaUser.id).single();
-        processUserData(userData, supaUser);
-        setIsAuthReady(true);
+        try {
+          const { data: userData } = await supabase.from('users').select('*').eq('id', supaUser.id).single();
+          processUserData(userData, supaUser);
+        } catch (e) {
+          console.error('Error loading user profile:', e);
+          processUserData(null, supaUser);
+        } finally {
+          setIsAuthReady(true);
+        }
 
         const userChannel = supabase
           .channel(`user-${supaUser.id}`)
@@ -1618,6 +1630,10 @@ function StellifyApp() {
 
         unsubscribeUser = () => { supabase.removeChannel(userChannel); };
       } else {
+        // If INITIAL_SESSION fires with no session but OAuth tokens are already in
+        // the URL hash, Supabase is still processing them — SIGNED_IN will follow
+        // momentarily. Don't dismiss the splash or reset user state yet.
+        if (event === 'INITIAL_SESSION' && window.location.hash.includes('access_token=')) return;
         setUser(null);
         setIsAuthReady(true);
       }
