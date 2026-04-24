@@ -2214,24 +2214,6 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
-  const handleLinkedInAuth = async () => {
-    setAuthError('');
-    setIsAuthLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc',
-        options: { redirectTo: `${window.location.origin}/` },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      console.error('LinkedIn Auth Error:', err);
-      const msg = language === 'DE' ? 'LinkedIn-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion LinkedIn.' : language === 'IT' ? 'Accesso LinkedIn fallito.' : 'LinkedIn authentication failed.';
-      setAuthError(msg);
-      showToast(msg, 'error');
-      setIsAuthLoading(false);
-    }
-  };
-
   const handleGoogleAuth = async () => {
     setAuthError('');
     setIsAuthLoading(true);
