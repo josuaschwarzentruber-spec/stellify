@@ -1079,8 +1079,15 @@ function StellifyApp() {
       }
     };
     window.addEventListener('popstate', onPop);
-    // Set initial history entry so first back-press works
-    window.history.replaceState({ view: activeView }, '', window.location.pathname);
+    // Preserve OAuth callback params/hash so Supabase can finish session extraction.
+    const hasOAuthCallbackData =
+      window.location.hash.includes('access_token=') ||
+      window.location.hash.includes('refresh_token=') ||
+      window.location.search.includes('code=');
+    if (!hasOAuthCallbackData) {
+      // Set initial history entry so first back-press works
+      window.history.replaceState({ view: activeView }, '', window.location.pathname);
+    }
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
