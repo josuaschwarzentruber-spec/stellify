@@ -709,16 +709,11 @@ app.post("/api/create-checkout-session", async (req, res) => {
     });
     res.json({ success: true, url: session.url });
   } catch (err: any) {
-    console.error(`[STRIPE ERROR] ${err.message}`);
-    const msg = err.message || '';
-    const hint = msg.includes('test mode') || msg.includes('a similar object exists in test mode')
-      ? 'Stripe-Konfigurationsfehler: Du verwendest einen Live-Key, aber die Preis-IDs sind im Test-Modus. Bitte erstelle die Preise im Live-Modus in Stripe und setze die Env-Variablen STRIPE_PRICE_* in Vercel.'
-      : msg.includes('live mode') || msg.includes('a similar object exists in live mode')
-      ? 'Stripe-Konfigurationsfehler: Die Preis-IDs sind im Live-Modus, aber ein Test-Key wird verwendet. Bitte Keys angleichen.'
-      : msg.includes('No such price') || msg.includes('resource_missing')
-      ? `Ungültige Preis-ID. Bitte STRIPE_PRICE_* Variablen in Vercel konfigurieren. (${msg})`
-      : msg || 'Unbekannter Stripe-Fehler';
-    res.status(500).json({ success: false, error: hint });
+    const msg = err.message || 'Unbekannter Fehler';
+    const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+    const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
+    console.error(`[STRIPE ERROR] mode=${mode} message=${msg} type=${err.type} code=${err.code}`);
+    res.status(500).json({ success: false, error: `[${mode}] ${msg}` });
   }
 });
 
