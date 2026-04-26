@@ -306,6 +306,30 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     }
   }
 
+  // Auto-renew: extend subscription_expires_at on every successful invoice
+  if (event.type === "invoice.payment_succeeded") {
+    const invoice = event.data.object as any;
+    if (invoice.subscription && invoice.billing_reason === 'subscription_cycle') {
+      try {
+        const sub = await getStripe().subscriptions.retrieve(invoice.subscription as string);
+        const customerId = sub.customer as string;
+        const usersSnap = await adminDb.collection('users').where('stripe_customer_id', '==', customerId).limit(1).get();
+        if (!usersSnap.empty) {
+          const userDoc = usersSnap.docs[0];
+          const u = userDoc.data() as any;
+          const isAnnual = u.subscription_interval === 'annual';
+          const expiresAt = new Date();
+          if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+          else expiresAt.setMonth(expiresAt.getMonth() + 1);
+          await userDoc.ref.update({ subscription_expires_at: expiresAt.toISOString() });
+          console.log(`[WEBHOOK] Renewed ${userDoc.id} until ${expiresAt.toISOString()}`);
+        }
+      } catch (err) {
+        console.error(`[WEBHOOK] invoice.payment_succeeded handler failed:`, err);
+      }
+    }
+  }
+
   res.json({ received: true });
 });
 
@@ -672,48 +696,56 @@ app.get("/api/health", (_req, res) => {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", async (req, res) => {
+app.post("/api/create-checkout-session", express.json(), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const body = req.body || {};
     const { planId, billingCycle, userId, successUrl, cancelUrl } = body;
+
     if (!planId || !userId || !billingCycle) {
       return res.status(400).json({ error: "Fehlende Parameter: planId, userId oder billingCycle" });
     }
-    const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) {
-      return res.status(500).json({ error: "Stripe ist nicht konfiguriert. Bitte STRIPE_SECRET_KEY in Vercel setzen." });
+      return res.status(500).json({ error: "STRIPE_SECRET_KEY nicht gesetzt" });
     }
-    const stripeClient = getStripe();
+
     const priceMap: Record<string, string | undefined> = {
-      'pro_monthly':      process.env.STRIPE_PRICE_PRO_MONTHLY      || 'price_1TIrQNHEswF7knZxM65zPbFJ',
-      'pro_yearly':       process.env.STRIPE_PRICE_PRO_YEARLY       || 'price_1TIrRqHEswF7knZxlkJaQa2H',
-      'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || 'price_1TIrSSHEswF7knZxcHQnDDGt',
-      'ultimate_yearly':  process.env.STRIPE_PRICE_ULTIMATE_YEARLY  || 'price_1TIrT7HEswF7knZxSTFWGFB2',
+      'pro_monthly':      process.env.STRIPE_PRICE_PRO_MONTHLY,
+      'pro_yearly':       process.env.STRIPE_PRICE_PRO_YEARLY,
+      'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY,
+      'ultimate_yearly':  process.env.STRIPE_PRICE_ULTIMATE_YEARLY,
     };
+
     const priceKey = `${planId}_${billingCycle}`;
-    const priceId  = priceMap[priceKey];
+    const priceId = priceMap[priceKey];
     if (!priceId) {
-      return res.status(400).json({ error: `Kein Preis für Plan "${priceKey}" konfiguriert` });
+      return res.status(400).json({ error: `Preis-ID für "${priceKey}" nicht in Vercel konfiguriert` });
     }
-    console.log(`[STRIPE] Mode: ${stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
+
+    const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
+    console.log(`[STRIPE] mode=${mode} plan=${priceKey} price=${priceId}`);
+
+    const stripeClient = new Stripe(stripeKey);
     const isAnnual = billingCycle === 'yearly';
+    const origin = (req.headers.origin as string) || process.env.SITE_URL || 'https://stellify.ch';
+
     const session = await stripeClient.checkout.sessions.create({
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       client_reference_id: userId,
       metadata: { planId, billingCycle, interval: isAnnual ? 'year' : 'month' },
       subscription_data: { metadata: { planId, billingCycle } },
-      success_url: successUrl || `${req.headers.origin}?payment=success`,
-      cancel_url:  cancelUrl  || `${req.headers.origin}?payment=cancel`,
-      automatic_tax: { enabled: false },
+      success_url: successUrl || `${origin}?payment=success`,
+      cancel_url:  cancelUrl  || `${origin}?view=pricing`,
     });
-    res.json({ success: true, url: session.url });
+
+    return res.json({ success: true, url: session.url });
   } catch (err: any) {
-    const msg = err.message || 'Unbekannter Fehler';
     const stripeKey = process.env.STRIPE_SECRET_KEY || '';
     const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
-    console.error(`[STRIPE ERROR] mode=${mode} message=${msg} type=${err.type} code=${err.code}`);
-    res.status(500).json({ success: false, error: `[${mode}] ${msg}` });
+    console.error(`[STRIPE ERROR] mode=${mode} type=${err.type} code=${err.code} msg=${err.message}`);
+    return res.status(500).json({ success: false, error: `[${mode}] ${err.message || 'Unbekannter Stripe-Fehler'}` });
   }
 });
 
