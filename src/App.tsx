@@ -1030,9 +1030,9 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Minimum splash duration: 4.5s for a professional brand moment
+  // Minimum splash duration: 1.5s for a brand moment
   useEffect(() => {
-    const timer = setTimeout(() => setSplashMinDone(true), 4500);
+    const timer = setTimeout(() => setSplashMinDone(true), 1500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1585,6 +1585,10 @@ function StellifyApp() {
       if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
 
       if (firebaseUser) {
+        // Show app immediately with basic auth data — Firestore loads in background
+        processUserData(null, firebaseUser);
+        setIsAuthReady(true);
+
         const userRef = doc(db, 'users', firebaseUser.uid);
 
         try {
@@ -1593,7 +1597,7 @@ function StellifyApp() {
             const rawName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
             const cleanName = rawName.replace(/\./g, ' ');
             const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            await setDoc(userRef, {
+            const newData = {
               id: firebaseUser.uid,
               email: firebaseUser.email || '',
               first_name: formattedName,
@@ -1606,28 +1610,23 @@ function StellifyApp() {
               language,
               theme,
               cv_context: cvContext || null,
-            });
-            const isOAuth = firebaseUser.providerData.some(p => p.providerId !== 'password');
-            if (isOAuth) {
-              fetch('/api/send-welcome-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
-              }).then(null, console.error);
-            }
+            };
+            setDoc(userRef, newData).then(() => {
+              const isOAuth = firebaseUser.providerData.some(p => p.providerId !== 'password');
+              if (isOAuth) {
+                fetch('/api/send-welcome-email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
+                }).then(null, console.error);
+              }
+            }).catch(console.error);
+            processUserData(newData, firebaseUser);
+          } else {
+            processUserData(userSnap.data(), firebaseUser);
           }
         } catch (e) {
-          console.error('Error ensuring user exists:', e);
-        }
-
-        try {
-          const userSnap = await getDoc(userRef);
-          processUserData(userSnap.exists() ? userSnap.data() : null, firebaseUser);
-        } catch (e) {
           console.error('Error loading user profile:', e);
-          processUserData(null, firebaseUser);
-        } finally {
-          setIsAuthReady(true);
         }
 
         unsubscribeUser = onSnapshot(userRef, (snap) => {
