@@ -33,7 +33,16 @@ import {
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon
 } from 'lucide-react';
-import { supabase } from './supabase';
+import { auth, db } from './firebase';
+import {
+  onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider,
+  type User as FirebaseUser,
+} from 'firebase/auth';
+import {
+  doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc,
+  collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp,
+} from 'firebase/firestore';
 import { searchData, SearchItem } from './data/searchData';
 import sampleJobs from './data/sampleJobs.json';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -1011,7 +1020,7 @@ function StellifyApp() {
   useEffect(() => {
     localStorage.setItem('language', language);
     if (user) {
-      supabase.from('users').update({ language }).eq('id', user.id).then(null, e => console.error("Error updating language in DB:", e));
+      updateDoc(doc(db, 'users', user.id), { language }).catch(e => console.error("Error updating language in DB:", e));
     }
   }, [language, user]);
 
@@ -1110,7 +1119,7 @@ function StellifyApp() {
     }
     localStorage.setItem('theme', theme);
     if (user) {
-      supabase.from('users').update({ theme }).eq('id', user.id).then(null, e => console.error("Error updating theme in DB:", e));
+      updateDoc(doc(db, 'users', user.id), { theme }).catch(e => console.error("Error updating theme in DB:", e));
     }
   }, [theme, user]);
   
@@ -1165,8 +1174,9 @@ function StellifyApp() {
 
   const getAuthToken = async (): Promise<string | null> => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      return session?.access_token ?? null;
+      const currentUser = auth.currentUser;
+      if (!currentUser) return null;
+      return await currentUser.getIdToken();
     } catch { return null; }
   };
   const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
@@ -1509,11 +1519,11 @@ function StellifyApp() {
   useEffect(() => {
     let unsubscribeUser: (() => void) | null = null;
 
-    const processUserData = (rawData: any, supaUser: any) => {
+    const processUserData = (rawData: any, firebaseUser: FirebaseUser) => {
       if (rawData?.language && rawData.language !== language) setLanguage(rawData.language);
       if (rawData?.theme && rawData.theme !== theme) setTheme(rawData.theme);
 
-      const rawName = rawData?.first_name || supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
+      const rawName = rawData?.first_name || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
       const cleanName = rawName.replace(/\./g, ' ');
       const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
       const sanitizedFirstName = formattedName === 'Gast' ? 'Nutzer' : formattedName;
@@ -1526,7 +1536,7 @@ function StellifyApp() {
         const daysLeft = Math.ceil(msLeft / 86400000);
         if (msLeft <= 0) {
           effectiveRole = 'client';
-          supabase.from('users').update({ role: 'client' }).eq('id', supaUser.id).then(null, console.error);
+          updateDoc(doc(db, 'users', firebaseUser.uid), { role: 'client' }).catch(console.error);
         } else {
           const threshold = rawData.subscription_interval === 'annual' ? 14 : 3;
           if (daysLeft <= threshold) setExpiryBanner({ daysLeft, interval: rawData.subscription_interval || 'monthly' });
@@ -1535,8 +1545,8 @@ function StellifyApp() {
       }
 
       const newUser: UserData = {
-        id: supaUser.id,
-        email: supaUser.email || '',
+        id: firebaseUser.uid,
+        email: firebaseUser.email || '',
         firstName: sanitizedFirstName,
         freeGenerationsUsed: rawData?.free_generations_used || 0,
         toolUses: rawData?.tool_uses || 0,
@@ -1556,12 +1566,12 @@ function StellifyApp() {
       if (rawData) {
         const today = new Date().toISOString().split('T')[0];
         if (rawData.last_daily_reset !== today) {
-          supabase.from('users').update({ daily_tool_uses: 0, last_daily_reset: today }).eq('id', supaUser.id).then(null, console.error);
+          updateDoc(doc(db, 'users', firebaseUser.uid), { daily_tool_uses: 0, last_daily_reset: today }).catch(console.error);
         }
 
         const currentMonth = new Date().toISOString().substring(0, 7);
         if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && rawData.last_monthly_reset !== currentMonth) {
-          supabase.from('users').update({ tool_uses: 0, free_generations_used: 0, search_uses: 0, last_monthly_reset: currentMonth }).eq('id', supaUser.id).then(null, console.error);
+          updateDoc(doc(db, 'users', firebaseUser.uid), { tool_uses: 0, free_generations_used: 0, search_uses: 0, last_monthly_reset: currentMonth }).catch(console.error);
         }
 
         if (!rawData.has_seen_tutorial) setIsTutorialOpen(true);
@@ -1569,21 +1579,21 @@ function StellifyApp() {
       }
     };
 
-    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
 
-      if (session?.user) {
-        const supaUser = session.user;
+      if (firebaseUser) {
+        const userRef = doc(db, 'users', firebaseUser.uid);
 
         try {
-          const { data: existingUser } = await supabase.from('users').select('id').eq('id', supaUser.id).single();
-          if (!existingUser) {
-            const rawName = supaUser.user_metadata?.full_name || supaUser.email?.split('@')[0] || 'Nutzer';
+          const userSnap = await getDoc(userRef);
+          if (!userSnap.exists()) {
+            const rawName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
             const cleanName = rawName.replace(/\./g, ' ');
             const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            const { error: insertError } = await supabase.from('users').insert({
-              id: supaUser.id,
-              email: supaUser.email || '',
+            await setDoc(userRef, {
+              id: firebaseUser.uid,
+              email: firebaseUser.email || '',
               first_name: formattedName,
               role: 'client',
               free_generations_used: 0,
@@ -1595,12 +1605,12 @@ function StellifyApp() {
               theme,
               cv_context: cvContext || null,
             });
-            if (insertError) console.error('Error creating user profile:', insertError);
-            if (event === 'SIGNED_IN' && supaUser.app_metadata?.provider !== 'email') {
+            const isOAuth = firebaseUser.providerData.some(p => p.providerId !== 'password');
+            if (isOAuth) {
               fetch('/api/send-welcome-email', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: supaUser.email, firstName: formattedName, language }),
+                body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
               }).then(null, console.error);
             }
           }
@@ -1609,35 +1619,26 @@ function StellifyApp() {
         }
 
         try {
-          const { data: userData } = await supabase.from('users').select('*').eq('id', supaUser.id).single();
-          processUserData(userData, supaUser);
+          const userSnap = await getDoc(userRef);
+          processUserData(userSnap.exists() ? userSnap.data() : null, firebaseUser);
         } catch (e) {
           console.error('Error loading user profile:', e);
-          processUserData(null, supaUser);
+          processUserData(null, firebaseUser);
         } finally {
           setIsAuthReady(true);
         }
 
-        const userChannel = supabase
-          .channel(`user-${supaUser.id}`)
-          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${supaUser.id}` } as any, (payload: any) => {
-            processUserData(payload.new, supaUser);
-          })
-          .subscribe();
-
-        unsubscribeUser = () => { supabase.removeChannel(userChannel); };
+        unsubscribeUser = onSnapshot(userRef, (snap) => {
+          if (snap.exists()) processUserData(snap.data(), firebaseUser);
+        });
       } else {
-        // INITIAL_SESSION can fire before Supabase has processed the OAuth
-        // redirect (hash tokens for implicit flow). Wait for SIGNED_IN instead.
-        const hash = window.location.hash;
-        if (event === 'INITIAL_SESSION' && hash.includes('access_token=')) return;
         setUser(null);
         setIsAuthReady(true);
       }
     });
 
     return () => {
-      authSubscription.unsubscribe();
+      unsubscribeAuth();
       if (unsubscribeUser) unsubscribeUser();
     };
   }, []);
@@ -1648,22 +1649,20 @@ function StellifyApp() {
       return;
     }
 
-    supabase.from('messages').select('role, content').eq('user_id', user.id).order('created_at', { ascending: true }).limit(50).then(({ data: msgs }) => {
-      if (msgs && msgs.length > 0) {
-        setMessages(msgs as Message[]);
+    const msgsQuery = query(
+      collection(db, 'messages'),
+      where('user_id', '==', user.id),
+      orderBy('created_at', 'asc'),
+      limit(50)
+    );
+    getDocs(msgsQuery).then((snap) => {
+      const msgs = snap.docs.map(d => d.data() as Message);
+      if (msgs.length > 0) {
+        setMessages(msgs);
       } else {
         setMessages([{ role: 'ai', content: t.stella_greeting.replace('{name}', user.firstName) }]);
       }
     });
-
-    const msgChannel = supabase
-      .channel(`messages-${user.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `user_id=eq.${user.id}` } as any, (payload: any) => {
-        setMessages(prev => [...prev, { role: payload.new.role, content: payload.new.content }]);
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(msgChannel); };
   }, [user]);
 
   useEffect(() => {
@@ -1698,8 +1697,7 @@ function StellifyApp() {
           
           // Save to Supabase if user is logged in
           if (user) {
-            supabase.from('users').update({ cv_context: importedContext }).eq('id', user.id)
-              .then(null, err => handleDbError(err, 'db', 'users'));
+            updateDoc(doc(db, 'users', user.id), { cv_context: importedContext }).catch(console.error);
           }
         }
         
@@ -1786,29 +1784,27 @@ function StellifyApp() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => {
-      if (data) setApplications(data);
+    const appsQuery = query(
+      collection(db, 'applications'),
+      where('user_id', '==', user.id),
+      orderBy('created_at', 'desc')
+    );
+    const unsubApps = onSnapshot(appsQuery, (snap) => {
+      setApplications(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
-    const appChannel = supabase.channel(`apps-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'applications', filter: `user_id=eq.${user.id}` } as any, () => {
-        supabase.from('applications').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).then(({ data }) => { if (data) setApplications(data); });
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(appChannel); };
+    return () => unsubApps();
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('cv_analyses').select('data').eq('user_id', user.id).order('created_at', { ascending: false }).limit(1).then(({ data }) => {
-      if (data?.[0]) setLatestAnalysis(data[0].data);
-    });
+    getDocs(query(collection(db, 'cv_analyses'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(1)))
+      .then(snap => { if (snap.docs[0]) setLatestAnalysis(snap.docs[0].data().data); });
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('tool_results').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(10).then(({ data }) => {
-      if (data) setToolHistory(data);
-    });
+    getDocs(query(collection(db, 'tool_results'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(10)))
+      .then(snap => { if (!snap.empty) setToolHistory(snap.docs.map(d => ({ id: d.id, ...d.data() }))); });
   }, [user]);
 
   const [careerRoadmap, setCareerRoadmap] = useState<string[]>([]);
@@ -1819,9 +1815,8 @@ function StellifyApp() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from('salary_calculations').select('*').eq('user_id', user.id).order('created_at', { ascending: false }).limit(5).then(({ data }) => {
-      if (data) setSalaryCalculations(data);
-    });
+    getDocs(query(collection(db, 'salary_calculations'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(5)))
+      .then(snap => { if (!snap.empty) setSalaryCalculations(snap.docs.map(d => d.data())); });
   }, [user]);
 
   useEffect(() => {
@@ -1976,7 +1971,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setLatestAnalysis(analysisData);
       
       if (user) {
-        await supabase.from('cv_analyses').insert({ user_id: user.id, data: analysisData });
+        await addDoc(collection(db, 'cv_analyses'), { user_id: user.id, data: analysisData, created_at: new Date().toISOString() });
       }
     } catch (e) {
       console.error("CV Analysis Error:", e);
@@ -2036,9 +2031,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           } catch (e) { console.warn("Backend CV analysis failed."); }
         })(),
         // Persist CV text in DB
-        supabase.from('users').update({ cv_context: text }).eq('id', user.id).then(
-          null, (e) => handleDbError(e, 'db', `users/${user.id}`)
-        ),
+        updateDoc(doc(db, 'users', user.id), { cv_context: text }).catch(e => handleDbError(e, 'db', `users/${user.id}`)),
       ]);
 
       setMessages(prev => [...prev, { 
@@ -2071,8 +2064,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
     try {
       if (authTab === 'login') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        await signInWithEmailAndPassword(auth, email, password);
       } else {
         if (password !== confirmPassword) {
           setAuthError(
@@ -2099,28 +2091,27 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         const cleanName = rawName.replace(/\./g, ' ');
         const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
 
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { full_name: formattedName } }
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const newUid = userCredential.user.uid;
+        await setDoc(doc(db, 'users', newUid), {
+          id: newUid,
+          email: userCredential.user.email || '',
+          first_name: formattedName,
+          role: 'client',
+          cv_context: cvContext || null,
+          free_generations_used: 0,
+          tool_uses: 0,
+          daily_tool_uses: 0,
+          last_daily_reset: new Date().toISOString().split('T')[0],
+          has_seen_tutorial: false,
+          language,
+          theme,
         });
-        if (signUpError) throw signUpError;
-
-        if (signUpData.user) {
-          await supabase.from('users').insert({
-            id: signUpData.user.id,
-            email: signUpData.user.email || '',
-            first_name: formattedName,
-            role: 'client',
-            cv_context: cvContext || null,
-            free_generations_used: 0,
-          });
-          fetch('/api/send-welcome-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: signUpData.user.email, firstName: formattedName, language }),
-          }).then(null, console.error);
-        }
+        fetch('/api/send-welcome-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userCredential.user.email, firstName: formattedName, language }),
+        }).then(null, console.error);
       }
       setIsAuthModalOpen(false);
       setEmail('');
@@ -2129,15 +2120,16 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setFirstName('');
     } catch (err: any) {
       console.error("Auth Error:", err);
+      const code: string = err.code || '';
       const msg: string = err.message || '';
-      if (msg.includes('Invalid login credentials')) {
+      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential' || msg.includes('Invalid login credentials')) {
         setAuthError(
           language === 'DE' ? 'Ungültige Anmeldedaten. Bitte überprüfe E-Mail und Passwort.' :
           language === 'FR' ? 'Identifiants invalides. Veuillez vérifier votre e-mail et mot de passe.' :
           language === 'IT' ? 'Credenziali non valide. Verifica email e password.' :
           'Invalid credentials. Please check your email and password.'
         );
-      } else if (msg.includes('User already registered') || msg.includes('already exists')) {
+      } else if (code === 'auth/email-already-in-use' || msg.includes('already exists')) {
         setAuthError(
           language === 'DE' ? 'Diese E-Mail wird bereits verwendet. Bitte melde dich stattdessen an.' :
           language === 'FR' ? 'Cet e-mail est déjà utilisé. Veuillez vous connecter à la place.' :
@@ -2145,7 +2137,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           'This email is already in use. Please log in instead.'
         );
         if (authTab === 'register') setAuthTab('login');
-      } else if (msg.includes('Password should be')) {
+      } else if (code === 'auth/weak-password' || msg.includes('Password should be')) {
         setAuthError(
           language === 'DE' ? 'Das Passwort ist zu schwach (mind. 6 Zeichen)' :
           language === 'FR' ? 'Le mot de passe est trop faible' :
@@ -2220,38 +2212,20 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
-  const handleLinkedInAuth = async () => {
-    setAuthError('');
-    setIsAuthLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'linkedin_oidc',
-        options: { redirectTo: `${window.location.origin}/` },
-      });
-      if (error) throw error;
-    } catch (err: any) {
-      console.error('LinkedIn Auth Error:', err);
-      const msg = language === 'DE' ? 'LinkedIn-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion LinkedIn.' : language === 'IT' ? 'Accesso LinkedIn fallito.' : 'LinkedIn authentication failed.';
-      setAuthError(msg);
-      showToast(msg, 'error');
-      setIsAuthLoading(false);
-    }
-  };
-
   const handleGoogleAuth = async () => {
     setAuthError('');
     setIsAuthLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: `${window.location.origin}/` },
-      });
-      if (error) throw error;
+      await signInWithPopup(auth, new GoogleAuthProvider());
+      setIsAuthModalOpen(false);
     } catch (err: any) {
-      console.error('Google Auth Error:', err);
-      const msg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
-      setAuthError(msg);
-      showToast(msg, 'error');
+      if (err.code !== 'auth/popup-closed-by-user') {
+        console.error('Google Auth Error:', err);
+        const msg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
+        setAuthError(msg);
+        showToast(msg, 'error');
+      }
+    } finally {
       setIsAuthLoading(false);
     }
   };
@@ -2270,7 +2244,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error || 'Delete failed');
       }
-      await supabase.auth.signOut();
+      await firebaseSignOut(auth);
       setIsDeleteAccountOpen(false);
       setUser(null);
       showToast(
@@ -2292,7 +2266,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       const cleanName = newName.trim().replace(/\./g, ' ');
       const formattedName = cleanName.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
       
-      await supabase.from('users').update({ first_name: formattedName }).eq('id', user.id);
+      await updateDoc(doc(db, 'users', user.id), { first_name: formattedName });
       setIsEditingName(false);
     } catch (error) {
       console.error("Error updating name:", error);
@@ -2303,7 +2277,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await firebaseSignOut(auth);
       setUser(null);
     } catch (err) {
       console.error("Logout Error:", err);
@@ -2335,7 +2309,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const addApplication = async () => {
     if (!user || !newApp.company || !newApp.position) return;
     try {
-      await supabase.from('applications').insert({ ...newApp, user_id: user.id });
+      await addDoc(collection(db, 'applications'), { ...newApp, user_id: user.id, created_at: new Date().toISOString() });
       setIsAddingApp(false);
       setNewApp({ company: '', position: '', status: 'Applied', location: '', salary: '', notes: '' });
     } catch (e) {
@@ -2347,7 +2321,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (!user || !editingApp || !editingApp.company || !editingApp.position) return;
     try {
       const { id, user_id, created_at, ...fields } = editingApp;
-      await supabase.from('applications').update({ ...fields, updated_at: new Date().toISOString() }).eq('id', editingApp.id).eq('user_id', user.id);
+      await updateDoc(doc(db, 'applications', editingApp.id), { ...fields, updated_at: new Date().toISOString() });
       setEditingApp(null);
     } catch (e) {
       handleDbError(e, 'db', `applications/${editingApp.id}`);
@@ -2357,7 +2331,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const updateApplicationStatus = async (appId: string, newStatus: string) => {
     if (!user) return;
     try {
-      await supabase.from('applications').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', appId).eq('user_id', user.id);
+      await updateDoc(doc(db, 'applications', appId), { status: newStatus, updated_at: new Date().toISOString() });
     } catch (e) {
       handleDbError(e, 'db', `applications/${appId}`);
     }
@@ -2366,7 +2340,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const deleteApplication = async (appId: string) => {
     if (!user) return;
     try {
-      await supabase.from('applications').delete().eq('id', appId).eq('user_id', user.id);
+      await deleteDoc(doc(db, 'applications', appId));
     } catch (e) {
       handleDbError(e, 'db', `applications/${appId}`);
     }
@@ -2389,11 +2363,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setIsAuthModalOpen(true);
       return;
     } else {
-      try {
-        await supabase.from('messages').insert({ user_id: user.id, role: 'user', content: userContent });
-      } catch (error) {
-        handleDbError(error, 'db', 'messages');
-      }
+      setMessages(prev => [...prev, userMsg]);
+      addDoc(collection(db, 'messages'), { user_id: user.id, role: 'user', content: userContent, created_at: new Date().toISOString() }).catch(console.error);
     }
 
     if (!overrideContent) setInput('');
@@ -2419,14 +2390,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         ? t.tool_daily_limit_pro
         : (user?.role === 'pro' ? t.tool_limit_pro : t.tool_limit_free);
       
-      if (!user) {
-        setMessages(prev => [...prev, { role: 'ai', content: limitMsg }]);
-      } else {
-        try {
-          await supabase.from('messages').insert({ user_id: user.id, role: 'ai', content: limitMsg });
-        } catch (error) {
-          handleDbError(error, 'db', 'messages');
-        }
+      setMessages(prev => [...prev, { role: 'ai', content: limitMsg }]);
+      if (user) {
+        addDoc(collection(db, 'messages'), { user_id: user.id, role: 'ai', content: limitMsg, created_at: new Date().toISOString() }).catch(console.error);
       }
       setIsTyping(false);
       return;
@@ -2435,10 +2401,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     // Increment usage for non-unlimited users
     if (user && !isUnlimited) {
       try {
-        await supabase.from('users').update({
+        await updateDoc(doc(db, 'users', user.id), {
           free_generations_used: (user.freeGenerationsUsed || 0) + 1,
           daily_tool_uses: (user.dailyToolUses || 0) + 1,
-        }).eq('id', user.id);
+        });
       } catch (e) {
         console.error("Error incrementing message count:", e);
       }
@@ -2503,14 +2469,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
       const reply = chatData.text || (language === 'DE' ? "Stella ist gerade nachdenklich. Bitte versuche es noch einmal." : language === 'FR' ? "Stella est en train de réfléchir. Veuillez réessayer." : language === 'IT' ? "Stella sta riflettendo. Si prega di riprovare." : "Stella is currently thoughtful. Please try again.");
       
-      if (!user) {
-        setMessages(prev => [...prev, { role: 'ai', content: reply }]);
-      } else {
-        try {
-          await supabase.from('messages').insert({ user_id: user.id, role: 'ai', content: reply });
-        } catch (error) {
-          handleDbError(error, 'db', 'messages');
-        }
+      setMessages(prev => [...prev, { role: 'ai', content: reply }]);
+      if (user) {
+        addDoc(collection(db, 'messages'), { user_id: user.id, role: 'ai', content: reply, created_at: new Date().toISOString() }).catch(console.error);
       }
     } catch (err: any) {
       console.error("Stella Chat Error:", err);
@@ -2545,14 +2506,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           : "Stella has answered too many requests today. Please try again tomorrow or upgrade your subscription.";
       }
       
-      if (!user) {
-        setMessages(prev => [...prev, { role: 'ai', content: errorMsg }]);
-      } else {
-        try {
-          await supabase.from('messages').insert({ user_id: user.id, role: 'ai', content: errorMsg });
-        } catch (error) {
-          handleDbError(error, 'db', 'messages');
-        }
+      setMessages(prev => [...prev, { role: 'ai', content: errorMsg }]);
+      if (user) {
+        addDoc(collection(db, 'messages'), { user_id: user.id, role: 'ai', content: errorMsg, created_at: new Date().toISOString() }).catch(console.error);
       }
     } finally {
       setIsTyping(false);
@@ -3222,9 +3178,8 @@ Bewerte in 3 Kategorien (je 0–100%):
           if (jsonMatch) {
             const analysisData = JSON.parse(jsonMatch[0]);
             
-            // Save to dedicated collection
             if (user) {
-              await supabase.from('cv_analyses').insert({ user_id: user.id, data: analysisData });
+              await addDoc(collection(db, 'cv_analyses'), { user_id: user.id, data: analysisData, created_at: new Date().toISOString() });
             }
 
             // Format for display
@@ -3314,9 +3269,8 @@ ${JSON.stringify(analysisData, null, 2)}
           if (jsonMatch) {
             const salaryData = JSON.parse(jsonMatch[0]);
             
-            // Save to dedicated collection
             if (user) {
-              await supabase.from('salary_calculations').insert({ user_id: user.id, data: salaryData });
+              await addDoc(collection(db, 'salary_calculations'), { user_id: user.id, data: salaryData, created_at: new Date().toISOString() });
             }
             
             setParsedSalaryResult(salaryData);
@@ -3416,23 +3370,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       // Save to history
       if (user) {
         try {
-          await supabase.from('tool_results').insert({
+          await addDoc(collection(db, 'tool_results'), {
             user_id: user.id,
             tool_id: activeTool.id,
             tool_title: activeTool.title,
             input: toolInput,
             result: resultText,
+            created_at: new Date().toISOString(),
           });
 
-          // Increment usage for non-unlimited users
           if (!isUnlimited) {
-            await supabase.from('users').update({
+            await updateDoc(doc(db, 'users', user.id), {
               tool_uses: (user.toolUses || 0) + 1,
               daily_tool_uses: (user.dailyToolUses || 0) + 1,
               ...(useSearch ? { search_uses: (user.searchUses || 0) + 1 } : {}),
-            }).eq('id', user.id);
+            });
           } else if (useSearch) {
-            await supabase.from('users').update({ search_uses: (user.searchUses || 0) + 1 }).eq('id', user.id);
+            await updateDoc(doc(db, 'users', user.id), { search_uses: (user.searchUses || 0) + 1 });
           }
         } catch (e) {
           handleDbError(e, 'db', `users/${user.id}`);
@@ -6419,10 +6373,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       Developer Test Tools
                     </div>
                     <div className="flex flex-wrap gap-3">
-                      <button 
+                      <button
                         onClick={async () => {
                           try {
-                            await supabase.from('users').update({ role: 'pro' }).eq('id', user.id);
+                            await updateDoc(doc(db, 'users', user.id), { role: 'pro' });
                             setMessages(prev => [...prev, { role: 'ai', content: 'Test-Upgrade: Du bist jetzt PRO-Nutzer! ✨' }]);
                           } catch (e) { console.error(e); }
                         }}
@@ -6430,10 +6384,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       >
                         Set Pro Role
                       </button>
-                      <button 
+                      <button
                         onClick={async () => {
                           try {
-                            await supabase.from('users').update({ role: 'client' }).eq('id', user.id);
+                            await updateDoc(doc(db, 'users', user.id), { role: 'client' });
                             setMessages(prev => [...prev, { role: 'ai', content: 'Test-Downgrade: Du bist wieder FREE-Nutzer.' }]);
                           } catch (e) { console.error(e); }
                         }}
@@ -9596,21 +9550,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                        'Sign in with Google'}
                     </button>
 
-                    <button
-                      type="button"
-                      onClick={handleLinkedInAuth}
-                      disabled={isAuthLoading}
-                      className="w-full border border-black/10 dark:border-white/10 py-3 text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-3 disabled:opacity-70 mt-3"
-                    >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="24" height="24" rx="2" fill="#0A66C2"/>
-                        <path d="M7 9H5v10h2V9zm-1-1.5A1.25 1.25 0 1 0 6 5a1.25 1.25 0 0 0 0 2.5zM19 13.2c0-2.3-1.1-4.2-3.4-4.2a3.2 3.2 0 0 0-2.6 1.3V9H11v10h2v-5.4c0-1.4.7-2.3 1.9-2.3 1.1 0 1.6.8 1.6 2.2V19h2v-5.8z" fill="white"/>
-                      </svg>
-                      {language === 'DE' ? 'Mit LinkedIn anmelden' :
-                       language === 'FR' ? 'Se connecter avec LinkedIn' :
-                       language === 'IT' ? 'Accedi con LinkedIn' :
-                       'Sign in with LinkedIn'}
-                    </button>
                   </>
                 )}
 
@@ -9627,7 +9566,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <button 
                     type="button"
                     onClick={async () => {
-                      await supabase.auth.signOut();
+                      await firebaseSignOut(auth);
                       window.localStorage.clear();
                       window.location.reload();
                     }}
@@ -9901,7 +9840,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={async () => {
                             if (!user?.id) return;
                             try {
-                              await supabase.from('users').update({ role: 'client' }).eq('id', user.id);
+                              await updateDoc(doc(db, 'users', user.id), { role: 'client' });
                               window.location.reload();
                             } catch (e) {
                               console.error(e);
@@ -9915,7 +9854,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={async () => {
                             if (!user?.id) return;
                             try {
-                              await supabase.from('users').update({ role: 'pro' }).eq('id', user.id);
+                              await updateDoc(doc(db, 'users', user.id), { role: 'pro' });
                               window.location.reload();
                             } catch (e) {
                               console.error(e);
@@ -9929,7 +9868,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={async () => {
                             if (!user?.id) return;
                             try {
-                              await supabase.from('users').update({ role: 'unlimited' }).eq('id', user.id);
+                              await updateDoc(doc(db, 'users', user.id), { role: 'unlimited' });
                               window.location.reload();
                             } catch (e) {
                               console.error(e);
@@ -10024,7 +9963,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               setIsTutorialOpen(false);
               if (user?.id) {
                 try {
-                  await supabase.from('users').update({ has_seen_tutorial: true }).eq('id', user.id);
+                  await updateDoc(doc(db, 'users', user.id), { has_seen_tutorial: true });
                 } catch (e) {
                   console.error("Error updating tutorial status:", e);
                 }
