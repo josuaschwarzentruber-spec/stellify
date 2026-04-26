@@ -36,7 +36,8 @@ const getStripe = () => {
   if (!stripe) {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) throw new Error("STRIPE_SECRET_KEY ist nicht gesetzt");
-    stripe = new Stripe(key);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    stripe = new Stripe(key, { apiVersion: '2024-06-20' as any });
   }
   return stripe;
 };
@@ -696,39 +697,38 @@ app.get("/api/health", (_req, res) => {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", express.json(), async (req: Request, res: Response, next: NextFunction) => {
+app.post("/api/create-checkout-session", express.json(), async (req, res) => {
+  const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+  const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
   try {
-    const body = req.body || {};
-    const { planId, billingCycle, userId, successUrl, cancelUrl } = body;
+    const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body || {};
 
     if (!planId || !userId || !billingCycle) {
-      return res.status(400).json({ error: "Fehlende Parameter: planId, userId oder billingCycle" });
+      res.status(400).json({ error: "Fehlende Parameter: planId, userId oder billingCycle" });
+      return;
     }
-
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) {
-      return res.status(500).json({ error: "STRIPE_SECRET_KEY nicht gesetzt" });
+      res.status(500).json({ error: "STRIPE_SECRET_KEY nicht gesetzt" });
+      return;
     }
 
-    const priceMap: Record<string, string | undefined> = {
+    const priceId: string | undefined = ({
       'pro_monthly':      process.env.STRIPE_PRICE_PRO_MONTHLY,
       'pro_yearly':       process.env.STRIPE_PRICE_PRO_YEARLY,
       'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY,
       'ultimate_yearly':  process.env.STRIPE_PRICE_ULTIMATE_YEARLY,
-    };
+    } as Record<string, string | undefined>)[`${planId}_${billingCycle}`];
 
-    const priceKey = `${planId}_${billingCycle}`;
-    const priceId = priceMap[priceKey];
     if (!priceId) {
-      return res.status(400).json({ error: `Preis-ID für "${priceKey}" nicht in Vercel konfiguriert` });
+      res.status(400).json({ error: `Preis-ID für "${planId}_${billingCycle}" nicht in Vercel konfiguriert` });
+      return;
     }
 
-    const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
-    console.log(`[STRIPE] mode=${mode} plan=${priceKey} price=${priceId}`);
-
-    const stripeClient = new Stripe(stripeKey);
+    console.log(`[STRIPE] mode=${mode} plan=${planId}_${billingCycle} price=${priceId}`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const stripeClient = new Stripe(stripeKey, { apiVersion: '2024-06-20' as any });
     const isAnnual = billingCycle === 'yearly';
-    const origin = (req.headers.origin as string) || process.env.SITE_URL || 'https://stellify.ch';
+    const origin = String(req.headers.origin || process.env.SITE_URL || 'https://stellify.ch');
 
     const session = await stripeClient.checkout.sessions.create({
       line_items: [{ price: priceId, quantity: 1 }],
@@ -740,12 +740,10 @@ app.post("/api/create-checkout-session", express.json(), async (req: Request, re
       cancel_url:  cancelUrl  || `${origin}?view=pricing`,
     });
 
-    return res.json({ success: true, url: session.url });
+    res.json({ success: true, url: session.url });
   } catch (err: any) {
-    const stripeKey = process.env.STRIPE_SECRET_KEY || '';
-    const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
     console.error(`[STRIPE ERROR] mode=${mode} type=${err.type} code=${err.code} msg=${err.message}`);
-    return res.status(500).json({ success: false, error: `[${mode}] ${err.message || 'Unbekannter Stripe-Fehler'}` });
+    res.status(500).json({ success: false, error: `[${mode}] ${err.message || 'Unbekannter Stripe-Fehler'}` });
   }
 });
 
