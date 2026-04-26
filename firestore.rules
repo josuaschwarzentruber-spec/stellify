@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users ────────────────────────────────────────────────────────────────
+    // Each user can only read and write their own document
+    match /users/{userId} {
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // delete is handled server-side via Admin SDK only
+      allow delete: if false;
+    }
+
+    // ── Messages ──────────────────────────────────────────────────────────────
+    match /messages/{messageId} {
+      allow read: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ── Applications ─────────────────────────────────────────────────────────
+    match /applications/{appId} {
+      allow read, update, delete: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // ── CV Analyses ──────────────────────────────────────────────────────────
+    match /cv_analyses/{analysisId} {
+      allow read: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ── Tool Results ─────────────────────────────────────────────────────────
+    match /tool_results/{resultId} {
+      allow read: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // ── Salary Calculations ──────────────────────────────────────────────────
+    match /salary_calculations/{calcId} {
+      allow read: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
