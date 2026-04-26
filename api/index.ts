@@ -36,7 +36,7 @@ const getStripe = () => {
   if (!stripe) {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) throw new Error("STRIPE_SECRET_KEY ist nicht gesetzt");
-    stripe = new Stripe(key, { apiVersion: "2023-10-16" as any });
+    stripe = new Stripe(key);
   }
   return stripe;
 };
@@ -698,14 +698,14 @@ app.post("/api/create-checkout-session", async (req, res) => {
     console.log(`[STRIPE] Mode: ${stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST'}, Plan: ${priceKey}, Price: ${priceId}`);
     const isAnnual = billingCycle === 'yearly';
     const session = await stripeClient.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       client_reference_id: userId,
       metadata: { planId, billingCycle, interval: isAnnual ? 'year' : 'month' },
-      subscription_data: { metadata: { cancel_at_period_end: 'true' } } as any,
+      subscription_data: { metadata: { planId, billingCycle } },
       success_url: successUrl || `${req.headers.origin}?payment=success`,
       cancel_url:  cancelUrl  || `${req.headers.origin}?payment=cancel`,
+      automatic_tax: { enabled: false },
     });
     res.json({ success: true, url: session.url });
   } catch (err: any) {
