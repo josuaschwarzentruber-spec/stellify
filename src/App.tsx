@@ -36,7 +36,7 @@ import {
 import { auth, db } from './firebase';
 import {
   onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider,
+  signOut as firebaseSignOut, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
   type User as FirebaseUser,
 } from 'firebase/auth';
 import {
@@ -1579,6 +1579,8 @@ function StellifyApp() {
       }
     };
 
+    getRedirectResult(auth).catch(() => {});
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
 
@@ -2219,7 +2221,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       await signInWithPopup(auth, new GoogleAuthProvider());
       setIsAuthModalOpen(false);
     } catch (err: any) {
-      if (err.code !== 'auth/popup-closed-by-user') {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+        await signInWithRedirect(auth, new GoogleAuthProvider());
+      } else if (err.code !== 'auth/popup-closed-by-user') {
         console.error('Google Auth Error:', err);
         const msg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
         setAuthError(msg);
@@ -9562,19 +9566,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.auth_terms_data_processing}
                 </p>
 
-                <div className="mt-8 pt-4 border-t border-black/5 flex justify-center">
-                  <button 
-                    type="button"
-                    onClick={async () => {
-                      await firebaseSignOut(auth);
-                      window.localStorage.clear();
-                      window.location.reload();
-                    }}
-                    className="text-[9px] uppercase tracking-widest text-[#9A9A94] hover:text-[#004225] transition-colors"
-                  >
-                    {t.auth_reset_session}
-                  </button>
-                </div>
               </form>
             </motion.div>
           </div>
