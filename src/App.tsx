@@ -2889,24 +2889,29 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             HANDLUNGSANWEISUNG: Führe eine tiefgehende "Premium-Entschlüsselung" des Schweizer Arbeitszeugnisses durch.
             TEXT: ${toolInput.certificateText}.
 
-            DEINE ROLLE: Du bist ein Experte für Schweizer Arbeitsrecht und HR-Codierung.
+            DEINE ROLLE: Du bist Experte für Schweizer Arbeitsrecht (OR Art. 330a) und HR-Codierung mit 20 Jahren Erfahrung.
+
+            SCHWEIZER ZEUGNIS-CODE (Referenz):
+            Note 6 (sehr gut): "stets zu unserer vollsten Zufriedenheit" / "ausserordentlich" / "überaus"
+            Note 5 (gut): "zu unserer vollen Zufriedenheit" / "sehr" / "hervorragend"
+            Note 4 (befriedigend): "zu unserer Zufriedenheit" / "gut" (ACHTUNG: "gut" allein = Durchschnitt!)
+            Note 3 (genügend): "im Grossen und Ganzen zu unserer Zufriedenheit" / "bemüht"
+            Note 2 (schlecht): "hat versucht" / fehlende Schlussformel / keine Adjektive
+            NEGATIV-CODES: "bemüht" = kaum Erfolg; "erledigt" ohne Zusatz = Minimalleistung; "ruhiges Wesen" = passiv; "kollegiales Umfeld geschätzt" = soziale Schwierigkeiten; fehlendes "wir bedauern" = kein Bedauern; fehlendes "jederzeit" = eingeschränkte Empfehlung
 
             ANALYSE-STRUKTUR:
-            1. GESAMTNOTE: Gib eine präzise Note von 1.0 bis 6.0 (Schweizer System).
-            2. KLARTEXT-DECODER: Übersetze die wichtigsten Sätze in ihre wahre Bedeutung.
-               - Beispiel: "Er war bemüht" -> "Er war erfolglos".
-               - Analysiere spezifisch: Leistungsbeurteilung, Verhalten, Austrittsgrund, Schlussformulierung.
-            3. VERSTECKTE BOTSCHAFTEN & NEGATIVE FORMULIERUNGEN:
-               - Suche nach Auslassungen (was fehlt?), zweideutigen Adjektiven oder unüblichen Reihenfolgen.
-               - Markiere kritische Punkte, die bei einem neuen Schweizer Arbeitgeber Fragen aufwerfen könnten.
-            4. MARKT-POSITIONIERUNG (ERKLÄRUNG):
-               - Erkläre dem Nutzer, wie dieses Zeugnis seine Chancen auf dem Schweizer Markt beeinflusst.
-               - Warum ist dieses Wissen wichtig? (z.B. Vorbereitung auf Fragen im Interview, Recht auf Zeugnisberichtigung).
-            5. HANDLUNGSEMPFEHLUNG: Konkrete Schritte zur Nachbesserung oder wie man Schwachstellen im Gespräch proaktiv anspricht.
+            1. GESAMTNOTE (1.0–6.0): Bewertung mit Begründung basierend auf dem Zeugnis-Code.
+            2. SATZ-FÜR-SATZ DECODER: Jeder relevante Satz im Klartext – was bedeutet er wirklich?
+            3. VERSTECKTE BOTSCHAFTEN: Auslassungen, negative Codes, unübliche Reihenfolgen, fehlende Standardformeln.
+            4. KRITISCHE PUNKTE: Was bemerkt ein neuer Schweizer Arbeitgeber sofort?
+            5. MARKT-POSITIONIERUNG: Konkrete Auswirkungen auf die Chancen im Schweizer Arbeitsmarkt.
+            6. HANDLUNGSEMPFEHLUNG:
+               - Recht auf Zeugnisberichtigung (OR Art. 330a): Welche Sätze sind anfechtbar?
+               - Konkrete Formulierungsvorschläge für eine Nachbesserung.
+               - Wie man Schwachstellen im Interview proaktiv adressiert.
 
-            AUSGABE:
-            Verwende Schweizer Hochdeutsch (kein "ß"). Sei direkt, präzise und professionell.
-            Füge eine Sektion "🇨🇭 Strategischer Vorteil" hinzu, die erklärt, wie diese Analyse dem Nutzer hilft, seine Position im Markt zu verstehen.
+            AUSGABE: Schweizer Hochdeutsch (kein "ß"). Direkt, präzise, professionell.
+            Sektion "🇨🇭 Strategischer Vorteil": Konkrete nächste Schritte für den Nutzer.
           `;
           break;
         case 'interview': {
@@ -3127,36 +3132,48 @@ Bewerte in 3 Kategorien (je 0–100%):
         }
         case 'salary-negotiation': {
           prompt = `
-            HANDLUNGSANWEISUNG: Erstelle einen präzisen Lohnverhandlungs-Leitfaden.
+            HANDLUNGSANWEISUNG: Erstelle einen präzisen, umsetzbaren Lohnverhandlungs-Leitfaden für die Schweiz.
             STELLE: ${toolInput.jobTitle}.
             VERHANDLUNGSZIEL: ${toolInput.targetSalary || 'Nicht spezifiziert'}.
             CV: ${cvContext || 'Nicht vorhanden'}.
-            SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
 
-            DEINE ROLLE: Du bist ein Experte für Schweizer Lohnverhandlungen mit 15 Jahren Erfahrung in der Personalberatung.
+            DEINE ROLLE: Du bist Senior Partner einer Schweizer Personalberatung (wie Michael Page, Hays, Adecco CH) mit 20 Jahren Verhandlungserfahrung.
 
             LEITFADEN-STRUKTUR:
+
             ## 🎯 Deine Marktpositionierung
-            - Warum bin ich diesen Betrag wert? (Kurz & präzise mit Schweizer Kontext)
+            - Warum genau dieser Betrag? (Belegt mit Schweizer Marktdaten: BFS Lohnstrukturerhebung, Salarium)
+            - Branchen-Multiplikatoren: Tech +15-20%, Banking +15-25%, traditionell +8-12%, NGO/Öffentlich +5-8%
 
-            ## 📊 Die richtige Einstiegsforderung
-            - Empfohlener Einstiegsanker (ca. 10-15% über Ziel)
-            - Begründung basierend auf Schweizer Marktdaten
+            ## 📊 Einstiegsanker (Taktik)
+            - Konkreter Einstiegswert (10-15% über Ziel, branchenabhängig)
+            - Timing: Wann das Thema ansprechen? (Erst nach mündlichem Angebot, NICHT vorher)
+            - Formulierung: "Basierend auf meiner Erfahrung und dem Schweizer Marktdurchschnitt für diese Position erwarte ich ein Jahresgehalt von CHF [X]."
 
-            ## 💬 5 starke Argumente (Schweizer Stil)
-            1-5 konkrete Argumente inkl. 13. Monatslohn, Weiterbildungsbudget, Flexibilität
+            ## 💬 5 konkrete Argumente (mit Formulierungen)
+            Für jedes Argument: Argument + genaue Formulierung auf Schweizer Hochdeutsch
+            1. Nachweisbare Leistung (Zahlen, Resultate aus CV)
+            2. Marktgerechter Lohn (Salarium-Referenz)
+            3. 13. Monatslohn: "Ich rechne den 13. Monatslohn im Jahresgehalt ein – das entspricht CHF [X]/Monat."
+            4. Spezifische Kompetenz / Marktknappheit
+            5. Langfristige Wertschöpfung für das Unternehmen
 
-            ## 🗣️ Formulierungen auf Schweizer Hochdeutsch
-            - Einstiegssatz (selbstbewusst, nicht arrogant)
-            - Bei Gegenfrage "Was verdienen Sie aktuell?"
-            - Bei Einwand "Das liegt über unserem Budget"
+            ## 🗣️ Einwand-Antworten (wörtliche Formulierungen)
+            - Bei "Was verdienen Sie aktuell?": "Ich möchte mich auf das konzentrieren, was diese Position wert ist. Meine Erwartung liegt bei CHF [X]."
+            - Bei "Das liegt über unserem Budget": "Ich verstehe. Können wir über eine Leistungskomponente (Bonus) oder einen früheren Review nach 6 Monaten sprechen?"
+            - Bei "Wir müssen intern schauen": "Gerne. Bis wann kann ich mit einer Rückmeldung rechnen?"
 
-            ## 🔄 Fallback-Strategie
-            - Was tun, wenn das Gehalt nicht verhandelbar ist? (Benefits, Bonus, Home Office, Weiterbildung)
+            ## 🔄 Fallback-Strategie (wenn Gehalt fix ist)
+            Priorisierte Alternativen: 1. Signing Bonus, 2. Leistungsbonus, 3. Weiterbildungsbudget (CHF 3'000-8'000/Jahr), 4. zusätzliche Ferientage, 5. Home Office Regelung, 6. frühzeitiger Lohnreview
 
             ## 🇨🇭 Schweizer Besonderheiten
-            - 13. Monatslohn: Wie einrechnen und einfordern
-            - Kulturelle Dos & Don'ts in Schweizer Gehaltsverhandlungen
+            - 13. Monatslohn: Branchenstandard CH, im Jahresgehalt einrechnen (Bruttogehalt × 13/12 = Monatslohn)
+            - Quellensteuer: Bei B/L-Ausweis kann Verhandlungsspielraum eingeschränkt sein
+            - Kultureller Code: Direkt, sachlich, faktenbasiert – keine amerikanische Überschwänglichkeit
+            - DO: Zahlen nennen, ruhig bleiben, Gegenvorschlag machen
+            - DON'T: Druck machen, emotionale Argumente, Vergleiche mit Kollegen
+
+            AUSGABE: Fliessender Text, professionell, keine Aufzählungszeichen ausser in den Formulierungsabschnitten.
           `;
           break;
         }
@@ -5310,7 +5327,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_pro: "Career Professional",
       dashboard_desc: "Your copilot Stella is ready. Analyze new jobs, optimize your profile, or prepare for your next interview.",
       dashboard_stat_analyses: "Analyses",
-      dashboard_stat_cv_status: "Lebenslauf (CV)",
+      dashboard_stat_cv_status: "CV (Resume)",
       dashboard_stat_ready: "Ready",
       dashboard_stat_missing: "Missing",
       dashboard_stat_chat: "Stella Chat",
@@ -6181,8 +6198,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="pt-6 border-t border-black/5">
               <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-4">Sprache / Langue / Lingua</p>
               <div className="flex flex-wrap gap-3">
-                {['DE', 'FR', 'IT', 'EN'].map((lang) => (
-                  <button 
+                {['DE', 'EN', 'FR', 'IT'].map((lang) => (
+                  <button
                     key={lang}
                     onClick={() => { setLanguage(lang as any); setIsMenuOpen(false); }}
                     className={`px-4 py-2 text-xs font-bold border ${language === lang ? 'bg-[#004225] text-white border-[#004225]' : 'border-black/10 text-[#5C5C58] dark:text-[#9A9A94] dark:border-white/10'}`}
