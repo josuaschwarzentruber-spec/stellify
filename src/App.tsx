@@ -90,18 +90,20 @@ class ErrorBoundary extends React.Component<any, any> {
   static getDerivedStateFromError(error: any) { return { hasError: true, error }; }
   render() {
     if ((this as any).state.hasError) {
+      const lang = (() => { try { return localStorage.getItem('language') || 'DE'; } catch { return 'DE'; } })();
+      const title = lang === 'FR' ? 'Une erreur inattendue s\'est produite.' : lang === 'IT' ? 'Si è verificato un errore imprevisto.' : lang === 'EN' ? 'An unexpected error has occurred.' : 'Ein unerwarteter Fehler ist aufgetreten.';
+      const desc = lang === 'FR' ? 'Nous nous excusons pour la gêne occasionnée. Nous travaillons déjà à une solution.' : lang === 'IT' ? 'Ci scusiamo per l\'inconveniente. Stiamo già lavorando a una soluzione.' : lang === 'EN' ? 'We apologise for the inconvenience. We are already working on a solution.' : 'Bitte entschuldigen Sie die Unannehmlichkeit. Wir arbeiten bereits an einer Lösung.';
+      const btn = lang === 'FR' ? 'Recharger la page' : lang === 'IT' ? 'Ricarica la pagina' : lang === 'EN' ? 'Reload page' : 'Seite neu laden';
       return (
         <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] p-12 text-center">
           <div className="max-w-md space-y-6">
-            <h1 className="text-3xl font-serif text-[#004225]">Ein unerwarteter Fehler ist aufgetreten.</h1>
-            <p className="text-sm text-[#5C5C58] font-light leading-relaxed">
-              Bitte entschuldigen Sie die Unannehmlichkeit. Wir arbeiten bereits an einer Lösung.
-            </p>
-            <button 
+            <h1 className="text-3xl font-serif text-[#004225]">{title}</h1>
+            <p className="text-sm text-[#5C5C58] font-light leading-relaxed">{desc}</p>
+            <button
               onClick={() => window.location.reload()}
               className="bg-[#004225] text-white px-8 py-3 text-sm font-medium hover:bg-[#00331d] transition-all"
             >
-              Seite neu laden
+              {btn}
             </button>
           </div>
         </div>
@@ -2035,17 +2037,17 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         updateDoc(doc(db, 'users', user.id), { cv_context: text }).catch(e => handleDbError(e, 'db', `users/${user.id}`)),
       ]);
 
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        content: `Ich habe dein CV "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!` 
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe dein CV "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
       }]);
       
       if (!isStellaOpen) setIsStellaOpen(true);
     } catch (error) {
       console.error("PDF extraction error:", error);
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        content: `Entschuldigung, beim Einlesen deines CVs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.` 
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines CVs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
       }]);
     } finally {
       setIsUploading(false);
@@ -2359,7 +2361,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setMessages(prev => [
         ...prev,
         userMsg,
-        { role: 'ai', content: 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts – es dauert nur 30 Sekunden! 🚀' }
+        { role: 'ai', content: language === 'FR' ? 'Pour utiliser Stella, tu dois d\'abord **t\'inscrire gratuitement**. Clique sur "Commencer gratuitement" en haut à droite – ça ne prend que 30 secondes !' : language === 'IT' ? 'Per usare Stella, devi prima **registrarti gratuitamente**. Clicca su "Inizia gratuitamente" in alto a destra – ci vogliono solo 30 secondi!' : language === 'EN' ? 'To use Stella, you must first **register for free**. Click on "Start for free" at the top right – it only takes 30 seconds!' : 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts – es dauert nur 30 Sekunden!' }
       ]);
       if (!overrideContent) setInput('');
       setAuthTab('register');
@@ -3159,7 +3161,7 @@ Bewerte in 3 Kategorien (je 0–100%):
           break;
         }
         default:
-          prompt = "Bitte hilf mir bei meiner Karriere.";
+          prompt = language === 'FR' ? "Aide-moi dans ma carrière." : language === 'IT' ? "Aiutami nella mia carriera." : language === 'EN' ? "Please help me with my career." : "Bitte hilf mir bei meiner Karriere.";
       }
 
       const toolRes = await authFetch('/api/process-tool', {
@@ -3261,7 +3263,7 @@ ${JSON.stringify(analysisData, null, 2)}
           }
         } catch (e) {
           console.error("Error parsing CV analysis JSON:", e);
-          setToolResult(resultText || 'Ein Fehler bei der Auswertung ist aufgetreten. Bitte versuche es erneut.');
+          setToolResult(resultText || (language === 'FR' ? 'Une erreur s\'est produite lors de l\'analyse. Veuillez réessayer.' : language === 'IT' ? 'Si è verificato un errore durante l\'analisi. Riprova.' : language === 'EN' ? 'An error occurred during analysis. Please try again.' : 'Ein Fehler bei der Auswertung ist aufgetreten. Bitte versuche es erneut.'));
         }
       }
 
@@ -3330,7 +3332,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           }
         } catch (e) {
           console.error("Error parsing Salary calculation JSON:", e);
-          setToolResult(resultText || 'Gehaltsberechnung konnte nicht ausgewertet werden. Bitte versuche es erneut.');
+          setToolResult(resultText || (language === 'FR' ? 'Le calcul de salaire n\'a pas pu être traité. Veuillez réessayer.' : language === 'IT' ? 'Il calcolo dello stipendio non ha potuto essere elaborato. Riprova.' : language === 'EN' ? 'Salary calculation could not be processed. Please try again.' : 'Gehaltsberechnung konnte nicht ausgewertet werden. Bitte versuche es erneut.'));
         }
       }
       
@@ -5591,12 +5593,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       badge: 'Coach',
       type: 'gratis',
       inputs: [
-        { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
-        { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
+        { key: 'firstName', label: language === 'FR' ? 'Prénom' : language === 'IT' ? 'Nome' : language === 'EN' ? 'First name' : 'Vorname', type: 'text', placeholder: language === 'FR' ? 'ex. Anna' : language === 'IT' ? 'es. Anna' : language === 'EN' ? 'e.g. Anna' : 'z.B. Anna' },
+        { key: 'lastName', label: language === 'FR' ? 'Nom de famille' : language === 'IT' ? 'Cognome' : language === 'EN' ? 'Last name' : 'Nachname', type: 'text', placeholder: language === 'FR' ? 'ex. Müller' : language === 'IT' ? 'es. Müller' : language === 'EN' ? 'e.g. Müller' : 'z.B. Müller' },
         { key: 'jobTitle', label: t.tools_data['interview'].input_label, type: 'text', placeholder: t.tools_data['interview'].input_placeholder },
-        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
-        { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
-        { key: 'description', label: 'Beschreibung / Wünsche', type: 'textarea', placeholder: 'Worauf soll das Interview-Training fokussieren?' },
+        { key: 'applicationType', label: language === 'FR' ? 'Type de candidature' : language === 'IT' ? 'Tipo di candidatura' : language === 'EN' ? 'Application type' : 'Art der Bewerbung', type: 'select', placeholder: language === 'FR' ? '— Veuillez sélectionner —' : language === 'IT' ? '— Seleziona —' : language === 'EN' ? '— Please select —' : '— Bitte wählen —', options: language === 'FR' ? ['Candidature / Présentation', 'Apprentissage', 'Reconversion', 'Travailleur qualifié'] : language === 'IT' ? ['Candidatura / Presentazione', 'Apprendistato', 'Riconversione', 'Lavoratore qualificato'] : language === 'EN' ? ['Application / Introduction', 'Apprenticeship', 'Career change', 'Skilled worker'] : ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'qualifications', label: language === 'FR' ? 'Qualifications' : language === 'IT' ? 'Qualifiche' : language === 'EN' ? 'Qualifications' : 'Qualifikationen', type: 'textarea', placeholder: language === 'FR' ? 'ex. CFC commerce, CAS Marketing, langues...' : language === 'IT' ? 'es. AFC commercio, CAS Marketing, lingue...' : language === 'EN' ? 'e.g. commercial apprenticeship, CAS Marketing, languages...' : 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
+        { key: 'description', label: language === 'FR' ? 'Description / Souhaits' : language === 'IT' ? 'Descrizione / Desideri' : language === 'EN' ? 'Description / Wishes' : 'Beschreibung / Wünsche', type: 'textarea', placeholder: language === 'FR' ? 'Sur quoi l\'entraînement d\'entretien doit-il se concentrer ?' : language === 'IT' ? 'Su cosa dovrebbe concentrarsi la simulazione del colloquio?' : language === 'EN' ? 'What should the interview training focus on?' : 'Worauf soll das Interview-Training fokussieren?' },
       ]
     },
     {
@@ -9997,7 +9999,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             const extracted = await extractTextFromImage(file);
             setToolInput((prev: any) => ({ ...prev, linkedinProfile: extracted }));
           } catch {
-            alert('Screenshot konnte nicht analysiert werden. Bitte Text manuell einfügen.');
+            alert(language === 'FR' ? 'La capture d\'écran n\'a pas pu être analysée. Veuillez saisir le texte manuellement.' : language === 'IT' ? 'Lo screenshot non ha potuto essere analizzato. Inserisci il testo manualmente.' : language === 'EN' ? 'Screenshot could not be analysed. Please enter text manually.' : 'Screenshot konnte nicht analysiert werden. Bitte Text manuell einfügen.');
           } finally {
             setIsExtractingImage(false);
           }
