@@ -36,7 +36,7 @@ import {
 import { auth, db } from './firebase';
 import {
   onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  signOut as firebaseSignOut, signInWithPopup, GoogleAuthProvider,
+  signOut as firebaseSignOut, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
   type User as FirebaseUser,
 } from 'firebase/auth';
 import {
@@ -1030,9 +1030,9 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Minimum splash duration: 4.5s for a professional brand moment
+  // Minimum splash duration: 1.5s for a brand moment
   useEffect(() => {
-    const timer = setTimeout(() => setSplashMinDone(true), 4500);
+    const timer = setTimeout(() => setSplashMinDone(true), 1500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1579,10 +1579,16 @@ function StellifyApp() {
       }
     };
 
+    getRedirectResult(auth).catch(() => {});
+
     const unsubscribeAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (unsubscribeUser) { unsubscribeUser(); unsubscribeUser = null; }
 
       if (firebaseUser) {
+        // Show app immediately with basic auth data — Firestore loads in background
+        processUserData(null, firebaseUser);
+        setIsAuthReady(true);
+
         const userRef = doc(db, 'users', firebaseUser.uid);
 
         try {
@@ -1591,7 +1597,7 @@ function StellifyApp() {
             const rawName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
             const cleanName = rawName.replace(/\./g, ' ');
             const formattedName = cleanName.split(' ').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-            await setDoc(userRef, {
+            const newData = {
               id: firebaseUser.uid,
               email: firebaseUser.email || '',
               first_name: formattedName,
@@ -1604,28 +1610,23 @@ function StellifyApp() {
               language,
               theme,
               cv_context: cvContext || null,
-            });
-            const isOAuth = firebaseUser.providerData.some(p => p.providerId !== 'password');
-            if (isOAuth) {
-              fetch('/api/send-welcome-email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
-              }).then(null, console.error);
-            }
+            };
+            setDoc(userRef, newData).then(() => {
+              const isOAuth = firebaseUser.providerData.some(p => p.providerId !== 'password');
+              if (isOAuth) {
+                fetch('/api/send-welcome-email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
+                }).then(null, console.error);
+              }
+            }).catch(console.error);
+            processUserData(newData, firebaseUser);
+          } else {
+            processUserData(userSnap.data(), firebaseUser);
           }
         } catch (e) {
-          console.error('Error ensuring user exists:', e);
-        }
-
-        try {
-          const userSnap = await getDoc(userRef);
-          processUserData(userSnap.exists() ? userSnap.data() : null, firebaseUser);
-        } catch (e) {
           console.error('Error loading user profile:', e);
-          processUserData(null, firebaseUser);
-        } finally {
-          setIsAuthReady(true);
         }
 
         unsubscribeUser = onSnapshot(userRef, (snap) => {
@@ -2219,7 +2220,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       await signInWithPopup(auth, new GoogleAuthProvider());
       setIsAuthModalOpen(false);
     } catch (err: any) {
-      if (err.code !== 'auth/popup-closed-by-user') {
+      if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
+        await signInWithRedirect(auth, new GoogleAuthProvider());
+      } else if (err.code !== 'auth/popup-closed-by-user') {
         console.error('Google Auth Error:', err);
         const msg = language === 'DE' ? 'Google-Anmeldung fehlgeschlagen.' : language === 'FR' ? 'Échec de la connexion Google.' : language === 'IT' ? 'Accesso Google fallito.' : 'Google authentication failed.';
         setAuthError(msg);
@@ -9562,19 +9565,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.auth_terms_data_processing}
                 </p>
 
-                <div className="mt-8 pt-4 border-t border-black/5 flex justify-center">
-                  <button 
-                    type="button"
-                    onClick={async () => {
-                      await firebaseSignOut(auth);
-                      window.localStorage.clear();
-                      window.location.reload();
-                    }}
-                    className="text-[9px] uppercase tracking-widest text-[#9A9A94] hover:text-[#004225] transition-colors"
-                  >
-                    {t.auth_reset_session}
-                  </button>
-                </div>
               </form>
             </motion.div>
           </div>
