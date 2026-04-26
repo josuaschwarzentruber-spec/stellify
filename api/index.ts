@@ -6,18 +6,29 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
-import { createClient } from "@supabase/supabase-js";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
+import { initializeApp, getApps, cert } from "firebase-admin/app";
+import { getAuth as getAdminAuth } from "firebase-admin/auth";
+import { getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
 
 dotenv.config();
 
-// ── Supabase Admin ────────────────────────────────────────────────────────────
-const supabaseAdmin = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+// ── Firebase Admin ────────────────────────────────────────────────────────────
+if (getApps().length === 0) {
+  initializeApp({
+    credential: cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+    }),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  });
+}
+const adminAuth = getAdminAuth();
+const adminDb = getFirestore();
+const adminStorage = getStorage();
 
 // ── Stripe (lazy) ────────────────────────────────────────────────────────────
 let stripe: Stripe | null = null;
@@ -171,17 +182,16 @@ const generalLimiter = rateLimit({
 });
 app.use(generalLimiter);
 
-// Supabase token verification middleware
+// Firebase token verification middleware
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
   if (!header?.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
-    const { data: { user }, error } = await supabaseAdmin.auth.getUser(header.slice(7));
-    if (error || !user) return res.status(401).json({ error: 'Invalid or expired token' });
-    (req as any).uid = user.id;
-    (req as any).userEmail = user.email;
+    const decoded = await adminAuth.verifyIdToken(header.slice(7));
+    (req as any).uid = decoded.uid;
+    (req as any).userEmail = decoded.email;
     next();
   } catch {
     return res.status(401).json({ error: 'Invalid or expired token' });
@@ -208,18 +218,19 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     if (userId && planId) {
       try {
         const isAnnual = session.metadata?.interval === 'year';
-        const { data: existingUser } = await supabaseAdmin.from('users').select('subscription_expires_at, email, first_name').eq('id', userId).single();
+        const userSnap = await adminDb.collection('users').doc(userId).get();
+        const existingUser = userSnap.data();
         const currentExpiry = existingUser?.subscription_expires_at;
         const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
         const expiresAt = new Date(baseDate);
         if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
         else expiresAt.setMonth(expiresAt.getMonth() + 1);
-        await supabaseAdmin.from('users').update({
+        await adminDb.collection('users').doc(userId).update({
           role: normaliseRole(planId),
           subscription_interval: isAnnual ? 'annual' : 'monthly',
           subscription_expires_at: expiresAt.toISOString(),
           stripe_customer_id: session.customer || null,
-        }).eq('id', userId);
+        });
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
         if (existingUser?.email) {
           const emailUser = process.env.EMAIL_USER;
@@ -247,7 +258,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           }
         }
       } catch (err) {
-        console.error(`[WEBHOOK] Supabase update failed:`, err);
+        console.error(`[WEBHOOK] Firestore update failed:`, err);
       }
     }
   }
@@ -255,10 +266,11 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription;
     try {
-      const { data: users } = await supabaseAdmin.from('users').select('id, email, first_name, subscription_interval').eq('stripe_customer_id', sub.customer as string).limit(1);
+      const usersSnap = await adminDb.collection('users').where('stripe_customer_id', '==', sub.customer as string).limit(1).get();
+      const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (users?.length) {
-        const u = users[0];
-        await supabaseAdmin.from('users').update({ role: 'client' }).eq('id', u.id);
+        const u = users[0] as any;
+        await adminDb.collection('users').doc(u.id).update({ role: 'client' });
         console.log(`[WEBHOOK] Downgraded ${u.id} to free after subscription deletion`);
         if (u.email) {
           const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
@@ -274,9 +286,10 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     const sub = event.data.object as Stripe.Subscription;
     if (sub.cancel_at_period_end) {
       try {
-        const { data: users } = await supabaseAdmin.from('users').select('email, first_name, subscription_interval').eq('stripe_customer_id', sub.customer as string).limit(1);
+        const usersSnap2 = await adminDb.collection('users').where('stripe_customer_id', '==', sub.customer as string).limit(1).get();
+        const users = usersSnap2.docs.map(d => d.data());
         if (users?.length) {
-          const u = users[0];
+          const u = users[0] as any;
           if (u.email) {
             const periodEnd = new Date((sub as any).current_period_end * 1000);
             const daysLeft = Math.ceil((periodEnd.getTime() - Date.now()) / 86400000);
@@ -529,18 +542,15 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
   const copy = resetCopy[lang] || resetCopy['DE'];
 
   try {
-    const { data, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
-      type: 'recovery',
-      email,
-      options: { redirectTo: `${siteUrl}/` },
-    });
-    if (linkError) {
-      if (linkError.message.includes('not found') || linkError.message.includes('User not found')) {
+    let resetLink: string;
+    try {
+      resetLink = await adminAuth.generatePasswordResetLink(email, { url: `${siteUrl}/` });
+    } catch (linkError: any) {
+      if (linkError.code === 'auth/user-not-found') {
         return res.status(404).json({ error: 'user-not-found' });
       }
       throw linkError;
     }
-    const resetLink = data.properties?.action_link || `${siteUrl}/`;
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
     await transporter.sendMail({
       from: `"Stellify" <${emailUser}>`,
@@ -559,9 +569,8 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
 app.post("/api/delete-account", requireAuth, async (req, res) => {
   const uid = (req as any).uid;
   try {
-    await supabaseAdmin.from('users').delete().eq('id', uid);
-    const { error } = await supabaseAdmin.auth.admin.deleteUser(uid);
-    if (error) throw error;
+    await adminDb.collection('users').doc(uid).delete();
+    await adminAuth.deleteUser(uid);
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[DELETE ACCOUNT]', err.message);
@@ -748,7 +757,7 @@ CV: ${text.substring(0, 2000)}` }]
 
     const uid = (req as any).uid;
     if (uid) {
-      await supabaseAdmin.from('cv_analyses').insert({ user_id: uid, data: metadata }).catch(console.error);
+      await adminDb.collection('cv_analyses').add({ user_id: uid, data: metadata, created_at: new Date().toISOString() }).catch(console.error);
     }
 
     res.json({ success: true, metadata });
@@ -793,7 +802,7 @@ CV: ${profile.text.substring(0, 1000)}` }]
   }
 });
 
-// ── CV File Storage (Supabase Storage) ───────────────────────────────────────
+// ── CV File Storage (Firebase Storage) ───────────────────────────────────────
 app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
   const { base64, fileName, mimeType } = req.body;
   const uid = (req as any).uid;
@@ -801,19 +810,17 @@ app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
 
   try {
     const buffer = Buffer.from(base64, 'base64');
-    const safeName = `${uid}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+    const safeName = `cv-files/${uid}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-    const { error } = await supabaseAdmin.storage
-      .from('cv-files')
-      .upload(safeName, buffer, { contentType: mimeType || 'application/octet-stream', upsert: true });
+    const bucket = adminStorage.bucket();
+    const file = bucket.file(safeName);
+    await file.save(buffer, { contentType: mimeType || 'application/octet-stream' });
 
-    if (error) throw error;
+    const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2100' });
 
-    const { data: { publicUrl } } = supabaseAdmin.storage.from('cv-files').getPublicUrl(safeName);
+    await adminDb.collection('users').doc(uid).update({ cv_file_path: safeName }).catch(console.error);
 
-    await supabaseAdmin.from('users').update({ cv_file_path: safeName }).eq('id', uid).catch(console.error);
-
-    res.json({ success: true, path: safeName, url: publicUrl });
+    res.json({ success: true, path: safeName, url });
   } catch (error: any) {
     console.error("[CV UPLOAD ERROR]", error);
     res.status(500).json({ error: error.message || 'Upload fehlgeschlagen' });
