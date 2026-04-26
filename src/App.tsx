@@ -1032,9 +1032,9 @@ function StellifyApp() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Minimum splash duration: 1.5s for a brand moment
+  // Minimum splash duration: 3.2s so all animations complete fully
   useEffect(() => {
-    const timer = setTimeout(() => setSplashMinDone(true), 1500);
+    const timer = setTimeout(() => setSplashMinDone(true), 3200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -5866,7 +5866,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
   if (!isAuthReady || !splashMinDone) {
-    const features = ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
+    const features = language === 'EN'
+      ? ['CV Analysis', 'Interview Coach', 'Cover Letter', 'Salary Calculator', 'Premium CV Rewrite', 'Certificate Decoder', 'LinkedIn Import', 'Career Roadmap']
+      : language === 'FR'
+      ? ['Analyse CV', 'Coach Entretien', 'Lettre de motivation', 'Calculateur salaire', 'CV Premium', 'Décodeur certificat', 'Import LinkedIn', 'Feuille de route carrière']
+      : language === 'IT'
+      ? ['Analisi CV', 'Coach Colloquio', 'Lettera motivazione', 'Calcolo stipendio', 'CV Premium', 'Decoder certificato', 'Import LinkedIn', 'Roadmap carriera']
+      : ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
 
@@ -5974,7 +5980,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#004225] to-[#00A854] rounded-full"
               initial={{ width: '0%' }}
               animate={{ width: '100%' }}
-              transition={{ delay: 1.7, duration: 1.4, ease: 'easeInOut' }}
+              transition={{ delay: 1.2, duration: 1.8, ease: 'easeInOut' }}
             />
           </motion.div>
 
