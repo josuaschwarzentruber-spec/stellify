@@ -547,7 +547,7 @@ app.get("/api/lehrstellen", requireAuth, async (req, res) => {
 });
 
 // ── Password Reset (custom branded email) ────────────────────────────────────
-app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, res) => {
+app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
   const { email, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const emailUser = process.env.EMAIL_USER;
@@ -624,7 +624,7 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
 });
 
 // ── Welcome Email ─────────────────────────────────────────────────────────────
-app.post("/api/send-welcome-email", emailLimiter, express.json(), async (req, res) => {
+app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
   const { email, firstName, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const emailUser = process.env.EMAIL_USER;
@@ -704,7 +704,7 @@ app.get("/api/send-test-email", async (req, res) => {
   const to = (req.query.to as string) || emailUser || '';
   await handleTestEmail(to, res);
 });
-app.post("/api/send-test-email", emailLimiter, requireAuth, express.json(), async (req, res) => {
+app.post("/api/send-test-email", emailLimiter, requireAuth, async (req, res) => {
   const emailUser = process.env.EMAIL_USER;
   const to = req.body?.to || emailUser || '';
   await handleTestEmail(to, res);
@@ -717,7 +717,7 @@ app.get("/api/health", (_req, res) => {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", express.json(), async (req, res) => {
+app.post("/api/create-checkout-session", async (req, res) => {
   const stripeKey = process.env.STRIPE_SECRET_KEY || '';
   const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
   try {
