@@ -7812,7 +7812,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 >
                   {t.pricing_yearly}
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${billingCycle === 'yearly' ? 'bg-black/10 text-black' : 'bg-white/15 text-white'}`}>
-                    −17%
+                    bis −25%
                   </span>
                 </button>
               </div>
@@ -7880,7 +7880,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
                 {billingCycle === 'yearly' && (
                   <div className="mt-2 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
-                    <span className="text-white text-xs font-semibold">−17%</span>
+                    <span className="text-white text-xs font-semibold">−25%</span>
                     <span className="text-white/70 text-xs">· CHF 178.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</span>
                   </div>
                 )}

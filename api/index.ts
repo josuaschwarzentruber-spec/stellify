@@ -338,24 +338,30 @@ app.use(express.json());
 
 // ── Gemini retry helper ───────────────────────────────────────────────────────
 const PRO_MODEL = 'gemini-2.5-pro';
-const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
-async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 3, preferredModel?: string): Promise<any> {
+const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 4, preferredModel?: string): Promise<any> {
   const modelsToTry = preferredModel
     ? [preferredModel, ...FALLBACK_MODELS.filter(m => m !== preferredModel)]
     : FALLBACK_MODELS;
-  for (let i = 0; i < maxAttempts; i++) {
-    const model = modelsToTry[Math.min(i, modelsToTry.length - 1)];
+  const attempts = Math.min(maxAttempts, modelsToTry.length);
+  let lastError: any;
+  for (let i = 0; i < attempts; i++) {
+    const model = modelsToTry[i];
     try {
       const result = await fn(model);
       if (!result?.text) throw new Error('EMPTY_RESPONSE');
       return result;
     } catch (err: any) {
+      lastError = err;
       const msg = err.message || '';
-      const isRetryable = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand') || msg.includes('500') || msg.includes('INTERNAL') || msg.includes('EMPTY_RESPONSE');
-      if (!isRetryable || i === maxAttempts - 1) throw err;
-      await new Promise(r => setTimeout(r, (i + 1) * 1500));
+      console.warn(`[GEMINI] model=${model} attempt=${i + 1} error=${msg.slice(0, 120)}`);
+      if (i < attempts - 1) {
+        const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand') || msg.includes('INTERNAL') || msg.includes('EMPTY_RESPONSE');
+        if (isOverloaded) await new Promise(r => setTimeout(r, (i + 1) * 1500));
+      }
     }
   }
+  throw lastError;
 }
 
 // ── Gemini Chat ───────────────────────────────────────────────────────────────
