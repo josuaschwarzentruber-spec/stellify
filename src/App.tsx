@@ -1526,6 +1526,12 @@ function StellifyApp() {
   const langDropdownRef = useRef<HTMLDivElement>(null);
   const [isExtractingImage, setIsExtractingImage] = useState(false);
 
+  const isTransientFirestoreError = (error: unknown) => {
+    const code = (error as { code?: string } | null)?.code || '';
+    const message = error instanceof Error ? error.message : String(error || '');
+    return code === 'unavailable' || code === 'failed-precondition' || message.toLowerCase().includes('client is offline');
+  };
+
   // --- EFFECTS ---
   useEffect(() => {
     let unsubscribeUser: (() => void) | null = null;
@@ -1641,12 +1647,26 @@ function StellifyApp() {
             processUserData(userSnap.data(), firebaseUser);
           }
         } catch (e) {
-          console.error('Error loading user profile:', e);
+          if (isTransientFirestoreError(e)) {
+            console.warn('Firestore profile load temporarily unavailable; continuing with auth-only session.');
+          } else {
+            console.error('Error loading user profile:', e);
+          }
         }
 
-        unsubscribeUser = onSnapshot(userRef, (snap) => {
-          if (snap.exists()) processUserData(snap.data(), firebaseUser);
-        });
+        unsubscribeUser = onSnapshot(
+          userRef,
+          (snap) => {
+            if (snap.exists()) processUserData(snap.data(), firebaseUser);
+          },
+          (error) => {
+            if (isTransientFirestoreError(error)) {
+              console.warn('Firestore profile listener temporarily unavailable; will recover automatically once the connection returns.');
+            } else {
+              console.error('Error subscribing to user profile:', error);
+            }
+          }
+        );
       } else {
         setUser(null);
         setIsAuthReady(true);
