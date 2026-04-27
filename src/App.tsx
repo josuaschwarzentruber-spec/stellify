@@ -7569,33 +7569,112 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#004225] via-[#004225]/95 to-transparent" />
         </div>
-        <div className="max-w-7xl mx-auto relative z-10 flex flex-col items-center text-center">
+        <div className="max-w-7xl mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-12"
+            className="grid lg:grid-cols-[1.15fr_0.85fr] gap-12 lg:gap-20 items-end"
           >
-            <div className="space-y-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-white/40">{t.promo_spot}</span>
-              <h2 className="text-5xl lg:text-7xl font-serif tracking-tight max-w-4xl mx-auto leading-[1.1]">
-                {t.promo_title}
-              </h2>
-            </div>
-            
-            <button 
-              onClick={() => setIsPromoOpen(true)}
-              className="group flex flex-col items-center gap-6"
-            >
-              <div className="w-24 h-24 bg-white text-[#004225] rounded-full flex items-center justify-center relative transition-transform duration-500 group-hover:scale-110">
-                <Play size={36} fill="currentColor" className="ml-1" />
-                <div className="absolute inset-0 rounded-full border border-white animate-ping opacity-20" />
-                <div className="absolute -inset-4 rounded-full border border-white/10 scale-90 group-hover:scale-100 transition-transform duration-700" />
+            <div className="space-y-8 text-left">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.35em] text-white/55 backdrop-blur-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#6FCF97]" />
+                  {t.promo_spot}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/30">
+                  {t.promo_presents}
+                </span>
               </div>
-              <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/60 group-hover:text-white transition-colors">
-                {t.promo_play}
-              </span>
-            </button>
+
+              <div className="space-y-6">
+                <h2 className="max-w-5xl text-5xl lg:text-7xl xl:text-[6.2rem] font-serif tracking-tight leading-[0.95] text-white text-balance">
+                  {t.promo_title}
+                </h2>
+                <p className="max-w-2xl text-lg lg:text-xl text-white/72 font-light leading-relaxed">
+                  {t.promo_desc}
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-3 gap-3 max-w-3xl">
+                <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
+                    <ShieldCheck size={16} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Swiss Grade</span>
+                  </div>
+                  <p className="text-sm text-white/70 font-light">Gebaut fuer Schweizer Standards, nicht fuer generische Vorlagen.</p>
+                </div>
+                <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
+                    <Target size={16} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Career Edge</span>
+                  </div>
+                  <p className="text-sm text-white/70 font-light">{t.promo_precision} {t.promo_redefined}</p>
+                </div>
+                <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
+                    <Sparkles size={16} />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em]">AI Copilot</span>
+                  </div>
+                  <p className="text-sm text-white/70 font-light">Vom CV bis zum Interview begleitet dich jede Antwort mit Kontext.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute -inset-5 bg-gradient-to-br from-white/10 via-transparent to-[#6FCF97]/10 blur-2xl" />
+              <button
+                onClick={() => setIsPromoOpen(true)}
+                className="group relative w-full overflow-hidden border border-white/10 bg-white/[0.06] p-8 md:p-10 text-left backdrop-blur-md transition-all duration-500 hover:border-white/25 hover:bg-white/[0.09] hover:-translate-y-1"
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_55%)]" />
+                <div className="absolute right-6 top-6 h-20 w-20 rounded-full border border-white/10" />
+                <div className="absolute right-12 top-12 h-3 w-3 rounded-full bg-[#6FCF97]/30" />
+
+                <div className="relative z-10 space-y-8">
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="space-y-3">
+                      <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">
+                        <span className="h-px w-8 bg-white/25" />
+                        Campaign Film
+                      </span>
+                      <h3 className="text-3xl md:text-4xl font-serif tracking-tight leading-tight text-white">
+                        {t.promo_precision} <span className="italic text-[#D1FAE5]">{t.promo_redefined}</span>
+                      </h3>
+                    </div>
+                    <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white text-[#004225] shadow-2xl shadow-black/20 transition-transform duration-500 group-hover:scale-110">
+                      <Play size={28} fill="currentColor" className="ml-1" />
+                      <div className="absolute inset-0 rounded-full border border-white animate-ping opacity-20" />
+                      <div className="absolute -inset-3 rounded-full border border-white/15 transition-transform duration-700 group-hover:scale-110" />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      ['01', 'CV'],
+                      ['02', 'Interview'],
+                      ['03', 'Offer'],
+                    ].map(([num, label]) => (
+                      <div key={num} className="border border-white/10 bg-black/10 px-3 py-4">
+                        <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{num}</div>
+                        <div className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-white/80">{label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-white/10 pt-6">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">{t.promo_play}</p>
+                      <p className="mt-2 text-sm text-white/70 font-light">{t.promo_journey}</p>
+                    </div>
+                    <div className="inline-flex items-center gap-2 text-sm font-medium text-white">
+                      <span className="text-white/70">Launch</span>
+                      <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </div>
           </motion.div>
         </div>
       </section>
