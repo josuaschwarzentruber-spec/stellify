@@ -3773,7 +3773,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       cta_free: "Kostenlos starten",
       upload_cv: "Lebenslauf (CV) hochladen",
       update_cv: "Lebenslauf (CV) aktualisieren",
-      cv_info: "① CV hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
+      cv_info: "① Lebenslauf (CV) hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
       dashboard: "Dashboard",
       tools: "Tools",
       pricing: "Preise",
@@ -3838,8 +3838,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Bezahle wie du willst",
       payment_secure: "Sicher via Stripe verarbeitet.",
       how_badge: "Der Prozess",
-      how_desc: "Von CV bis Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
-      how_1_t: "CV hochladen & analysieren",
+      how_desc: "Vom Lebenslauf (CV) bis zur Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
+      how_1_t: "Lebenslauf (CV) hochladen & analysieren",
       how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn nach Schweizer ATS-Standard – in Sekunden.",
       how_2_t: "Bewerbung perfektionieren",
       how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jede CV-Sektion und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
@@ -3882,7 +3882,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Unlimited-Abo. ✨",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
-      onboarding_cv_title: "Lade deinen CV hoch",
+      onboarding_cv_title: "Lade deinen Lebenslauf (CV) hoch",
       onboarding_cv_desc: "Lade deinen Lebenslauf hoch, damit Stella dich und deine Erfahrungen besser versteht. So erhältst du personalisierte Tipps.",
       onboarding_chat_title: "Frag Stella",
       onboarding_chat_desc: "Nutze den Stella Chat für Karriereberatung, Interview-Vorbereitung oder um mehr über den Schweizer Arbeitsmarkt zu erfahren.",
@@ -3953,7 +3953,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       view_all: "Alle ansehen",
       time_just_now: "Gerade eben",
       stella_context_title: "Stella Context",
-      stella_context_cv_ready: "CV analysiert",
+      stella_context_cv_ready: "Lebenslauf (CV) analysiert",
       stella_context_no_cv: "Kein Lebenslauf hochgeladen",
       stella_context_focus: "Fokus-Bereiche",
       stella_roadmap: "Deine Roadmap",
@@ -7672,7 +7672,27 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <Sparkles size={16} />
                     <span className="text-[10px] font-bold uppercase tracking-[0.25em]">AI Copilot</span>
                   </div>
-                  <p className="text-sm text-white/70 font-light">Vom CV bis zum Interview begleitet dich jede Antwort mit Kontext.</p>
+                  <p className="text-sm text-white/70 font-light">Vom Lebenslauf (CV) bis zum Interview begleitet dich jede Antwort mit Kontext.</p>
+                </div>
+              </div>
+
+              <div className="max-w-3xl border border-white/10 bg-black/10 px-5 py-5 backdrop-blur-sm">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">Marketing-Ideen</p>
+                    <p className="text-sm text-white/78 font-light leading-relaxed">
+                      Wenn du eine wirklich starke, serioese Idee fuer Werbespot, Kampagne oder Conversion-Story hast, sende sie an
+                      {' '}<a href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.
+                      {' '}Geprueft werden nur serioese, umsetzbare Vorschlaege mit echtem Mehrwert.
+                    </p>
+                  </div>
+                  <a
+                    href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee&body=Hallo%20Stellify-Team%2C%0A%0Aich%20habe%20eine%20serioese%20Marketing-Idee%20fuer%20euch%3A%0A%0A"
+                    className="inline-flex shrink-0 items-center gap-2 border border-white/15 bg-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-white/12 hover:border-white/30"
+                  >
+                    Idee einreichen
+                    <ArrowRight size={14} />
+                  </a>
                 </div>
               </div>
             </div>
@@ -7707,7 +7727,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
                   <div className="grid grid-cols-3 gap-3">
                     {[
-                      ['01', 'CV'],
+                      ['01', 'Lebenslauf'],
                       ['02', 'Interview'],
                       ['03', 'Offer'],
                     ].map(([num, label]) => (
@@ -9645,10 +9665,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="text-center mb-8">
                 <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
                 <h3 className="text-xl font-medium mt-4">
-                  {authTab === 'login' ? t.auth_welcome : authTab === 'register' ? t.auth_create : t.auth_reset_password_title}
+                  {authTab === 'login'
+                    ? (language === 'FR' ? 'Bon retour chez Stellify' : language === 'IT' ? 'Bentornato su Stellify' : language === 'EN' ? 'Welcome back to Stellify' : 'Willkommen zurueck bei Stellify')
+                    : authTab === 'register'
+                    ? (language === 'FR' ? 'Créez votre accès premium' : language === 'IT' ? 'Crea il tuo accesso premium' : language === 'EN' ? 'Create your premium access' : 'Erstelle deinen Premium-Zugang')
+                    : t.auth_reset_password_title}
                 </h3>
                 <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light mt-2">
-                  {authTab === 'forgot' ? t.auth_reset_password_desc : t.auth_precision}
+                  {authTab === 'forgot'
+                    ? t.auth_reset_password_desc
+                    : authTab === 'login'
+                    ? (language === 'FR'
+                      ? 'Connectez-vous et reprenez votre prochaine candidature exactement là où vous vous êtes arrêté.'
+                      : language === 'IT'
+                      ? 'Accedi e riprendi la tua prossima candidatura esattamente da dove avevi lasciato.'
+                      : language === 'EN'
+                      ? 'Sign in and continue your next application exactly where you left off.'
+                      : 'Melde dich an und setze deine naechste Bewerbung genau dort fort, wo du aufgehört hast.')
+                    : (language === 'FR'
+                      ? 'Créez votre compte et transformez votre CV en candidature suisse de haut niveau.'
+                      : language === 'IT'
+                      ? 'Crea il tuo account e trasforma il tuo CV in una candidatura svizzera di alto livello.'
+                      : language === 'EN'
+                      ? 'Create your account and turn your CV into a Swiss-grade application.'
+                      : 'Erstelle dein Konto und verwandle deinen Lebenslauf (CV) in eine Bewerbung auf Schweizer Spitzenniveau.')}
                 </p>
               </div>
 
