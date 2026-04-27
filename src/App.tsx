@@ -7658,7 +7658,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <ShieldCheck size={16} />
                     <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Swiss Grade</span>
                   </div>
-                  <p className="text-sm text-white/70 font-light">Gebaut fuer Schweizer Standards, nicht fuer generische Vorlagen.</p>
+                  <p className="text-sm text-white/70 font-light">Gebaut für Schweizer Standards, nicht für generische Vorlagen.</p>
                 </div>
                 <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
                   <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
@@ -7681,13 +7681,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="space-y-1.5">
                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">Marketing-Ideen</p>
                     <p className="text-sm text-white/78 font-light leading-relaxed">
-                      Wenn du eine wirklich starke, serioese Idee fuer Werbespot, Kampagne oder Conversion-Story hast, sende sie an
+                      Wenn du eine wirklich starke, seriöse Idee für Werbespot, Kampagne oder Conversion-Story hast, sende sie an
                       {' '}<a href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.
-                      {' '}Geprueft werden nur serioese, umsetzbare Vorschlaege mit echtem Mehrwert.
+                      {' '}Geprüft werden nur seriöse, umsetzbare Vorschläge mit echtem Mehrwert.
                     </p>
                   </div>
                   <a
-                    href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee&body=Hallo%20Stellify-Team%2C%0A%0Aich%20habe%20eine%20serioese%20Marketing-Idee%20fuer%20euch%3A%0A%0A"
+                    href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee&body=Hallo%20Stellify-Team%2C%0A%0Aich%20habe%20eine%20seri%C3%B6se%20Marketing-Idee%20f%C3%BCr%20euch%3A%0A%0A"
                     className="inline-flex shrink-0 items-center gap-2 border border-white/15 bg-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-white/12 hover:border-white/30"
                   >
                     Idee einreichen
@@ -9666,7 +9666,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
                 <h3 className="text-xl font-medium mt-4">
                   {authTab === 'login'
-                    ? (language === 'FR' ? 'Bon retour chez Stellify' : language === 'IT' ? 'Bentornato su Stellify' : language === 'EN' ? 'Welcome back to Stellify' : 'Willkommen zurueck bei Stellify')
+                    ? (language === 'FR' ? 'Bon retour chez Stellify' : language === 'IT' ? 'Bentornato su Stellify' : language === 'EN' ? 'Welcome back to Stellify' : 'Willkommen zurück bei Stellify')
                     : authTab === 'register'
                     ? (language === 'FR' ? 'Créez votre accès premium' : language === 'IT' ? 'Crea il tuo accesso premium' : language === 'EN' ? 'Create your premium access' : 'Erstelle deinen Premium-Zugang')
                     : t.auth_reset_password_title}
