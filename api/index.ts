@@ -16,7 +16,8 @@ import { getStorage } from "firebase-admin/storage";
 dotenv.config();
 
 // ── Firebase Admin ────────────────────────────────────────────────────────────
-if (getApps().length === 0) {
+function ensureFirebaseAdmin() {
+  if (getApps().length > 0) return;
   initializeApp({
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
@@ -26,9 +27,15 @@ if (getApps().length === 0) {
     storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
   });
 }
-const adminAuth = getAdminAuth();
-const adminDb = getFirestore();
-const adminStorage = getStorage();
+
+function getAdminServices() {
+  ensureFirebaseAdmin();
+  return {
+    adminAuth: getAdminAuth(),
+    adminDb: getFirestore(),
+    adminStorage: getStorage(),
+  };
+}
 
 // ── Stripe (lazy) ────────────────────────────────────────────────────────────
 let stripe: Stripe | null = null;
@@ -190,6 +197,7 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   try {
+    const { adminAuth } = getAdminServices();
     const decoded = await adminAuth.verifyIdToken(header.slice(7));
     (req as any).uid = decoded.uid;
     (req as any).userEmail = decoded.email;
@@ -218,6 +226,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     const planId = session.metadata?.planId;
     if (userId && planId) {
       try {
+        const { adminDb } = getAdminServices();
         const isAnnual = session.metadata?.interval === 'year';
         const userSnap = await adminDb.collection('users').doc(userId).get();
         const existingUser = userSnap.data();
@@ -267,6 +276,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
   if (event.type === "customer.subscription.deleted") {
     const sub = event.data.object as Stripe.Subscription;
     try {
+      const { adminDb } = getAdminServices();
       const usersSnap = await adminDb.collection('users').where('stripe_customer_id', '==', sub.customer as string).limit(1).get();
       const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (users?.length) {
@@ -287,6 +297,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     const sub = event.data.object as Stripe.Subscription;
     if (sub.cancel_at_period_end) {
       try {
+        const { adminDb } = getAdminServices();
         const usersSnap2 = await adminDb.collection('users').where('stripe_customer_id', '==', sub.customer as string).limit(1).get();
         const users = usersSnap2.docs.map(d => d.data());
         if (users?.length) {
@@ -312,6 +323,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
     const invoice = event.data.object as any;
     if (invoice.subscription && invoice.billing_reason === 'subscription_cycle') {
       try {
+        const { adminDb } = getAdminServices();
         const sub = await getStripe().subscriptions.retrieve(invoice.subscription as string);
         const customerId = sub.customer as string;
         const usersSnap = await adminDb.collection('users').where('stripe_customer_id', '==', customerId).limit(1).get();
@@ -575,6 +587,7 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
   try {
     let resetLink: string;
     try {
+      const { adminAuth } = getAdminServices();
       resetLink = await adminAuth.generatePasswordResetLink(email, { url: `${siteUrl}/` });
     } catch (linkError: any) {
       if (linkError.code === 'auth/user-not-found') {
@@ -600,6 +613,7 @@ app.post("/api/send-password-reset", emailLimiter, express.json(), async (req, r
 app.post("/api/delete-account", requireAuth, async (req, res) => {
   const uid = (req as any).uid;
   try {
+    const { adminAuth, adminDb } = getAdminServices();
     await adminDb.collection('users').doc(uid).delete();
     await adminAuth.deleteUser(uid);
     res.json({ ok: true });
@@ -788,6 +802,7 @@ CV: ${text.substring(0, 2000)}` }]
 
     const uid = (req as any).uid;
     if (uid) {
+      const { adminDb } = getAdminServices();
       await adminDb.collection('cv_analyses').add({ user_id: uid, data: metadata, created_at: new Date().toISOString() }).catch(console.error);
     }
 
@@ -840,6 +855,7 @@ app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
   if (!base64 || !fileName) return res.status(400).json({ error: "base64 und fileName erforderlich" });
 
   try {
+    const { adminDb, adminStorage } = getAdminServices();
     const buffer = Buffer.from(base64, 'base64');
     const safeName = `cv-files/${uid}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
