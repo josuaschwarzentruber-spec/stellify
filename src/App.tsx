@@ -159,7 +159,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       desc: isFR ? "Nous comprenons le marché suisse de l'emploi comme personne d'autre." : isIT ? "Capiamo il mercato del lavoro svizzero come nessun altro." : isEN ? "We understand the Swiss job market like no one else." : "Wir verstehen den Schweizer Arbeitsmarkt wie kein anderer."
     },
     {
-      title: isFR ? "Optimisation de CV 2.0" : isIT ? "Ottimizzazione CV 2.0" : isEN ? "CV Optimisation 2.0" : "CV Optimierung 2.0",
+      title: isFR ? "Optimisation de CV 2.0" : isIT ? "Ottimizzazione CV 2.0" : isEN ? "CV Optimisation 2.0" : "Lebenslauf-Optimierung 2.0",
       subtitle: isFR ? "Sécurisé ATS & design percutant." : isIT ? "ATS-sicuro & design potente." : isEN ? "ATS-proof & design-strong." : "ATS-sicher & Design-stark.",
       icon: <FileText className="w-16 h-16 text-[#004225]" />,
       desc: isFR ? "Votre CV ne sera pas seulement lu, il sera admiré." : isIT ? "Il tuo CV non sarà solo letto, sarà ammirato." : isEN ? "Your CV won't just be read — it will be admired." : "Dein Lebenslauf wird nicht nur gelesen, er wird bewundert."
@@ -457,7 +457,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
                 <ul className="list-disc pl-5 space-y-2 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Kontodaten:</strong> Vorname, E-Mail-Adresse (bei Registrierung)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur KI-Verarbeitung, nicht dauerhaft gespeichert)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Lebenslauf-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur KI-Verarbeitung, nicht dauerhaft gespeichert)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Nutzungsdaten:</strong> Anzahl Tool-Nutzungen, Chat-Anfragen, Datum des letzten Resets</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zahlungsdaten:</strong> Werden ausschliesslich durch Stripe Inc. verarbeitet.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal gespeichert)</li>
@@ -470,7 +470,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Authentifizierung und Kontoverwaltung</li>
                   <li>Abrechnung und Zahlungsabwicklung (via Stripe)</li>
                   <li>Einhaltung gesetzlicher Pflichten</li>
-                  <li>KI-gestützte Karriereberatung (Verarbeitung des CV-Textes durch einen externen KI-Dienst)</li>
+                  <li>KI-gestützte Karriereberatung (Verarbeitung des Lebenslauf-Textes durch einen externen KI-Dienst)</li>
                 </ul>
               </Section>
               <Section title="4. Rechtsgrundlage der Bearbeitung">
@@ -483,7 +483,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Weitergabe an Dritte">
                 <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und CV-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
+                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -494,7 +494,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p><p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv.</p></div>
                 </div>
               </Section>
-              <Section title="7. Speicherdauer"><ul className="list-disc pl-5 space-y-2"><li>Kontodaten: bis zur Kontolöschung</li><li>CV-Text: nicht dauerhaft gespeichert</li><li>Zahlungsbelege: 10 Jahre (OR Art. 958f)</li><li>Nutzungsstatistiken: monatlich zurückgesetzt</li></ul></Section>
+              <Section title="7. Speicherdauer"><ul className="list-disc pl-5 space-y-2"><li>Kontodaten: bis zur Kontolöschung</li><li>Lebenslauf-Text: nicht dauerhaft gespeichert</li><li>Zahlungsbelege: 10 Jahre (OR Art. 958f)</li><li>Nutzungsstatistiken: monatlich zurückgesetzt</li></ul></Section>
               <Section title="8. Deine Rechte">
                 <p>Du hast nach Schweizer DSG und DSGVO folgende Rechte:</p>
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -2025,7 +2025,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         body: JSON.stringify({ prompt, model })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'CV-Analyse fehlgeschlagen');
+      if (!res.ok) throw new Error(data.error || 'Lebenslauf-Analyse fehlgeschlagen');
       const jsonMatch = (data.text || '').match(/\{[\s\S]*\}/);
       if (!jsonMatch) return;
       const analysisData = JSON.parse(jsonMatch[0]);
@@ -2097,7 +2097,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe dein CV "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
+        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe deinen Lebenslauf "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
       }]);
       
       if (!isStellaOpen) setIsStellaOpen(true);
@@ -2105,7 +2105,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       console.error("PDF extraction error:", error);
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines CVs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
+        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines Lebenslaufs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
       }]);
     } finally {
       setIsUploading(false);
@@ -3771,9 +3771,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_title: "Von Bewerbung bis Interview – dein KI-Karriere-Coach",
       hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch – präzise, diskret und auf den Schweizer Markt zugeschnitten.",
       cta_free: "Kostenlos starten",
-      upload_cv: "Lebenslauf (CV) hochladen",
-      update_cv: "Lebenslauf (CV) aktualisieren",
-      cv_info: "① Lebenslauf (CV) hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
+      upload_cv: "Lebenslauf hochladen",
+      update_cv: "Lebenslauf aktualisieren",
+      cv_info: "① Lebenslauf hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
       dashboard: "Dashboard",
       tools: "Tools",
       pricing: "Preise",
@@ -3838,11 +3838,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Bezahle wie du willst",
       payment_secure: "Sicher via Stripe verarbeitet.",
       how_badge: "Der Prozess",
-      how_desc: "Vom Lebenslauf (CV) bis zur Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
-      how_1_t: "Lebenslauf (CV) hochladen & analysieren",
+      how_desc: "Vom Lebenslauf bis zur Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
+      how_1_t: "Lebenslauf hochladen & analysieren",
       how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn nach Schweizer ATS-Standard – in Sekunden.",
       how_2_t: "Bewerbung perfektionieren",
-      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jede CV-Sektion und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
+      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
       how_3_t: "Interview bestehen",
       how_3_d: "Trainiere mit dem KI-Interview-Coach: echte Schweizer Fragen, dein persönliches Bewertungsraster und konkrete Formulierungsvorschläge für jede Situation.",
       faq_badge: "Häufige Fragen",
@@ -3882,7 +3882,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Unlimited-Abo. ✨",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
-      onboarding_cv_title: "Lade deinen Lebenslauf (CV) hoch",
+      onboarding_cv_title: "Lade deinen Lebenslauf hoch",
       onboarding_cv_desc: "Lade deinen Lebenslauf hoch, damit Stella dich und deine Erfahrungen besser versteht. So erhältst du personalisierte Tipps.",
       onboarding_chat_title: "Frag Stella",
       onboarding_chat_desc: "Nutze den Stella Chat für Karriereberatung, Interview-Vorbereitung oder um mehr über den Schweizer Arbeitsmarkt zu erfahren.",
@@ -3916,7 +3916,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_pro: "Karriere-Profi",
       dashboard_desc: "Dein Copilot Stella ist bereit. Analysiere neue Stellen, optimiere dein Profil oder bereite dich auf dein nächstes Interview vor.",
       dashboard_stat_analyses: "Analysen",
-      dashboard_stat_cv_status: "Lebenslauf (CV)",
+      dashboard_stat_cv_status: "Lebenslauf",
       dashboard_stat_ready: "Bereit",
       dashboard_stat_missing: "Fehlt",
       dashboard_stat_chat: "Stella Chat",
@@ -3953,7 +3953,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       view_all: "Alle ansehen",
       time_just_now: "Gerade eben",
       stella_context_title: "Stella Context",
-      stella_context_cv_ready: "Lebenslauf (CV) analysiert",
+      stella_context_cv_ready: "Lebenslauf analysiert",
       stella_context_no_cv: "Kein Lebenslauf hochgeladen",
       stella_context_focus: "Fokus-Bereiche",
       stella_roadmap: "Deine Roadmap",
@@ -4133,8 +4133,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Stellify spart dir 3–5 Std. pro Bewerbung"
       ],
       tools_data: {
-        'cv-optimizer': { 
-          title: 'CV-Optimierer', 
+        'cv-optimizer': {
+          title: 'Lebenslauf-Optimierer',
           desc: 'Analysiert deinen Lebenslauf auf Schweizer Standards & optimiert Formulierungen.', 
           input_label: 'Welche Sektion optimieren?', 
           input_placeholder: 'z.B. Berufserfahrung, Kurzprofil...',
@@ -4181,8 +4181,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'z.B. Senior Data Scientist',
           tutorial: 'Beispiel: Ziel "Senior Data Scientist". Analyse zeigt Lücken in "Cloud Architecture" und "Leadership Experience" im Vergleich zu Schweizer Top-Arbeitgebern.'
         },
-        'cv-analysis': { 
-          title: 'CV-Analyse', 
+        'cv-analysis': {
+          title: 'Lebenslauf-Analyse',
           desc: 'Tiefgehende Analyse deines Lebenslaufs auf Keywords, Branchen-Fit und Verbesserungspotential.',
           tutorial: 'Beispiel: Dein CV hat einen Swiss-Readiness Score von 75%. Wir empfehlen die Ergänzung deiner Arbeitsbewilligung (C-Bewilligung) und die GERS-Sprachniveaus.'
         },
@@ -4261,8 +4261,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'cv-premium': { 
           title: 'Premium CV-Rewrite', 
           desc: 'Vollständige Optimierung deines Lebenslaufs auf Schweizer Premium-Standard (kein ß, Schweizer Präzision).', 
-          input_label: 'Dein aktueller CV-Text', 
-          input_placeholder: 'Kopiere hier deinen gesamten CV-Inhalt hinein...',
+          input_label: 'Dein aktueller Lebenslauf-Text',
+          input_placeholder: 'Kopiere hier deinen gesamten Lebenslauf hierein...',
           tutorial: 'Beispiel: Komplette Neuerstellung. Wir entfernen das "ß", passen die Datumsformate an und optimieren das Layout auf Schweizer Eleganz.'
         },
         'career-roadmap': { 
@@ -5948,7 +5948,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ? ['Analyse CV', 'Coach Entretien', 'Lettre de motivation', 'Calculateur salaire', 'CV Premium', 'Décodeur certificat', 'Import LinkedIn', 'Feuille de route carrière']
       : language === 'IT'
       ? ['Analisi CV', 'Coach Colloquio', 'Lettera motivazione', 'Calcolo stipendio', 'CV Premium', 'Decoder certificato', 'Import LinkedIn', 'Roadmap carriera']
-      : ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
+      : ['Lebenslauf-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'Lebenslauf Premium', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
 
@@ -7679,18 +7679,35 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="max-w-3xl border border-white/10 bg-black/10 px-5 py-5 backdrop-blur-sm">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">Marketing-Ideen</p>
-                    <p className="text-sm text-white/78 font-light leading-relaxed">
-                      Wenn du eine wirklich starke, seriöse Idee für Werbespot, Kampagne oder Conversion-Story hast, sende sie an
-                      {' '}<a href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.
-                      {' '}Geprüft werden nur seriöse, umsetzbare Vorschläge mit echtem Mehrwert.
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">
+                      {language === 'FR' ? 'Idées marketing' : language === 'IT' ? 'Idee di marketing' : language === 'EN' ? 'Marketing Ideas' : 'Marketing-Ideen'}
+                    </p>
+                    <p className="text-sm text-white/70 font-light leading-relaxed">
+                      {language === 'FR'
+                        ? <>Si tu as une idée solide pour un spot, une campagne ou une conversion story, envoie-la à{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : language === 'IT'
+                        ? <>Se hai un'idea concreta per uno spot, una campagna o una storia di conversione, inviala a{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : language === 'EN'
+                        ? <>If you have a solid idea for an ad spot, campaign or conversion story, send it to{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot, eine Kampagne oder Conversion-Story hast, sende sie an{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                      }
                     </p>
                   </div>
                   <a
-                    href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee&body=Hallo%20Stellify-Team%2C%0A%0Aich%20habe%20eine%20seri%C3%B6se%20Marketing-Idee%20f%C3%BCr%20euch%3A%0A%0A"
+                    href={`mailto:support.stellify@gmail.com?subject=${
+                      language === 'FR' ? 'Id%C3%A9e%20marketing%20pour%20Stellify'
+                      : language === 'IT' ? 'Idea%20di%20marketing%20per%20Stellify'
+                      : language === 'EN' ? 'Marketing%20Idea%20for%20Stellify'
+                      : 'Marketing-Idee%20f%C3%BCr%20Stellify'
+                    }&body=${
+                      language === 'FR' ? 'Bonjour%20%C3%A9quipe%20Stellify%2C%0A%0AMon%20id%C3%A9e%20%3A%0A%0A'
+                      : language === 'IT' ? 'Ciao%20team%20Stellify%2C%0A%0ALa%20mia%20idea%3A%0A%0A'
+                      : language === 'EN' ? 'Hello%20Stellify%20Team%2C%0A%0AMy%20idea%3A%0A%0A'
+                      : 'Hallo%20Stellify-Team%2C%0A%0AMeine%20Idee%3A%0A%0A'
+                    }`}
                     className="inline-flex shrink-0 items-center gap-2 border border-white/15 bg-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-white/12 hover:border-white/30"
                   >
-                    Idee einreichen
+                    {language === 'FR' ? 'Soumettre' : language === 'IT' ? 'Invia idea' : language === 'EN' ? 'Submit idea' : 'Idee einreichen'}
                     <ArrowRight size={14} />
                   </a>
                 </div>
@@ -8764,27 +8781,42 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FDFCFB]/50 dark:bg-[#1A1A18]/50 transition-colors">
+            <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-[#FDFCFB]/50 dark:bg-[#1A1A18]/50 transition-colors">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] p-4 text-sm font-light leading-relaxed relative group ${
-                    m.role === 'user' ? 'bg-[#004225] text-white' : 'bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-[#1A1A18] dark:text-[#FAFAF8]'
-                  }`}>
-                    {m.content}
-                    {m.role === 'ai' && (
-                      <div className="absolute -bottom-5 left-0 text-[8px] text-[#9A9A94] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        {t.ai_notice}
+                  {m.role === 'user' ? (
+                    <div className="max-w-[82%] px-4 py-3 bg-[#004225] text-white text-sm font-light leading-relaxed shadow-sm">
+                      {m.content}
+                    </div>
+                  ) : (
+                    <div className="max-w-[90%] group relative">
+                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#004225] via-[#00A854]/60 to-transparent rounded-full" />
+                      <div className="pl-4 pr-4 pt-3 pb-3 bg-gradient-to-br from-white to-[#F2F8F5] dark:from-[#1E2B23] dark:to-[#1A1A18] border border-[#004225]/10 dark:border-[#004225]/20 shadow-[0_2px_20px_-6px_rgba(0,66,37,0.12)]">
+                        <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-[#004225]/10 dark:border-[#004225]/20">
+                          <div className="w-4 h-4 rounded-full bg-[#004225] flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <span className="text-white font-serif text-[9px] leading-none">S</span>
+                          </div>
+                          <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854]">Stella AI</span>
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#059669] shadow-[0_0_6px_rgba(5,150,105,0.5)]" />
+                        </div>
+                        <p className="text-sm font-light leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] whitespace-pre-wrap">{m.content}</p>
+                        <div className="mt-2 text-[8px] text-[#9A9A94] font-medium uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                          {t.ai_notice}
+                        </div>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-white border border-black/5 p-4 flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-[#9A9A94] rounded-full animate-bounce" />
-                    <span className="w-1.5 h-1.5 bg-[#9A9A94] rounded-full animate-bounce [animation-delay:0.2s]" />
-                    <span className="w-1.5 h-1.5 bg-[#9A9A94] rounded-full animate-bounce [animation-delay:0.4s]" />
+                  <div className="relative">
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#004225] via-[#00A854]/60 to-transparent rounded-full" />
+                    <div className="pl-4 pr-5 py-3 bg-gradient-to-br from-white to-[#F2F8F5] dark:from-[#1E2B23] dark:to-[#1A1A18] border border-[#004225]/10 dark:border-[#004225]/20 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 bg-[#004225]/50 rounded-full animate-bounce" />
+                      <span className="w-1.5 h-1.5 bg-[#004225]/50 rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <span className="w-1.5 h-1.5 bg-[#004225]/50 rounded-full animate-bounce [animation-delay:0.4s]" />
+                    </div>
                   </div>
                 </div>
               )}
@@ -9681,7 +9713,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       ? 'Accedi e riprendi la tua prossima candidatura esattamente da dove avevi lasciato.'
                       : language === 'EN'
                       ? 'Sign in and continue your next application exactly where you left off.'
-                      : 'Melde dich an und setze deine naechste Bewerbung genau dort fort, wo du aufgehört hast.')
+                      : 'Melde dich an und setze deine nächste Bewerbung genau dort fort, wo du aufgehört hast.')
                     : (language === 'FR'
                       ? 'Créez votre compte et transformez votre CV en candidature suisse de haut niveau.'
                       : language === 'IT'
