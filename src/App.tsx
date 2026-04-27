@@ -964,6 +964,7 @@ function StellifyApp() {
   const [user, setUser] = useState<UserData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const authEmailRef = useRef<HTMLInputElement>(null);
+  const justLoggedIn = useRef(false);
   const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -1469,6 +1470,7 @@ function StellifyApp() {
 
   // Search State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [showLoginWelcome, setShowLoginWelcome] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
@@ -1499,6 +1501,13 @@ function StellifyApp() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  useEffect(() => {
+    if (showLoginWelcome) {
+      const timer = setTimeout(() => setShowLoginWelcome(false), 5500);
+      return () => clearTimeout(timer);
+    }
+  }, [showLoginWelcome]);
   const [showSwissNotice, setShowSwissNotice] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -1596,6 +1605,10 @@ function StellifyApp() {
         // Show app immediately with basic auth data — Firestore loads in background
         processUserData(null, firebaseUser);
         setIsAuthReady(true);
+        if (justLoggedIn.current) {
+          justLoggedIn.current = false;
+          setTimeout(() => setShowLoginWelcome(true), 700);
+        }
 
         const userRef = doc(db, 'users', firebaseUser.uid);
 
@@ -1738,28 +1751,66 @@ function StellifyApp() {
     return () => window.removeEventListener('message', handleOAuthMessage);
   }, [user, cvContext, language]);
 
+  // Keyword-to-tool mapping for semantic tool discovery
+  const toolKeywordMap: Record<string, string[]> = {
+    'cv-analysis': ['cv', 'lebenslauf', 'analyse', 'scan', 'prüfen', 'analysieren', 'resume', 'analyse cv', 'check cv'],
+    'cv-optimizer': ['optimieren', 'optimize', 'verbessern', 'improve', 'abschnitt', 'section'],
+    'cv-gen': ['erstellen', 'generieren', 'schreiben', 'write', 'cv erstell', 'lebenslauf erstell', 'cv schreib'],
+    'cv-premium': ['premium', 'professionell', 'professional', 'design cv'],
+    'interview': ['interview', 'vorstellungsgespräch', 'vorbereitung', 'training', 'coaching', 'gespräch', 'fragen'],
+    'salary-calc': ['lohn', 'gehalt', 'salary', 'verdienen', 'verhandeln', 'vergütung', 'worth', 'einkommen'],
+    'ats-sim': ['ats', 'bewerbungssystem', 'keywords', 'algorithmus', 'tracking system'],
+    'zeugnis': ['zeugnis', 'arbeitszeugnis', 'certificate', 'referenz', 'reference', 'zwischenzeugnis'],
+    'skill-gap': ['skills', 'fähigkeiten', 'gap', 'lücke', 'kompetenzen', 'qualifikationen', 'weiterbildung'],
+    'tracker': ['bewerbung', 'application', 'tracker', 'status', 'verfolgen', 'übersicht', 'bewerb'],
+    'career-roadmap': ['karriere', 'career', 'roadmap', 'plan', 'strategie', 'ziel', 'goal', 'zukunft'],
+    'matching': ['stellen', 'jobs', 'stelle', 'arbeit', 'matching', 'passend', 'suchen', 'suche', 'offene stellen', 'job suche', 'stellenangebot'],
+    'lehrstellen': ['lehrstelle', 'ausbildung', 'apprenticeship', 'lehrling', 'lehre', 'lehrberuf'],
+    'berufseinstieg': ['einstieg', 'erster job', 'berufsstart', 'neu', 'first job', 'einsteigen'],
+    'erfahrung-plus': ['50+', 'ü50', 'senior', 'erfahrung', 'älter', 'over 50'],
+    'wiedereinstieg': ['wiedereinstieg', 'comeback', 'rückkehr', 'pause', 'elternzeit', 'karenz'],
+    'linkedin-job': ['linkedin', 'netzwerk', 'network', 'verbindung', 'social'],
+    'karriere-checkup': ['checkup', 'fortschritt', 'status check', 'überblick', 'progress'],
+  };
+
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
-      const filteredSearchData = searchData.filter(item => 
-        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const q = searchQuery.toLowerCase();
 
-      const filteredTools = tools.filter(tool => 
-        tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        tool.desc.toLowerCase().includes(searchQuery.toLowerCase())
+      // Match tools by keyword map (semantic discovery)
+      const keywordMatchedIds = new Set<string>();
+      Object.entries(toolKeywordMap).forEach(([toolId, keywords]) => {
+        if (keywords.some(kw => q.includes(kw) || kw.includes(q))) {
+          keywordMatchedIds.add(toolId);
+        }
+      });
+
+      // Match tools by title/desc + keyword map — tools are primary results
+      const filteredTools = tools.filter(tool =>
+        tool.title.toLowerCase().includes(q) ||
+        tool.desc.toLowerCase().includes(q) ||
+        keywordMatchedIds.has(tool.id)
       ).map(tool => ({
         id: tool.id,
         title: tool.title,
         content: tool.desc,
         category: 'Tool',
-        type: 'tool'
+        type: 'tool',
+        badge: tool.badge,
+        toolType: tool.type,
       }));
 
-      const filteredFaqs = faqs.filter(faq => 
-        faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        faq.a.toLowerCase().includes(searchQuery.toLowerCase())
+      // Secondary: Career tips from searchData
+      const filteredSearchData = searchData.filter(item =>
+        item.title.toLowerCase().includes(q) ||
+        item.content.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q)
+      );
+
+      // Secondary: FAQs
+      const filteredFaqs = faqs.filter(faq =>
+        faq.q.toLowerCase().includes(q) ||
+        faq.a.toLowerCase().includes(q)
       ).map((faq, index) => ({
         id: `faq-${index}`,
         title: faq.q,
@@ -1768,26 +1819,12 @@ function StellifyApp() {
         type: 'faq'
       }));
 
-      const filteredJobs = sampleJobs.filter(job => 
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ).map(job => ({
-        id: job.id,
-        title: job.title,
-        content: `${job.company} • ${job.location} • ${job.category}`,
-        category: language === 'DE' ? 'Job' : 'Job',
-        type: 'job'
-      }));
-
       const userResult = user && (
-        user.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        'profil'.includes(searchQuery.toLowerCase()) ||
-        'meine daten'.includes(searchQuery.toLowerCase()) ||
-        'cv'.includes(searchQuery.toLowerCase()) ||
-        'lebenslauf'.includes(searchQuery.toLowerCase())
+        user.firstName.toLowerCase().includes(q) ||
+        'profil'.includes(q) ||
+        'meine daten'.includes(q) ||
+        'cv'.includes(q) ||
+        'lebenslauf'.includes(q)
       ) ? [{
         id: 'user-profile',
         title: `${user.firstName} (Dein Profil)`,
@@ -1796,7 +1833,8 @@ function StellifyApp() {
         type: 'profile'
       }] : [];
 
-      const results = [...userResult, ...filteredSearchData, ...filteredTools, ...filteredFaqs, ...filteredJobs];
+      // Tools first (discovery-first), then tips, then FAQs — no direct job listings
+      const results = [...userResult, ...filteredTools, ...filteredSearchData, ...filteredFaqs];
       setSearchResults(results);
       setSelectedSearchIndex(results.length > 0 ? 0 : -1);
     } else {
@@ -2087,6 +2125,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
     try {
       if (authTab === 'login') {
+        justLoggedIn.current = true;
         await signInWithEmailAndPassword(auth, email, password);
       } else {
         if (password !== confirmPassword) {
@@ -2239,6 +2278,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setAuthError('');
     setIsAuthLoading(true);
     try {
+      justLoggedIn.current = true;
       await signInWithPopup(auth, new GoogleAuthProvider());
       setIsAuthModalOpen(false);
     } catch (err: any) {
@@ -3691,6 +3731,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const translations: Record<string, any> = {
     DE: {
       welcome: "Willkommen zurück,",
+      welcome_modal_subtitle: "Was möchtest du heute erreichen?",
+      welcome_modal_quickstart: "Schnellstart",
+      welcome_modal_dismiss: "Weiter zum Dashboard",
+      search_label_tool: "Tools & Möglichkeiten entdecken...",
       stella_greeting: "Grüezi, {name}! Ich bin Stella, deine KI-Karriere-Assistentin. Wie kann ich dir heute helfen?",
       drag_cv_here: "Lebenslauf (CV) hierher ziehen oder klicken",
       drop_file_here: "Datei hier loslassen",
@@ -4263,6 +4307,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     },
     FR: {
       welcome: "Bon retour,",
+      welcome_modal_subtitle: "Que veux-tu accomplir aujourd'hui ?",
+      welcome_modal_quickstart: "Démarrage rapide",
+      welcome_modal_dismiss: "Aller au tableau de bord",
+      search_label_tool: "Découvrir les outils & possibilités...",
       stella_greeting: "Salut, {name}! Je suis Stella, votre assistante de carrière IA. Comment puis-je vous aider aujourd'hui?",
       drag_cv_here: "Glissez votre CV ici ou cliquez",
       drop_file_here: "Relâchez le fichier ici",
@@ -4715,6 +4763,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     },
     IT: {
       welcome: "Bentornato,",
+      welcome_modal_subtitle: "Cosa vuoi raggiungere oggi?",
+      welcome_modal_quickstart: "Avvio rapido",
+      welcome_modal_dismiss: "Vai alla dashboard",
+      search_label_tool: "Scopri strumenti & possibilità...",
       stella_greeting: "Ciao, {name}! Sono Stella, la tua assistente di carriera AI. Come posso aiutarti oggi?",
       drag_cv_here: "Trascina il CV qui o clicca",
       drop_file_here: "Rilascia il file qui",
@@ -5167,6 +5219,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     },
     EN: {
       welcome: "Welcome back,",
+      welcome_modal_subtitle: "What do you want to achieve today?",
+      welcome_modal_quickstart: "Quick Start",
+      welcome_modal_dismiss: "Go to Dashboard",
+      search_label_tool: "Discover tools & opportunities...",
       stella_greeting: "Hello, {name}! I'm Stella, your AI career assistant. How can I help you today?",
       drag_cv_here: "Drag CV here or click",
       drop_file_here: "Drop file here",
@@ -8287,6 +8343,134 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <ArrowLeft size={18} className="-rotate-90" />
       </button>
 
+      {/* --- LOGIN WELCOME MODAL --- */}
+      <AnimatePresence>
+        {showLoginWelcome && user && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowLoginWelcome(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, y: 32, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+              className="relative z-10 w-full max-w-lg bg-white dark:bg-[#1A1A18] shadow-2xl overflow-hidden"
+            >
+              {/* Progress bar auto-dismiss */}
+              <motion.div
+                initial={{ width: '100%' }}
+                animate={{ width: '0%' }}
+                transition={{ duration: 5.5, ease: 'linear' }}
+                className="absolute top-0 left-0 h-0.5 bg-[#004225]"
+              />
+
+              {/* Header */}
+              <div className="px-8 pt-10 pb-6 border-b border-black/5 dark:border-white/5">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] mb-2">
+                      {t.welcome}
+                    </p>
+                    <h2 className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">
+                      {user.firstName}
+                    </h2>
+                    <p className="mt-1 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">
+                      {t.welcome_modal_subtitle}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowLoginWelcome(false)}
+                    className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] mt-1"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Tool suggestions */}
+              <div className="px-8 py-6">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] mb-4">
+                  {t.welcome_modal_quickstart}
+                </p>
+                <div className="space-y-2">
+                  {(user.role === 'unlimited'
+                    ? [
+                        { id: 'career-roadmap', icon: <Compass size={16} />, badge: 'Ultimate' },
+                        { id: 'cv-premium', icon: <Sparkles size={16} />, badge: 'Ultimate' },
+                        { id: 'matching', icon: <Search size={16} />, badge: 'Ultimate' },
+                      ]
+                    : user.role === 'pro'
+                    ? [
+                        { id: 'cv-analysis', icon: <Search size={16} />, badge: 'Pro' },
+                        { id: 'salary-calc', icon: <Coins size={16} />, badge: 'Pro' },
+                        { id: 'skill-gap', icon: <Target size={16} />, badge: 'Pro' },
+                      ]
+                    : user.cvContext
+                    ? [
+                        { id: 'cv-analysis', icon: <Search size={16} />, badge: 'Pro' },
+                        { id: 'interview', icon: <Mic size={16} />, badge: 'Gratis' },
+                        { id: 'salary-calc', icon: <Coins size={16} />, badge: 'Pro' },
+                      ]
+                    : [
+                        { id: 'cv-gen', icon: <Sparkles size={16} />, badge: 'Gratis' },
+                        { id: 'interview', icon: <Mic size={16} />, badge: 'Gratis' },
+                        { id: 'salary-calc', icon: <Coins size={16} />, badge: 'Pro' },
+                      ]
+                  ).map((item) => {
+                    const tool = tools.find(tl => tl.id === item.id);
+                    if (!tool) return null;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => { handleToolClick(item.id); setShowLoginWelcome(false); }}
+                        className="w-full flex items-center gap-4 p-4 bg-black/3 dark:bg-white/3 hover:bg-[#004225]/5 dark:hover:bg-[#004225]/20 border border-transparent hover:border-[#004225]/20 transition-all group text-left"
+                      >
+                        <div className="w-9 h-9 bg-[#004225]/8 dark:bg-[#004225]/20 flex items-center justify-center text-[#004225] dark:text-[#00C060] flex-shrink-0 group-hover:scale-110 transition-transform rounded-sm">
+                          {item.icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00C060] transition-colors">
+                              {tool.title}
+                            </span>
+                            <span className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm ${
+                              item.badge === 'Gratis' ? 'bg-[#004225]/10 text-[#004225]' :
+                              item.badge === 'Pro' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                              'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                            }`}>
+                              {item.badge}
+                            </span>
+                          </div>
+                          <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5 line-clamp-1">
+                            {tool.desc}
+                          </p>
+                        </div>
+                        <ChevronRight size={16} className="text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00C060] transition-colors flex-shrink-0" />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="px-8 pb-8">
+                <button
+                  onClick={() => setShowLoginWelcome(false)}
+                  className="w-full py-3 bg-[#004225] text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-colors"
+                >
+                  {t.welcome_modal_dismiss}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* --- SEARCH OVERLAY --- */}
       <AnimatePresence>
         {isSearchOpen && (
@@ -8309,7 +8493,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <input 
                   autoFocus
                   type="text" 
-                  placeholder={t.search_label}
+                  placeholder={t.search_label_tool || t.search_label}
                   className="flex-1 text-xl font-serif outline-none bg-transparent text-[#1A1A18] dark:text-[#FAFAF8]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -8365,34 +8549,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="py-8 px-4">
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_popular}</h5>
                     <div className="flex flex-wrap gap-2 mb-8">
-                      {['Software', 'Zürich', 'Lohn', 'CV Tipps', 'Interview'].map(tag => (
+                      {[
+                        { label: language === 'FR' ? 'CV & Curriculum' : language === 'IT' ? 'CV & Curriculum' : language === 'EN' ? 'CV & Resume' : 'Lebenslauf & CV', query: 'lebenslauf' },
+                        { label: language === 'FR' ? 'Recherche d\'emploi' : language === 'IT' ? 'Ricerca lavoro' : language === 'EN' ? 'Job Search' : 'Stellensuche', query: 'stellen' },
+                        { label: language === 'FR' ? 'Salaire' : language === 'IT' ? 'Stipendio' : language === 'EN' ? 'Salary' : 'Lohn & Gehalt', query: 'lohn' },
+                        { label: language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview', query: 'interview' },
+                        { label: language === 'FR' ? 'Plan de carrière' : language === 'IT' ? 'Piano carriera' : language === 'EN' ? 'Career Plan' : 'Karriereplan', query: 'karriere' },
+                      ].map(tag => (
                         <button
-                          key={tag}
-                          onClick={() => setSearchQuery(tag)}
+                          key={tag.query}
+                          onClick={() => setSearchQuery(tag.query)}
                           className="px-3 py-1.5 bg-black/5 dark:bg-white/5 text-[11px] font-medium text-[#5C5C58] dark:text-[#FAFAF8] hover:bg-[#004225] hover:text-white transition-all rounded-md"
                         >
-                          {tag}
+                          {tag.label}
                         </button>
                       ))}
                       <button
-                        onClick={() => {
-                          setIsSearchOpen(false);
-                          navigate('jobs');
-                          setJobFilters({ keyword: '', location: '', industry: 'Lehrstellen' });
-                        }}
+                        onClick={() => setSearchQuery('lehrstelle')}
                         className="px-3 py-1.5 bg-[#004225] text-white text-[11px] font-bold hover:bg-[#00331d] transition-all rounded-md flex items-center gap-1.5"
                       >
-                        🎓 Lehrstellen
+                        🎓 {language === 'FR' ? 'Apprentissage' : language === 'IT' ? 'Apprendistato' : language === 'EN' ? 'Apprenticeship' : 'Lehrstellen'}
                       </button>
                     </div>
 
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_quick}</h5>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { id: 'cv-premium', title: t.tools_data['cv-premium'].title, icon: <Sparkles size={14} /> },
-                        { id: 'salary-calc', title: t.tools_data['salary-calc'].title, icon: <Coins size={14} /> },
-                        { id: 'interview', title: t.tools_data['interview'].title, icon: <Mic size={14} /> },
-                        { id: 'cv-analysis', title: t.tools_data['cv-analysis'].title, icon: <Search size={14} /> }
+                        { id: 'cv-gen', title: t.tools_data['cv-gen'].title, icon: <Sparkles size={14} />, badge: 'Gratis' },
+                        { id: 'salary-calc', title: t.tools_data['salary-calc'].title, icon: <Coins size={14} />, badge: 'Pro' },
+                        { id: 'interview', title: t.tools_data['interview'].title, icon: <Mic size={14} />, badge: 'Gratis' },
+                        { id: 'matching', title: t.tools_data['matching'].title, icon: <Search size={14} />, badge: 'Ultimate' }
                       ].map(action => (
                         <button
                           key={action.id}
@@ -8402,17 +8588,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           }}
                           className="flex items-center gap-3 p-3 bg-black/5 dark:bg-white/5 hover:bg-[#004225]/5 dark:hover:bg-[#004225]/20 border border-transparent hover:border-[#004225]/20 transition-all rounded-lg text-left group"
                         >
-                          <div className="w-8 h-8 bg-white dark:bg-black/20 flex items-center justify-center rounded-full text-[#004225] group-hover:scale-110 transition-transform">
+                          <div className="w-8 h-8 bg-white dark:bg-black/20 flex items-center justify-center rounded-full text-[#004225] group-hover:scale-110 transition-transform flex-shrink-0">
                             {action.icon}
                           </div>
-                          <span className="text-sm font-medium">{action.title}</span>
+                          <div className="min-w-0">
+                            <div className="text-sm font-medium truncate">{action.title}</div>
+                            <span className={`text-[8px] font-bold uppercase tracking-wider ${
+                              action.badge === 'Gratis' ? 'text-[#004225]' :
+                              action.badge === 'Pro' ? 'text-blue-600 dark:text-blue-400' :
+                              'text-amber-600 dark:text-amber-400'
+                            }`}>{action.badge}</span>
+                          </div>
                         </button>
                       ))}
                     </div>
                   </div>
                 ) : searchResults.length > 0 ? (
                   <div className="space-y-6 py-2">
-                    {['profile', 'tool', 'job', 'tip', 'faq'].map(type => {
+                    {['profile', 'tool', 'tip', 'faq'].map(type => {
                       const items = searchResults.filter(item => item.type === type);
                       if (items.length === 0) return null;
                       return (
@@ -8452,19 +8645,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                   }`}
                                 >
                                   <div className="flex justify-between items-start mb-0.5">
-                                    <div className="flex items-center gap-2">
+                                    <div className="flex items-center gap-2 flex-wrap">
                                       <h4 className={`text-sm font-bold transition-colors ${isSelected ? 'text-[#004225] dark:text-[#FAFAF8]' : 'group-hover:text-[#004225]'}`}>{result.title}</h4>
+                                      {result.type === 'tool' && result.badge && (
+                                        <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm bg-[#004225]/8 text-[#004225] dark:bg-[#004225]/30 dark:text-[#00C060]">
+                                          {result.badge}
+                                        </span>
+                                      )}
+                                      {result.type === 'tool' && result.toolType && (
+                                        <span className={`text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm ${
+                                          result.toolType === 'gratis' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' :
+                                          result.toolType === 'pro' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
+                                          'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                                        }`}>
+                                          {result.toolType === 'gratis' ? 'Free' : result.toolType === 'pro' ? 'Pro' : 'Ultimate'}
+                                        </span>
+                                      )}
                                       {isSelected && (
                                         <span className="text-[8px] bg-[#004225] text-white px-1.5 py-0.5 rounded font-bold uppercase tracking-widest animate-pulse">
                                           Enter
                                         </span>
                                       )}
                                     </div>
-                                    {result.location && (
-                                      <span className="text-[10px] text-[#9A9A94] flex items-center gap-1">
-                                        <MapPin size={10} />
-                                        {result.location}
-                                      </span>
+                                    {result.type === 'tool' && (
+                                      <ChevronRight size={14} className={`flex-shrink-0 transition-colors ${isSelected ? 'text-[#004225]' : 'text-[#9A9A94] group-hover:text-[#004225]'}`} />
                                     )}
                                   </div>
                                   <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light line-clamp-1">{result.content}</p>
