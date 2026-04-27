@@ -158,7 +158,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       tag: isFR ? 'VOTRE CV' : isIT ? 'IL TUO CV' : isEN ? 'YOUR CV' : 'DEIN LEBENSLAUF (CV)',
       line1: isFR ? 'Ton CV.' : isIT ? 'Il tuo CV.' : isEN ? 'Your CV.' : 'Dein Lebenslauf (CV).',
       line2: isFR ? 'Perfectionné.' : isIT ? 'Perfezionato.' : isEN ? 'Perfected.' : 'Perfektioniert.',
-      sub: isFR ? 'ATS-optimisé. Design soigné. Résultats immédiats.' : isIT ? 'Ottimizzato ATS. Design curato. Risultati immediati.' : isEN ? 'ATS-optimised. Refined design. Immediate results.' : 'ATS-optimiert. Präzises Design. Sofortige Wirkung.',
+      sub: isFR ? 'ATS-optimisé. Design soigné. Résultats immédiats.' : isIT ? 'Ottimizzato ATS. Design curato. Risultati immediati.' : isEN ? 'ATS-optimised. Refined design. Immediate results.' : 'Recruiter-geprüft. Präzises Design. Sofortige Wirkung.',
       isCta: false,
     },
     {
@@ -210,24 +210,37 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none" style={{ height: 'clamp(32px, 8vh, 72px)', background: '#000' }} />
       <div className="absolute bottom-0 left-0 right-0 z-30 pointer-events-none" style={{ height: 'clamp(32px, 8vh, 72px)', background: '#000' }} />
 
+      {/* DOT GRID */}
+      <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px)', backgroundSize: '46px 46px' }} />
+
+      {/* ATMOSPHERIC ORBS */}
+      <motion.div
+        className="absolute rounded-full pointer-events-none"
+        style={{ width: '65vw', height: '65vw', maxWidth: 900, maxHeight: 900, top: '-25%', left: '-20%', background: 'radial-gradient(circle, rgba(0,100,50,0.32) 0%, transparent 65%)' }}
+        animate={{ x: ['0%', '9%', '-4%', '0%'], y: ['0%', '7%', '-5%', '0%'] }}
+        transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className="absolute rounded-full pointer-events-none"
+        style={{ width: '50vw', height: '50vw', maxWidth: 700, maxHeight: 700, bottom: '-20%', right: '-15%', background: 'radial-gradient(circle, rgba(0,70,35,0.22) 0%, transparent 65%)' }}
+        animate={{ x: ['0%', '-7%', '5%', '0%'], y: ['0%', '-6%', '4%', '0%'] }}
+        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
+      />
+      <motion.div
+        className="absolute rounded-full pointer-events-none"
+        style={{ width: '30vw', height: '30vw', maxWidth: 400, maxHeight: 400, top: '30%', right: '10%', background: 'radial-gradient(circle, rgba(0,130,60,0.12) 0%, transparent 65%)' }}
+        animate={{ x: ['0%', '5%', '-3%', '0%'], y: ['0%', '-8%', '5%', '0%'] }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 8 }}
+      />
+
       {/* AMBIENT LIGHT — shifts per scene */}
       <motion.div
         key={`ambient-${sceneIdx}`}
         className="absolute inset-0 pointer-events-none"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 2 }}
-        style={{ background: 'radial-gradient(ellipse 75% 55% at 48% 52%, rgba(0,80,40,0.45) 0%, transparent 68%)' }}
-      />
-
-      {/* SCAN LINE */}
-      <motion.div
-        key={`scan-${sceneIdx}`}
-        className="absolute left-0 right-0 h-px pointer-events-none z-20"
-        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent)' }}
-        initial={{ top: '8vh' }}
-        animate={{ top: '92vh' }}
-        transition={{ duration: 4.6, ease: 'linear' }}
+        transition={{ duration: 2.5 }}
+        style={{ background: 'radial-gradient(ellipse 60% 50% at 45% 55%, rgba(0,90,45,0.28) 0%, transparent 70%)' }}
       />
 
       {/* CUT FLASH */}
@@ -3869,9 +3882,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_title: "Von Bewerbung bis Interview – dein KI-Karriere-Coach",
       hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch – präzise, diskret und auf den Schweizer Markt zugeschnitten.",
       cta_free: "Kostenlos starten",
-      upload_cv: "Lebenslauf (CV) hochladen",
-      update_cv: "Lebenslauf (CV) aktualisieren",
-      cv_info: "① Lebenslauf (CV) hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
+      upload_cv: "Lebenslauf hochladen",
+      update_cv: "Lebenslauf aktualisieren",
+      cv_info: "① Lebenslauf hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
       dashboard: "Dashboard",
       tools: "Tools",
       pricing: "Preise",
@@ -3936,11 +3949,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Bezahle wie du willst",
       payment_secure: "Sicher via Stripe verarbeitet.",
       how_badge: "Der Prozess",
-      how_desc: "Vom Lebenslauf (CV) bis zur Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
-      how_1_t: "Lebenslauf (CV) hochladen & analysieren",
-      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn nach Schweizer ATS-Standard – in Sekunden.",
+      how_desc: "Vom Lebenslauf bis zur Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
+      how_1_t: "Lebenslauf hochladen & analysieren",
+      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn auf Schweizer Niveau – in Sekunden.",
       how_2_t: "Bewerbung perfektionieren",
-      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
+      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und prüfe, ob Recruiter-Software deinen Lebenslauf findet – alles in Schweizer Hochdeutsch.",
       how_3_t: "Interview bestehen",
       how_3_d: "Trainiere mit dem KI-Interview-Coach: echte Schweizer Fragen, dein persönliches Bewertungsraster und konkrete Formulierungsvorschläge für jede Situation.",
       faq_badge: "Häufige Fragen",
@@ -3980,12 +3993,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Unlimited-Abo. ✨",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
-      onboarding_cv_title: "Lade deinen Lebenslauf (CV) hoch",
+      onboarding_cv_title: "Lade deinen Lebenslauf hoch",
       onboarding_cv_desc: "Lade deinen Lebenslauf hoch, damit Stella dich und deine Erfahrungen besser versteht. So erhältst du personalisierte Tipps.",
       onboarding_chat_title: "Frag Stella",
       onboarding_chat_desc: "Nutze den Stella Chat für Karriereberatung, Interview-Vorbereitung oder um mehr über den Schweizer Arbeitsmarkt zu erfahren.",
       onboarding_tools_title: "Experten-Tools",
-      onboarding_tools_desc: "Nutze unsere spezialisierten Tools für Gehaltschecks, ATS-Optimierung und Marktanalyse.",
+      onboarding_tools_desc: "Nutze unsere spezialisierten Tools für Gehaltschecks, Lebenslauf-Prüfung und Marktanalyse.",
       onboarding_next: "Weiter",
       onboarding_finish: "Loslegen",
       settings_rewatch_tutorial: "Tutorial erneut ansehen",
@@ -4014,7 +4027,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_pro: "Karriere-Profi",
       dashboard_desc: "Dein Copilot Stella ist bereit. Analysiere neue Stellen, optimiere dein Profil oder bereite dich auf dein nächstes Interview vor.",
       dashboard_stat_analyses: "Analysen",
-      dashboard_stat_cv_status: "Lebenslauf (CV)",
+      dashboard_stat_cv_status: "Lebenslauf",
       dashboard_stat_ready: "Bereit",
       dashboard_stat_missing: "Fehlt",
       dashboard_stat_chat: "Stella Chat",
@@ -4051,7 +4064,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       view_all: "Alle ansehen",
       time_just_now: "Gerade eben",
       stella_context_title: "Stella Context",
-      stella_context_cv_ready: "Lebenslauf (CV) analysiert",
+      stella_context_cv_ready: "Lebenslauf analysiert",
       stella_context_no_cv: "Kein Lebenslauf hochgeladen",
       stella_context_focus: "Fokus-Bereiche",
       stella_roadmap: "Deine Roadmap",
@@ -4192,7 +4205,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       comparison_bad_items: [
         "Leeres Chatfenster, du weisst nicht was eingeben",
         "Kein Schweizer Format/Standard (ss vs ß)",
-        "Kein ATS-Check – du weisst nicht ob dein CV gelesen wird",
+        "Kein Lebenslauf-Check – du weisst nicht, ob dein Lebenslauf überhaupt gelesen wird",
         "Kein Zeugnis-Decoder – Schweizer Code bleibt ein Rätsel",
         "Kein Job-Matching – du bewirbst dich ins Blaue",
         "5 verschiedene Apps, kein roter Faden"
@@ -4225,7 +4238,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       value_items: [
         "Ein Karriereberater kostet CHF 200–400 / Sitzung",
         "Zeugnis nicht verstanden = falscher Job",
-        "Ein schlechter ATS-Score = CV wird nie gelesen",
+        "Wenn dein Lebenslauf unsichtbar bleibt, bekommst du nie eine Einladung",
         "Eine schlechte Bewerbung = verpasste Stelle",
         "Mit einer besseren Stelle amortisiert sich das Abo sofort",
         "Stellify spart dir 3–5 Std. pro Bewerbung"
@@ -7787,7 +7800,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         ? <>Se hai un'idea concreta per uno spot, una campagna o una storia di conversione, inviala a{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
                         : language === 'EN'
                         ? <>If you have a solid idea for an ad spot, campaign or conversion story, send it to{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
-                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot, eine Kampagne oder Conversion-Story hast, sende sie an{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot oder eine Kampagne hast, sende sie an{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
                       }
                     </p>
                   </div>
@@ -8406,17 +8419,22 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{t.features}</h4>
               <ul className="space-y-4 text-sm font-light">
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'cv-optimizer') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">CV Optimizer</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'ats-sim') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">ATS Simulator</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'salary-calc') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">Salary Check</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'interview') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">Interview Coach</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'cv-optimizer') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Lebenslauf-Optimierer' : 'CV Optimizer'}</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'ats-sim') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Lebenslauf-Check' : 'CV Check'}</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'salary-calc') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Gehaltsrechner' : language === 'FR' ? 'Calculateur salaire' : language === 'IT' ? 'Calcolo stipendio' : 'Salary Check'}</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'interview') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Interview-Coach' : language === 'FR' ? 'Coach entretien' : language === 'IT' ? 'Coach colloquio' : 'Interview Coach'}</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'zeugnis') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Zeugnis-Decoder' : language === 'FR' ? 'Décodeur certificat' : language === 'IT' ? 'Decoder certificato' : 'Certificate Decoder'}</button></li>
+                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'career-roadmap') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Karriere-Roadmap' : language === 'FR' ? 'Feuille de route carrière' : language === 'IT' ? 'Roadmap carriera' : 'Career Roadmap'}</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">Company</h4>
+              <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{language === 'DE' ? 'Unternehmen' : language === 'FR' ? 'Entreprise' : language === 'IT' ? 'Azienda' : 'Company'}</h4>
               <ul className="space-y-4 text-sm font-light">
                 <li><a href="#success" className="hover:text-white transition-colors">{t.success_stories}</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">{t.pricing}</a></li>
+                <li><a href={`mailto:support.stellify@gmail.com?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
+                  {language === 'DE' ? 'Kooperationen' : language === 'FR' ? 'Partenariats' : language === 'IT' ? 'Collaborazioni' : 'Partnerships'}
+                </a></li>
                 <li><a href="mailto:support.stellify@gmail.com" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
               </ul>
             </div>
