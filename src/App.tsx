@@ -137,125 +137,223 @@ const LazyVideo = ({ src, className, ...props }: any) => {
 
 // --- PROMO SEQUENCE COMPONENT ---
 const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t: any, language: string }) => {
-  const [step, setStep] = useState(0);
-  const totalSteps = 5;
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setStep((prev) => (prev + 1) % totalSteps);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, []);
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [isCutting, setIsCutting] = useState(false);
 
   const isFR = language === 'FR';
   const isIT = language === 'IT';
   const isEN = language === 'EN';
 
-  const steps = [
+  const scenes = [
     {
-      title: isFR ? "Précision à chaque ligne." : isIT ? "Precisione in ogni riga." : isEN ? "Precision in every line." : "Präzision in jeder Zeile.",
-      subtitle: isFR ? "Votre co-pilote de carrière suisse." : isIT ? "Il tuo co-pilota di carriera svizzero." : isEN ? "Your Swiss Career Co-Pilot." : "Dein Schweizer Karriere-Copilot.",
-      icon: <Target className="w-16 h-16 text-[#004225]" />,
-      desc: isFR ? "Nous comprenons le marché suisse de l'emploi comme personne d'autre." : isIT ? "Capiamo il mercato del lavoro svizzero come nessun altro." : isEN ? "We understand the Swiss job market like no one else." : "Wir verstehen den Schweizer Arbeitsmarkt wie kein anderer."
+      chapter: '01 — 05',
+      tag: isFR ? 'OUVERTURE' : isIT ? 'APERTURA' : isEN ? 'OPENING' : 'ERÖFFNUNG',
+      line1: isFR ? 'En Suisse.' : isIT ? 'In Svizzera.' : isEN ? 'In Switzerland.' : 'In der Schweiz.',
+      line2: isFR ? 'Chaque mot compte.' : isIT ? 'Ogni parola conta.' : isEN ? 'Every word counts.' : 'Zählt jedes Wort.',
+      sub: isFR ? 'Le marché le plus exigeant d\'Europe.' : isIT ? 'Il mercato più esigente d\'Europa.' : isEN ? 'The most demanding market in Europe.' : 'Der anspruchsvollste Markt Europas.',
+      isCta: false,
     },
     {
-      title: isFR ? "Optimisation de CV 2.0" : isIT ? "Ottimizzazione CV 2.0" : isEN ? "CV Optimisation 2.0" : "CV Optimierung 2.0",
-      subtitle: isFR ? "Sécurisé ATS & design percutant." : isIT ? "ATS-sicuro & design potente." : isEN ? "ATS-proof & design-strong." : "ATS-sicher & Design-stark.",
-      icon: <FileText className="w-16 h-16 text-[#004225]" />,
-      desc: isFR ? "Votre CV ne sera pas seulement lu, il sera admiré." : isIT ? "Il tuo CV non sarà solo letto, sarà ammirato." : isEN ? "Your CV won't just be read — it will be admired." : "Dein Lebenslauf wird nicht nur gelesen, er wird bewundert."
+      chapter: '02 — 05',
+      tag: isFR ? 'VOTRE CV' : isIT ? 'IL TUO CV' : isEN ? 'YOUR CV' : 'DEIN LEBENSLAUF (CV)',
+      line1: isFR ? 'Ton CV.' : isIT ? 'Il tuo CV.' : isEN ? 'Your CV.' : 'Dein Lebenslauf (CV).',
+      line2: isFR ? 'Perfectionné.' : isIT ? 'Perfezionato.' : isEN ? 'Perfected.' : 'Perfektioniert.',
+      sub: isFR ? 'ATS-optimisé. Design soigné. Résultats immédiats.' : isIT ? 'Ottimizzato ATS. Design curato. Risultati immediati.' : isEN ? 'ATS-optimised. Refined design. Immediate results.' : 'ATS-optimiert. Präzises Design. Sofortige Wirkung.',
+      isCta: false,
     },
     {
-      title: "Stella AI",
-      subtitle: isFR ? "Votre conseillère personnelle." : isIT ? "La tua consulente personale." : isEN ? "Your personal advisor." : "Deine persönliche Beraterin.",
-      icon: <Sparkles className="w-16 h-16 text-[#004225]" />,
-      desc: isFR ? "Feedback en temps réel et stratégies pour votre succès." : isIT ? "Feedback in tempo reale e strategie per il tuo successo." : isEN ? "Real-time feedback and strategies for your success." : "Echtzeit-Feedback und Strategien für deinen Erfolg."
+      chapter: '03 — 05',
+      tag: isFR ? 'L\'ENTRETIEN' : isIT ? 'IL COLLOQUIO' : isEN ? 'THE INTERVIEW' : 'DAS INTERVIEW',
+      line1: isFR ? 'L\'entretien.' : isIT ? 'Il colloquio.' : isEN ? 'The interview.' : 'Das Interview.',
+      line2: isFR ? 'Maîtrisé.' : isIT ? 'Superato.' : isEN ? 'Mastered.' : 'Gemeistert.',
+      sub: isFR ? 'Questions réelles. Feedback en temps réel. Confiance totale.' : isIT ? 'Domande reali. Feedback istantaneo. Fiducia totale.' : isEN ? 'Real questions. Real-time feedback. Total confidence.' : 'Echte Fragen. Echtzeit-Feedback. Totales Vertrauen.',
+      isCta: false,
     },
     {
-      title: isFR ? "Analyse salariale" : isIT ? "Analisi stipendio" : isEN ? "Salary Insights" : "Lohn-Check & Insights",
-      subtitle: isFR ? "Sachez ce que vous valez." : isIT ? "Sai quanto vali." : isEN ? "Know your worth." : "Wisse, was du wert bist.",
-      icon: <Coins className="w-16 h-16 text-[#004225]" />,
-      desc: isFR ? "Des données transparentes pour votre prochaine négociation." : isIT ? "Dati trasparenti per la tua prossima negoziazione." : isEN ? "Transparent data for your next salary negotiation." : "Transparente Daten für deine nächste Verhandlung."
+      chapter: '04 — 05',
+      tag: 'STELLA AI',
+      line1: 'Stella AI.',
+      line2: isFR ? 'Ton avantage.' : isIT ? 'Il tuo vantaggio.' : isEN ? 'Your edge.' : 'Dein Vorteil.',
+      sub: isFR ? 'L\'IA qui comprend le marché suisse.' : isIT ? 'L\'IA che capisce il mercato svizzero.' : isEN ? 'The AI that understands the Swiss market.' : 'Die KI, die den Schweizer Markt versteht.',
+      isCta: false,
     },
     {
-      title: isFR ? "Prêt pour la réussite ?" : isIT ? "Pronto per il successo?" : isEN ? "Ready for the next level?" : "Bereit für den Aufstieg?",
-      subtitle: isFR ? "Stellify est votre partenaire." : isIT ? "Stellify è il tuo partner." : isEN ? "Stellify is your partner." : "Stellify ist dein Partner.",
-      icon: <Rocket className="w-16 h-16 text-[#004225]" />,
-      desc: isFR ? "Commencez maintenant et décrochez le job de vos rêves." : isIT ? "Inizia ora e ottieni il lavoro dei tuoi sogni." : isEN ? "Start now and land your dream job." : "Starte jetzt und sichere dir deinen Traumjob."
-    }
+      chapter: '05 — 05',
+      tag: isFR ? 'FIN' : isIT ? 'FINE' : isEN ? 'FIN' : 'ENDE',
+      line1: 'Stellify.',
+      line2: isFR ? 'Commence maintenant.' : isIT ? 'Inizia ora.' : isEN ? 'Start now.' : 'Jetzt starten.',
+      sub: isFR ? 'Gratuit · Sans risque · Résultats réels.' : isIT ? 'Gratuito · Senza rischi · Risultati reali.' : isEN ? 'Free · No risk · Real results.' : 'Kostenlos · Ohne Risiko · Echte Ergebnisse.',
+      isCta: true,
+    },
   ];
 
+  const totalScenes = scenes.length;
+
+  useEffect(() => {
+    if (sceneIdx >= totalScenes - 1) return;
+    const timer = setTimeout(() => {
+      setIsCutting(true);
+      setTimeout(() => {
+        setSceneIdx(s => s + 1);
+        setIsCutting(false);
+      }, 250);
+    }, 4600);
+    return () => clearTimeout(timer);
+  }, [sceneIdx]);
+
+  const scene = scenes[sceneIdx];
+
   return (
-    <div className="flex flex-col items-center text-center">
+    <div className="relative w-full h-full flex flex-col items-center justify-center select-none overflow-hidden">
+
+      {/* CINEMATIC LETTERBOX BARS */}
+      <div className="absolute top-0 left-0 right-0 z-30 pointer-events-none" style={{ height: 'clamp(32px, 8vh, 72px)', background: '#000' }} />
+      <div className="absolute bottom-0 left-0 right-0 z-30 pointer-events-none" style={{ height: 'clamp(32px, 8vh, 72px)', background: '#000' }} />
+
+      {/* AMBIENT LIGHT — shifts per scene */}
+      <motion.div
+        key={`ambient-${sceneIdx}`}
+        className="absolute inset-0 pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 2 }}
+        style={{ background: 'radial-gradient(ellipse 75% 55% at 48% 52%, rgba(0,80,40,0.45) 0%, transparent 68%)' }}
+      />
+
+      {/* SCAN LINE */}
+      <motion.div
+        key={`scan-${sceneIdx}`}
+        className="absolute left-0 right-0 h-px pointer-events-none z-20"
+        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 30%, rgba(255,255,255,0.06) 70%, transparent)' }}
+        initial={{ top: '8vh' }}
+        animate={{ top: '92vh' }}
+        transition={{ duration: 4.6, ease: 'linear' }}
+      />
+
+      {/* CUT FLASH */}
+      <AnimatePresence>
+        {isCutting && (
+          <motion.div
+            className="absolute inset-0 z-50 pointer-events-none"
+            style={{ background: '#fff' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.07 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.12 }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* CHAPTER + BRAND — top bar */}
+      <div className="absolute left-0 right-0 z-20 flex items-center justify-between px-8 md:px-14" style={{ top: 'clamp(10px, 2.5vh, 24px)' }}>
+        <motion.span
+          key={`ch-${sceneIdx}`}
+          className="text-[9px] font-bold uppercase tracking-[0.45em] text-white/25"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.7 }}
+        >
+          {scene.chapter}
+        </motion.span>
+        <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-white/15">A STELLIFY FILM</span>
+        <button
+          onClick={onComplete}
+          className="flex items-center gap-2 group text-white/30 hover:text-white/80 transition-colors"
+        >
+          <span className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">{t.close}</span>
+          <div className="w-8 h-8 border border-white/15 flex items-center justify-center group-hover:border-white/50 transition-colors">
+            <X size={14} />
+          </div>
+        </button>
+      </div>
+
+      {/* MAIN SCENE CONTENT */}
       <AnimatePresence mode="wait">
         <motion.div
-          key={step}
-          initial={{ opacity: 0, y: 40, filter: 'blur(10px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -40, filter: 'blur(10px)' }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="space-y-12"
+          key={sceneIdx}
+          className="relative z-10 w-full px-8 md:px-14 lg:px-20 space-y-6 md:space-y-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.45 }}
         >
-          <div className="flex justify-center">
-            <div className="w-32 h-32 rounded-full bg-white/5 border border-white/10 flex items-center justify-center relative shadow-[0_0_50px_rgba(0,66,37,0.3)]">
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                {steps[step].icon}
-              </motion.div>
-              <div className="absolute inset-0 rounded-full border border-[#004225]/20 animate-ping" />
-            </div>
-          </div>
+          {/* Tag line */}
+          <motion.div
+            className="flex items-center gap-4"
+            initial={{ opacity: 0, x: -16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+          >
+            <div className="h-px w-10 bg-[#00A854]/50" />
+            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-[0.45em] text-[#00A854]/65">{scene.tag}</span>
+          </motion.div>
 
-          <div className="space-y-6 bg-black/20 backdrop-blur-md p-8 md:p-16 border border-white/5 shadow-2xl">
-            <motion.h2 
-              className="text-5xl lg:text-7xl font-serif text-white leading-tight tracking-tight"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+          {/* Line 1 — big serif */}
+          <motion.h2
+            className="font-serif text-white leading-none tracking-tight"
+            style={{ fontSize: 'clamp(3rem, 9vw, 7.5rem)' }}
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {scene.line1}
+          </motion.h2>
+
+          {/* Line 2 — italic serif, green tint */}
+          <motion.h3
+            className="font-serif italic text-[#C6F6D5] leading-none tracking-tight"
+            style={{ fontSize: 'clamp(2.4rem, 7vw, 6rem)' }}
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {scene.line2}
+          </motion.h3>
+
+          {/* Sub-line */}
+          <motion.p
+            className="text-sm md:text-base text-white/38 font-light tracking-wide max-w-xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.9, delay: 0.72 }}
+          >
+            {scene.sub}
+          </motion.p>
+
+          {/* CTA — only on last scene */}
+          {scene.isCta && (
+            <motion.button
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.1 }}
+              onClick={onComplete}
+              className="mt-2 inline-flex items-center gap-3 px-10 py-4 bg-white text-black text-[11px] font-bold uppercase tracking-[0.35em] hover:bg-[#D1FAE5] transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)]"
             >
-              {steps[step].title}
-            </motion.h2>
-            <motion.p 
-              className="text-2xl lg:text-3xl text-[#00C060] font-light italic"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              {steps[step].subtitle}
-            </motion.p>
-            <motion.p 
-              className="text-white/70 text-lg max-w-2xl mx-auto font-light"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              {steps[step].desc}
-            </motion.p>
-          </div>
+              {isFR ? 'Commencer gratuitement' : isIT ? 'Inizia gratuitamente' : isEN ? 'Start for free' : 'Kostenlos starten'}
+              <ArrowRight size={13} />
+            </motion.button>
+          )}
         </motion.div>
       </AnimatePresence>
 
-      {/* Progress Indicators */}
-      <div className="mt-24 flex gap-3 justify-center w-full">
-        {steps.map((_, i) => (
-          <div 
-            key={i}
-            className={`h-0.5 transition-all duration-500 rounded-full ${i === step ? 'w-12 bg-white' : 'w-4 bg-white/25'}`}
-          />
-        ))}
+      {/* PROGRESS TIMELINE — just above bottom bar */}
+      <div className="absolute left-0 right-0 z-30 px-8 md:px-14" style={{ bottom: 'clamp(34px, 8.5vh, 76px)' }}>
+        <div className="flex gap-1.5">
+          {scenes.map((_, i) => (
+            <div key={i} className="relative flex-1 h-[1px] bg-white/10 overflow-hidden">
+              {i < sceneIdx && <div className="absolute inset-0 bg-white/35" />}
+              {i === sceneIdx && (
+                <motion.div
+                  className="absolute top-0 left-0 bottom-0 bg-white/65"
+                  initial={{ width: '0%' }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: 4.6, ease: 'linear' }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-
-      <motion.button
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        onClick={onComplete}
-        className="mt-16 px-12 py-5 bg-white text-black text-xs font-bold uppercase tracking-[0.3em] hover:bg-[#004225] hover:text-white transition-all"
-      >
-        Jetzt Starten
-      </motion.button>
     </div>
   );
 };
@@ -457,7 +555,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
                 <ul className="list-disc pl-5 space-y-2 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Kontodaten:</strong> Vorname, E-Mail-Adresse (bei Registrierung)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur KI-Verarbeitung, nicht dauerhaft gespeichert)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Lebenslauf-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur KI-Verarbeitung, nicht dauerhaft gespeichert)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Nutzungsdaten:</strong> Anzahl Tool-Nutzungen, Chat-Anfragen, Datum des letzten Resets</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zahlungsdaten:</strong> Werden ausschliesslich durch Stripe Inc. verarbeitet.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal gespeichert)</li>
@@ -470,7 +568,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Authentifizierung und Kontoverwaltung</li>
                   <li>Abrechnung und Zahlungsabwicklung (via Stripe)</li>
                   <li>Einhaltung gesetzlicher Pflichten</li>
-                  <li>KI-gestützte Karriereberatung (Verarbeitung des CV-Textes durch einen externen KI-Dienst)</li>
+                  <li>KI-gestützte Karriereberatung (Verarbeitung des Lebenslauf-Textes durch einen externen KI-Dienst)</li>
                 </ul>
               </Section>
               <Section title="4. Rechtsgrundlage der Bearbeitung">
@@ -483,7 +581,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Weitergabe an Dritte">
                 <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und CV-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
+                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -494,7 +592,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p><p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv.</p></div>
                 </div>
               </Section>
-              <Section title="7. Speicherdauer"><ul className="list-disc pl-5 space-y-2"><li>Kontodaten: bis zur Kontolöschung</li><li>CV-Text: nicht dauerhaft gespeichert</li><li>Zahlungsbelege: 10 Jahre (OR Art. 958f)</li><li>Nutzungsstatistiken: monatlich zurückgesetzt</li></ul></Section>
+              <Section title="7. Speicherdauer"><ul className="list-disc pl-5 space-y-2"><li>Kontodaten: bis zur Kontolöschung</li><li>Lebenslauf-Text: nicht dauerhaft gespeichert</li><li>Zahlungsbelege: 10 Jahre (OR Art. 958f)</li><li>Nutzungsstatistiken: monatlich zurückgesetzt</li></ul></Section>
               <Section title="8. Deine Rechte">
                 <p>Du hast nach Schweizer DSG und DSGVO folgende Rechte:</p>
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -2025,7 +2123,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         body: JSON.stringify({ prompt, model })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'CV-Analyse fehlgeschlagen');
+      if (!res.ok) throw new Error(data.error || 'Lebenslauf-Analyse fehlgeschlagen');
       const jsonMatch = (data.text || '').match(/\{[\s\S]*\}/);
       if (!jsonMatch) return;
       const analysisData = JSON.parse(jsonMatch[0]);
@@ -2097,7 +2195,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe dein CV "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
+        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe deinen Lebenslauf "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
       }]);
       
       if (!isStellaOpen) setIsStellaOpen(true);
@@ -2105,7 +2203,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       console.error("PDF extraction error:", error);
       setMessages(prev => [...prev, {
         role: 'ai',
-        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines CVs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
+        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines Lebenslaufs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
       }]);
     } finally {
       setIsUploading(false);
@@ -3842,7 +3940,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       how_1_t: "Lebenslauf (CV) hochladen & analysieren",
       how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn nach Schweizer ATS-Standard – in Sekunden.",
       how_2_t: "Bewerbung perfektionieren",
-      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jede CV-Sektion und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
+      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und simuliere den ATS-Check – alles in Schweizer Hochdeutsch.",
       how_3_t: "Interview bestehen",
       how_3_d: "Trainiere mit dem KI-Interview-Coach: echte Schweizer Fragen, dein persönliches Bewertungsraster und konkrete Formulierungsvorschläge für jede Situation.",
       faq_badge: "Häufige Fragen",
@@ -4133,8 +4231,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Stellify spart dir 3–5 Std. pro Bewerbung"
       ],
       tools_data: {
-        'cv-optimizer': { 
-          title: 'CV-Optimierer', 
+        'cv-optimizer': {
+          title: 'Lebenslauf-Optimierer',
           desc: 'Analysiert deinen Lebenslauf auf Schweizer Standards & optimiert Formulierungen.', 
           input_label: 'Welche Sektion optimieren?', 
           input_placeholder: 'z.B. Berufserfahrung, Kurzprofil...',
@@ -4181,8 +4279,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'z.B. Senior Data Scientist',
           tutorial: 'Beispiel: Ziel "Senior Data Scientist". Analyse zeigt Lücken in "Cloud Architecture" und "Leadership Experience" im Vergleich zu Schweizer Top-Arbeitgebern.'
         },
-        'cv-analysis': { 
-          title: 'CV-Analyse', 
+        'cv-analysis': {
+          title: 'Lebenslauf-Analyse',
           desc: 'Tiefgehende Analyse deines Lebenslaufs auf Keywords, Branchen-Fit und Verbesserungspotential.',
           tutorial: 'Beispiel: Dein CV hat einen Swiss-Readiness Score von 75%. Wir empfehlen die Ergänzung deiner Arbeitsbewilligung (C-Bewilligung) und die GERS-Sprachniveaus.'
         },
@@ -4261,8 +4359,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'cv-premium': { 
           title: 'Premium CV-Rewrite', 
           desc: 'Vollständige Optimierung deines Lebenslaufs auf Schweizer Premium-Standard (kein ß, Schweizer Präzision).', 
-          input_label: 'Dein aktueller CV-Text', 
-          input_placeholder: 'Kopiere hier deinen gesamten CV-Inhalt hinein...',
+          input_label: 'Dein aktueller Lebenslauf-Text',
+          input_placeholder: 'Kopiere hier deinen gesamten Lebenslauf hierein...',
           tutorial: 'Beispiel: Komplette Neuerstellung. Wir entfernen das "ß", passen die Datumsformate an und optimieren das Layout auf Schweizer Eleganz.'
         },
         'career-roadmap': { 
@@ -5948,7 +6046,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ? ['Analyse CV', 'Coach Entretien', 'Lettre de motivation', 'Calculateur salaire', 'CV Premium', 'Décodeur certificat', 'Import LinkedIn', 'Feuille de route carrière']
       : language === 'IT'
       ? ['Analisi CV', 'Coach Colloquio', 'Lettera motivazione', 'Calcolo stipendio', 'CV Premium', 'Decoder certificato', 'Import LinkedIn', 'Roadmap carriera']
-      : ['CV-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'CV Premium Rewrite', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
+      : ['Lebenslauf-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'Lebenslauf Premium', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
 
@@ -7679,18 +7777,35 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="max-w-3xl border border-white/10 bg-black/10 px-5 py-5 backdrop-blur-sm">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">Marketing-Ideen</p>
-                    <p className="text-sm text-white/78 font-light leading-relaxed">
-                      Wenn du eine wirklich starke, seriöse Idee für Werbespot, Kampagne oder Conversion-Story hast, sende sie an
-                      {' '}<a href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.
-                      {' '}Geprüft werden nur seriöse, umsetzbare Vorschläge mit echtem Mehrwert.
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">
+                      {language === 'FR' ? 'Idées marketing' : language === 'IT' ? 'Idee di marketing' : language === 'EN' ? 'Marketing Ideas' : 'Marketing-Ideen'}
+                    </p>
+                    <p className="text-sm text-white/70 font-light leading-relaxed">
+                      {language === 'FR'
+                        ? <>Si tu as une idée solide pour un spot, une campagne ou une conversion story, envoie-la à{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : language === 'IT'
+                        ? <>Se hai un'idea concreta per uno spot, una campagna o una storia di conversione, inviala a{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : language === 'EN'
+                        ? <>If you have a solid idea for an ad spot, campaign or conversion story, send it to{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot, eine Kampagne oder Conversion-Story hast, sende sie an{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                      }
                     </p>
                   </div>
                   <a
-                    href="mailto:support.stellify@gmail.com?subject=Stellify%20Marketing-Idee&body=Hallo%20Stellify-Team%2C%0A%0Aich%20habe%20eine%20seri%C3%B6se%20Marketing-Idee%20f%C3%BCr%20euch%3A%0A%0A"
+                    href={`mailto:support.stellify@gmail.com?subject=${
+                      language === 'FR' ? 'Id%C3%A9e%20marketing%20pour%20Stellify'
+                      : language === 'IT' ? 'Idea%20di%20marketing%20per%20Stellify'
+                      : language === 'EN' ? 'Marketing%20Idea%20for%20Stellify'
+                      : 'Marketing-Idee%20f%C3%BCr%20Stellify'
+                    }&body=${
+                      language === 'FR' ? 'Bonjour%20%C3%A9quipe%20Stellify%2C%0A%0AMon%20id%C3%A9e%20%3A%0A%0A'
+                      : language === 'IT' ? 'Ciao%20team%20Stellify%2C%0A%0ALa%20mia%20idea%3A%0A%0A'
+                      : language === 'EN' ? 'Hello%20Stellify%20Team%2C%0A%0AMy%20idea%3A%0A%0A'
+                      : 'Hallo%20Stellify-Team%2C%0A%0AMeine%20Idee%3A%0A%0A'
+                    }`}
                     className="inline-flex shrink-0 items-center gap-2 border border-white/15 bg-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-white/12 hover:border-white/30"
                   >
-                    Idee einreichen
+                    {language === 'FR' ? 'Soumettre' : language === 'IT' ? 'Invia idea' : language === 'EN' ? 'Submit idea' : 'Idee einreichen'}
                     <ArrowRight size={14} />
                   </a>
                 </div>
@@ -8764,27 +8879,42 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#FDFCFB]/50 dark:bg-[#1A1A18]/50 transition-colors">
+            <div className="flex-1 overflow-y-auto p-4 space-y-5 bg-[#FDFCFB]/50 dark:bg-[#1A1A18]/50 transition-colors">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] p-4 text-sm font-light leading-relaxed relative group ${
-                    m.role === 'user' ? 'bg-[#004225] text-white' : 'bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-[#1A1A18] dark:text-[#FAFAF8]'
-                  }`}>
-                    {m.content}
-                    {m.role === 'ai' && (
-                      <div className="absolute -bottom-5 left-0 text-[8px] text-[#9A9A94] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                        {t.ai_notice}
+                  {m.role === 'user' ? (
+                    <div className="max-w-[82%] px-4 py-3 bg-[#004225] text-white text-sm font-light leading-relaxed shadow-sm">
+                      {m.content}
+                    </div>
+                  ) : (
+                    <div className="max-w-[90%] group relative">
+                      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#004225] via-[#00A854]/60 to-transparent rounded-full" />
+                      <div className="pl-4 pr-4 pt-3 pb-3 bg-gradient-to-br from-white to-[#F2F8F5] dark:from-[#1E2B23] dark:to-[#1A1A18] border border-[#004225]/10 dark:border-[#004225]/20 shadow-[0_2px_20px_-6px_rgba(0,66,37,0.12)]">
+                        <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-[#004225]/10 dark:border-[#004225]/20">
+                          <div className="w-4 h-4 rounded-full bg-[#004225] flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <span className="text-white font-serif text-[9px] leading-none">S</span>
+                          </div>
+                          <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854]">Stella AI</span>
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#059669] shadow-[0_0_6px_rgba(5,150,105,0.5)]" />
+                        </div>
+                        <p className="text-sm font-light leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] whitespace-pre-wrap">{m.content}</p>
+                        <div className="mt-2 text-[8px] text-[#9A9A94] font-medium uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                          {t.ai_notice}
+                        </div>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
               {isTyping && (
                 <div className="flex justify-start">
-                  <div className="bg-white border border-black/5 p-4 flex gap-1">
-                    <span className="w-1.5 h-1.5 bg-[#9A9A94] rounded-full animate-bounce" />
-                    <span className="w-1.5 h-1.5 bg-[#9A9A94] rounded-full animate-bounce [animation-delay:0.2s]" />
-                    <span className="w-1.5 h-1.5 bg-[#9A9A94] rounded-full animate-bounce [animation-delay:0.4s]" />
+                  <div className="relative">
+                    <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-[#004225] via-[#00A854]/60 to-transparent rounded-full" />
+                    <div className="pl-4 pr-5 py-3 bg-gradient-to-br from-white to-[#F2F8F5] dark:from-[#1E2B23] dark:to-[#1A1A18] border border-[#004225]/10 dark:border-[#004225]/20 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 bg-[#004225]/50 rounded-full animate-bounce" />
+                      <span className="w-1.5 h-1.5 bg-[#004225]/50 rounded-full animate-bounce [animation-delay:0.2s]" />
+                      <span className="w-1.5 h-1.5 bg-[#004225]/50 rounded-full animate-bounce [animation-delay:0.4s]" />
+                    </div>
                   </div>
                 </div>
               )}
@@ -9681,7 +9811,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       ? 'Accedi e riprendi la tua prossima candidatura esattamente da dove avevi lasciato.'
                       : language === 'EN'
                       ? 'Sign in and continue your next application exactly where you left off.'
-                      : 'Melde dich an und setze deine naechste Bewerbung genau dort fort, wo du aufgehört hast.')
+                      : 'Melde dich an und setze deine nächste Bewerbung genau dort fort, wo du aufgehört hast.')
                     : (language === 'FR'
                       ? 'Créez votre compte et transformez votre CV en candidature suisse de haut niveau.'
                       : language === 'IT'
@@ -10263,53 +10393,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </AnimatePresence>
       <AnimatePresence>
         {isPromoOpen && (
-          <div className="fixed inset-0 z-[500] flex items-center justify-center bg-black/98 backdrop-blur-2xl">
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-[#004225]"
-            >
-              {/* Background Image with Overlay */}
-              <div className="absolute inset-0 z-0">
-                <img 
-                  src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=2070" 
-                  alt="Background"
-                  className="w-full h-full object-cover opacity-20 mix-blend-overlay grayscale"
-                  referrerPolicy="no-referrer"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#004225]/95 via-[#004225]/80 to-[#004225]" />
-                
-                {/* Decorative Elements */}
-                <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                  <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-[#004225] blur-[120px] opacity-30" />
-                  <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#004225] blur-[120px] opacity-30" />
-                </div>
-              </div>
-
-              {/* Close Button - More prominent */}
-              <button 
-                onClick={() => setIsPromoOpen(false)}
-                className="absolute top-12 right-12 z-[600] text-white/60 hover:text-white transition-all flex items-center gap-3 group"
-              >
-                <span className="text-[10px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">{t.close}</span>
-                <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-white/60 transition-colors bg-black/20 backdrop-blur-sm">
-                  <X size={24} />
-                </div>
-              </button>
-
-              {/* Animated Promo Content */}
-              <div className="max-w-5xl w-full px-6 relative z-10">
-                <PromoSequence onComplete={() => setIsPromoOpen(false)} t={t} language={language} />
-              </div>
-
-              {/* Background Ambient Effects */}
-              <div className="absolute inset-0 -z-10 pointer-events-none">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[100%] bg-gradient-to-tr from-[#004225]/20 via-transparent to-transparent opacity-50" />
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,66,37,0.2)_0%,transparent_70%)]" />
-              </div>
-            </motion.div>
-          </div>
+          <motion.div
+            className="fixed inset-0 z-[500] overflow-hidden"
+            style={{ background: '#03080A' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35 }}
+          >
+            <PromoSequence onComplete={() => setIsPromoOpen(false)} t={t} language={language} />
+          </motion.div>
         )}
       </AnimatePresence>
 
