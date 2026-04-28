@@ -717,7 +717,7 @@ app.get("/api/health", (_req, res) => {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", async (req, res) => {
+app.post("/api/create-checkout-session", express.json(), async (req, res) => {
   const stripeKey = process.env.STRIPE_SECRET_KEY || '';
   const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
   try {
@@ -745,8 +745,7 @@ app.post("/api/create-checkout-session", async (req, res) => {
     }
 
     console.log(`[STRIPE] mode=${mode} plan=${planId}_${billingCycle} price=${priceId}`);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const stripeClient = new Stripe(stripeKey, { apiVersion: '2024-06-20' as any });
+    const stripeClient = getStripe();
     const isAnnual = billingCycle === 'yearly';
     const origin = String(req.headers.origin || process.env.SITE_URL || 'https://stellify.ch');
 
