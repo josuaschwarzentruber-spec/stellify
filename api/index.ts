@@ -350,7 +350,24 @@ app.use(express.json());
 
 // ── Gemini retry helper ───────────────────────────────────────────────────────
 const PRO_MODEL = 'gemini-2.5-pro';
-const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'];
+const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-latest', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'];
+
+function safeGetText(result: any): string | null {
+  if (!result) return null;
+  try {
+    const txt = result.text;
+    if (typeof txt === 'string') return txt;
+    // Handle candidates array directly
+    const parts = result.candidates?.[0]?.content?.parts;
+    if (Array.isArray(parts)) {
+      return parts.filter((p: any) => p.text).map((p: any) => p.text).join('') || null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 4, preferredModel?: string): Promise<any> {
   const modelsToTry = preferredModel
     ? [preferredModel, ...FALLBACK_MODELS.filter(m => m !== preferredModel)]
@@ -361,15 +378,22 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
     const model = modelsToTry[i];
     try {
       const result = await fn(model);
-      if (!result?.text) throw new Error('EMPTY_RESPONSE');
-      return result;
+      const text = safeGetText(result);
+      if (text === null || text === undefined) throw new Error('EMPTY_RESPONSE');
+      // Attach text back for callers that use result.text
+      if (text !== undefined) (result as any)._safeText = text;
+      return { ...result, text };
     } catch (err: any) {
       lastError = err;
-      const msg = err.message || '';
-      console.warn(`[GEMINI] model=${model} attempt=${i + 1} error=${msg.slice(0, 120)}`);
+      const msg = (err.message || '') + (err.status ? ` [${err.status}]` : '');
+      console.warn(`[GEMINI] model=${model} attempt=${i + 1} error=${msg.slice(0, 200)}`);
       if (i < attempts - 1) {
-        const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand') || msg.includes('INTERNAL') || msg.includes('EMPTY_RESPONSE');
-        if (isOverloaded) await new Promise(r => setTimeout(r, (i + 1) * 1500));
+        const isRetryable = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
+          || msg.includes('INTERNAL') || msg.includes('EMPTY_RESPONSE') || msg.includes('429')
+          || msg.includes('quota') || msg.includes('overload') || msg.includes('Resource exhausted')
+          || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('timeout') || msg.includes('network');
+        if (isRetryable) await new Promise(r => setTimeout(r, (i + 1) * 2000));
+        else await new Promise(r => setTimeout(r, 500)); // short pause between model switches
       }
     }
   }
@@ -392,9 +416,11 @@ app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
     res.json({ text: response.text ?? '' });
   } catch (error: any) {
     console.error("[CHAT ERROR]", error);
-    const msg = error.message || '';
-    const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
-    res.status(isOverloaded ? 503 : 500).json({ error: isOverloaded ? 'overloaded' : msg });
+    const msg = (error.message || '') + (error.status ? ` [status=${error.status}]` : '');
+    const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
+      || msg.includes('overload') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('Resource exhausted');
+    const isQuotaError = msg.includes('quota') || msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED');
+    res.status(isOverloaded || isQuotaError ? 503 : 500).json({ error: isOverloaded || isQuotaError ? 'overloaded' : msg });
   }
 });
 
@@ -429,8 +455,10 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
     res.json({ text: response.text, sources });
   } catch (error: any) {
     console.error("[TOOL ERROR]", error);
-    const msg = error.message || '';
-    const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand');
+    const msg = (error.message || '') + (error.status ? ` [status=${error.status}]` : '');
+    const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
+      || msg.includes('overload') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('Resource exhausted')
+      || msg.includes('quota') || msg.includes('429');
     res.status(isOverloaded ? 503 : 500).json({ error: isOverloaded ? 'overloaded' : msg });
   }
 });
@@ -940,6 +968,62 @@ app.get("/api/auth/linkedin/callback", async (req, res) => {
   } catch (err: any) {
     console.error('[LINKEDIN CALLBACK ERROR]', err.message);
     res.status(500).send(`<html><body><p>Fehler: ${err.message}</p><button onclick="window.close()">Schliessen</button></body></html>`);
+  }
+});
+
+// ── HR Job Application Email ─────────────────────────────────────────────────
+app.post("/api/send-job-email", emailLimiter, requireAuth, async (req, res) => {
+  const { to, subject, body, fromName } = req.body;
+  if (!to || !subject || !body) return res.status(400).json({ error: 'to, subject und body sind erforderlich' });
+
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+  if (!emailUser || !emailPass) return res.status(500).json({ error: 'E-Mail nicht konfiguriert' });
+
+  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  const htmlBody = body
+    .split('\n')
+    .map((line: string) => line.trim() ? `<p style="margin:0 0 14px;font-size:15px;color:#1A1A18;line-height:1.7;">${line.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : '<br/>')
+    .join('');
+
+  const html = `<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F5F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F4F0;padding:40px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:600px;width:100%;">
+        <tr><td style="background:#004225;padding:24px 40px;">
+          <span style="font-family:Georgia,serif;font-size:22px;color:#FDFCFB;letter-spacing:-0.5px;">Stell<span style="color:#6FCF97;">ify</span></span>
+          <span style="font-size:11px;color:#6FCF97;margin-left:16px;font-family:Helvetica,Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;">Bewerbung</span>
+        </td></tr>
+        <tr><td style="padding:40px 40px 32px;">
+          ${htmlBody}
+        </td></tr>
+        <tr><td style="padding:16px 40px 28px;border-top:1px solid #E8E6E0;">
+          <p style="margin:0;font-size:11px;color:#9A9A94;">Erstellt mit <a href="${siteUrl}" style="color:#004225;text-decoration:none;">Stellify</a> – Schweizer KI-Karriere-Plattform</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
+    await transporter.sendMail({
+      from: `"${fromName || 'Stellify Bewerbung'}" <${emailUser}>`,
+      replyTo: fromName ? undefined : emailUser,
+      to,
+      subject,
+      text: body,
+      html,
+    });
+    console.log(`[JOB EMAIL] Sent to ${to}`);
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error('[JOB EMAIL ERROR]', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

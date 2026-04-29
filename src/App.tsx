@@ -1290,7 +1290,8 @@ function StellifyApp() {
     try {
       const currentUser = auth.currentUser;
       if (!currentUser) return null;
-      return await currentUser.getIdToken();
+      // forceRefresh=true ensures we never send an expired token
+      return await currentUser.getIdToken(true);
     } catch { return null; }
   };
   const authFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
@@ -3348,6 +3349,40 @@ Bewerte in 3 Kategorien (je 0–100%):
           `;
           break;
         }
+        case 'hr-email': {
+          const recipientName = toolInput.hrName || '';
+          const company = toolInput.company || '';
+          const position = toolInput.position || '';
+          const senderName = (toolInput.firstName || '') + (toolInput.lastName ? ' ' + toolInput.lastName : '');
+          prompt = `
+            HANDLUNGSANWEISUNG: Erstelle eine perfekte, professionelle Bewerbungsmail für den Schweizer Arbeitsmarkt.
+            EMPFÄNGER: ${recipientName ? `${recipientName} (HR-Verantwortliche/r)` : 'Zuständige HR-Person'} bei ${company || '[Unternehmen]'}.
+            STELLE: ${position || 'Initiativbewerbung'}.
+            BEWERBER: ${senderName || 'Der Kandidat'}.
+            CV-KONTEXT: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Stärken.'}
+            BESONDERE WÜNSCHE: ${toolInput.notes || 'Keine'}.
+
+            ANFORDERUNGEN AN DIE MAIL:
+            - Betreffzeile: Klar, professionell, mit Stellenbezeichnung
+            - Anrede: Personalisiert falls HR-Name vorhanden, sonst "Sehr geehrte Damen und Herren,"
+            - Einleitung: Aufmerksamkeitsstarker erster Satz (KEIN "hiermit bewerbe ich mich")
+            - Hauptteil: Warum diese Firma, warum diese Stelle, was der Kandidat einbringt (Konkret mit Beispielen aus dem CV)
+            - Abschluss: Selbstbewusster Call-to-Action für ein Gespräch
+            - Grussformel: Schweizer Standard ("Mit freundlichen Grüssen")
+            - Signatur: Vollständiger Name
+            - SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss)
+            - LÄNGE: Max. 250 Wörter – jeder Satz zählt
+            - STIL: Professionell, selbstbewusst, präzise – kein Unterwürfigkeitston
+
+            AUSGABE-FORMAT:
+            Betreff: [Betreffzeile]
+
+            [Vollständiger E-Mail-Text ab der Anrede]
+
+            Bitte NUR den Mail-Text ausgeben, ohne Erklärungen oder Kommentare.
+          `;
+          break;
+        }
         default:
           prompt = language === 'FR' ? "Aide-moi dans ma carrière." : language === 'IT' ? "Aiutami nella mia carriera." : language === 'EN' ? "Please help me with my career." : "Bitte hilf mir bei meiner Karriere.";
       }
@@ -4413,6 +4448,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_label: 'Aktuelle / Ziel-Vergütung',
           input_placeholder: 'z.B. Ich möchte von 95k auf 115k CHF aufsteigen...',
           tutorial: 'Beispiel: Verhandlung bei der Zurich Insurance. Wir liefern 5 konkrete Argumente, die perfekte Einstiegsforderung und Reaktionen auf typische Einwände.'
+        },
+        'hr-email': {
+          title: 'HR-Bewerbungsmail',
+          desc: 'Generiert eine perfekte, professionelle Bewerbungsmail an HR-Verantwortliche, Recruiter oder Firmen – bereit zum Absenden.',
+          badge: 'NEU',
+          input_label: 'HR-Kontakt Name (optional)',
+          input_placeholder: 'z.B. Frau Müller',
+          tutorial: 'Beispiel: Initiativbewerbung bei Novartis. Stella generiert eine präzise, selbstbewusste Mail mit deinen Stärken – du kopierst sie einfach und sendest sie ab.'
         }
       }
     },
@@ -4869,6 +4912,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_label: 'Salaire actuel / cible',
           input_placeholder: 'ex: Je souhaite passer de 95k à 115k CHF...',
           tutorial: 'Exemple : Négociation chez Zurich Insurance. Nous fournissons 5 arguments concrets, la demande initiale idéale et les réponses aux objections typiques.'
+        },
+        'hr-email': {
+          title: 'E-mail de Candidature RH',
+          desc: 'Génère un e-mail de candidature parfait et professionnel à envoyer aux responsables RH, recruteurs ou entreprises.',
+          badge: 'NOUVEAU',
+          input_label: 'Nom du contact RH (optionnel)',
+          input_placeholder: 'ex. Mme Dupont',
+          tutorial: 'Exemple : Candidature spontanée chez Nestlé. Stella génère un e-mail précis et percutant avec tes points forts – tu n\'as plus qu\'à l\'envoyer.'
         }
       }
     },
@@ -5325,6 +5376,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_label: 'Stipendio attuale / obiettivo',
           input_placeholder: 'es: Voglio passare da 95k a 115k CHF...',
           tutorial: 'Esempio: Trattativa da Zurich Insurance. Forniamo 5 argomenti concreti, la domanda iniziale ideale e le risposte alle obiezioni tipiche.'
+        },
+        'hr-email': {
+          title: 'Email Candidatura HR',
+          desc: 'Genera una email di candidatura perfetta e professionale da inviare a responsabili HR, recruiter o aziende.',
+          badge: 'NUOVO',
+          input_label: 'Nome contatto HR (opzionale)',
+          input_placeholder: 'es. Sig.ra Rossi',
+          tutorial: 'Esempio: Candidatura spontanea da Novartis. Stella genera una email precisa e incisiva con i tuoi punti di forza – devi solo inviarla.'
         }
       }
     },
@@ -5781,6 +5840,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_label: 'Current / Target Salary',
           input_placeholder: 'e.g. I want to go from 95k to 115k CHF...',
           tutorial: 'Example: Negotiation at Zurich Insurance. We provide 5 concrete arguments, the ideal opening demand and responses to typical objections.'
+        },
+        'hr-email': {
+          title: 'HR Application Email',
+          desc: 'Generates a perfect, professional job application email to send to HR contacts, recruiters or companies – ready to send.',
+          badge: 'NEW',
+          input_label: 'HR Contact Name (optional)',
+          input_placeholder: 'e.g. Ms. Johnson',
+          tutorial: 'Example: Speculative application at UBS. Stella generates a precise, confident email highlighting your strengths – you just send it.'
         }
       }
     }
@@ -6031,6 +6098,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [
         { key: 'jobTitle', label: t.tools_data['salary-calc'].input_job, type: 'text', placeholder: t.tools_data['salary-calc'].input_job_placeholder },
         { key: 'targetSalary', label: t.tools_data['salary-negotiation'].input_label, type: 'text', placeholder: t.tools_data['salary-negotiation'].input_placeholder }
+      ]
+    },
+    {
+      id: 'hr-email',
+      title: t.tools_data['hr-email'].title,
+      desc: t.tools_data['hr-email'].desc,
+      icon: <Mail size={20} />,
+      badge: t.tools_data['hr-email'].badge,
+      type: 'gratis',
+      inputs: [
+        { key: 'firstName', label: language === 'FR' ? 'Prénom' : language === 'IT' ? 'Nome' : language === 'EN' ? 'First name' : 'Vorname', type: 'text', placeholder: language === 'FR' ? 'ex. Anna' : language === 'IT' ? 'es. Anna' : language === 'EN' ? 'e.g. Anna' : 'z.B. Anna' },
+        { key: 'lastName', label: language === 'FR' ? 'Nom de famille' : language === 'IT' ? 'Cognome' : language === 'EN' ? 'Last name' : 'Nachname', type: 'text', placeholder: language === 'FR' ? 'ex. Müller' : language === 'IT' ? 'es. Müller' : language === 'EN' ? 'e.g. Müller' : 'z.B. Müller' },
+        { key: 'company', label: language === 'FR' ? 'Entreprise cible' : language === 'IT' ? 'Azienda' : language === 'EN' ? 'Target company' : 'Ziel-Unternehmen', type: 'text', placeholder: language === 'FR' ? 'ex. Nestlé SA' : language === 'IT' ? 'es. Novartis AG' : language === 'EN' ? 'e.g. Roche Ltd' : 'z.B. Novartis AG' },
+        { key: 'position', label: language === 'FR' ? 'Poste / Offre' : language === 'IT' ? 'Posizione' : language === 'EN' ? 'Position / Role' : 'Stelle / Position', type: 'text', placeholder: language === 'FR' ? 'ex. Marketing Manager' : language === 'IT' ? 'es. Project Manager' : language === 'EN' ? 'e.g. Software Engineer' : 'z.B. Projektleiter' },
+        { key: 'hrName', label: t.tools_data['hr-email'].input_label, type: 'text', placeholder: t.tools_data['hr-email'].input_placeholder },
+        { key: 'hrEmail', label: language === 'FR' ? 'E-mail HR (pour envoi direct)' : language === 'IT' ? 'E-mail HR (per invio diretto)' : language === 'EN' ? 'HR email (for direct send)' : 'HR E-Mail (für direkten Versand)', type: 'text', placeholder: 'hr@firma.ch' },
+        { key: 'notes', label: language === 'FR' ? 'Notes / Souhaits particuliers' : language === 'IT' ? 'Note / Desideri particolari' : language === 'EN' ? 'Notes / Special wishes' : 'Besondere Wünsche / Hinweise', type: 'textarea', placeholder: language === 'FR' ? 'ex. Candidature spontanée, référence à une annonce...' : language === 'IT' ? 'es. Candidatura spontanea, riferimento a annuncio...' : language === 'EN' ? 'e.g. speculative application, reference to a job posting...' : 'z.B. Initiativbewerbung, Bezug auf Stelleninserat...' },
       ]
     }
   ];
@@ -9371,167 +9455,263 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.tool_analyzing}</p>
                     </div>
                   ) : toolResult ? (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="h-full flex flex-col"
                     >
-                      <div className="flex items-center justify-between mb-6">
-                        <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225]">{t.tool_result}</h4>
-                        <div className="flex gap-3">
-                          <button 
+                      {/* ── Premium Result Header ── */}
+                      <div className="flex items-center justify-between mb-5 pb-4 border-b border-black/8 dark:border-white/8">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 bg-[#004225] text-white flex items-center justify-center shadow-md shrink-0">
+                            {activeTool.icon}
+                          </div>
+                          <div>
+                            <h4 className="text-[11px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#6FCF97]">{activeTool.title}</h4>
+                            <p className="text-[9px] text-[#9A9A94] font-light">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="hidden sm:flex items-center gap-1 px-2 py-1 border border-[#004225]/20 dark:border-[#6FCF97]/20 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#6FCF97]">
+                            <ShieldCheck size={9} />
+                            AI-verified
+                          </div>
+                          <button
                             onClick={downloadAsPDF}
-                            className="text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] transition-colors flex items-center gap-1"
+                            className="flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:hover:text-[#FAFAF8] transition-all border border-transparent hover:border-[#004225]/20"
                           >
-                            <FileText size={12} />
+                            <FileText size={11} />
                             PDF
                           </button>
-                          <button 
+                          <button
                             onClick={downloadAsWord}
-                            className="text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] transition-colors flex items-center gap-1"
+                            className="flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:hover:text-[#FAFAF8] transition-all border border-transparent hover:border-[#004225]/20"
                           >
-                            <FileUp size={12} />
+                            <FileUp size={11} />
                             Word
                           </button>
-                          <button 
-                            onClick={() => {
-                              navigator.clipboard.writeText(toolResult);
-                              showToast(t.tool_copied);
-                            }}
-                            className="text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] transition-colors"
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(toolResult); showToast(t.tool_copy); }}
+                            className="flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:hover:text-[#FAFAF8] transition-all border border-transparent hover:border-[#004225]/20"
                           >
+                            <Copy size={11} />
                             {t.tool_copy}
+                          </button>
+                          <button
+                            onClick={() => { if (isEditingToolResult) setToolResult(toolResultEditable); setIsEditingToolResult(!isEditingToolResult); }}
+                            className="flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331d] transition-all"
+                          >
+                            {isEditingToolResult ? <><CheckCircle2 size={11} /> OK</> : <><FileText size={11} /> {language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}</>}
                           </button>
                         </div>
                       </div>
-                      <div className="flex-1 overflow-y-auto font-serif text-lg leading-relaxed pr-4 custom-scrollbar markdown-body relative group">
-                        {(activeTool.id === 'cv-premium' || activeTool.id === 'career-roadmap' || activeTool.id === 'zeugnis') && (
-                          <div className="mb-8 p-4 bg-[#004225]/5 border border-[#004225]/20 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-[#004225] text-white flex items-center justify-center rounded-full shadow-lg">
-                                <Sparkles size={16} />
-                              </div>
-                              <div>
-                                <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                                  {activeTool.id === 'cv-premium' ? 'Swiss Premium Standard' : 
-                                   activeTool.id === 'career-roadmap' ? 'Swiss Career Strategy' : 
-                                   'Premium Zeugnis-Decoder'}
-                                </h5>
-                                <p className="text-[9px] text-[#004225]/70 font-light">
-                                  {activeTool.id === 'cv-premium' ? 'Optimiert für Schweizer Präzision & Diskretion' : 
-                                   activeTool.id === 'career-roadmap' ? 'Strategischer Fahrplan für den Schweizer Markt' :
-                                   'Entschlüsselung versteckter Botschaften & Codes'}
+
+                      {/* ── Result Content ── */}
+                      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        {isEditingToolResult ? (
+                          <div className="space-y-2">
+                            <textarea
+                              className="w-full min-h-[400px] p-4 bg-white dark:bg-[#1A1A18] border border-[#004225]/30 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] focus:outline-none focus:border-[#004225] transition-all leading-relaxed resize-y"
+                              value={toolResultEditable}
+                              onChange={(e) => setToolResultEditable(e.target.value)}
+                            />
+                            <button onClick={() => { setToolResultEditable(toolResult || ''); setIsEditingToolResult(false); }} className="text-[9px] text-[#9A9A94] hover:text-[#004225] transition-colors">
+                              {language === 'FR' ? 'Annuler' : language === 'IT' ? 'Annulla' : language === 'EN' ? 'Cancel' : 'Abbrechen'}
+                            </button>
+                          </div>
+                        ) : activeTool.id === 'hr-email' ? (
+                          /* ── HR Email Preview ── */
+                          (() => {
+                            const lines = toolResult.split('\n');
+                            const subjectLine = lines.find(l => l.toLowerCase().startsWith('betreff:') || l.toLowerCase().startsWith('subject:') || l.toLowerCase().startsWith('objet:') || l.toLowerCase().startsWith('oggetto:'));
+                            const subject = subjectLine ? subjectLine.replace(/^(betreff|subject|objet|oggetto):\s*/i, '').trim() : (language === 'EN' ? 'Job Application' : language === 'FR' ? 'Candidature' : language === 'IT' ? 'Candidatura' : 'Bewerbung');
+                            const body = lines.filter(l => !l.toLowerCase().startsWith('betreff:') && !l.toLowerCase().startsWith('subject:') && !l.toLowerCase().startsWith('objet:') && !l.toLowerCase().startsWith('oggetto:')).join('\n').trim();
+                            const hrEmail = toolInput.hrEmail || '';
+                            const mailtoHref = hrEmail ? `mailto:${hrEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                            return (
+                              <div className="space-y-4">
+                                {/* Email client mockup */}
+                                <div className="border border-black/10 dark:border-white/10 rounded-none overflow-hidden shadow-lg">
+                                  {/* Email client bar */}
+                                  <div className="bg-[#004225] px-4 py-3 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <Mail size={14} className="text-[#6FCF97]" />
+                                      <span className="text-[10px] font-bold uppercase tracking-widest text-white">
+                                        {language === 'FR' ? 'Aperçu de l\'e-mail' : language === 'IT' ? 'Anteprima email' : language === 'EN' ? 'Email Preview' : 'E-Mail Vorschau'}
+                                      </span>
+                                    </div>
+                                    <div className="flex gap-1.5">
+                                      <div className="w-2.5 h-2.5 rounded-full bg-red-400 opacity-70" />
+                                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 opacity-70" />
+                                      <div className="w-2.5 h-2.5 rounded-full bg-green-400 opacity-70" />
+                                    </div>
+                                  </div>
+                                  {/* Email metadata */}
+                                  <div className="bg-[#F8F7F3] dark:bg-[#1E1E1A] border-b border-black/8 px-5 py-3 space-y-2">
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] w-12 shrink-0">{language === 'EN' ? 'TO' : language === 'FR' ? 'À' : language === 'IT' ? 'A' : 'AN'}</span>
+                                      <span className="text-[11px] text-[#1A1A18] dark:text-[#FAFAF8] font-medium">{toolInput.hrEmail || toolInput.hrName || (language === 'EN' ? 'HR Department' : language === 'FR' ? 'Département RH' : language === 'IT' ? 'Ufficio HR' : 'HR-Abteilung')}{toolInput.company ? ` · ${toolInput.company}` : ''}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] w-12 shrink-0">CC</span>
+                                      <span className="text-[10px] text-[#9A9A94] italic">{language === 'EN' ? '— optional —' : language === 'FR' ? '— optionnel —' : language === 'IT' ? '— opzionale —' : '— optional —'}</span>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] w-12 shrink-0">{language === 'EN' ? 'SUBJ.' : language === 'FR' ? 'OBJET' : language === 'IT' ? 'OGG.' : 'BETR.'}</span>
+                                      <span className="text-[12px] font-semibold text-[#004225] dark:text-[#6FCF97] leading-tight">{subject}</span>
+                                    </div>
+                                  </div>
+                                  {/* Email body */}
+                                  <div className="bg-white dark:bg-[#18181A] px-6 py-5 max-h-72 overflow-y-auto custom-scrollbar">
+                                    <div className="font-serif text-[13px] leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] whitespace-pre-wrap">{body}</div>
+                                  </div>
+                                  {/* Email attachment hint */}
+                                  <div className="bg-[#F8F7F3] dark:bg-[#1E1E1A] border-t border-black/8 px-5 py-3 flex items-center gap-2">
+                                    <div className="flex items-center gap-2 text-[#9A9A94]">
+                                      <FileUp size={12} />
+                                      <span className="text-[9px] font-medium">{language === 'EN' ? 'Attach CV, diplomas, references before sending' : language === 'FR' ? 'Joindre CV, diplômes, références avant d\'envoyer' : language === 'IT' ? 'Allegare CV, diplomi, referenze prima di inviare' : 'CV, Zeugnisse, Referenzen beifügen vor dem Versand'}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* Action buttons */}
+                                <div className="grid grid-cols-2 gap-3">
+                                  <a
+                                    href={mailtoHref}
+                                    className="flex items-center justify-center gap-2 py-3.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-md"
+                                  >
+                                    <Mail size={13} />
+                                    {language === 'EN' ? 'Open in Mail Client' : language === 'FR' ? 'Ouvrir dans client mail' : language === 'IT' ? 'Apri nel client mail' : 'In Mail-App öffnen'}
+                                  </a>
+                                  <button
+                                    onClick={() => { navigator.clipboard.writeText(`Betreff: ${subject}\n\n${body}`); showToast(t.tool_copy); }}
+                                    className="flex items-center justify-center gap-2 py-3.5 border border-[#004225]/30 text-[#004225] dark:text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/5 transition-all"
+                                  >
+                                    <Copy size={13} />
+                                    {language === 'EN' ? 'Copy Email' : language === 'FR' ? 'Copier l\'e-mail' : language === 'IT' ? 'Copia email' : 'E-Mail kopieren'}
+                                  </button>
+                                </div>
+                                <p className="text-[9px] text-[#9A9A94] text-center leading-relaxed px-4">
+                                  {language === 'EN' ? '✦ Generated by Stella AI · Review before sending · Attach CV if required' : language === 'FR' ? '✦ Généré par Stella AI · Vérifier avant d\'envoyer · Joindre CV si requis' : language === 'IT' ? '✦ Generato da Stella AI · Verificare prima di inviare · Allegare CV se richiesto' : '✦ Von Stella KI generiert · Vor Versand prüfen · CV beifügen wenn nötig'}
                                 </p>
                               </div>
+                            );
+                          })()
+                        ) : activeTool.id === 'salary-calc' && parsedSalaryResult ? (
+                          /* ── Salary Result ── */
+                          <div className="space-y-8 py-4">
+                            <div className="relative overflow-hidden bg-[#004225] p-8 text-center space-y-3">
+                              <div className="absolute inset-0 opacity-5" style={{backgroundImage:'repeating-linear-gradient(45deg,#fff 0,#fff 1px,transparent 0,transparent 50%)',backgroundSize:'12px 12px'}} />
+                              <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#6FCF97]">{t.salary_median_label}</p>
+                              <h3 className="text-5xl font-serif text-white tracking-tight">CHF {parsedSalaryResult.medianSalary.toLocaleString('de-CH')}</h3>
+                              <p className="text-[10px] text-white/50 font-light">{parsedSalaryResult.jobTitle} · {parsedSalaryResult.canton}</p>
                             </div>
-                            <div className="flex items-center gap-1 px-2 py-1 bg-[#004225] text-white text-[8px] font-bold uppercase tracking-widest rounded-sm">
-                              <ShieldCheck size={10} />
-                              Verified
-                            </div>
-                          </div>
-                        )}
-                        {(activeTool.id === 'cv-analysis' || activeTool.id === 'ats-sim') && (
-                          <div className="mb-8 p-4 bg-[#004225]/5 border border-[#004225]/20 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-[#004225] text-white flex items-center justify-center rounded-full shadow-lg">
-                                <Target size={16} />
+                            <div className="space-y-3 px-1">
+                              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-2">
+                                <span>Min</span><span>Median</span><span>Max</span>
                               </div>
-                              <div>
-                                <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">Premium Analysis</h5>
-                                <p className="text-[9px] text-[#004225]/70 font-light">{t.premium_analysis_desc}</p>
+                              <div className="relative h-3 bg-black/8 dark:bg-white/8 rounded-full overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#004225]/30 via-[#004225] to-[#004225]/30" style={{left:`${(parsedSalaryResult.minSalary/(parsedSalaryResult.maxSalary*1.1))*100}%`,right:`${100-(parsedSalaryResult.maxSalary/(parsedSalaryResult.maxSalary*1.1))*100}%`}} />
+                                <div className="absolute top-0 bottom-0 w-0.5 bg-white shadow-lg" style={{left:`${(parsedSalaryResult.medianSalary/(parsedSalaryResult.maxSalary*1.1))*100}%`}} />
                               </div>
-                            </div>
-                            <div className="flex items-center gap-1 px-2 py-1 bg-[#004225] text-white text-[8px] font-bold uppercase tracking-widest rounded-sm">
-                              <ShieldCheck size={10} />
-                              Verified
-                            </div>
-                          </div>
-                        )}
-                        {activeTool.id === 'salary-calc' && parsedSalaryResult ? (
-                          <div className="space-y-12 py-8">
-                            <div className="text-center space-y-4">
-                              <h3 className="text-3xl font-serif text-[#004225]">CHF {parsedSalaryResult.medianSalary.toLocaleString('de-CH')}</h3>
-                              <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94]">{t.salary_median_label}</p>
-                            </div>
-                            
-                            <div className="space-y-6">
-                              <div className="relative h-4 bg-black/5 rounded-full overflow-hidden">
-                                <div 
-                                  className="absolute top-0 bottom-0 bg-[#004225] opacity-20"
-                                  style={{ 
-                                    left: `${(parsedSalaryResult.minSalary / parsedSalaryResult.maxSalary) * 100}%`,
-                                    right: `${100 - ((parsedSalaryResult.maxSalary / parsedSalaryResult.maxSalary) * 100)}%`
-                                  }}
-                                />
-                                <div 
-                                  className="absolute top-0 bottom-0 w-1 bg-[#004225] shadow-[0_0_10px_rgba(0,66,37,0.5)]"
-                                  style={{ left: `${(parsedSalaryResult.medianSalary / (parsedSalaryResult.maxSalary * 1.1)) * 100}%` }}
-                                />
-                              </div>
-                              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                                <span>Min: CHF {parsedSalaryResult.minSalary.toLocaleString('de-CH')}</span>
-                                <span>Max: CHF {parsedSalaryResult.maxSalary.toLocaleString('de-CH')}</span>
+                              <div className="flex justify-between text-[11px] font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">
+                                <span>CHF {parsedSalaryResult.minSalary.toLocaleString('de-CH')}</span>
+                                <span className="text-[#004225] dark:text-[#6FCF97]">CHF {parsedSalaryResult.medianSalary.toLocaleString('de-CH')}</span>
+                                <span>CHF {parsedSalaryResult.maxSalary.toLocaleString('de-CH')}</span>
                               </div>
                             </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t border-black/5">
+                            <div className="grid grid-cols-1 gap-3">
                               {parsedSalaryResult.insights.map((insight: string, i: number) => (
-                                <div key={i} className="p-4 bg-[#FDFCFB] border border-black/5 space-y-2">
-                                  <div className="w-6 h-6 bg-[#004225]/10 rounded-full flex items-center justify-center text-[#004225]">
-                                    {i === 0 ? <MapPin size={12} /> : i === 1 ? <Briefcase size={12} /> : <TrendingUp size={12} />}
+                                <div key={i} className="flex items-start gap-3 p-4 bg-[#004225]/4 dark:bg-[#004225]/10 border-l-2 border-[#004225]">
+                                  <div className="w-7 h-7 bg-[#004225] text-white flex items-center justify-center shrink-0">
+                                    {i === 0 ? <MapPin size={13} /> : i === 1 ? <Briefcase size={13} /> : <TrendingUp size={13} />}
                                   </div>
-                                  <p className="text-[10px] font-light leading-relaxed text-[#5C5C58]">{insight}</p>
+                                  <p className="text-[11px] font-light leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] pt-0.5">{insight}</p>
                                 </div>
                               ))}
                             </div>
-
-                            <div className="p-6 bg-[#004225]/5 border border-[#004225]/10 space-y-3">
-                              <div className="flex items-center gap-2 text-[#004225]">
-                                <Info size={16} />
-                                <span className="text-[10px] font-bold uppercase tracking-widest">{t.salary_important_notice}</span>
-                              </div>
-                              <p className="text-[10px] font-light leading-relaxed text-[#004225]/80">
-                                {t.salary_disclaimer}
-                              </p>
+                            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 flex items-start gap-2">
+                              <Info size={14} className="text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+                              <p className="text-[10px] font-light leading-relaxed text-amber-800 dark:text-amber-300">{t.salary_disclaimer}</p>
                             </div>
                           </div>
                         ) : (
-                          <div className="space-y-3">
-                            <div className="flex justify-end gap-2">
-                              <button
-                                onClick={() => {
-                                  if (isEditingToolResult) {
-                                    setToolResult(toolResultEditable);
-                                  }
-                                  setIsEditingToolResult(!isEditingToolResult);
-                                }}
-                                className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-[#4A4A45] dark:text-[#9A9A94]"
-                              >
-                                {isEditingToolResult ? <><CheckCircle2 size={11} /> Speichern</> : <><FileText size={11} /> Bearbeiten</>}
-                              </button>
-                              {isEditingToolResult && (
-                                <button
-                                  onClick={() => { setToolResultEditable(toolResult || ''); setIsEditingToolResult(false); }}
-                                  className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all text-[#4A4A45] dark:text-[#9A9A94]"
-                                >
-                                  Abbrechen
-                                </button>
-                              )}
-                            </div>
-                            {isEditingToolResult ? (
-                              <textarea
-                                className="w-full min-h-[400px] p-4 bg-white dark:bg-[#1A1A18] border border-[#004225]/30 dark:border-[#FAFAF8]/20 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] focus:outline-none focus:border-[#004225] transition-all leading-relaxed resize-y"
-                                value={toolResultEditable}
-                                onChange={(e) => setToolResultEditable(e.target.value)}
-                              />
-                            ) : (
-                              <Markdown>{toolResult}</Markdown>
+                          /* ── Premium Markdown Result ── */
+                          <div className="space-y-0">
+                            {/* Tool-specific banner */}
+                            {(activeTool.id === 'cv-premium' || activeTool.id === 'career-roadmap' || activeTool.id === 'cv-gen' || activeTool.id === 'zeugnis' || activeTool.id === 'cv-optimizer' || activeTool.id === 'linkedin-job') && (
+                              <div className="mb-6 flex items-center gap-3 p-3.5 bg-gradient-to-r from-[#004225]/8 to-transparent border-l-4 border-[#004225]">
+                                <Sparkles size={14} className="text-[#004225] shrink-0" />
+                                <div>
+                                  <p className="text-[9px] font-bold uppercase tracking-widest text-[#004225]">
+                                    {activeTool.id === 'cv-premium' ? 'Swiss Premium CV Standard' : activeTool.id === 'career-roadmap' ? 'Swiss Career Strategy' : activeTool.id === 'zeugnis' ? 'Arbeitszeugnis · Schweizer Code' : activeTool.id === 'cv-gen' ? 'Bewerbungsschreiben · Swiss Format' : activeTool.id === 'cv-optimizer' ? 'CV Precision Optimizer' : 'LinkedIn Application Package'}
+                                  </p>
+                                  <p className="text-[8px] text-[#004225]/60 font-light mt-0.5">
+                                    {language === 'EN' ? 'Generated for the Swiss job market · Please review before use' : language === 'FR' ? 'Généré pour le marché suisse · À vérifier avant utilisation' : language === 'IT' ? 'Generato per il mercato svizzero · Verificare prima dell\'uso' : 'Für Schweizer Markt generiert · Bitte vor Verwendung prüfen'}
+                                  </p>
+                                </div>
+                              </div>
                             )}
+                            {(activeTool.id === 'cv-analysis' || activeTool.id === 'ats-sim') && (
+                              <div className="mb-6 flex items-center gap-3 p-3.5 bg-gradient-to-r from-blue-50 to-transparent dark:from-blue-900/10 border-l-4 border-blue-600">
+                                <Target size={14} className="text-blue-600 shrink-0" />
+                                <div>
+                                  <p className="text-[9px] font-bold uppercase tracking-widest text-blue-700 dark:text-blue-400">Swiss Market Deep Analysis</p>
+                                  <p className="text-[8px] text-blue-600/60 font-light mt-0.5">{t.premium_analysis_desc}</p>
+                                </div>
+                              </div>
+                            )}
+                            {/* Rendered markdown with premium styling */}
+                            <div className="[&>*:first-child]:mt-0">
+                              <Markdown
+                                components={{
+                                  h1: ({children}) => (
+                                    <div className="flex items-center gap-2 mt-7 mb-4 pb-2 border-b-2 border-[#004225]/15">
+                                      <div className="w-1 h-5 bg-[#004225] shrink-0" />
+                                      <h2 className="text-[13px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#6FCF97] m-0">{children}</h2>
+                                    </div>
+                                  ),
+                                  h2: ({children}) => (
+                                    <div className="flex items-center gap-2 mt-6 mb-3">
+                                      <div className="w-1 h-4 bg-[#004225]/50 shrink-0" />
+                                      <h3 className="text-[12px] font-bold uppercase tracking-wider text-[#004225] dark:text-[#6FCF97] m-0">{children}</h3>
+                                    </div>
+                                  ),
+                                  h3: ({children}) => (
+                                    <h4 className="text-[11px] font-bold uppercase tracking-wide text-[#4A4A45] dark:text-[#CACAC4] mt-4 mb-2">{children}</h4>
+                                  ),
+                                  p: ({children}) => (
+                                    <p className="text-[13px] leading-[1.8] text-[#1A1A18] dark:text-[#EBEBEB] font-light mb-3">{children}</p>
+                                  ),
+                                  li: ({children}) => (
+                                    <li className="flex items-start gap-2 mb-2 list-none">
+                                      <span className="mt-1.5 w-1.5 h-1.5 bg-[#004225] rounded-full shrink-0" />
+                                      <span className="text-[12px] leading-relaxed text-[#1A1A18] dark:text-[#EBEBEB] font-light">{children}</span>
+                                    </li>
+                                  ),
+                                  ul: ({children}) => <ul className="my-3 pl-0 space-y-1">{children}</ul>,
+                                  ol: ({children}) => <ol className="my-3 pl-0 space-y-1 [counter-reset:item]">{children}</ol>,
+                                  strong: ({children}) => <strong className="font-semibold text-[#004225] dark:text-[#6FCF97]">{children}</strong>,
+                                  hr: () => <hr className="border-0 border-t border-[#004225]/10 my-6" />,
+                                  blockquote: ({children}) => (
+                                    <div className="border-l-4 border-[#004225] pl-4 py-1 my-4 bg-[#004225]/4 dark:bg-[#004225]/10">
+                                      <div className="text-[12px] font-light italic text-[#1A1A18] dark:text-[#EBEBEB] leading-relaxed">{children}</div>
+                                    </div>
+                                  ),
+                                  code: ({children}) => (
+                                    <code className="bg-[#004225]/8 dark:bg-[#004225]/20 text-[#004225] dark:text-[#6FCF97] px-1.5 py-0.5 text-[11px] font-mono rounded-sm">{children}</code>
+                                  ),
+                                }}
+                              >{toolResult}</Markdown>
+                            </div>
+                            <div className="mt-6 pt-4 border-t border-black/5 dark:border-white/5 flex items-center justify-between">
+                              <p className="text-[8px] text-[#9A9A94] font-bold uppercase tracking-widest">{t.ai_notice}</p>
+                              <div className="flex items-center gap-1 text-[8px] text-[#9A9A94]">
+                                <ShieldCheck size={9} />
+                                <span>Stellify · Swiss AI</span>
+                              </div>
+                            </div>
                           </div>
                         )}
-                        <div className="absolute bottom-4 right-4 text-[8px] text-[#9A9A94] font-bold uppercase tracking-widest opacity-40">
-                          {t.ai_notice}
-                        </div>
                       </div>
                     </motion.div>
                   ) : (
