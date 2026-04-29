@@ -271,10 +271,10 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
         <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-white/15">A STELLIFY FILM</span>
         <button
           onClick={onComplete}
-          className="flex items-center gap-2 group text-white/30 hover:text-white/80 transition-colors"
+          className="flex items-center gap-2 group text-white/70 hover:text-white transition-colors"
         >
-          <span className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">{t.close}</span>
-          <div className="w-8 h-8 border border-white/15 flex items-center justify-center group-hover:border-white/50 transition-colors">
+          <span className="text-[9px] font-bold uppercase tracking-[0.4em]">{t.close}</span>
+          <div className="w-8 h-8 border border-white/40 flex items-center justify-center group-hover:border-white/90 group-hover:bg-white/10 transition-all">
             <X size={14} />
           </div>
         </button>
@@ -9460,6 +9460,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       animate={{ opacity: 1, y: 0 }}
                       className="h-full flex flex-col"
                     >
+                      {/* ── Error State ── */}
+                      {toolResult.startsWith('⚠️') ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center gap-5 py-8 px-4">
+                          <div className="w-14 h-14 rounded-full bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/30 flex items-center justify-center text-2xl">⚠️</div>
+                          <div className="space-y-2 max-w-xs">
+                            <p className="text-[13px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-relaxed">{toolResult.replace('⚠️ ', '')}</p>
+                            <p className="text-[10px] text-[#9A9A94] font-light">{language === 'EN' ? 'The AI service may be temporarily busy. Please try again.' : language === 'FR' ? 'Le service IA est peut-être temporairement occupé. Réessayez.' : language === 'IT' ? 'Il servizio AI potrebbe essere temporaneamente occupato. Riprova.' : 'Der KI-Dienst ist möglicherweise vorübergehend ausgelastet. Bitte versuche es erneut.'}</p>
+                          </div>
+                          <button
+                            onClick={processTool}
+                            className="flex items-center gap-2 px-6 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-md"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                            {language === 'EN' ? 'Try again' : language === 'FR' ? 'Réessayer' : language === 'IT' ? 'Riprova' : 'Erneut versuchen'}
+                          </button>
+                        </div>
+                      ) : (<>
                       {/* ── Premium Result Header ── */}
                       <div className="flex items-center justify-between mb-5 pb-4 border-b border-black/8 dark:border-white/8">
                         <div className="flex items-center gap-3">
@@ -9491,7 +9508,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             Word
                           </button>
                           <button
-                            onClick={() => { navigator.clipboard.writeText(toolResult); showToast(t.tool_copy); }}
+                            onClick={() => { navigator.clipboard.writeText(toolResult); showToast(t.tool_copied); }}
                             className="flex items-center gap-1 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:hover:text-[#FAFAF8] transition-all border border-transparent hover:border-[#004225]/20"
                           >
                             <Copy size={11} />
@@ -9583,7 +9600,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                     {language === 'EN' ? 'Open in Mail Client' : language === 'FR' ? 'Ouvrir dans client mail' : language === 'IT' ? 'Apri nel client mail' : 'In Mail-App öffnen'}
                                   </a>
                                   <button
-                                    onClick={() => { navigator.clipboard.writeText(`Betreff: ${subject}\n\n${body}`); showToast(t.tool_copy); }}
+                                    onClick={() => { navigator.clipboard.writeText(`Betreff: ${subject}\n\n${body}`); showToast(t.tool_copied); }}
                                     className="flex items-center justify-center gap-2 py-3.5 border border-[#004225]/30 text-[#004225] dark:text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/5 transition-all"
                                   >
                                     <Copy size={13} />
@@ -9713,6 +9730,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         )}
                       </div>
+                      </>)}
                     </motion.div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-start pt-6 pb-12 text-center space-y-6 max-w-md mx-auto">
