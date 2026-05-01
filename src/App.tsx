@@ -28,7 +28,7 @@ import {
   Mail,
   Sparkles,
   Search, Shield, FileText, AlertCircle, Info,
-  Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, GraduationCap, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
+  Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon
@@ -1307,7 +1307,7 @@ function StellifyApp() {
     const [liveJobs, setLiveJobs] = useState<any[] | null>(null);
     const [isSearching, setIsSearching] = useState(false);
     const [isLiveResult, setIsLiveResult] = useState(false);
-    const [liveSource, setLiveSource] = useState<'adzuna' | 'gemini' | null>(null);
+    const [liveSource, setLiveSource] = useState<'adzuna' | null>(null);
     const [liveTotal, setLiveTotal] = useState<number | null>(null);
 
     const localFiltered = (sampleJobs as any[]).filter(job => {
@@ -1331,11 +1331,7 @@ function StellifyApp() {
         if (jobFilters.location) params.set('location', jobFilters.location);
         if (jobFilters.industry) params.set('category', jobFilters.industry);
         const token = await getAuthToken();
-        const isLehrstellen = jobFilters.industry === 'Lehrstellen';
-        const endpoint = isLehrstellen
-          ? `/api/lehrstellen?keyword=${encodeURIComponent(jobFilters.keyword)}&location=${encodeURIComponent(jobFilters.location)}`
-          : `/api/jobs?${params}`;
-        const res = await fetch(endpoint, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+        const res = await fetch(`/api/jobs?${params}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
         const data = await res.json();
         if (data.jobs && data.jobs.length > 0) {
           setLiveJobs(data.jobs);
@@ -1372,23 +1368,6 @@ function StellifyApp() {
 
     return (
       <div className="space-y-8">
-        {/* Lehrstellen banner */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => { setJobFilters({ keyword: '', location: '', industry: '' }); setLiveJobs(null); }}
-            className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-widest border transition-all ${jobFilters.industry === '' || jobFilters.industry !== 'Lehrstellen' ? 'bg-[#004225] text-white border-[#004225]' : 'bg-transparent text-[#004225] dark:text-[#00A854] border-[#004225]/30 hover:border-[#004225]'}`}
-          >
-            {language === 'FR' ? 'Tous les emplois' : language === 'IT' ? 'Tutti i lavori' : language === 'EN' ? 'All Jobs' : 'Alle Stellen'}
-          </button>
-          <button
-            onClick={() => { setJobFilters({ keyword: '', location: '', industry: 'Lehrstellen' }); setLiveJobs(null); }}
-            className={`flex-1 py-2.5 text-[11px] font-bold uppercase tracking-widest border transition-all flex items-center justify-center gap-2 ${jobFilters.industry === 'Lehrstellen' ? 'bg-[#004225] text-white border-[#004225]' : 'bg-transparent text-[#004225] dark:text-[#00A854] border-[#004225]/30 hover:border-[#004225]'}`}
-          >
-            <GraduationCap size={14} />
-            {language === 'FR' ? 'Apprentissages' : language === 'IT' ? 'Apprendistati' : language === 'EN' ? 'Apprenticeships' : 'Lehrstellen'}
-          </button>
-        </div>
-
         {/* Search bar */}
         <div className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 space-y-2">
@@ -1444,7 +1423,6 @@ function StellifyApp() {
               <option value="PublicSector">{language === 'FR' ? 'Secteur public' : language === 'IT' ? 'Settore pubblico' : language === 'EN' ? 'Public Sector' : 'Öffentlicher Sektor'}</option>
               <option value="Transport">{language === 'FR' ? 'Transport' : language === 'IT' ? 'Trasporti' : language === 'EN' ? 'Transport' : 'Transport'}</option>
               <option value="NonProfit">{language === 'FR' ? 'ONG / Non-profit' : language === 'IT' ? 'ONG / Non-profit' : language === 'EN' ? 'NGO / Non-Profit' : 'NGO / Non-Profit'}</option>
-              <option value="Lehrstellen">{language === 'FR' ? 'Apprentissages' : language === 'IT' ? 'Apprendistati' : language === 'EN' ? 'Apprenticeships' : 'Lehrstellen'}</option>
             </select>
           </div>
           {/* Live Search button */}
@@ -1476,11 +1454,6 @@ function StellifyApp() {
             {liveSource === 'adzuna' && (
               <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
                 via Adzuna API
-              </span>
-            )}
-            {liveSource === 'gemini' && (
-              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800">
-                {language === 'FR' ? 'via Recherche IA' : language === 'IT' ? 'via Ricerca IA' : language === 'EN' ? 'via AI Search' : 'via KI-Suche'}
               </span>
             )}
           </div>
@@ -1877,7 +1850,6 @@ function StellifyApp() {
     'tracker': ['bewerbung', 'application', 'tracker', 'status', 'verfolgen', 'übersicht', 'bewerb'],
     'career-roadmap': ['karriere', 'career', 'roadmap', 'plan', 'strategie', 'ziel', 'goal', 'zukunft'],
     'matching': ['stellen', 'jobs', 'stelle', 'arbeit', 'matching', 'passend', 'suchen', 'suche', 'offene stellen', 'job suche', 'stellenangebot'],
-    'lehrstellen': ['lehrstelle', 'ausbildung', 'apprenticeship', 'lehrling', 'lehre', 'lehrberuf'],
     'berufseinstieg': ['einstieg', 'erster job', 'berufsstart', 'neu', 'first job', 'einsteigen'],
     'erfahrung-plus': ['50+', 'ü50', 'senior', 'erfahrung', 'älter', 'over 50'],
     'wiedereinstieg': ['wiedereinstieg', 'comeback', 'rückkehr', 'pause', 'elternzeit', 'karenz'],
@@ -2817,7 +2789,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       let useSearch = false;
 
       // Check for search tools
-      if (activeTool.id === 'job-search' || activeTool.id === 'lehrstellen') {
+      if (activeTool.id === 'job-search') {
         // Enforce Search Limits
         if (user?.role === 'pro' && searchUses >= 10) {
           setToolResult(t.tool_limit_search_pro);
@@ -3163,18 +3135,6 @@ Bewerte in 3 Kategorien (je 0–100%):
             - TOP 5 MISSING SKILLS: Welche harten und weichen Faktoren fehlen?
             - LERNPFAD: Konkrete Kurse (z.B. auf LinkedIn Learning, Coursera oder Schweizer Instituten wie ZHAW/HSG).
             - PROJEKT-IDEE: Wie kann der Kandidat diesen Skill ohne neuen Job beweisen?
-          `;
-          break;
-        case 'lehrstellen':
-          prompt = `
-            Suche nach passenden Lehrstellen in der Schweiz für: "${toolInput.interest || 'Allgemeine Lehrstelle'}".
-            Region: ${toolInput.location || 'Ganze Schweiz'}.
-            Analysiere die Eignung basierend auf dem CV: ${cvContext || 'Kein CV vorhanden'}.
-            Gib die Top 5 Resultate aus mit:
-            - Lehrberuf & Firma
-            - Standort
-            - Link (falls verfügbar)
-            - Warum das passen könnte.
           `;
           break;
         case 'berufseinstieg':
@@ -4351,16 +4311,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'z.B. Marketing Manager',
           tutorial: 'Beispiel: Frage "Warum wollen Sie ausgerechnet in der Schweiz arbeiten?". Wir trainieren die Antwort: Fokus auf Stabilität, Innovation und deinen Beitrag zum Schweizer Standort.'
         },
-        'lehrstellen': { 
-          title: 'Lehrstellen-Finder', 
-          desc: 'Finde die perfekte Lehrstelle in deiner Region. Mit KI-Check für deine Eignung.', 
-          input_interest: 'Was interessiert dich?', 
-          input_interest_placeholder: 'z.B. Informatik, KV, Technik...',
-          input_location: 'Region',
-          input_location_placeholder: 'z.B. Bern, Zürich, Basel...',
-          tutorial: 'Beispiel: Suche nach Informatik-Lehrstellen in Bern. Wir prüfen, ob deine Schulnoten und Interessen zum Anforderungsprofil der Post oder SBB passen.'
-        },
-        'berufseinstieg': { 
+        'berufseinstieg': {
           title: 'Berufseinstieg-Guide', 
           desc: 'Frisch aus der Lehre oder Studium? Wir zeigen dir, wie du deinen ersten "echten" Job findest.', 
           input_label: 'Was hast du abgeschlossen?', 
@@ -4873,7 +4824,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'tracker': { title: 'Stratégie de candidature', desc: 'Créez un plan de bataille sur mesure pour votre prochaine candidature.', input_label: 'Titre du poste / Entreprise', input_placeholder: 'ex. Chef de projet senior chez Roche' },
         'matching': { title: 'Job Matching', desc: 'L\'IA trouve vos 5 profils de postes correspondants.' },
         'interview': { title: 'Coach d\'entretien', desc: 'L\'IA simule 5 questions réelles et évalue vos réponses.', input_label: 'Poste pour l\'entretien', input_placeholder: 'ex: Responsable Marketing' },
-        'lehrstellen': { title: 'Recherche d\'apprentissage', desc: 'Trouvez l\'apprentissage parfait dans votre région.', input_interest: 'Qu\'est-ce qui vous intéresse ?', input_interest_placeholder: 'ex: Informatique, Commerce...', input_location: 'Région', input_location_placeholder: 'ex: Genève, Lausanne...' },
         'berufseinstieg': { title: 'Guide premier emploi', desc: 'Fraîchement diplômé ? Nous vous aidons à trouver votre premier "vrai" job.', input_label: 'Quel diplôme avez-vous ?', input_placeholder: 'ex: CFC Informatique...' },
         'erfahrung-plus': { title: 'Expérience-Plus', desc: 'Outil spécial pour les 50+. Valorisez votre expérience.', input_label: 'Votre plus grande force', input_placeholder: 'ex: 20 ans d\'expérience de direction dans la construction' },
         'wiedereinstieg': { title: 'Check retour à l\'emploi', desc: 'Longue pause ? Nous comblons la lacune de manière convaincante.', input_label: 'Raison de la pause', input_placeholder: 'ex: Congé parental...' },
@@ -5337,7 +5287,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'tracker': { title: 'Strategia di candidatura', desc: 'Crea un piano di battaglia su misura per la tua prossima candidatura.', input_label: 'Titolo del lavoro / Azienda', input_placeholder: 'es. Senior Project Manager presso Roche' },
         'matching': { title: 'Job Matching', desc: 'L\'IA trova i tuoi 5 profili lavorativi corrispondenti.' },
         'interview': { title: 'Coach per colloqui', desc: 'L\'IA simula 5 domande reali e valuta le tue risposte.', input_label: 'Posizione per il colloquio', input_placeholder: 'es. Responsabile Marketing' },
-        'lehrstellen': { title: 'Ricerca apprendistato', desc: 'Trova l\'apprendistato perfetto nella tua regione.', input_interest: 'Cosa ti interessa?', input_interest_placeholder: 'es: Informatica, Commercio...', input_location: 'Regione', input_location_placeholder: 'es: Lugano, Bellinzona...' },
         'berufseinstieg': { title: 'Guida primo lavoro', desc: 'Appena diplomato? Ti aiutiamo a trovare il tuo primo "vero" lavoro.', input_label: 'Cosa hai completato?', input_placeholder: 'es. AFC Informatica...' },
         'erfahrung-plus': { title: 'Esperienza-Plus', desc: 'Strumento speciale per gli over 50. Valorizza la tua esperienza.', input_label: 'Il tuo punto di forza', input_placeholder: 'es: 20 anni di esperienza dirigenziale nell\'edilizia' },
         'wiedereinstieg': { title: 'Check rientro al lavoro', desc: 'Lunga pausa? Colmiamo la lacuna in modo convincente.', input_label: 'Motivo della pausa', input_placeholder: 'es. Congedo parentale...' },
@@ -5801,7 +5750,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'tracker': { title: 'Application Strategy', desc: 'Create a tailored battle plan for your next application.', input_label: 'Job Title / Company', input_placeholder: 'e.g. Senior Project Manager at Roche' },
         'matching': { title: 'Job Matching', desc: 'AI finds your top 5 matching job profiles with fit score.' },
         'interview': { title: 'Interview Coach', desc: 'AI simulates 5 real questions, evaluates answers, gives a grade 0-100.', input_label: 'Position for the interview', input_placeholder: 'e.g. Marketing Manager' },
-        'lehrstellen': { title: 'Apprenticeship Finder', desc: 'Find the perfect apprenticeship in your region. With AI check for your suitability.', input_interest: 'What interests you?', input_interest_placeholder: 'e.g. IT, Commerce, Tech...', input_location: 'Region', input_location_placeholder: 'e.g. Zurich, Bern, Basel...' },
         'berufseinstieg': { title: 'Career Entry Guide', desc: 'Fresh out of apprenticeship or studies? We show you how to find your first "real" job.', input_label: 'What did you complete?', input_placeholder: 'e.g. EFZ IT...' },
         'erfahrung-plus': { title: 'Experience-Plus', desc: 'Special tool for 50+. We show you how to sell your decades of experience as an unbeatable advantage.', input_label: 'Your greatest strength', input_placeholder: 'e.g. 20 years of leadership experience in construction' },
         'wiedereinstieg': { title: 'Re-entry Check', desc: 'Took a longer break? We fill the gap in your CV professionally and convincingly.', input_label: 'Reason for break', input_placeholder: 'e.g. Parental leave...' },
@@ -6001,19 +5949,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: []
     },
     {
-      id: 'lehrstellen', 
-      title: t.tools_data['lehrstellen'].title, 
-      desc: t.tools_data['lehrstellen'].desc, 
-      icon: <GraduationCap size={20} />, 
-      badge: 'New Gen', 
-      type: 'gratis',
-      inputs: [
-        { key: 'interest', label: t.tools_data['lehrstellen'].input_interest, type: 'text', placeholder: t.tools_data['lehrstellen'].input_interest_placeholder },
-        { key: 'location', label: t.tools_data['lehrstellen'].input_location, type: 'text', placeholder: t.tools_data['lehrstellen'].input_location_placeholder }
-      ] 
-    },
-    { 
-      id: 'berufseinstieg', 
+      id: 'berufseinstieg',
       title: t.tools_data['berufseinstieg'].title, 
       desc: t.tools_data['berufseinstieg'].desc, 
       icon: <Rocket size={20} />, 
@@ -8781,12 +8717,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {tag.label}
                         </button>
                       ))}
-                      <button
-                        onClick={() => setSearchQuery('lehrstelle')}
-                        className="px-3 py-1.5 bg-[#004225] text-white text-[11px] font-bold hover:bg-[#00331d] transition-all rounded-md flex items-center gap-1.5"
-                      >
-                        🎓 {language === 'FR' ? 'Apprentissage' : language === 'IT' ? 'Apprendistato' : language === 'EN' ? 'Apprenticeship' : 'Lehrstellen'}
-                      </button>
                     </div>
 
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_quick}</h5>
