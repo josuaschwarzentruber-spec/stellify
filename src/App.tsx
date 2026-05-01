@@ -842,7 +842,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3× Tool-Nutzungen','3× Stella Chat-Anfragen','KI-Gehaltsrechner (Basisversion)','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 199.–/Jahr)', ['50× Tool-Nutzungen/Monat','20× Aktionen/Tag','Zeugnis-Decoder, Interview-Coach, alle Pro-Tools','Prioritärer Support']],['Ultimate-Plan (CHF 39.90/Mo. · CHF 399.–/Jahr)', ['Unbegrenzte Nutzungen ♾️','Alle Pro-Features + exklusive Ultimate-Tools','Deep Analysis Modus','24/7 VIP-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3× KI-Anfragen einmalig (Tools oder Chat)','KI-Gehaltsrechner (Basisversion)','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 199.–/Jahr)', ['80 KI-Anfragen pro Monat','Max. 20 / Tag · 5 / Minute','Zeugnis-Decoder, Interview-Coach, alle Pro-Tools','Prioritärer Support']],['Ultimate-Plan (CHF 39.90/Mo. · CHF 399.–/Jahr)', ['200 KI-Anfragen pro Monat','Max. 50 / Tag · 10 / Minute','Alle Pro-Features + exklusive Ultimate-Tools','24/7 VIP-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -872,7 +872,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3× utilisations d\'outil','3× requêtes Stella Chat','Calculateur de salaire IA (base)','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 199.–/an)', ['50× utilisations d\'outils/mois','20× actions/jour','Décodeur de certificat, Coach entretien, tous les outils Pro','Support prioritaire']],['Plan Ultimate (CHF 39.90/mois · CHF 399.–/an)', ['Utilisations illimitées ♾️','Toutes les fonctionnalités Pro + outils Ultimate exclusifs','Mode analyse approfondie','Support VIP 24/7']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3× requêtes IA en une fois (outils ou chat)','Calculateur de salaire IA (base)','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 199.–/an)', ['80 requêtes IA par mois','Max. 20 / jour · 5 / minute','Décodeur de certificat, Coach entretien, tous les outils Pro','Support prioritaire']],['Plan Ultimate (CHF 39.90/mois · CHF 399.–/an)', ['200 requêtes IA par mois','Max. 50 / jour · 10 / minute','Toutes les fonctionnalités Pro + outils Ultimate exclusifs','Support VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -902,7 +902,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3× utilizzi strumento','3× richieste Stella Chat','Calcolatore stipendio IA (base)','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 199.–/anno)', ['50× utilizzi strumenti/mese','20× azioni/giorno','Decodificatore certificato, Coach colloquio, tutti gli strumenti Pro','Supporto prioritario']],['Piano Ultimate (CHF 39.90/mese · CHF 399.–/anno)', ['Utilizzi illimitati ♾️','Tutte le funzionalità Pro + strumenti Ultimate esclusivi','Modalità analisi approfondita','Supporto VIP 24/7']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3× richieste AI una tantum (strumenti o chat)','Calcolatore stipendio AI (base)','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 199.–/anno)', ['80 richieste AI al mese','Max. 20 / giorno · 5 / minuto','Decodificatore certificato, Coach colloquio, tutti gli strumenti Pro','Supporto prioritario']],['Piano Ultimate (CHF 39.90/mese · CHF 399.–/anno)', ['200 richieste AI al mese','Max. 50 / giorno · 10 / minuto','Tutte le funzionalità Pro + strumenti Ultimate esclusivi','Supporto VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -932,7 +932,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3× tool uses','3× Stella Chat requests','AI Salary Calculator (basic)','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 199.–/yr)', ['50× tool uses/month','20× actions/day','Certificate Decoder, Interview Coach, all Pro tools','Priority support']],['Ultimate Plan (CHF 39.90/mo · CHF 399.–/yr)', ['Unlimited uses ♾️','All Pro features + exclusive Ultimate tools','Deep Analysis Mode','24/7 VIP Support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3× AI requests one-off (tools or chat)','AI Salary Calculator (basic)','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 199.–/yr)', ['80 AI requests per month','Max. 20 / day · 5 / minute','Certificate Decoder, Interview Coach, all Pro tools','Priority support']],['Ultimate Plan (CHF 39.90/mo · CHF 399.–/yr)', ['200 AI requests per month','Max. 50 / day · 10 / minute','All Pro features + exclusive Ultimate tools','24/7 VIP Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -3975,7 +3975,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
       faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung — du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück — ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Ultimate, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Der Gratis-Plan beinhaltet einmalig drei Tool-Nutzungen sowie drei Nachrichten im Stella-Chat — ideal, um die Plattform unverbindlich kennenzulernen. Diese Nutzungen werden nicht zurückgesetzt. Im Pro-Plan stehen dir monatlich fünfzig Tool-Nutzungen und täglich bis zu zwanzig Aktionen zur Verfügung. Der Ultimate-Plan bietet unbegrenzte Nutzung aller Funktionen ohne jede Einschränkung.",
+      faq_3_a: "Der Gratis-Plan beinhaltet einmalig drei KI-Anfragen (Tools oder Stella-Chat zusammen) — ideal um die Plattform unverbindlich zu testen. Diese Nutzungen werden nicht zurückgesetzt; danach ist ein Upgrade nötig. Im Pro-Plan stehen dir bis zu achtzig KI-Anfragen pro Monat zur Verfügung, mit einem täglichen Limit von zwanzig und höchstens fünf Anfragen pro Minute. Der Ultimate-Plan bietet bis zu zweihundert KI-Anfragen pro Monat, mit einem täglichen Limit von fünfzig und höchstens zehn Anfragen pro Minute. Diese Limits dienen ausschliesslich dem Schutz vor Missbrauch und sind für normale Nutzung mehr als ausreichend.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -4222,9 +4222,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
         { title: "Datenschutz 'Made in CH'", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
-      pricing_pro_f: ["50× Bewerbungen / Nutzungen pro Monat", "20× Aktionen pro Tag", "Zeugnis-Decoder (Pro)", "Interview-Coach"],
-      pricing_ultimate_f: ["Unlimitierte Bewerbungen ♾️", "Alle Pro-Features + Exklusive Tools", "Deep Analysis Modus (KI)", "24/7 VIP-Support"],
+      pricing_free_f: ["3× Tool- oder Chat-Nutzung (einmalig, kein Reset)", "KI-Gehaltsrechner (Basis)", "Schweizer Karriere-Standards"],
+      pricing_pro_f: ["80 KI-Anfragen pro Monat", "Max. 20 Anfragen pro Tag · 5 pro Minute", "Zeugnis-Decoder, Interview-Coach, alle Pro-Tools", "Prioritärer Support"],
+      pricing_ultimate_f: ["200 KI-Anfragen pro Monat", "Max. 50 Anfragen pro Tag · 10 pro Minute", "Alle Pro-Features + exklusive Ultimate-Tools", "24/7 VIP-Support"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Ultimate wählen",
@@ -4550,7 +4550,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
       faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer — vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement — votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Ultimate, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Le plan Gratuit comprend une seule fois trois utilisations d'outils ainsi que trois messages dans le chat Stella — idéal pour découvrir la plateforme sans engagement. Ces utilisations ne sont pas réinitialisées. Le plan Pro offre cinquante utilisations d'outils par mois et jusqu'à vingt actions par jour. Le plan Ultimate propose une utilisation illimitée de toutes les fonctionnalités, sans aucune restriction.",
+      faq_3_a: "Le plan Gratuit comprend une seule fois trois requêtes IA (outils ou chat Stella confondus) — idéal pour découvrir la plateforme sans engagement. Ces utilisations ne sont pas réinitialisées ; ensuite, un passage à un plan payant est nécessaire. Le plan Pro offre jusqu'à quatre-vingts requêtes IA par mois, avec une limite quotidienne de vingt et au maximum cinq requêtes par minute. Le plan Ultimate propose jusqu'à deux cents requêtes IA par mois, avec une limite quotidienne de cinquante et au maximum dix requêtes par minute. Ces limites servent uniquement à prévenir les abus et sont largement suffisantes pour un usage normal.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -4797,9 +4797,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× candidatures ou utilisations d'outil", "3× demandes Stella Chat", "Calculateur de salaire IA (Base)", "Normes suisses"],
-      pricing_pro_f: ["50× candidatures / utilisations par mois", "20× actions par jour", "Décodeur de certificats (Pro)", "Coach d'entretien"],
-      pricing_ultimate_f: ["Candidatures illimitées ♾️", "Toutes les fonctions Pro", "Coach IA personnel", "Support VIP 24/7"],
+      pricing_free_f: ["3× utilisations d'outil ou chat (unique, pas de réinitialisation)", "Calculateur de salaire IA (base)", "Standards suisses"],
+      pricing_pro_f: ["80 requêtes IA par mois", "Max. 20 requêtes par jour · 5 par minute", "Décodeur de certificats, Coach entretien, tous les outils Pro", "Support prioritaire"],
+      pricing_ultimate_f: ["200 requêtes IA par mois", "Max. 50 requêtes par jour · 10 par minute", "Toutes les fonctions Pro + outils Ultimate exclusifs", "Support VIP 24/7"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Ultimate",
@@ -5013,7 +5013,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Come funziona l'abbonamento Stellify?",
       faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare — hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento — il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Ultimate, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Il piano Gratuito include una volta sola tre utilizzi degli strumenti e tre messaggi nella chat Stella — ideale per scoprire la piattaforma senza impegno. Questi utilizzi non vengono ripristinati. Il piano Pro mette a disposizione cinquanta utilizzi degli strumenti al mese e fino a venti azioni al giorno. Il piano Ultimate offre un utilizzo illimitato di tutte le funzionalità, senza alcuna restrizione.",
+      faq_3_a: "Il piano Gratuito include una sola volta tre richieste AI (strumenti o chat Stella insieme) — ideale per scoprire la piattaforma senza impegno. Questi utilizzi non vengono ripristinati; in seguito è necessario passare a un piano a pagamento. Il piano Pro mette a disposizione fino a ottanta richieste AI al mese, con un limite giornaliero di venti e un massimo di cinque richieste al minuto. Il piano Ultimate offre fino a duecento richieste AI al mese, con un limite giornaliero di cinquanta e un massimo di dieci richieste al minuto. Questi limiti servono esclusivamente a prevenire abusi e sono ampiamente sufficienti per un utilizzo normale.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -5260,9 +5260,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× candidature o utilizzi strumenti", "3× messaggi Stella Chat", "Calcolatore di stipendio AI (Base)", "Standard svizzeri"],
-      pricing_pro_f: ["50× candidature / mese", "Decodificatore di certificati (Pro)", "Coach per colloqui", "Supporto prioritario"],
-      pricing_ultimate_f: ["Candidature illimitate", "Tutte le funzioni Pro", "Coach AI personale", "Supporto VIP 24/7"],
+      pricing_free_f: ["3× utilizzi di strumenti o chat (unico, nessun reset)", "Calcolatore di stipendio AI (base)", "Standard svizzeri"],
+      pricing_pro_f: ["80 richieste AI al mese", "Max. 20 richieste al giorno · 5 al minuto", "Decodificatore di certificati, Coach per colloqui, tutti gli strumenti Pro", "Supporto prioritario"],
+      pricing_ultimate_f: ["200 richieste AI al mese", "Max. 50 richieste al giorno · 10 al minuto", "Tutte le funzioni Pro + strumenti Ultimate esclusivi", "Supporto VIP 24/7"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Ultimate",
@@ -5476,7 +5476,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "How does the Stellify subscription work?",
       faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required — you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again — your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Ultimate, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "The Free plan includes three tool uses and three messages in the Stella chat — ideal for exploring the platform with no commitment. These uses are one-time only and do not reset. The Pro plan provides fifty tool uses per month and up to twenty actions per day. The Ultimate plan offers unlimited use of all features with no restrictions whatsoever.",
+      faq_3_a: "The Free plan includes three AI requests in total (tools or Stella chat combined) — ideal for exploring the platform with no commitment. These uses do not reset; afterwards an upgrade is required. The Pro plan provides up to eighty AI requests per month, with a daily cap of twenty and a maximum of five requests per minute. The Ultimate plan offers up to two hundred AI requests per month, with a daily cap of fifty and a maximum of ten requests per minute. These limits exist solely to prevent abuse and are more than sufficient for normal use.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -5723,9 +5723,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Salary Transparency", desc: "Get precise salary forecasts based on Swiss market data for your specific region and industry.", icon: "Coins" },
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× applications or tool uses", "3× Stella Chat messages", "AI Salary Calculator (Base)", "Swiss Standards"],
-      pricing_pro_f: ["50× applications / month", "Certificate Decoder (Pro)", "Interview Coach", "Priority Support"],
-      pricing_ultimate_f: ["Unlimited applications", "All Pro features + Exclusive Tools", "Deep Analysis Mode (AI)", "24/7 VIP Support"],
+      pricing_free_f: ["3× tool uses or chat messages (one-off, no reset)", "AI Salary Calculator (base)", "Swiss career standards"],
+      pricing_pro_f: ["80 AI requests per month", "Max. 20 requests per day · 5 per minute", "Certificate Decoder, Interview Coach, all Pro tools", "Priority Support"],
+      pricing_ultimate_f: ["200 AI requests per month", "Max. 50 requests per day · 10 per minute", "All Pro features + Exclusive Ultimate Tools", "24/7 VIP Support"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Ultimate",
