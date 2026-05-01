@@ -351,13 +351,18 @@ app.use(express.json());
 // ── Gemini retry helper ───────────────────────────────────────────────────────
 const PRO_MODEL = 'gemini-2.5-pro';
 const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-latest', 'gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'];
+const MAX_INPUT_CHARS = 32000;   // ~8k tokens
+const MAX_OUTPUT_TOKENS = 2000;  // soft cap (Gemini config)
+
+function clampInput(text: string): string {
+  return text.length > MAX_INPUT_CHARS ? text.slice(0, MAX_INPUT_CHARS) : text;
+}
 
 function safeGetText(result: any): string | null {
   if (!result) return null;
   try {
     const txt = result.text;
     if (typeof txt === 'string') return txt;
-    // Handle candidates array directly
     const parts = result.candidates?.[0]?.content?.parts;
     if (Array.isArray(parts)) {
       return parts.filter((p: any) => p.text).map((p: any) => p.text).join('') || null;
@@ -380,8 +385,6 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
       const result = await fn(model);
       const text = safeGetText(result);
       if (text === null || text === undefined) throw new Error('EMPTY_RESPONSE');
-      // Attach text back for callers that use result.text
-      if (text !== undefined) (result as any)._safeText = text;
       return { ...result, text };
     } catch (err: any) {
       lastError = err;
@@ -393,29 +396,188 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
           || msg.includes('quota') || msg.includes('overload') || msg.includes('Resource exhausted')
           || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('timeout') || msg.includes('network');
         if (isRetryable) await new Promise(r => setTimeout(r, (i + 1) * 2000));
-        else await new Promise(r => setTimeout(r, 500)); // short pause between model switches
+        else await new Promise(r => setTimeout(r, 500));
       }
     }
   }
   throw lastError;
 }
 
+// ── AI Quota / Rate-Limit Enforcement ────────────────────────────────────────
+// Limits per role. Free users get 3 lifetime tries — then upgrade is required.
+const QUOTA = {
+  client:    { lifetime: 3 },
+  pro:       { perMin: 5,  perDay: 20, perMonth: 80 },
+  unlimited: { perMin: 10, perDay: 50, perMonth: 200 },
+} as const;
+
+const GLOBAL_DAILY_CALL_CAP = 200; // safety net: ~$3.60/day worst case
+
+// In-memory per-user minute counters (resets on server restart, fine for short windows)
+const minuteCounters = new Map<string, { count: number; resetAt: number }>();
+function bumpMinute(uid: string): number {
+  const now = Date.now();
+  const cur = minuteCounters.get(uid);
+  if (!cur || cur.resetAt < now) {
+    minuteCounters.set(uid, { count: 1, resetAt: now + 60_000 });
+    return 1;
+  }
+  cur.count += 1;
+  return cur.count;
+}
+
+function todayKey(): string {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+function monthKey(): string {
+  return new Date().toISOString().slice(0, 7); // YYYY-MM
+}
+
+async function checkGlobalBudget(adminDb: FirebaseFirestore.Firestore): Promise<boolean> {
+  const ref = adminDb.collection('system').doc('budget');
+  const snap = await ref.get();
+  const data = snap.data();
+  const today = todayKey();
+  if (!data || data.cost_today_date !== today) {
+    await ref.set({ cost_today_date: today, calls_today: 0 }, { merge: true });
+    return true;
+  }
+  return (data.calls_today || 0) < GLOBAL_DAILY_CALL_CAP;
+}
+
+async function incrementGlobalBudget(adminDb: FirebaseFirestore.Firestore) {
+  const ref = adminDb.collection('system').doc('budget');
+  const today = todayKey();
+  await adminDb.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.data();
+    if (!data || data.cost_today_date !== today) {
+      tx.set(ref, { cost_today_date: today, calls_today: 1 });
+    } else {
+      tx.update(ref, { calls_today: (data.calls_today || 0) + 1 });
+    }
+  });
+}
+
+const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) => {
+  const uid = (req as any).uid as string | undefined;
+  if (!uid) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+    const { adminDb } = getAdminServices();
+
+    // Global cap check (last line of defence)
+    const ok = await checkGlobalBudget(adminDb);
+    if (!ok) {
+      return res.status(503).json({ error: 'Stellify ist heute stark ausgelastet. Bitte versuche es morgen erneut.' });
+    }
+
+    const userRef = adminDb.collection('users').doc(uid);
+    const userSnap = await userRef.get();
+    const u = userSnap.data() || {};
+    const role = (u.role as string) || 'client';
+
+    if (role === 'client') {
+      const used = u.ai_calls_lifetime || 0;
+      if (used >= QUOTA.client.lifetime) {
+        return res.status(402).json({
+          error: 'Du hast deine 3 kostenlosen Versuche aufgebraucht. Upgrade auf Pro oder Ultimate für weitere KI-Anfragen.',
+          upgrade: true,
+          remaining: 0,
+        });
+      }
+    } else if (role === 'pro' || role === 'unlimited') {
+      const limits = role === 'pro' ? QUOTA.pro : QUOTA.unlimited;
+
+      // Minute (in-memory)
+      const minuteCount = bumpMinute(uid);
+      if (minuteCount > limits.perMin) {
+        return res.status(429).json({
+          error: `Limit erreicht: max. ${limits.perMin} Anfragen pro Minute. Bitte kurz warten.`,
+          retryAfter: 60,
+        });
+      }
+
+      // Daily (Firestore)
+      const today = todayKey();
+      const dayCount = u.ai_calls_today_date === today ? (u.ai_calls_today || 0) : 0;
+      if (dayCount >= limits.perDay) {
+        return res.status(429).json({
+          error: `Tägliches Limit erreicht (${limits.perDay} Anfragen). Reset um Mitternacht.`,
+          retryAfter: 86400,
+        });
+      }
+
+      // Monthly (Firestore)
+      const month = monthKey();
+      const monthCount = u.ai_calls_month_key === month ? (u.ai_calls_month || 0) : 0;
+      if (monthCount >= limits.perMonth) {
+        return res.status(429).json({
+          error: `Monatliches Limit erreicht (${limits.perMonth} Anfragen). Reset zum Monatsbeginn.`,
+          retryAfter: 86400 * 7,
+        });
+      }
+    } else {
+      return res.status(403).json({ error: 'Unbekannte Rolle' });
+    }
+
+    (req as any).quotaRole = role;
+    (req as any).quotaUserRef = userRef;
+    (req as any).quotaUserData = u;
+    next();
+  } catch (err: any) {
+    console.error('[QUOTA ERROR]', err.message);
+    res.status(500).json({ error: 'Quota-Prüfung fehlgeschlagen' });
+  }
+};
+
+// Call after a successful AI response to increment counters
+async function recordAIUsage(req: Request) {
+  const role = (req as any).quotaRole as string;
+  const userRef = (req as any).quotaUserRef as FirebaseFirestore.DocumentReference;
+  const u = (req as any).quotaUserData as any;
+  if (!userRef) return;
+  try {
+    const { adminDb } = getAdminServices();
+    if (role === 'client') {
+      await userRef.update({ ai_calls_lifetime: (u.ai_calls_lifetime || 0) + 1 });
+    } else {
+      const today = todayKey();
+      const month = monthKey();
+      const newDay = u.ai_calls_today_date === today ? (u.ai_calls_today || 0) + 1 : 1;
+      const newMonth = u.ai_calls_month_key === month ? (u.ai_calls_month || 0) + 1 : 1;
+      await userRef.update({
+        ai_calls_today: newDay,
+        ai_calls_today_date: today,
+        ai_calls_month: newMonth,
+        ai_calls_month_key: month,
+      });
+    }
+    await incrementGlobalBudget(adminDb);
+  } catch (err: any) {
+    console.error('[USAGE RECORD]', err.message);
+  }
+}
+
+
 // ── Gemini Chat ───────────────────────────────────────────────────────────────
-app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
+app.post("/api/chat", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { messages, userContent, systemInstruction, model } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   try {
     const ai = new GoogleGenAI({ apiKey });
+    const userText = clampInput(typeof userContent === 'string' ? userContent : '');
     const contents = messages?.length
-      ? [...messages, { role: "user", parts: [{ text: userContent }] }]
-      : [{ role: "user", parts: [{ text: userContent }] }];
+      ? [...messages, { role: "user", parts: [{ text: userText }] }]
+      : [{ role: "user", parts: [{ text: userText }] }];
     const response = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({ model: mdl, contents, config: { systemInstruction, temperature: 0.7 } })
+      ai.models.generateContent({ model: mdl, contents, config: { systemInstruction, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS } })
     , 3, model);
+    await recordAIUsage(req);
     res.json({ text: response.text ?? '' });
   } catch (error: any) {
-    console.error("[CHAT ERROR]", error);
+    console.error("[CHAT ERROR]", error.message);
     const msg = (error.message || '') + (error.status ? ` [status=${error.status}]` : '');
     const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
       || msg.includes('overload') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('Resource exhausted');
@@ -425,7 +587,7 @@ app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
 });
 
 // ── Gemini Tool ───────────────────────────────────────────────────────────────
-app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
+app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { prompt, model, useSearch, language } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
@@ -440,11 +602,12 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
 
   try {
     const ai = new GoogleGenAI({ apiKey });
+    const userText = clampInput(typeof prompt === 'string' ? prompt : '');
     const response = await geminiWithRetry((mdl) =>
       ai.models.generateContent({
         model: mdl,
-        contents: prompt,
-        config: { systemInstruction, temperature: 0.4, tools: useSearch ? [{ googleSearch: {} }] : undefined }
+        contents: userText,
+        config: { systemInstruction, temperature: 0.4, maxOutputTokens: MAX_OUTPUT_TOKENS, tools: useSearch ? [{ googleSearch: {} }] : undefined }
       })
     , 3, model);
     let sources: string[] = [];
@@ -452,9 +615,10 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
       const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];
       sources = chunks.filter((c: any) => c.web?.uri).map((c: any) => `[${c.web.title || c.web.uri}](${c.web.uri})`);
     }
+    await recordAIUsage(req);
     res.json({ text: response.text, sources });
   } catch (error: any) {
-    console.error("[TOOL ERROR]", error);
+    console.error("[TOOL ERROR]", error.message);
     const msg = (error.message || '') + (error.status ? ` [status=${error.status}]` : '');
     const isOverloaded = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
       || msg.includes('overload') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('Resource exhausted')
@@ -464,7 +628,7 @@ app.post("/api/process-tool", aiLimiter, requireAuth, async (req, res) => {
 });
 
 // ── LinkedIn Screenshot / Image Text Extraction ───────────────────────────────
-app.post("/api/extract-image", aiLimiter, requireAuth, async (req, res) => {
+app.post("/api/extract-image", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { base64, mimeType } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
@@ -482,12 +646,13 @@ app.post("/api/extract-image", aiLimiter, requireAuth, async (req, res) => {
             { text: 'Extrahiere alle sichtbaren Textinformationen aus diesem LinkedIn-Profil-Screenshot. Gib Name, Berufsbezeichnung, Unternehmen, Ausbildung, Fähigkeiten und alle anderen relevanten Karriereinformationen als strukturierten Text zurück. Nur den extrahierten Text, keine Erklärungen.' }
           ]
         }],
-        config: { temperature: 0.1 }
+        config: { temperature: 0.1, maxOutputTokens: 1500 }
       })
     , 3, PRO_MODEL);
+    await recordAIUsage(req);
     res.json({ text: response.text });
   } catch (error: any) {
-    console.error("[IMAGE EXTRACT ERROR]", error);
+    console.error("[IMAGE EXTRACT ERROR]", error.message);
     res.status(500).json({ error: error.message || 'Bildanalyse fehlgeschlagen' });
   }
 });
@@ -537,7 +702,7 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
   }
 
   const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey) return res.status(500).json({ error: "Keine Job-API konfiguriert" });
+  if (!geminiKey) return res.json({ jobs: [], live: false, source: 'none' });
   try {
     const ai = new GoogleGenAI({ apiKey: geminiKey });
     const prompt = `Suche nach aktuellen Stellenangeboten in der Schweiz. Suchbegriff: ${keyword || 'alle Berufe'}, Branche: ${category || 'alle'}, Ort: ${location || 'ganze Schweiz'}. Gib exakt 10 echte aktuelle Stellenangebote zurück als reines JSON-Array ohne Markdown. Felder: id, title, company, location, category, description (2 Sätze), url (echter Link), ats_keywords (3 strings).`;
@@ -548,27 +713,6 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
     const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
     if (jsonMatch) return res.json({ jobs: JSON.parse(jsonMatch[0]), live: true, source: 'gemini' });
     return res.json({ jobs: [], live: true, source: 'gemini' });
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
-  }
-});
-
-// ── Live Lehrstellen (Yousty, lehrstellennachweis.ch, berufsberatung.ch) ──────
-app.get("/api/lehrstellen", requireAuth, async (req, res) => {
-  const { keyword = '', location = '', beruf = '' } = req.query as Record<string, string>;
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey) return res.status(500).json({ error: "Gemini API nicht konfiguriert" });
-  try {
-    const ai = new GoogleGenAI({ apiKey: geminiKey });
-    const prompt = `Suche auf yousty.ch, lehrstellennachweis.ch und berufsberatung.ch nach aktuellen Lehrstellen (Berufsausbildung EFZ/EBA) in der Schweiz.${beruf ? ` Beruf: ${beruf}.` : ''}${keyword ? ` Stichwort: ${keyword}.` : ''}${location ? ` Ort/Kanton: ${location}.` : ''} Gib exakt 12 echte aktuelle Lehrstellen zurück als reines JSON-Array ohne Markdown. Felder: id (eindeutig), title (Berufsbezeichnung z.B. "Kaufmann/Kauffrau EFZ"), company (Lehrbetrieb), location (Ort, Kanton), category (immer "Lehrstellen"), description (2 Sätze über die Ausbildung), url (echter Link zu yousty.ch oder lehrstellennachweis.ch), lehrjahr_start (z.B. "August 2025"), abschluss (z.B. "EFZ" oder "EBA"), ats_keywords (3 strings).`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash',
-      contents: prompt,
-      config: { tools: [{ googleSearch: {} }], temperature: 0.2 },
-    });
-    const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
-    if (jsonMatch) return res.json({ jobs: JSON.parse(jsonMatch[0]), live: true, source: 'yousty' });
-    return res.json({ jobs: [], live: true, source: 'yousty' });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
   }
@@ -796,7 +940,7 @@ app.post("/api/create-checkout-session", express.json(), async (req, res) => {
 
 
 // ── CV Analysis ──────────────────────────────────────────────────────────────
-app.post("/api/analyze-cv", aiLimiter, requireAuth, async (req, res) => {
+app.post("/api/analyze-cv", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { text } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
@@ -817,14 +961,17 @@ app.post("/api/analyze-cv", aiLimiter, requireAuth, async (req, res) => {
   "improvements": ["punkt1", "punkt2", "punkt3"]
 }
 
-CV: ${text.substring(0, 2000)}` }]
+CV: ${String(text).substring(0, 2000)}` }]
         }],
-        config: { temperature: 0.2 }
+        config: { temperature: 0.2, maxOutputTokens: 800 }
       })
     , 3);
 
     const jsonMatch = (response.text || '').match(/\{[\s\S]*\}/);
-    if (!jsonMatch) return res.json({ success: true, metadata: {} });
+    if (!jsonMatch) {
+      await recordAIUsage(req);
+      return res.json({ success: true, metadata: {} });
+    }
     const metadata = JSON.parse(jsonMatch[0]);
 
     const uid = (req as any).uid;
@@ -833,15 +980,16 @@ CV: ${text.substring(0, 2000)}` }]
       await adminDb.collection('cv_analyses').add({ user_id: uid, data: metadata, created_at: new Date().toISOString() }).catch(console.error);
     }
 
+    await recordAIUsage(req);
     res.json({ success: true, metadata });
   } catch (error: any) {
-    console.error("[ANALYZE CV ERROR]", error);
+    console.error("[ANALYZE CV ERROR]", error.message);
     res.status(500).json({ error: error.message || 'CV-Analyse fehlgeschlagen' });
   }
 });
 
 // ── Career Roadmap Generation ─────────────────────────────────────────────────
-app.post("/api/generate-roadmap", aiLimiter, requireAuth, async (req, res) => {
+app.post("/api/generate-roadmap", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { profile } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
@@ -858,19 +1006,23 @@ app.post("/api/generate-roadmap", aiLimiter, requireAuth, async (req, res) => {
 Antworte NUR mit einem validen JSON-Array ohne Markdown:
 ["Schritt 1: ...", "Schritt 2: ...", "Schritt 3: ..."]
 
-CV: ${profile.text.substring(0, 1000)}` }]
+CV: ${String(profile.text).substring(0, 1000)}` }]
         }],
-        config: { temperature: 0.4 }
+        config: { temperature: 0.4, maxOutputTokens: 600 }
       })
     , 3);
 
     const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
-    if (!jsonMatch) return res.json({ success: false, roadmap: [] });
+    if (!jsonMatch) {
+      await recordAIUsage(req);
+      return res.json({ success: false, roadmap: [] });
+    }
     const roadmap = JSON.parse(jsonMatch[0]);
 
+    await recordAIUsage(req);
     res.json({ success: true, roadmap: Array.isArray(roadmap) ? roadmap.slice(0, 3) : [] });
   } catch (error: any) {
-    console.error("[ROADMAP ERROR]", error);
+    console.error("[ROADMAP ERROR]", error.message);
     res.status(500).json({ success: false, error: error.message || 'Roadmap-Generierung fehlgeschlagen' });
   }
 });
