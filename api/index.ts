@@ -146,7 +146,11 @@ async function sendRenewalReminder(to: string, firstName: string, planType: 'mon
 // ── Express App ───────────────────────────────────────────────────────────────
 const app = express();
 
-app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+}));
 app.use(morgan("dev"));
 
 // Restrict CORS to own domain only
@@ -712,13 +716,25 @@ app.post("/api/send-test-email", emailLimiter, requireAuth, async (req, res) => 
 
 // ── Health ────────────────────────────────────────────────────────────────────
 app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+  const stripeKey = (process.env.STRIPE_SECRET_KEY || '').trim();
+  res.json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    stripe: {
+      mode: stripeKey.startsWith('sk_live_') ? 'LIVE' : stripeKey.startsWith('sk_test_') ? 'TEST' : 'MISSING_OR_INVALID',
+      hasSecret: Boolean(stripeKey),
+      hasProMonthly: Boolean((process.env.STRIPE_PRICE_PRO_MONTHLY || '').trim()),
+      hasProYearly: Boolean((process.env.STRIPE_PRICE_PRO_YEARLY || '').trim()),
+      hasUltimateMonthly: Boolean((process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || '').trim()),
+      hasUltimateYearly: Boolean((process.env.STRIPE_PRICE_ULTIMATE_YEARLY || '').trim()),
+    },
+  });
 });
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
 app.post("/api/create-checkout-session", async (req, res) => {
-  const stripeKey = process.env.STRIPE_SECRET_KEY || '';
+  const stripeKey = (process.env.STRIPE_SECRET_KEY || '').trim();
   const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
   try {
     const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body || {};
@@ -733,10 +749,10 @@ app.post("/api/create-checkout-session", async (req, res) => {
     }
 
     const priceId: string | undefined = ({
-      'pro_monthly':      process.env.STRIPE_PRICE_PRO_MONTHLY,
-      'pro_yearly':       process.env.STRIPE_PRICE_PRO_YEARLY,
-      'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY,
-      'ultimate_yearly':  process.env.STRIPE_PRICE_ULTIMATE_YEARLY,
+      'pro_monthly':      (process.env.STRIPE_PRICE_PRO_MONTHLY || '').trim(),
+      'pro_yearly':       (process.env.STRIPE_PRICE_PRO_YEARLY || '').trim(),
+      'ultimate_monthly': (process.env.STRIPE_PRICE_ULTIMATE_MONTHLY || '').trim(),
+      'ultimate_yearly':  (process.env.STRIPE_PRICE_ULTIMATE_YEARLY || '').trim(),
     } as Record<string, string | undefined>)[`${planId}_${billingCycle}`];
 
     if (!priceId) {
@@ -763,7 +779,13 @@ app.post("/api/create-checkout-session", async (req, res) => {
     res.json({ success: true, url: session.url });
   } catch (err: any) {
     console.error(`[STRIPE ERROR] mode=${mode} type=${err.type} code=${err.code} msg=${err.message}`);
-    res.status(500).json({ success: false, error: `[${mode}] ${err.message || 'Unbekannter Stripe-Fehler'}` });
+    const msg = err?.message || 'Unbekannter Stripe-Fehler';
+    const hint =
+      msg.includes('No such price') ? 'Die STRIPE_PRICE_* ID existiert in diesem Stripe-Modus nicht.' :
+      msg.includes('test mode') || msg.includes('live mode') ? 'Secret-Key und price_ IDs sind in unterschiedlichen Modi.' :
+      msg.includes('Invalid API Key') ? 'Der STRIPE_SECRET_KEY ist ungueltig oder gehoert zum falschen Account.' :
+      undefined;
+    res.status(500).json({ success: false, error: `[${mode}] ${msg}`, hint });
   }
 });
 

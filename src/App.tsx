@@ -2622,8 +2622,14 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         })
       });
 
-      const data = await res.json().catch(() => ({ error: 'Server-Fehler' }));
-      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      const raw = await res.text();
+      let data: any = {};
+      try {
+        data = raw ? JSON.parse(raw) : {};
+      } catch {
+        data = { error: raw || 'Server-Fehler' };
+      }
+      if (!res.ok) throw new Error(data.hint ? `${data.error} ${data.hint}` : (data.error || `HTTP ${res.status}`));
       if (data.url) {
         window.location.href = data.url;
       } else {
