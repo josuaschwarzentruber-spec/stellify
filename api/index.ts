@@ -434,48 +434,75 @@ function monthKey(): string {
 }
 
 async function checkGlobalBudget(adminDb: FirebaseFirestore.Firestore): Promise<boolean> {
-  const ref = adminDb.collection('system').doc('budget');
-  const snap = await ref.get();
-  const data = snap.data();
-  const today = todayKey();
-  if (!data || data.cost_today_date !== today) {
-    await ref.set({ cost_today_date: today, calls_today: 0 }, { merge: true });
-    return true;
+  try {
+    const ref = adminDb.collection('system').doc('budget');
+    const snap = await ref.get();
+    const data = snap.data();
+    const today = todayKey();
+    if (!data || data.cost_today_date !== today) {
+      await ref.set({ cost_today_date: today, calls_today: 0 }, { merge: true });
+      return true;
+    }
+    return (data.calls_today || 0) < GLOBAL_DAILY_CALL_CAP;
+  } catch (err: any) {
+    console.warn('[BUDGET CHECK FAILED — fail-open]', err.message);
+    return true; // fail-open: don't block requests if Firestore hiccups
   }
-  return (data.calls_today || 0) < GLOBAL_DAILY_CALL_CAP;
 }
 
 async function incrementGlobalBudget(adminDb: FirebaseFirestore.Firestore) {
-  const ref = adminDb.collection('system').doc('budget');
-  const today = todayKey();
-  await adminDb.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const data = snap.data();
-    if (!data || data.cost_today_date !== today) {
-      tx.set(ref, { cost_today_date: today, calls_today: 1 });
-    } else {
-      tx.update(ref, { calls_today: (data.calls_today || 0) + 1 });
-    }
-  });
+  try {
+    const ref = adminDb.collection('system').doc('budget');
+    const today = todayKey();
+    await adminDb.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const data = snap.data();
+      if (!data || data.cost_today_date !== today) {
+        tx.set(ref, { cost_today_date: today, calls_today: 1 });
+      } else {
+        tx.update(ref, { calls_today: (data.calls_today || 0) + 1 });
+      }
+    });
+  } catch (err: any) {
+    console.warn('[BUDGET INCREMENT FAILED]', err.message);
+  }
 }
 
 const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) => {
   const uid = (req as any).uid as string | undefined;
   if (!uid) return res.status(401).json({ error: 'Unauthorized' });
 
+  let adminDb: FirebaseFirestore.Firestore;
   try {
-    const { adminDb } = getAdminServices();
+    adminDb = getAdminServices().adminDb;
+  } catch (err: any) {
+    // If Firebase Admin can't init, the auth middleware would have already failed
+    // — but just in case, fail-open here so AI calls still go through
+    console.error('[QUOTA] Admin SDK init failed — fail-open', err.message);
+    return next();
+  }
 
-    // Global cap check (last line of defence)
-    const ok = await checkGlobalBudget(adminDb);
-    if (!ok) {
-      return res.status(503).json({ error: 'Stellify ist heute stark ausgelastet. Bitte versuche es morgen erneut.' });
-    }
+  // Global cap check (fail-open if Firestore errors)
+  const ok = await checkGlobalBudget(adminDb);
+  if (!ok) {
+    return res.status(503).json({ error: 'Stellify ist heute stark ausgelastet. Bitte versuche es morgen erneut.' });
+  }
 
-    const userRef = adminDb.collection('users').doc(uid);
+  let u: any = {};
+  let role = 'client';
+  let userRef: FirebaseFirestore.DocumentReference | null = null;
+  try {
+    userRef = adminDb.collection('users').doc(uid);
     const userSnap = await userRef.get();
-    const u = userSnap.data() || {};
-    const role = (u.role as string) || 'client';
+    u = userSnap.data() || {};
+    role = (u.role as string) || 'client';
+  } catch (err: any) {
+    // If we can't read the user doc, fail-open and skip quota enforcement
+    console.warn('[QUOTA] User read failed — fail-open', err.message);
+    return next();
+  }
+
+  try {
 
     if (role === 'client') {
       const used = u.ai_calls_lifetime || 0;
@@ -526,8 +553,8 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
     (req as any).quotaUserData = u;
     next();
   } catch (err: any) {
-    console.error('[QUOTA ERROR]', err.message);
-    res.status(500).json({ error: 'Quota-Prüfung fehlgeschlagen' });
+    console.error('[QUOTA ERROR — fail-open]', err.message);
+    next(); // fail-open so the AI feature isn't broken by an unrelated bug
   }
 };
 
