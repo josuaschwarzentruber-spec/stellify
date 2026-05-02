@@ -54,8 +54,8 @@ import Markdown from 'react-markdown';
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const PRO_MODEL = "gemini-2.5-pro";
-const FLASH_MODEL = "gemini-2.5-flash";
+const PRO_MODEL = "deepseek-reasoner";
+const FLASH_MODEL = "deepseek-chat";
 
 // --- TYPES ---
 interface Message {
@@ -594,7 +594,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Weitergabe an Dritte">
                 <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
+                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (DeepSeek)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Anbieter: DeepSeek. Eingabedaten werden gemäss den Nutzungsbedingungen des Anbieters verarbeitet.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -649,7 +649,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Transfert à des tiers">
                 <p>Nous ne transmettons vos données qu'aux sous-traitants suivants :</p>
                 <div className="mt-3 space-y-4">
-                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (Google LLC)', 'Finalité : traitement IA des requêtes et du contenu du CV. Siège : USA. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
+                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (DeepSeek)', 'Finalité : traitement IA des requêtes et du contenu du CV. Fournisseur : DeepSeek. Les données sont traitées selon les conditions d\'utilisation du fournisseur.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -700,7 +700,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Trasferimento a terzi">
                 <p>Trasferiamo i dati solo ai seguenti responsabili del trattamento:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (Google LLC)', 'Finalità: elaborazione IA delle richieste e del contenuto del CV. Sede: USA. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
+                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (DeepSeek)', 'Finalità: elaborazione IA delle richieste e del contenuto del CV. Fornitore: DeepSeek. I dati sono trattati secondo i termini d\'uso del fornitore.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -751,7 +751,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Third-Party Data Sharing">
                 <p>We only share data with the following processors:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (Google LLC)', 'Purpose: AI processing of user requests and CV content. Location: USA. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
+                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (DeepSeek)', 'Purpose: AI processing of user requests and CV content. Provider: DeepSeek. Input data is processed according to the provider\'s terms of service.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -2605,8 +2605,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         body: JSON.stringify({
           userContent,
           messages: messages.slice(-10).map((h: Message) => ({
-            role: h.role === "ai" ? "model" : "user",
-            parts: [{ text: h.content }]
+            role: h.role === "ai" ? "assistant" : "user",
+            content: h.content
           })),
           systemInstruction,
           model
