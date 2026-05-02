@@ -354,6 +354,106 @@ const FALLBACK_MODELS = ['gemini-2.5-flash', 'gemini-2.5-flash-latest', 'gemini-
 const MAX_INPUT_CHARS = 32000;   // ~8k tokens
 const MAX_OUTPUT_TOKENS = 2000;  // soft cap (Gemini config)
 
+// ── DeepSeek (OpenAI-kompatibel) ──────────────────────────────────────────────
+const DEEPSEEK_API_URL = (process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com').replace(/\/$/, '') + '/chat/completions';
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
+const DEEPSEEK_TIMEOUT_MS = 30_000;
+
+type ChatHistoryMsg = { role?: string; parts?: Array<{ text?: string }>; content?: string };
+
+function geminiHistoryToOpenAI(messages?: ChatHistoryMsg[]): Array<{ role: 'user' | 'assistant'; content: string }> {
+  if (!Array.isArray(messages)) return [];
+  return messages.map((m) => {
+    const role = m.role === 'model' || m.role === 'assistant' ? 'assistant' as const : 'user' as const;
+    const content = typeof m.content === 'string'
+      ? m.content
+      : (m.parts || []).map((p) => p?.text || '').join('');
+    return { role, content };
+  }).filter((m) => m.content);
+}
+
+async function deepseekChat(opts: {
+  systemInstruction?: string;
+  history?: ChatHistoryMsg[];
+  userContent: string;
+  temperature?: number;
+  maxOutputTokens?: number;
+}): Promise<string> {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) throw new Error('DEEPSEEK_API_KEY fehlt');
+
+  const messages: Array<{ role: string; content: string }> = [];
+  if (opts.systemInstruction) messages.push({ role: 'system', content: opts.systemInstruction });
+  messages.push(...geminiHistoryToOpenAI(opts.history));
+  messages.push({ role: 'user', content: clampInput(opts.userContent) });
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), DEEPSEEK_TIMEOUT_MS);
+  try {
+    const r = await fetch(DEEPSEEK_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages,
+        temperature: opts.temperature ?? 0.7,
+        max_tokens: opts.maxOutputTokens ?? MAX_OUTPUT_TOKENS,
+        stream: false,
+      }),
+      signal: ctrl.signal,
+    });
+    if (!r.ok) {
+      const body = await r.text().catch(() => '');
+      throw new Error(`DeepSeek HTTP ${r.status}: ${body.slice(0, 200)}`);
+    }
+    const data: any = await r.json();
+    const text: string | undefined = data?.choices?.[0]?.message?.content;
+    if (!text) throw new Error('DeepSeek EMPTY_RESPONSE');
+    return text;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Try DeepSeek first, fall back to Gemini for plain text generation.
+// (Bild-/Vision- und Google-Search-Endpoints umgehen diesen Helper bewusst.)
+async function generateText(opts: {
+  systemInstruction?: string;
+  history?: ChatHistoryMsg[];
+  userContent: string;
+  temperature?: number;
+  maxOutputTokens?: number;
+  preferredGeminiModel?: string;
+}): Promise<{ text: string; provider: 'deepseek' | 'gemini' }> {
+  if (process.env.DEEPSEEK_API_KEY) {
+    try {
+      const text = await deepseekChat(opts);
+      return { text, provider: 'deepseek' };
+    } catch (err: any) {
+      console.warn('[DEEPSEEK→GEMINI fallback]', (err?.message || err).toString().slice(0, 200));
+    }
+  }
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('Weder DEEPSEEK_API_KEY noch GEMINI_API_KEY ist gesetzt');
+  const ai = new GoogleGenAI({ apiKey });
+  const userText = clampInput(opts.userContent);
+  const contents = (opts.history?.length)
+    ? [...opts.history, { role: 'user', parts: [{ text: userText }] }]
+    : [{ role: 'user', parts: [{ text: userText }] }];
+  const response = await geminiWithRetry((mdl) =>
+    ai.models.generateContent({
+      model: mdl,
+      contents,
+      config: {
+        systemInstruction: opts.systemInstruction,
+        temperature: opts.temperature ?? 0.7,
+        maxOutputTokens: opts.maxOutputTokens ?? MAX_OUTPUT_TOKENS,
+      },
+    })
+  , 3, opts.preferredGeminiModel);
+  return { text: response.text ?? '', provider: 'gemini' };
+}
+
 function clampInput(text: string): string {
   return text.length > MAX_INPUT_CHARS ? text.slice(0, MAX_INPUT_CHARS) : text;
 }
@@ -560,22 +660,20 @@ async function recordAIUsage(req: Request) {
 }
 
 
-// ── Gemini Chat ───────────────────────────────────────────────────────────────
+// ── Chat (DeepSeek primär, Gemini Fallback) ───────────────────────────────────
 app.post("/api/chat", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { messages, userContent, systemInstruction, model } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const userText = clampInput(typeof userContent === 'string' ? userContent : '');
-    const contents = messages?.length
-      ? [...messages, { role: "user", parts: [{ text: userText }] }]
-      : [{ role: "user", parts: [{ text: userText }] }];
-    const response = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({ model: mdl, contents, config: { systemInstruction, temperature: 0.7, maxOutputTokens: MAX_OUTPUT_TOKENS } })
-    , 3, model);
+    const { text, provider } = await generateText({
+      systemInstruction,
+      history: messages,
+      userContent: typeof userContent === 'string' ? userContent : '',
+      temperature: 0.7,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
+      preferredGeminiModel: model,
+    });
     await recordAIUsage(req);
-    res.json({ text: response.text ?? '' });
+    res.json({ text, provider });
   } catch (error: any) {
     console.error("[CHAT ERROR]", error.message);
     const msg = (error.message || '') + (error.status ? ` [status=${error.status}]` : '');
@@ -586,11 +684,9 @@ app.post("/api/chat", aiLimiter, requireAuth, enforceAIQuota, async (req, res) =
   }
 });
 
-// ── Gemini Tool ───────────────────────────────────────────────────────────────
+// ── Tool (DeepSeek primär; Gemini wenn Google-Search nötig) ───────────────────
 app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { prompt, model, useSearch, language } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
 
   const langInstructions: Record<string, string> = {
     DE: `Du bist Stellify – ein Elite-Karriereberater mit 20 Jahren Erfahrung auf dem Schweizer Arbeitsmarkt (Zürich, Genf, Basel, Zug, Bern). Du kennst die Strukturen der grössten Schweizer Arbeitgeber (Nestlé, Novartis, UBS, Credit Suisse, Roche, ABB, Zurich Insurance, Swiss Re, Glencore, Richemont) sowie den KMU-Sektor. SPRACHE: Schweizer Hochdeutsch (KEIN "ß", immer "ss"). Ton: präzise, direkt, professionell – wie ein Schweizer HR-Direktor. QUALITÄT: Deine Antworten sind konkret, umsetzbar und auf höchstem Niveau. Keine Floskeln, keine leeren Phrasen.`,
@@ -601,22 +697,35 @@ app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req
   const systemInstruction = langInstructions[language] || langInstructions.DE;
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const userText = clampInput(typeof prompt === 'string' ? prompt : '');
-    const response = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({
-        model: mdl,
-        contents: userText,
-        config: { systemInstruction, temperature: 0.4, maxOutputTokens: MAX_OUTPUT_TOKENS, tools: useSearch ? [{ googleSearch: {} }] : undefined }
-      })
-    , 3, model);
-    let sources: string[] = [];
+    // Mit Google-Suche → Gemini ist Pflicht (DeepSeek hat kein Grounding)
     if (useSearch) {
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
+      const ai = new GoogleGenAI({ apiKey });
+      const userText = clampInput(typeof prompt === 'string' ? prompt : '');
+      const response = await geminiWithRetry((mdl) =>
+        ai.models.generateContent({
+          model: mdl,
+          contents: userText,
+          config: { systemInstruction, temperature: 0.4, maxOutputTokens: MAX_OUTPUT_TOKENS, tools: [{ googleSearch: {} }] }
+        })
+      , 3, model);
       const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      sources = chunks.filter((c: any) => c.web?.uri).map((c: any) => `[${c.web.title || c.web.uri}](${c.web.uri})`);
+      const sources: string[] = chunks.filter((c: any) => c.web?.uri).map((c: any) => `[${c.web.title || c.web.uri}](${c.web.uri})`);
+      await recordAIUsage(req);
+      return res.json({ text: response.text, sources, provider: 'gemini' });
     }
+
+    // Sonst: DeepSeek primär, Gemini Fallback
+    const { text, provider } = await generateText({
+      systemInstruction,
+      userContent: typeof prompt === 'string' ? prompt : '',
+      temperature: 0.4,
+      maxOutputTokens: MAX_OUTPUT_TOKENS,
+      preferredGeminiModel: model,
+    });
     await recordAIUsage(req);
-    res.json({ text: response.text, sources });
+    res.json({ text, sources: [], provider });
   } catch (error: any) {
     console.error("[TOOL ERROR]", error.message);
     const msg = (error.message || '') + (error.status ? ` [status=${error.status}]` : '');
@@ -939,21 +1048,13 @@ app.post("/api/create-checkout-session", express.json(), async (req, res) => {
 });
 
 
-// ── CV Analysis ──────────────────────────────────────────────────────────────
+// ── CV Analysis (DeepSeek primär, Gemini Fallback) ───────────────────────────
 app.post("/api/analyze-cv", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { text } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   if (!text) return res.status(400).json({ error: "text fehlt" });
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({
-        model: mdl,
-        contents: [{
-          role: 'user',
-          parts: [{ text: `Analysiere diesen Lebenslauf für den Schweizer Arbeitsmarkt und antworte NUR mit einem validen JSON-Objekt ohne Markdown:
+    const userPrompt = `Analysiere diesen Lebenslauf für den Schweizer Arbeitsmarkt und antworte NUR mit einem validen JSON-Objekt ohne Markdown:
 {
   "keywords": ["keyword1", "keyword2"],
   "industryMatch": "Branche",
@@ -961,13 +1062,15 @@ app.post("/api/analyze-cv", aiLimiter, requireAuth, enforceAIQuota, async (req, 
   "improvements": ["punkt1", "punkt2", "punkt3"]
 }
 
-CV: ${String(text).substring(0, 2000)}` }]
-        }],
-        config: { temperature: 0.2, maxOutputTokens: 800 }
-      })
-    , 3);
+CV: ${String(text).substring(0, 2000)}`;
 
-    const jsonMatch = (response.text || '').match(/\{[\s\S]*\}/);
+    const { text: responseText } = await generateText({
+      userContent: userPrompt,
+      temperature: 0.2,
+      maxOutputTokens: 800,
+    });
+
+    const jsonMatch = (responseText || '').match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       await recordAIUsage(req);
       return res.json({ success: true, metadata: {} });
@@ -988,31 +1091,25 @@ CV: ${String(text).substring(0, 2000)}` }]
   }
 });
 
-// ── Career Roadmap Generation ─────────────────────────────────────────────────
+// ── Career Roadmap (DeepSeek primär, Gemini Fallback) ────────────────────────
 app.post("/api/generate-roadmap", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { profile } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   if (!profile?.text) return res.status(400).json({ error: "profile.text fehlt" });
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({
-        model: mdl,
-        contents: [{
-          role: 'user',
-          parts: [{ text: `Basierend auf diesem CV, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Arbeitsmarkt.
+    const userPrompt = `Basierend auf diesem CV, erstelle eine 3-stufige Karriere-Roadmap für den Schweizer Arbeitsmarkt.
 Antworte NUR mit einem validen JSON-Array ohne Markdown:
 ["Schritt 1: ...", "Schritt 2: ...", "Schritt 3: ..."]
 
-CV: ${String(profile.text).substring(0, 1000)}` }]
-        }],
-        config: { temperature: 0.4, maxOutputTokens: 600 }
-      })
-    , 3);
+CV: ${String(profile.text).substring(0, 1000)}`;
 
-    const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
+    const { text: responseText } = await generateText({
+      userContent: userPrompt,
+      temperature: 0.4,
+      maxOutputTokens: 600,
+    });
+
+    const jsonMatch = (responseText || '').match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       await recordAIUsage(req);
       return res.json({ success: false, roadmap: [] });
