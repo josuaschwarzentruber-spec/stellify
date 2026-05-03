@@ -30,9 +30,12 @@ function ensureFirebaseAdmin() {
 
 function getAdminServices() {
   ensureFirebaseAdmin();
+  // Allow targeting a non-default Firestore database (e.g. when Firebase
+  // creates an "ai-studio-<id>" database instead of "(default)").
+  const dbId = process.env.FIREBASE_DATABASE_ID;
   return {
     adminAuth: getAdminAuth(),
-    adminDb: getFirestore(),
+    adminDb: dbId ? getFirestore(dbId) : getFirestore(),
     adminStorage: getStorage(),
   };
 }
