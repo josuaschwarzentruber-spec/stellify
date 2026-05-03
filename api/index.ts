@@ -7,6 +7,7 @@ import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
+import { GoogleGenAI } from "@google/genai";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
@@ -660,9 +661,49 @@ app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req
 });
 
 // ── LinkedIn Screenshot / Image Text Extraction ───────────────────────────────
-// DeepSeek does not currently support image input — feature disabled.
-app.post("/api/extract-image", aiLimiter, requireAuth, async (_req, res) => {
-  res.status(501).json({ error: 'Bildanalyse wird derzeit nicht unterstützt. Bitte Text manuell einfügen.' });
+// DeepSeek has no vision capability — Gemini is used solely for this endpoint.
+const VISION_MODEL = 'gemini-2.5-flash';
+const VISION_FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+app.post("/api/extract-image", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
+  const { base64, mimeType } = req.body;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(501).json({ error: 'Bildanalyse nicht konfiguriert (GEMINI_API_KEY fehlt).' });
+  if (!base64) return res.status(400).json({ error: "base64 fehlt" });
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const models = [VISION_MODEL, ...VISION_FALLBACK_MODELS];
+    let lastError: any;
+    for (let i = 0; i < models.length; i++) {
+      try {
+        const response = await ai.models.generateContent({
+          model: models[i],
+          contents: [{
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType: mimeType || 'image/jpeg', data: base64 } },
+              { text: 'Extrahiere alle sichtbaren Textinformationen aus diesem LinkedIn-Profil-Screenshot. Gib Name, Berufsbezeichnung, Unternehmen, Ausbildung, Fähigkeiten und alle anderen relevanten Karriereinformationen als strukturierten Text zurück. Nur den extrahierten Text, keine Erklärungen.' }
+            ]
+          }],
+          config: { temperature: 0.1, maxOutputTokens: 1500 }
+        });
+        const text = (response as any).text
+          || (response as any).candidates?.[0]?.content?.parts?.filter((p: any) => p.text).map((p: any) => p.text).join('')
+          || '';
+        if (!text) throw new Error('EMPTY_RESPONSE');
+        await recordAIUsage(req);
+        return res.json({ text });
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[VISION] model=${models[i]} attempt=${i + 1} error=${(err.message || '').slice(0, 200)}`);
+        if (i < models.length - 1) await new Promise(r => setTimeout(r, (i + 1) * 1000));
+      }
+    }
+    throw lastError;
+  } catch (error: any) {
+    console.error("[IMAGE EXTRACT ERROR]", error.message);
+    res.status(500).json({ error: error.message || 'Bildanalyse fehlgeschlagen' });
+  }
 });
 
 // ── Live Job Search ───────────────────────────────────────────────────────────
