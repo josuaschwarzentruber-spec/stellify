@@ -146,22 +146,30 @@ async function sendRenewalReminder(to: string, firstName: string, planType: 'mon
 // ── Express App ───────────────────────────────────────────────────────────────
 const app = express();
 
+// Vercel sits behind a proxy → trust X-Forwarded-* headers (fixes rate-limit warning)
+app.set('trust proxy', 1);
+
 app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
 app.use(morgan("dev"));
 
-// Restrict CORS to own domain only
+// Restrict CORS to own domain (apex + www) plus Vercel-Preview-Deployments
 const allowedOrigins = [
   process.env.SITE_URL || 'https://stellify.ch',
+  'https://stellify.ch',
+  'https://www.stellify.ch',
   'http://localhost:3000',
   'http://localhost:5173',
-];
+].map((o) => o.replace(/\/$/, ''));
+const vercelPreviewRegex = /^https:\/\/[a-z0-9-]+\.vercel\.app$/i;
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.some(o => origin.startsWith(o))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    if (!origin) return callback(null, true);
+    const normalized = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(normalized) || vercelPreviewRegex.test(normalized)) {
+      return callback(null, true);
     }
+    console.warn('[CORS BLOCKED]', normalized);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
 }));
