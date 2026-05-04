@@ -8995,17 +8995,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, y: 40 }}
               className="bg-white dark:bg-[#1A1A18] w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors sm:rounded-none"
             >
-              <div className="p-3 sm:p-5 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26] shrink-0">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 bg-[#004225] text-white flex items-center justify-center">
+              <div className="p-4 sm:p-6 border-b border-black/8 dark:border-white/8 flex items-center justify-between gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26] shrink-0">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 bg-[#004225] text-white flex items-center justify-center shadow-md">
                     {activeTool.icon}
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-base sm:text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] truncate leading-tight">{activeTool.title}</h3>
-                    <p className="text-[9px] sm:text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold opacity-80">{activeTool.badge}</p>
+                    <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold mt-0.5 opacity-80">{activeTool.badge}</p>
                   </div>
                 </div>
-                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
+                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
                   <X size={20} />
                 </button>
               </div>
@@ -9184,18 +9184,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {activeTool.id === 'interview-live' && interviewSession && !isProcessingTool ? (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col gap-6">
                       {/* Header */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-[#004225] text-white flex items-center justify-center">
+                      <div className="flex items-center justify-between gap-4 flex-wrap pb-5 border-b border-black/8 dark:border-white/8">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-11 h-11 bg-[#004225] text-white flex items-center justify-center shadow-md shrink-0">
                             <Headphones size={18} />
                           </div>
-                          <div>
-                            <h4 className="text-sm font-medium">{interviewSession.questions[0] && !interviewSession.isComplete ? `${interviewSession.jobContext || toolInput.jobTitle}` : t.interview_complete}</h4>
-                            <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">{t.interview_question_of.replace('{current}', String(Math.min(interviewSession.currentQ + 1, 5)))}</p>
+                          <div className="min-w-0">
+                            <h4 className="text-[15px] font-semibold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate">{interviewSession.questions[0] && !interviewSession.isComplete ? `${interviewSession.jobContext || toolInput.jobTitle}` : t.interview_complete}</h4>
+                            <p className="text-[11px] text-[#9A9A94] font-light mt-0.5 uppercase tracking-widest">{t.interview_question_of.replace('{current}', String(Math.min(interviewSession.currentQ + 1, 5)))}</p>
                           </div>
                         </div>
                         {/* Progress bar */}
-                        <div className="flex gap-1">
+                        <div className="flex gap-1 shrink-0">
                           {interviewSession.questions.map((_, i) => (
                             <div key={i} className={`w-6 h-1.5 rounded-full transition-all ${i < interviewSession.answers.length ? 'bg-[#059669]' : i === interviewSession.currentQ && !interviewSession.isComplete ? 'bg-[#004225]' : 'bg-black/10 dark:bg-white/10'}`} />
                           ))}
@@ -9726,17 +9726,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white dark:bg-[#1A1A18] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors"
             >
-              <div className="p-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#004225] text-white flex items-center justify-center rounded-full">
-                    <Briefcase size={24} />
+              <div className="p-6 border-b border-black/8 dark:border-white/8 flex items-center justify-between gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26]">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-11 h-11 shrink-0 bg-[#004225] text-white flex items-center justify-center shadow-md">
+                    <Briefcase size={20} />
                   </div>
-                  <div>
-                    <h3 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{selectedJob.title}</h3>
-                    <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-bold uppercase tracking-widest">{selectedJob.company}</p>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate">{selectedJob.title}</h3>
+                    <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] font-bold uppercase tracking-widest mt-0.5">{selectedJob.company}</p>
                   </div>
                 </div>
-                <button onClick={() => setIsJobModalOpen(false)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]">
+                <button onClick={() => setIsJobModalOpen(false)} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
                   <X size={20} />
                 </button>
               </div>
@@ -9824,28 +9824,38 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
             >
-              <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FDFCFB]">
-                <h3 className="text-xl font-serif">{t.generated_app_title}</h3>
-                <button onClick={() => setGeneratedApp(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
+              <div className="p-6 border-b border-black/8 flex items-center justify-between gap-4 bg-[#FDFCFB]">
+                <div className="flex items-center gap-4 min-w-0">
+                  <div className="w-11 h-11 shrink-0 bg-[#004225] text-white flex items-center justify-center shadow-md">
+                    <FileText size={20} />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-xl font-serif text-[#1A1A18] leading-tight truncate">{t.generated_app_title}</h3>
+                    <p className="text-[10px] text-[#9A9A94] font-light mt-0.5">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</p>
+                  </div>
+                </div>
+                <button onClick={() => setGeneratedApp(null)} className="p-2 shrink-0 hover:bg-black/5 rounded-full transition-colors text-[#5C5C58] hover:text-[#1A1A18]">
                   <X size={20} />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto p-8 font-serif text-lg leading-relaxed whitespace-pre-wrap">
                 {generatedApp}
               </div>
-              <div className="p-6 border-t border-black/5 flex justify-end gap-4 bg-[#FDFCFB]">
-                <button 
+              <div className="p-5 border-t border-black/8 flex items-center justify-end gap-1 flex-wrap bg-[#FDFCFB]">
+                <button
                   onClick={() => {
                     navigator.clipboard.writeText(generatedApp);
                     showToast(t.tool_copied);
                   }}
-                  className="px-6 py-3 text-sm font-medium border border-black/10 hover:bg-black/5 transition-all"
+                  className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 transition-colors"
                 >
+                  <Copy size={12} />
                   {t.tool_copy}
                 </button>
+                <div className="w-px h-5 bg-black/10 mx-2 shrink-0" aria-hidden="true" />
                 <button
                   onClick={() => setGeneratedApp(null)}
-                  className="px-6 py-3 text-sm font-medium bg-[#004225] text-white hover:bg-[#00331d] transition-all"
+                  className="flex items-center gap-1.5 px-5 py-2 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331d] shadow-sm hover:shadow-md transition-all"
                 >
                   {t.close}
                 </button>
