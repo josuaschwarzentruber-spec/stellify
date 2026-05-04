@@ -4195,14 +4195,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       security_item_3_d: "Wir halten uns strikt an das Schweizer Datenschutzgesetz und die europäische DSGVO.",
       comparison_badge: "Warum Stellify?",
       comparison_title: "Der erste echte KI-Karriere-Copilot für die Schweiz.",
-      comparison_subtitle: "Andere Tools machen eines. Stellify macht alles – und versteht den Schweizer Markt.",
-      comparison_bad_title: "Standard KI / Andere Tools",
+      comparison_subtitle: "Andere Anbieter machen eines. Stellify macht alles – und versteht den Schweizer Markt.",
+      comparison_bad_title: "Standard-KI / Andere Anbieter",
       comparison_bad_items: [
-        "Leeres Chatfenster, du weisst nicht was eingeben",
+        "Leeres Chatfenster, du weisst nicht, was du eingeben sollst",
         "Kein Schweizer Format/Standard (ss vs ß)",
         "Kein Lebenslauf-Check – du weisst nicht, ob dein Lebenslauf überhaupt gelesen wird",
         "Kein Zeugnis-Decoder – Schweizer Code bleibt ein Rätsel",
-        "Kein Job-Matching – du bewirbst dich ins Blaue",
+        "Keine Stellenvorschläge – du bewirbst dich ins Blaue",
         "5 verschiedene Apps, kein roter Faden"
       ],
       comparison_good_title: "Stellify KI-Copilot",
@@ -4356,7 +4356,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           tutorial: 'Beispiel: Post über deinen neuen Job bei der Credit Suisse. Professionell, bescheiden und doch wirkungsvoll im Schweizer Stil.'
         },
         'cv-premium': { 
-          title: 'Premium CV-Rewrite', 
+          title: 'Premium Lebenslauf-Rewrite',
           desc: 'Vollständige Optimierung deines Lebenslaufs auf Schweizer Premium-Standard (kein ß, Schweizer Präzision).', 
           input_label: 'Dein aktueller Lebenslauf-Text',
           input_placeholder: 'Kopiere hier deinen gesamten Lebenslauf hierein...',
@@ -6369,15 +6369,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               >
                 {t.nav_login}
               </button>
-              <button
+              <motion.button
                 onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
-                className="relative bg-[#004225] text-white text-sm font-bold px-5 py-2.5 hover:bg-[#00331d] transition-all flex items-center gap-2 shadow-md shadow-[#004225]/30 uppercase tracking-wider"
+                whileHover={{ y: -1 }}
+                whileTap={{ y: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                className="relative bg-[#004225] text-white text-sm font-bold px-5 py-2.5 hover:bg-[#00331d] hover:shadow-lg transition-colors flex items-center gap-2 shadow-md shadow-[#004225]/30 uppercase tracking-wider group"
               >
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00A854] rounded-full animate-ping opacity-75" />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00A854] rounded-full" />
                 {t.nav_register}
-                <ArrowRight size={14} />
-              </button>
+                <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+              </motion.button>
             </>
           )}
         </div>
@@ -8170,24 +8173,29 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
 
           {/* TRUST BAR */}
-          <div className="flex flex-wrap justify-center gap-6 mb-10">
-            <div className="flex items-center gap-2 text-white/50 text-xs">
-              <Shield size={13} className="text-white/40" />
-              <span>{language === 'DE' ? '7-Tage Geld-zurück-Garantie' : language === 'FR' ? 'Garantie 7 jours' : language === 'IT' ? 'Garanzia 7 giorni' : '7-day money-back guarantee'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/50 text-xs">
-              <Lock size={13} className="text-white/40" />
-              <span>SSL-gesichert · 256-bit</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/50 text-xs">
-              <CreditCard size={13} className="text-white/40" />
-              <span>{language === 'DE' ? 'Sichere Zahlung via Stripe' : language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro via Stripe' : 'Secure payment via Stripe'}</span>
-            </div>
-            <div className="flex items-center gap-2 text-white/50 text-xs">
-              <CheckCircle2 size={13} className="text-white/40" />
-              <span>{language === 'DE' ? 'Keine automatische Verlängerung' : language === 'FR' ? 'Pas de renouvellement automatique' : language === 'IT' ? 'Nessun rinnovo automatico' : 'No automatic renewal'}</span>
-            </div>
-          </div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-40px' }}
+            variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+            className="flex flex-wrap justify-center gap-6 mb-10"
+          >
+            {[
+              { icon: <Shield size={13} className="text-white/40" />, label: language === 'DE' ? '7-Tage Geld-zurück-Garantie' : language === 'FR' ? 'Garantie 7 jours' : language === 'IT' ? 'Garanzia 7 giorni' : '7-day money-back guarantee' },
+              { icon: <Lock size={13} className="text-white/40" />, label: 'SSL-gesichert · 256-bit' },
+              { icon: <CreditCard size={13} className="text-white/40" />, label: language === 'DE' ? 'Sichere Zahlung via Stripe' : language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro via Stripe' : 'Secure payment via Stripe' },
+              { icon: <CheckCircle2 size={13} className="text-white/40" />, label: language === 'DE' ? 'Keine automatische Verlängerung' : language === 'FR' ? 'Pas de renouvellement automatique' : language === 'IT' ? 'Nessun rinnovo automatico' : 'No automatic renewal' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
+                className="flex items-center gap-2 text-white/50 text-xs"
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </motion.div>
+            ))}
+          </motion.div>
 
           <motion.div
             initial="hidden"
@@ -8397,18 +8405,47 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- FINAL CTA --- */}
-      <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white text-center">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <h2 className="text-5xl lg:text-7xl font-serif tracking-tight leading-tight">{t.cta_final_title}</h2>
-          <p className="text-white/60 font-light text-lg">{t.cta_final_desc}</p>
-          <button
+      <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white text-center relative overflow-hidden">
+        <motion.div
+          aria-hidden="true"
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 0.1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.4, ease: 'easeOut' }}
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.18), transparent 60%)' }}
+        />
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-100px' }}
+          variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
+          className="max-w-4xl mx-auto space-y-8 relative"
+        >
+          <motion.h2
+            variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] } } }}
+            className="text-5xl lg:text-7xl font-serif tracking-tight leading-tight"
+          >
+            {t.cta_final_title}
+          </motion.h2>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } }}
+            className="text-white/60 font-light text-lg"
+          >
+            {t.cta_final_desc}
+          </motion.p>
+          <motion.button
+            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } } }}
+            whileHover={{ y: -3 }}
+            whileTap={{ y: 0 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 22 }}
             onClick={() => user ? setActiveView('dashboard') : setIsAuthModalOpen(true)}
-            className="bg-white text-[#004225] px-10 py-5 text-xl font-medium hover:bg-[#FDFCFB] transition-all inline-flex items-center gap-3 group"
+            className="bg-white text-[#004225] px-10 py-5 text-xl font-medium hover:bg-[#FDFCFB] shadow-2xl shadow-black/30 transition-colors inline-flex items-center gap-3 group"
           >
             {user ? t.dashboard : t.cta_final_btn}
             <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       </section>
 
       {/* --- SUBSCRIPTION EXPIRY BANNER --- */}
