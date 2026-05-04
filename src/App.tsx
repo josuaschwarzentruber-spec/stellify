@@ -155,10 +155,10 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
     },
     {
       chapter: '02 — 05',
-      tag: isFR ? 'VOTRE CV' : isIT ? 'IL TUO CV' : isEN ? 'YOUR CV' : 'DEIN LEBENSLAUF (CV)',
-      line1: isFR ? 'Ton CV.' : isIT ? 'Il tuo CV.' : isEN ? 'Your CV.' : 'Dein Lebenslauf (CV).',
+      tag: isFR ? 'VOTRE CV' : isIT ? 'IL TUO CV' : isEN ? 'YOUR CV' : 'DEIN LEBENSLAUF',
+      line1: isFR ? 'Ton CV.' : isIT ? 'Il tuo CV.' : isEN ? 'Your CV.' : 'Dein Lebenslauf.',
       line2: isFR ? 'Perfectionné.' : isIT ? 'Perfezionato.' : isEN ? 'Perfected.' : 'Perfektioniert.',
-      sub: isFR ? 'ATS-optimisé. Design soigné. Résultats immédiats.' : isIT ? 'Ottimizzato ATS. Design curato. Risultati immediati.' : isEN ? 'ATS-optimised. Refined design. Immediate results.' : 'Recruiter-geprüft. Präzises Design. Sofortige Wirkung.',
+      sub: isFR ? 'Optimisé pour les recruteurs. Design soigné. Résultats immédiats.' : isIT ? 'Ottimizzato per i recruiter. Design curato. Risultati immediati.' : isEN ? 'Recruiter-ready. Refined design. Immediate results.' : 'Recruiter-geprüft. Präzises Design. Sofortige Wirkung.',
       isCta: false,
     },
     {
@@ -3842,7 +3842,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       welcome_modal_dismiss: "Weiter zum Dashboard",
       search_label_tool: "Tools & Möglichkeiten entdecken...",
       stella_greeting: "Grüezi, {name}! Ich bin Stella, deine KI-Karriere-Assistentin. Wie kann ich dir heute helfen?",
-      drag_cv_here: "Lebenslauf (CV) hierher ziehen oder klicken",
+      drag_cv_here: "Lebenslauf hierher ziehen oder klicken",
       drop_file_here: "Datei hier loslassen",
       pdf_only: "PDF & Word akzeptiert",
       search_placeholder: "Jobs oder Tipps suchen...",
@@ -3854,7 +3854,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       job_category: "Bereich",
       job_description: "Stellenbeschreibung",
       job_requirements: "Anforderungen",
-      job_keywords: "ATS Keywords",
+      job_keywords: "Wichtige Schlagworte",
       search_results: "{count} Ergebnisse gefunden",
       search_no_results: "Keine Ergebnisse gefunden",
       search_no_results_desc: "Versuche es mit anderen Suchbegriffen oder Kategorien.",
@@ -3932,7 +3932,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       auth_back_to_login: "Zurück zum Login",
       auth_placeholder_name: "Max",
       auth_placeholder_email: "dein@email.ch",
-      tool_no_cv: "⚠️ Kein Lebenslauf (CV) hochgeladen. Die KI nutzt allgemeine Informationen. Lade deinen Lebenslauf hoch für bessere Resultate.",
+      tool_no_cv: "⚠️ Kein Lebenslauf hochgeladen. Die KI arbeitet mit allgemeinen Informationen. Lade deinen Lebenslauf hoch für persönlichere Resultate.",
       tool_process: "Verarbeite...",
       tool_generate: "Generieren",
       tool_analyzing: "Stella analysiert...",
@@ -4065,9 +4065,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_roadmap: "Deine Roadmap",
       stella_roadmap_empty: "Lade deinen Lebenslauf hoch, um deine Roadmap zu sehen.",
       stella_insights: "Stella Insights",
-      stella_market_score: "Market Score",
-      stella_top_keywords: "Top Keywords",
-      stella_best_match: "Bester Match",
+      stella_market_score: "Markt-Bewertung",
+      stella_top_keywords: "Wichtigste Schlagworte",
+      stella_best_match: "Beste Übereinstimmung",
       stella_ch_corrections: "Sprachliche Korrekturen (CH-Hochdeutsch)",
       stella_ch_tips: "Schweiz-Spezifische Tipps",
       stella_short_profile: "Optimiertes Kurzprofil",
@@ -4079,7 +4079,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       docs_empty: "Noch keine Dokumente generiert. Starte mit einem Tool unten.",
       stella_raw_json: "Rohdaten (JSON) anzeigen",
       stella_full_analysis: "Vollständige Analyse",
-      stella_insights_with_cv: "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze den CV-Analyse-Tool für einen Tiefen-Check.",
+      stella_insights_with_cv: "Stella hat dein Profil analysiert. Dein Fokus auf Präzision passt hervorragend zum Schweizer Markt. Nutze die Lebenslauf-Analyse für einen tieferen Check.",
       stella_insights_no_cv: "Sobald du deinen Lebenslauf hochlädst, erstelle ich hier eine massgeschneiderte Analyse deiner Marktchancen.",
       salary_history: "Gehaltsverlauf",
       hero_precision: "Schweizer KI-Präzision",
@@ -4111,15 +4111,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       badge_new: "NEU",
       tools_section_badge: "21 KI-Tools",
       tools_section_title: "Alles, was du für deine Karriere brauchst",
-      tools_section_desc: "Von der CV-Analyse bis zur Lohnverhandlung – Stellify begleitet dich durch jeden Schritt.",
+      tools_section_desc: "Von der Lebenslauf-Analyse bis zur Lohnverhandlung – Stellify begleitet dich durch jeden Schritt.",
       tools_section_cta: "Alle 21 Tools ansehen →",
       testimonial_verified: "Verifiziert",
       cv_banner_title: "Lade deinen Lebenslauf hoch für personalisierte KI-Analysen",
       cv_banner_desc: "PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen Lebenslauf abgestimmt",
-      cv_banner_btn: "Lebenslauf (CV) hochladen",
+      cv_banner_btn: "Lebenslauf hochladen",
       cv_stat_upload: "Hochladen",
       testimonials: [
-        { name: 'Lukas B.', role: 'Polymechaniker EFZ', city: 'Winterthur', quote: 'Nach meiner Ausbildung wusste ich nicht genau, wie ich meine Praxiserfahrungen am besten im CV verkaufe. Stellify half mir, meine Projekte präzise zu beschreiben. Jetzt habe ich einen tollen Job bei einem grossen Industrieunternehmen.' },
+        { name: 'Lukas B.', role: 'Polymechaniker EFZ', city: 'Winterthur', quote: 'Nach meiner Ausbildung wusste ich nicht genau, wie ich meine Praxiserfahrungen im Lebenslauf am besten darstelle. Stellify half mir, meine Projekte präzise zu beschreiben. Jetzt habe ich einen tollen Job bei einem grossen Industrieunternehmen.' },
         { name: 'Sarah W.', role: 'HR-Fachfrau', city: 'Zürich', quote: 'Ich sehe täglich hunderte Bewerbungen. Der Zeugnis-Decoder von Stellify ist erschreckend präzise. Er hilft mir nicht nur privat, er gibt mir auch eine neue Perspektive auf den Schweizer Arbeitsmarkt.' },
         { name: 'Hans-Peter K.', role: 'Logistikleiter', city: 'Olten', quote: 'Mit über 50 nochmal neu anfangen war eine Herausforderung. Stellify hat meine jahrzehntelange Erfahrung in moderne, ATS-optimierte Sprache übersetzt. Das öffnete mir Türen, die ich schon für geschlossen hielt.' }
       ],
@@ -4183,14 +4183,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       market_3_t: "KI wird akzeptiert",
       market_3_d: "78% der Schweizer Arbeitnehmer würden KI für Karrierehilfe nutzen.",
       market_4_t: "Kein gutes CH-Tool",
-      market_4_d: "Keine Lösung versteht das Schweizer Zeugnis-System und ATS-Anforderungen.",
+      market_4_d: "Keine Lösung versteht das Schweizer Zeugnis-System und die Anforderungen der Bewerbungs-Scanner.",
       security_badge: "Datenschutz & Sicherheit",
       security_title: "Deine Daten sind in der Schweiz sicher.",
       security_desc: "Wir nehmen Datenschutz ernst. Deine Dokumente werden nach Schweizer Standards verarbeitet und verschlüsselt gespeichert.",
       security_item_1_t: "Schweizer Server",
       security_item_1_d: "Alle Daten werden ausschliesslich in hochsicheren Rechenzentren in der Schweiz verarbeitet.",
       security_item_2_t: "Ende-zu-Ende Verschlüsselung",
-      security_item_2_d: "Deine CVs und persönlichen Daten sind jederzeit verschlüsselt und für Dritte unzugänglich.",
+      security_item_2_d: "Deine Lebensläufe und persönlichen Daten sind jederzeit verschlüsselt und für Dritte unzugänglich.",
       security_item_3_t: "DSGVO & DSG Konform",
       security_item_3_d: "Wir halten uns strikt an das Schweizer Datenschutzgesetz und die europäische DSGVO.",
       comparison_badge: "Warum Stellify?",
@@ -4209,16 +4209,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       comparison_good_items: [
         "Geführte Prozesse, Stella weiss was du brauchst",
         "100% Schweizer Standards (Arbeitszeugnis-Code)",
-        "Echter ATS-Simulator für Schweizer Recruiter",
+        "Echter Recruiter-Scanner-Test für die Schweiz",
         "Präziser Zeugnis-Decoder (Geheimsprache)",
-        "KI-Job-Matching mit Fit-Score",
+        "KI-Jobsuche mit Übereinstimmungs-Bewertung",
         "Alles in einer Plattform, perfekt abgestimmt"
       ],
       why_stellify_points: [
         { title: "Schweizer Präzision", desc: "Wir beherrschen die Nuancen des Schweizer Marktes – von der korrekten Rechtschreibung bis hin zu kantonalen Besonderheiten.", icon: "Target" },
         { title: "Zeugnis-Code Entschlüsselt", desc: "Verstehe endlich, was wirklich in deinen Arbeitszeugnissen steht. Stella erkennt versteckte Botschaften sofort.", icon: "ShieldCheck" },
         { title: "Mehrsprachigkeit", desc: "Bewirb dich nahtlos auf Deutsch, Englisch, Französisch oder Italienisch – perfekt für den multilingualen Schweizer Markt.", icon: "Globe" },
-        { title: "ATS-Optimierung", desc: "Unsere KI ist auf die Systeme grosser Schweizer Arbeitgeber trainiert, damit dein CV garantiert gelesen wird.", icon: "Cpu" },
+        { title: "Bewerbungs-Scanner-Optimierung", desc: "Unsere KI ist auf die Systeme grosser Schweizer Arbeitgeber trainiert, damit dein Lebenslauf garantiert gelesen wird.", icon: "Cpu" },
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
         { title: "Datenschutz 'Made in CH'", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
@@ -4267,11 +4267,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           tutorial: 'Beispiel: Motivationsschreiben für eine Stelle als Marketing Manager bei Nestlé. Fokus auf lokale Marktkenntnisse und messbare Erfolge in der Westschweiz.'
         },
         'ats-sim': { 
-          title: 'ATS-Simulation', 
-          desc: 'Prüft ob dein Lebenslauf durch Recruiter-Software kommt. Mit Score & Tipps.', 
-          input_label: 'Stelleninserat (optional)', 
-          input_placeholder: 'Kopiere das Inserat für einen Match-Check...',
-          tutorial: 'Beispiel: Check eines CVs gegen ein Inserat von Roche. Analyse zeigt, dass Keywords wie "GMP-Compliance" oder "Stakeholder Management" fehlen.'
+          title: 'Bewerbungs-Scanner-Test',
+          desc: 'Prüft, ob dein Lebenslauf durch automatische Recruiter-Software kommt. Mit Bewertung & Tipps.',
+          input_label: 'Stelleninserat (optional)',
+          input_placeholder: 'Kopiere das Inserat für eine Übereinstimmungs-Prüfung...',
+          tutorial: 'Beispiel: Prüfung deines Lebenslaufs gegen ein Inserat von Roche. Die Analyse zeigt, dass Schlagworte wie "GMP-Compliance" oder "Stakeholder Management" fehlen.'
         },
         'zeugnis': { 
           title: 'Premium Zeugnis-Decoder', 
@@ -4290,19 +4290,19 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'cv-analysis': {
           title: 'Lebenslauf-Analyse',
           desc: 'Tiefgehende Analyse deines Lebenslaufs auf Keywords, Branchen-Fit und Verbesserungspotential.',
-          tutorial: 'Beispiel: Dein CV hat einen Swiss-Readiness Score von 75%. Wir empfehlen die Ergänzung deiner Arbeitsbewilligung (C-Bewilligung) und die GERS-Sprachniveaus.'
+          tutorial: 'Beispiel: Dein Lebenslauf hat eine Schweiz-Bereitschaft von 75%. Wir empfehlen die Ergänzung deiner Arbeitsbewilligung (C-Bewilligung) und die GERS-Sprachniveaus.'
         },
         'tracker': { 
           title: 'Bewerbungs-Strategie', 
           desc: 'Erstelle einen massgeschneiderten Schlachtplan für deine nächste Bewerbung.', 
           input_label: 'Jobtitel / Firma', 
           input_placeholder: 'z.B. Senior Projektleiter bei Roche',
-          tutorial: 'Beispiel: Schlachtplan für UBS. Schritt 1: Networking via LinkedIn. Schritt 2: CV-Anpassung auf "Wealth Management". Schritt 3: Vorbereitung auf Verhaltensfragen.'
+          tutorial: 'Beispiel: Schlachtplan für UBS. Schritt 1: Networking via LinkedIn. Schritt 2: Lebenslauf-Anpassung auf "Wealth Management". Schritt 3: Vorbereitung auf Verhaltensfragen.'
         },
-        'matching': { 
-          title: 'Job-Matching', 
-          desc: 'KI findet deine Top 5 passenden Stellenprofile mit Fit-Score.',
-          tutorial: 'Beispiel: Basierend auf deinem Profil passen Stellen als "Business Analyst" im Versicherungswesen (Zürich) am besten (92% Fit).'
+        'matching': {
+          title: 'Passende Stellen finden',
+          desc: 'KI findet deine Top 5 passenden Stellenprofile mit Übereinstimmungs-Bewertung.',
+          tutorial: 'Beispiel: Basierend auf deinem Profil passen Stellen als "Business Analyst" im Versicherungswesen (Zürich) am besten (92% Übereinstimmung).'
         },
         'interview': { 
           title: 'Interview-Coach', 
@@ -4327,7 +4327,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'wiedereinstieg': { 
           title: 'Wiedereinstieg-Check', 
-          desc: 'Längere Pause gemacht? Wir füllen die Lücke in deinem CV professionell und überzeugend.', 
+          desc: 'Längere Pause gemacht? Wir füllen die Lücke in deinem Lebenslauf professionell und überzeugend.',
           input_label: 'Grund der Pause (optional)', 
           input_placeholder: 'z.B. Elternzeit, Weiterbildung...',
           tutorial: 'Beispiel: Nach 2 Jahren Elternzeit. Wir formulieren die Pause als "Management von Familien-Logistik & Weiterbildung in Digital Marketing" um.'
@@ -4341,7 +4341,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'linkedin-job': { 
           title: 'LinkedIn → Bewerbung', 
-          desc: 'Profil + Stelleninserat → Motivationsschreiben, CV-Highlights & Top-Argumente.', 
+          desc: 'Profil + Stelleninserat → Anschreiben, Lebenslauf-Highlights & Top-Argumente.',
           input_profile: 'LinkedIn Profil Text', 
           input_profile_placeholder: 'Kopiere dein LinkedIn-Profil ("Über mich" & Erfahrung)...',
           input_ad: 'Stelleninserat',
@@ -7328,31 +7328,53 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               />
 
               {/* Primary CTA */}
-              <button
+              <motion.button
                 onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
-                className="w-full bg-[#004225] text-white px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-3 group shadow-lg shadow-[#004225]/20"
+                whileHover={{ y: -2 }}
+                whileTap={{ y: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+                className="w-full bg-[#004225] text-white px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#00331d] transition-colors flex items-center justify-center gap-3 group shadow-lg hover:shadow-2xl shadow-[#004225]/25"
               >
                 {t.cta_free}
                 <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </button>
+              </motion.button>
 
               {/* 3-step funnel */}
-              <div className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest">
-                <span className="flex items-center gap-1.5 text-[#004225] dark:text-[#00A854]">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-50px' }}
+                variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
+                className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest"
+              >
+                <motion.span
+                  variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
+                  className="flex items-center gap-1.5 text-[#004225] dark:text-[#00A854]"
+                >
                   <span className="w-4 h-4 bg-[#004225] dark:bg-[#00A854] text-white text-[8px] flex items-center justify-center rounded-full font-bold">1</span>
                   Gratis anmelden
-                </span>
-                <ArrowRight size={9} className="text-[#9A9A94]" />
-                <span className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]">
+                </motion.span>
+                <motion.span variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }}>
+                  <ArrowRight size={9} className="text-[#9A9A94]" />
+                </motion.span>
+                <motion.span
+                  variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
+                  className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]"
+                >
                   <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">2</span>
                   Plan wählen
-                </span>
-                <ArrowRight size={9} className="text-[#9A9A94]" />
-                <span className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]">
+                </motion.span>
+                <motion.span variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }}>
+                  <ArrowRight size={9} className="text-[#9A9A94]" />
+                </motion.span>
+                <motion.span
+                  variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
+                  className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]"
+                >
                   <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">3</span>
                   Karriere starten
-                </span>
-              </div>
+                </motion.span>
+              </motion.div>
 
               {/* Secondary links */}
               <div className="flex items-center justify-center gap-4 text-xs text-[#9A9A94]">
@@ -8167,9 +8189,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
+            className="grid lg:grid-cols-3 gap-8 mb-16"
+          >
             {/* GRATIS */}
-            <div className="p-10 bg-white/5 border border-white/10 flex flex-col">
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
+              className="p-10 bg-white/5 border border-white/10 flex flex-col"
+            >
               <div className="mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 letter-spacing-widest">Gratis</span>
                 <div className="flex items-baseline gap-1 mt-4">
@@ -8190,10 +8221,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 onClick={() => user ? setActiveView('dashboard') : (setAuthTab('register'), setIsAuthModalOpen(true))}
                 className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium"
               >{user ? t.dashboard : t.pricing_cta_free}</button>
-            </div>
+            </motion.div>
 
             {/* PRO */}
-            <div className="p-10 bg-[#004225]/10 border-2 border-[#004225] relative flex flex-col">
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
+              className="p-10 bg-[#004225]/10 border-2 border-[#004225] relative flex flex-col shadow-xl shadow-[#004225]/30"
+            >
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full">{t.pricing_recommended}</div>
               <div className="mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Pro</span>
@@ -8216,17 +8250,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </li>
                 ))}
               </ul>
-              <button 
+              <button
                 onClick={() => handleSubscription('pro')}
                 disabled={isSubscribing}
-                className="w-full py-4 bg-[#004225] hover:bg-[#00331d] transition-all text-sm font-medium disabled:opacity-50"
+                className="w-full py-4 bg-[#004225] hover:bg-[#00331d] shadow-md hover:shadow-lg shadow-[#004225]/20 transition-all text-[11px] font-bold uppercase tracking-widest disabled:opacity-50 disabled:shadow-none"
               >
                 {isSubscribing ? '...' : t.pricing_cta_pro}
               </button>
-            </div>
+            </motion.div>
 
             {/* ULTIMATE */}
-            <div className="p-10 bg-white/5 border border-white/10 flex flex-col">
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
+              className="p-10 bg-white/5 border border-white/10 flex flex-col"
+            >
               <div className="mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">Ultimate ♾️</span>
                 <div className="flex items-baseline gap-1 mt-4">
@@ -8248,15 +8285,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </li>
                 ))}
               </ul>
-              <button 
+              <button
                 onClick={() => handleSubscription('ultimate')}
                 disabled={isSubscribing}
-                className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium disabled:opacity-50"
+                className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-[11px] font-bold uppercase tracking-widest disabled:opacity-50"
               >
                 {isSubscribing ? '...' : t.pricing_cta_ultimate}
               </button>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* VALUE BOX */}
           <div className="max-w-3xl mx-auto p-8 border border-[#004225]/30 bg-[#004225]/5 rounded-none mb-16">
@@ -8304,19 +8341,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-12">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
+            className="grid md:grid-cols-3 gap-12"
+          >
             {[
               { step: '01', title: t.how_1_t, desc: t.how_1_d },
               { step: '02', title: t.how_2_t, desc: t.how_2_d },
               { step: '03', title: t.how_3_t, desc: t.how_3_d }
             ].map((item, i) => (
-              <div key={i} className="relative p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 group hover:border-[#004225]/30 dark:hover:border-[#004225]/40 transition-all">
-                <div className="text-5xl font-serif text-[#004225]/10 dark:text-[#004225]/20 mb-6 group-hover:text-[#004225]/20 dark:group-hover:text-[#004225]/40 transition-all">{item.step}</div>
+              <motion.div
+                key={i}
+                variants={{ hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] } } }}
+                whileHover={{ y: -4 }}
+                className="relative p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 group hover:border-[#004225]/30 dark:hover:border-[#004225]/40 hover:shadow-lg transition-all"
+              >
+                <div className="text-5xl font-serif text-[#004225]/10 dark:text-[#004225]/20 mb-6 group-hover:text-[#004225]/30 dark:group-hover:text-[#004225]/40 transition-all">{item.step}</div>
                 <h3 className="text-xl font-medium mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h3>
                 <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{item.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -9908,11 +9956,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
               className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"
             />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] w-full max-w-md p-10 relative z-20 shadow-2xl"
+              exit={{ opacity: 0, scale: 0.96, y: 24 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+              className="bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] w-full max-w-md p-8 sm:p-10 relative z-20 shadow-2xl border border-black/8 dark:border-white/8"
             >
               <button
                 onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
@@ -9961,28 +10010,45 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       ? 'Crea il tuo account e trasforma il tuo CV in una candidatura svizzera di alto livello.'
                       : language === 'EN'
                       ? 'Create your account and turn your CV into a Swiss-grade application.'
-                      : 'Erstelle dein Konto und verwandle deinen Lebenslauf (CV) in eine Bewerbung auf Schweizer Spitzenniveau.')}
+                      : 'Erstelle dein Konto und verwandle deinen Lebenslauf in eine Bewerbung auf Schweizer Spitzenniveau.')}
                 </p>
               </div>
 
               {authTab !== 'forgot' && (
-                <div className="flex bg-[#FDFCFB] dark:bg-[#2A2A26] p-1 mb-8">
-                  <button 
+                <div className="relative flex bg-[#FDFCFB] dark:bg-[#2A2A26] p-1 mb-8 border border-black/8 dark:border-white/8">
+                  <motion.div
+                    layout
+                    transition={{ type: 'spring', stiffness: 400, damping: 32 }}
+                    className="absolute top-1 bottom-1 bg-white dark:bg-[#1A1A18] shadow-sm pointer-events-none"
+                    style={{
+                      left: authTab === 'login' ? '0.25rem' : '50%',
+                      right: authTab === 'login' ? '50%' : '0.25rem',
+                    }}
+                    aria-hidden="true"
+                  />
+                  <button
                     onClick={() => { setAuthTab('login'); setAuthError(''); }}
-                    className={`flex-1 py-2 text-xs font-medium transition-all ${authTab === 'login' ? 'bg-white dark:bg-[#1A1A18] shadow-sm text-[#1A1A18] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}
+                    className={`relative z-10 flex-1 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors ${authTab === 'login' ? 'text-[#004225] dark:text-[#6FCF97]' : 'text-[#9A9A94] hover:text-[#5C5C58] dark:hover:text-[#FAFAF8]'}`}
                   >
                     {t.auth_login}
                   </button>
-                  <button 
+                  <button
                     onClick={() => { setAuthTab('register'); setAuthError(''); }}
-                    className={`flex-1 py-2 text-xs font-medium transition-all ${authTab === 'register' ? 'bg-white dark:bg-[#1A1A18] shadow-sm text-[#1A1A18] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}
+                    className={`relative z-10 flex-1 py-2 text-[11px] font-bold uppercase tracking-widest transition-colors ${authTab === 'register' ? 'text-[#004225] dark:text-[#6FCF97]' : 'text-[#9A9A94] hover:text-[#5C5C58] dark:hover:text-[#FAFAF8]'}`}
                   >
                     {t.auth_register}
                   </button>
                 </div>
               )}
 
-              <form onSubmit={(e) => { e.preventDefault(); if (authTab === 'forgot') handleForgotPassword(); else handleAuth(e); }} className="space-y-4">
+              <motion.form
+                key={authTab}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                onSubmit={(e) => { e.preventDefault(); if (authTab === 'forgot') handleForgotPassword(); else handleAuth(e); }}
+                className="space-y-4"
+              >
                 {authTab === 'register' && (
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.auth_first_name}</label>
@@ -10141,10 +10207,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
 
-                <button 
+                <button
                   type="submit"
                   disabled={isAuthLoading}
-                  className="w-full bg-[#004225] text-white py-4 text-sm font-medium hover:bg-[#00331d] transition-all mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                  className="w-full bg-[#004225] text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] shadow-md hover:shadow-lg shadow-[#004225]/20 transition-all mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {isAuthLoading ? (
                     <RefreshCw className="animate-spin" size={18} />
@@ -10206,7 +10272,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.auth_terms_data_processing}
                 </p>
 
-              </form>
+              </motion.form>
             </motion.div>
           </div>
         )}
