@@ -9391,9 +9391,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       className="h-full flex flex-col"
                     >
                       {/* ── Premium Result Header ── */}
-                      <div className="flex flex-col gap-4 mb-5 pb-4 border-b border-black/8 dark:border-white/8">
+                      <div className="flex flex-col gap-5 mb-6 pb-5 border-b border-black/8 dark:border-white/8">
                         {/* Title row */}
-                        <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="flex items-center justify-between gap-4 flex-wrap">
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="w-11 h-11 bg-[#004225] text-white flex items-center justify-center shadow-md shrink-0">
                               {activeTool.icon}
@@ -9403,39 +9403,38 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</p>
                             </div>
                           </div>
-                          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 border border-[#004225]/20 dark:border-[#6FCF97]/20 bg-[#004225]/5 dark:bg-[#6FCF97]/5 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#6FCF97] shrink-0">
-                            <ShieldCheck size={10} />
+                          <div className="hidden sm:flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#004225]/70 dark:text-[#6FCF97]/70 shrink-0">
+                            <ShieldCheck size={11} />
                             AI-verified
                           </div>
                         </div>
                         {/* Action bar */}
-                        <div className="flex items-center justify-end gap-2 flex-wrap">
-                          <div className="flex items-center gap-1 p-1 bg-black/[0.03] dark:bg-white/[0.03] rounded-sm">
-                            <button
-                              onClick={downloadAsPDF}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-white dark:hover:bg-[#1A1A18] dark:text-[#9A9A94] dark:hover:text-[#FAFAF8] transition-all rounded-sm"
-                            >
-                              <FileText size={12} />
-                              PDF
-                            </button>
-                            <button
-                              onClick={downloadAsWord}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-white dark:hover:bg-[#1A1A18] dark:text-[#9A9A94] dark:hover:text-[#FAFAF8] transition-all rounded-sm"
-                            >
-                              <FileUp size={12} />
-                              Word
-                            </button>
-                            <button
-                              onClick={() => { navigator.clipboard.writeText(toolResult); showToast(t.tool_copy); }}
-                              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-white dark:hover:bg-[#1A1A18] dark:text-[#9A9A94] dark:hover:text-[#FAFAF8] transition-all rounded-sm"
-                            >
-                              <Copy size={12} />
-                              {t.tool_copy}
-                            </button>
-                          </div>
+                        <div className="flex items-center justify-end gap-1 flex-wrap">
+                          <button
+                            onClick={downloadAsPDF}
+                            className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:text-[#9A9A94] dark:hover:text-[#FAFAF8] dark:hover:bg-white/5 transition-colors"
+                          >
+                            <FileText size={12} />
+                            PDF
+                          </button>
+                          <button
+                            onClick={downloadAsWord}
+                            className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:text-[#9A9A94] dark:hover:text-[#FAFAF8] dark:hover:bg-white/5 transition-colors"
+                          >
+                            <FileUp size={12} />
+                            Word
+                          </button>
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(toolResult); showToast(t.tool_copy); }}
+                            className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] hover:text-[#004225] hover:bg-[#004225]/5 dark:text-[#9A9A94] dark:hover:text-[#FAFAF8] dark:hover:bg-white/5 transition-colors"
+                          >
+                            <Copy size={12} />
+                            {t.tool_copy}
+                          </button>
+                          <div className="w-px h-5 bg-black/10 dark:bg-white/10 mx-2 shrink-0" aria-hidden="true" />
                           <button
                             onClick={() => { if (isEditingToolResult) setToolResult(toolResultEditable); setIsEditingToolResult(!isEditingToolResult); }}
-                            className="flex items-center gap-1.5 px-4 py-2 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331d] shadow-sm transition-all"
+                            className="flex items-center gap-1.5 px-5 py-2 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331d] shadow-sm hover:shadow-md transition-all"
                           >
                             {isEditingToolResult ? <><CheckCircle2 size={12} /> OK</> : <><FileText size={12} /> {language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}</>}
                           </button>
