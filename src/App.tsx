@@ -31,7 +31,8 @@ import {
   Quote, Coins, Cpu, ShieldCheck, Target, Layout, Mic, Rocket, Award, RefreshCw, Linkedin, Share2, Sun, Moon, ChevronDown,
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
-  Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon
+  Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon,
+  Pause, Volume2, VolumeX
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -118,6 +119,9 @@ function handleDbError(error: unknown, operation: string, path: string | null) {
 }
 
 // --- LAZY COMPONENTS ---
+const PROMO_VIDEO_URL: string = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_PROMO_VIDEO_URL)
+  || "https://player.vimeo.com/external/370337605.sd.mp4?s=55d55b05a3f628a6e2e56218a4a20e74e0f5a9f6&profile_id=164&oauth2_token_id=57447761";
+
 const LazyVideo = ({ src, className, ...props }: any) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "200px" });
@@ -132,6 +136,141 @@ const LazyVideo = ({ src, className, ...props }: any) => {
         />
       )}
     </div>
+  );
+};
+
+// --- PROMO VIDEO MODAL (Werbespot Lightbox) ---
+const PromoVideoModal = ({ onClose, src, language }: { onClose: () => void; src: string; language: string }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === ' ') {
+        e.preventDefault();
+        const v = videoRef.current;
+        if (!v) return;
+        v.paused ? v.play() : v.pause();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onClose]);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setIsPlaying(true); }
+    else { v.pause(); setIsPlaying(false); }
+  };
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setIsMuted(v.muted);
+  };
+
+  const onTime = () => {
+    const v = videoRef.current;
+    if (!v || !v.duration) return;
+    setProgress((v.currentTime / v.duration) * 100);
+  };
+
+  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const v = videoRef.current;
+    if (!v || !v.duration) return;
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const ratio = (e.clientX - rect.left) / rect.width;
+    v.currentTime = Math.max(0, Math.min(1, ratio)) * v.duration;
+  };
+
+  const closeLabel = language === 'FR' ? 'Fermer' : language === 'IT' ? 'Chiudi' : language === 'EN' ? 'Close' : 'Schliessen';
+  const muteLabel = language === 'FR' ? 'Couper le son' : language === 'IT' ? 'Disattiva audio' : language === 'EN' ? 'Mute' : 'Stummschalten';
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-[600] flex items-center justify-center bg-black/95 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.96, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative w-full max-w-6xl mx-4 aspect-video bg-black shadow-2xl"
+      >
+        <video
+          ref={videoRef}
+          src={src}
+          autoPlay
+          playsInline
+          onTimeUpdate={onTime}
+          onEnded={() => setIsPlaying(false)}
+          onClick={togglePlay}
+          className="w-full h-full object-cover cursor-pointer"
+        />
+
+        {/* Top bar */}
+        <div className="absolute top-0 left-0 right-0 flex items-center justify-between gap-3 p-4 bg-gradient-to-b from-black/70 to-transparent pointer-events-none">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/70 pointer-events-auto">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#6FCF97] animate-pulse" />
+            Stellify · Campaign Film
+          </div>
+          <button
+            onClick={onClose}
+            aria-label={closeLabel}
+            className="pointer-events-auto p-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Bottom bar with progress + controls */}
+        <div className="absolute bottom-0 left-0 right-0 px-4 pb-4 pt-8 bg-gradient-to-t from-black/80 to-transparent">
+          <div
+            onClick={seek}
+            className="group relative h-1 w-full bg-white/15 hover:h-1.5 transition-all cursor-pointer mb-3"
+          >
+            <div
+              className="absolute left-0 top-0 h-full bg-[#6FCF97]"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={togglePlay}
+              aria-label={isPlaying ? 'Pause' : 'Play'}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+            >
+              {isPlaying ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
+            </button>
+            <button
+              onClick={toggleMute}
+              aria-label={muteLabel}
+              className="p-2 hover:bg-white/10 rounded-full transition-colors text-white"
+            >
+              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </button>
+            <span className="ml-auto text-[9px] font-bold uppercase tracking-[0.3em] text-white/40">
+              ESC · {closeLabel}
+            </span>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -1557,6 +1696,7 @@ function StellifyApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showLoginWelcome, setShowLoginWelcome] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
+  const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   // Show promo banner 6s after page load (only once per browser)
@@ -7873,7 +8013,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="relative">
               <div className="absolute -inset-5 bg-gradient-to-br from-white/10 via-transparent to-[#6FCF97]/10 blur-2xl" />
               <button
-                onClick={() => setIsPromoOpen(true)}
+                onClick={() => setIsPromoVideoOpen(true)}
                 className="group relative w-full overflow-hidden border border-white/10 bg-white/[0.06] p-8 md:p-10 text-left backdrop-blur-md transition-all duration-500 hover:border-white/25 hover:bg-white/[0.09] hover:-translate-y-1"
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_55%)]" />
@@ -7923,6 +8063,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
               </button>
+
+              <div className="mt-4 flex justify-center">
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsPromoOpen(true); }}
+                  className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 hover:text-white/80 transition-colors flex items-center gap-2"
+                >
+                  <span className="h-px w-6 bg-white/20" />
+                  {language === 'FR' ? 'Tournée cinématique' : language === 'IT' ? 'Tour cinematografico' : language === 'EN' ? 'Cinematic Tour' : 'Cinematic Tour'}
+                </button>
+              </div>
             </div>
           </motion.div>
         </div>
@@ -10649,6 +10799,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             <PromoSequence onComplete={() => setIsPromoOpen(false)} t={t} language={language} />
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isPromoVideoOpen && (
+          <PromoVideoModal
+            src={PROMO_VIDEO_URL}
+            language={language}
+            onClose={() => setIsPromoVideoOpen(false)}
+          />
         )}
       </AnimatePresence>
 
