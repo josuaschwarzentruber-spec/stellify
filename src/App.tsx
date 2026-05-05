@@ -119,8 +119,7 @@ function handleDbError(error: unknown, operation: string, path: string | null) {
 }
 
 // --- LAZY COMPONENTS ---
-const PROMO_VIDEO_URL: string = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_PROMO_VIDEO_URL)
-  || "https://player.vimeo.com/external/370337605.sd.mp4?s=55d55b05a3f628a6e2e56218a4a20e74e0f5a9f6&profile_id=164&oauth2_token_id=57447761";
+const PROMO_VIDEO_URL: string = (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_PROMO_VIDEO_URL) || "";
 
 const LazyVideo = ({ src, className, ...props }: any) => {
   const ref = useRef(null);
@@ -140,7 +139,7 @@ const LazyVideo = ({ src, className, ...props }: any) => {
 };
 
 // --- PROMO VIDEO MODAL (Werbespot Lightbox) ---
-const PromoVideoModal = ({ onClose, src, language }: { onClose: () => void; src: string; language: string }) => {
+const PromoVideoModal = ({ onClose, onError, src, language }: { onClose: () => void; onError?: () => void; src: string; language: string }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
@@ -219,6 +218,7 @@ const PromoVideoModal = ({ onClose, src, language }: { onClose: () => void; src:
           playsInline
           onTimeUpdate={onTime}
           onEnded={() => setIsPlaying(false)}
+          onError={() => onError?.()}
           onClick={togglePlay}
           className="w-full h-full object-cover cursor-pointer"
         />
@@ -7911,14 +7911,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </svg>
           </div>
 
-          <LazyVideo 
-            src="https://player.vimeo.com/external/370337605.sd.mp4?s=55d55b05a3f628a6e2e56218a4a20e74e0f5a9f6&profile_id=164&oauth2_token_id=57447761" 
-            autoPlay 
-            muted 
-            loop 
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-overlay"
-          />
+          {PROMO_VIDEO_URL && (
+            <LazyVideo
+              src={PROMO_VIDEO_URL}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-overlay"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-[#004225] via-[#004225]/95 to-transparent" />
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
@@ -8013,7 +8015,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="relative">
               <div className="absolute -inset-5 bg-gradient-to-br from-white/10 via-transparent to-[#6FCF97]/10 blur-2xl" />
               <button
-                onClick={() => setIsPromoVideoOpen(true)}
+                onClick={() => PROMO_VIDEO_URL ? setIsPromoVideoOpen(true) : setIsPromoOpen(true)}
                 className="group relative w-full overflow-hidden border border-white/10 bg-white/[0.06] p-8 md:p-10 text-left backdrop-blur-md transition-all duration-500 hover:border-white/25 hover:bg-white/[0.09] hover:-translate-y-1"
               >
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_55%)]" />
@@ -8063,16 +8065,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
               </button>
-
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={(e) => { e.stopPropagation(); setIsPromoOpen(true); }}
-                  className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/40 hover:text-white/80 transition-colors flex items-center gap-2"
-                >
-                  <span className="h-px w-6 bg-white/20" />
-                  {language === 'FR' ? 'Tournée cinématique' : language === 'IT' ? 'Tour cinematografico' : language === 'EN' ? 'Cinematic Tour' : 'Cinematic Tour'}
-                </button>
-              </div>
             </div>
           </motion.div>
         </div>
@@ -10803,11 +10795,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </AnimatePresence>
 
       <AnimatePresence>
-        {isPromoVideoOpen && (
+        {isPromoVideoOpen && PROMO_VIDEO_URL && (
           <PromoVideoModal
             src={PROMO_VIDEO_URL}
             language={language}
             onClose={() => setIsPromoVideoOpen(false)}
+            onError={() => { setIsPromoVideoOpen(false); setIsPromoOpen(true); }}
           />
         )}
       </AnimatePresence>
