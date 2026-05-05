@@ -283,6 +283,19 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
   const isIT = language === 'IT';
   const isEN = language === 'EN';
 
+  // ESC to close + lock body scroll
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onComplete();
+    };
+    window.addEventListener('keydown', onKey);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = '';
+    };
+  }, [onComplete]);
+
   const scenes = [
     {
       chapter: '01 — 05',
@@ -352,24 +365,14 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       {/* DOT GRID */}
       <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px)', backgroundSize: '46px 46px' }} />
 
-      {/* ATMOSPHERIC ORBS */}
-      <motion.div
+      {/* ATMOSPHERIC ORBS — static for performance */}
+      <div
         className="absolute rounded-full pointer-events-none"
         style={{ width: '65vw', height: '65vw', maxWidth: 900, maxHeight: 900, top: '-25%', left: '-20%', background: 'radial-gradient(circle, rgba(0,100,50,0.32) 0%, transparent 65%)' }}
-        animate={{ x: ['0%', '9%', '-4%', '0%'], y: ['0%', '7%', '-5%', '0%'] }}
-        transition={{ duration: 28, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <motion.div
+      <div
         className="absolute rounded-full pointer-events-none"
         style={{ width: '50vw', height: '50vw', maxWidth: 700, maxHeight: 700, bottom: '-20%', right: '-15%', background: 'radial-gradient(circle, rgba(0,70,35,0.22) 0%, transparent 65%)' }}
-        animate={{ x: ['0%', '-7%', '5%', '0%'], y: ['0%', '-6%', '4%', '0%'] }}
-        transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
-      />
-      <motion.div
-        className="absolute rounded-full pointer-events-none"
-        style={{ width: '30vw', height: '30vw', maxWidth: 400, maxHeight: 400, top: '30%', right: '10%', background: 'radial-gradient(circle, rgba(0,130,60,0.12) 0%, transparent 65%)' }}
-        animate={{ x: ['0%', '5%', '-3%', '0%'], y: ['0%', '-8%', '5%', '0%'] }}
-        transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 8 }}
       />
 
       {/* AMBIENT LIGHT — shifts per scene */}
@@ -397,25 +400,24 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       </AnimatePresence>
 
       {/* CHAPTER + BRAND — top bar */}
-      <div className="absolute left-0 right-0 z-20 flex items-center justify-between px-8 md:px-14" style={{ top: 'clamp(10px, 2.5vh, 24px)' }}>
+      <div className="absolute left-0 right-0 z-40 flex items-center justify-between gap-3 px-6 md:px-14" style={{ top: 'clamp(10px, 2.5vh, 24px)' }}>
         <motion.span
           key={`ch-${sceneIdx}`}
-          className="text-[9px] font-bold uppercase tracking-[0.45em] text-white/25"
+          className="text-[9px] font-bold uppercase tracking-[0.45em] text-white/40 shrink-0"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.7 }}
         >
           {scene.chapter}
         </motion.span>
-        <span className="text-[9px] font-bold uppercase tracking-[0.5em] text-white/15">A STELLIFY FILM</span>
+        <span className="hidden md:inline text-[9px] font-bold uppercase tracking-[0.5em] text-white/25">A STELLIFY FILM</span>
         <button
           onClick={onComplete}
-          className="flex items-center gap-2 group text-white/30 hover:text-white/80 transition-colors"
+          aria-label={t.close}
+          className="flex items-center gap-2.5 px-3 py-2 border border-white/25 hover:border-white/70 bg-black/30 hover:bg-white/10 backdrop-blur-sm text-white/80 hover:text-white transition-all shrink-0 group"
         >
-          <span className="text-[9px] font-bold uppercase tracking-[0.4em] opacity-0 group-hover:opacity-100 transition-opacity">{t.close}</span>
-          <div className="w-8 h-8 border border-white/15 flex items-center justify-center group-hover:border-white/50 transition-colors">
-            <X size={14} />
-          </div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.3em]">{t.close}</span>
+          <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
         </button>
       </div>
 
@@ -1698,18 +1700,6 @@ function StellifyApp() {
   const [isPromoOpen, setIsPromoOpen] = useState(false);
   const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-
-  // Show promo banner 6s after page load (only once per browser)
-  useEffect(() => {
-    const hasSeenPromo = localStorage.getItem('hasSeenPromo');
-    if (!hasSeenPromo) {
-      const timer = setTimeout(() => {
-        setIsPromoOpen(true);
-        localStorage.setItem('hasSeenPromo', 'true');
-      }, 6000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
