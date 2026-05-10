@@ -515,14 +515,15 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
 }
 
 // ── AI Quota / Rate-Limit Enforcement ────────────────────────────────────────
-// Limits per role. Free users get 3 lifetime tries — then upgrade is required.
+// Free users get 3 lifetime tries — then upgrade is required.
+// Pro/Unlimited get generous monthly allowances with per-minute throttling.
 const QUOTA = {
   client:    { lifetime: 3 },
-  pro:       { perMin: 5,  perDay: 20, perMonth: 80 },
-  unlimited: { perMin: 10, perDay: 50, perMonth: 200 },
+  pro:       { perMin: 15, perDay: 150, perMonth: 800 },
+  unlimited: { perMin: 30, perDay: 600, perMonth: 5000 },
 } as const;
 
-const GLOBAL_DAILY_CALL_CAP = 200; // safety net: ~$3.60/day worst case
+const GLOBAL_DAILY_CALL_CAP = 3000; // safety net against runaway costs (~$45/day worst case)
 
 // In-memory per-user minute counters (resets on server restart, fine for short windows)
 const minuteCounters = new Map<string, { count: number; resetAt: number }>();
@@ -577,10 +578,13 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
   try {
     const { adminDb } = getAdminServices();
 
-    // Global cap check (last line of defence)
+    // Global cap check (last line of defence — protects against bugs/DDoS)
     const ok = await checkGlobalBudget(adminDb);
     if (!ok) {
-      return res.status(503).json({ error: 'Stellify ist heute stark ausgelastet. Bitte versuche es morgen erneut.' });
+      return res.status(503).json({
+        error: 'Stella legt gerade eine kurze Pause ein. Bitte versuche es in ein paar Stunden erneut – sorry für die Unterbrechung!',
+        retryAfter: 3600,
+      });
     }
 
     const userRef = adminDb.collection('users').doc(uid);
