@@ -6358,58 +6358,60 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   return (
     <div className="min-h-screen bg-[#FDFCFB] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">
       {/* --- NAVIGATION --- */}
-      <nav className="sticky top-0 z-50 bg-[#FDFCFB]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors duration-300">
-        <div className="flex items-center gap-8">
+      <nav className="sticky top-0 z-50 bg-[#FDFCFB]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-3 transition-colors duration-300">
+        <div className="flex items-center gap-4 sm:gap-8 min-w-0">
           <button
             onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity"
+            className="text-xl sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0"
           >
             Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
           </button>
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 rounded-full p-1">
             {user ? (
               <>
                 <button
                   onClick={() => navigate('dashboard')}
-                  className={`text-sm font-medium transition-colors ${activeView === 'dashboard' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'dashboard' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.dashboard}
                 </button>
                 <button
                   onClick={() => navigate('tools')}
-                  className={`text-sm font-medium transition-colors ${activeView === 'tools' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.tools}
                 </button>
                 <button
                   onClick={() => navigate('jobs')}
-                  className={`text-sm font-medium transition-colors ${activeView === 'jobs' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'jobs' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.search_type_job}
                 </button>
                 <button
                   onClick={() => { document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="text-sm font-medium transition-colors text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854]"
+                  className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5"
                 >
                   {t.pricing}
                 </button>
               </>
             ) : (
               <>
-                <a href="#features" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.features}</a>
-                <a href="#success" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.success_stories}</a>
-                <a href="#how" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.how_it_works}</a>
-                <a href="#pricing" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.pricing}</a>
+                <a href="#features" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.features}</a>
+                <a href="#success" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.success_stories}</a>
+                <a href="#how" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.how_it_works}</a>
+                <a href="#pricing" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.pricing}</a>
               </>
             )}
-            <div className="relative border-l border-black/5 dark:border-white/5 pl-6" ref={langDropdownRef}>
-              <button 
+            </div>
+            <div className="relative" ref={langDropdownRef}>
+              <button
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                className="flex items-center gap-2 text-xs font-bold text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors uppercase tracking-widest"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/10 transition-all uppercase tracking-widest"
               >
-                <Globe size={14} />
+                <Globe size={13} />
                 {language}
-                <ChevronDown size={12} className={`transition-transform duration-200 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={11} className={`transition-transform duration-200 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               <AnimatePresence>
@@ -6476,36 +6478,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             <Search size={20} />
           </button>
-          <button 
+          <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 hover:bg-black/5 rounded-full transition-colors"
+            className="md:hidden p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           {user ? (
-            <div className="flex items-center gap-4">
-              <button 
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="p-2 hover:bg-black/5 rounded-full transition-colors text-[#5C5C58]"
+                className="p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
                 title={t.nav_settings}
               >
-                <Settings size={18} />
+                <Settings size={16} />
               </button>
 
-              <span className="text-sm font-medium hidden sm:inline">{t.nav_greeting}, {user.firstName}</span>
-              <button 
+              <span className="text-[13px] font-medium hidden lg:inline text-[#5C5C58] dark:text-[#9A9A94]">{t.nav_greeting}, {user.firstName}</span>
+              <button
                 onClick={handleLogout}
-                className="p-2 hover:bg-black/5 rounded-full transition-colors"
+                className="p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
                 title={t.nav_logout}
               >
-                <LogOut size={18} />
+                <LogOut size={16} />
               </button>
             </div>
           ) : (
             <>
-              <button 
+              <button
                 onClick={() => { setAuthTab('login'); setIsAuthModalOpen(true); }}
-                className="text-sm font-medium text-[#5C5C58] hover:text-[#1A1A18] transition-colors px-4 py-2"
+                className="hidden sm:inline-flex text-[13px] font-medium text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] rounded-full transition-all px-4 py-1.5"
               >
                 {t.nav_login}
               </button>
@@ -6529,36 +6531,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- MOBILE MENU --- */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden fixed inset-x-0 top-16 bg-white border-b border-black/5 z-40 p-6 space-y-6 shadow-xl"
+            className="md:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#1A1A18] border-b border-black/8 dark:border-white/8 z-40 p-4 sm:p-6 space-y-5 shadow-xl"
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {user ? (
                 <>
-                  <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'dashboard' ? 'text-[#004225]' : ''}`}>{t.dashboard}</button>
-                  <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'tools' ? 'text-[#004225]' : ''}`}>{t.tools}</button>
-                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'jobs' ? 'text-[#004225]' : ''}`}>{t.search_type_job}</button>
-                  <button onClick={() => { setIsMenuOpen(false); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-lg font-medium text-left">{t.pricing}</button>
+                  <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
+                  <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
+                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
+                  <button onClick={() => { setIsMenuOpen(false); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }} className="px-4 py-3 text-base font-medium text-left rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</button>
                 </>
               ) : (
                 <>
-                  <a href="#features" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium">{t.features}</a>
-                  <a href="#how" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium">{t.how_it_works}</a>
-                  <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium">{t.pricing}</a>
+                  <a href="#features" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.features}</a>
+                  <a href="#how" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.how_it_works}</a>
+                  <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</a>
                 </>
               )}
             </div>
-            <div className="pt-6 border-t border-black/5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-4">Sprache / Langue / Lingua</p>
-              <div className="flex flex-wrap gap-3">
+            <div className="pt-6 border-t border-black/8 dark:border-white/8">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-3">Sprache / Langue / Lingua</p>
+              <div className="flex flex-wrap gap-2">
                 {['DE', 'EN', 'FR', 'IT'].map((lang) => (
                   <button
                     key={lang}
                     onClick={() => { setLanguage(lang as any); setIsMenuOpen(false); }}
-                    className={`px-4 py-2 text-xs font-bold border ${language === lang ? 'bg-[#004225] text-white border-[#004225]' : 'border-black/10 text-[#5C5C58] dark:text-[#9A9A94] dark:border-white/10'}`}
+                    className={`px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors ${language === lang ? 'bg-[#004225] text-white' : 'bg-black/[0.04] dark:bg-white/[0.04] text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/[0.08] dark:hover:bg-white/[0.08]'}`}
                   >
                     {lang}
                   </button>
@@ -7713,8 +7715,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ))}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="p-8 border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
+          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+            <div className="p-6 sm:p-8 border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
               <h3 className="text-lg font-medium text-red-900 dark:text-red-400 mb-6 flex items-center gap-2">
                 <X size={20} className="text-red-500" />
                 {t.comparison_bad_title}
@@ -7928,7 +7930,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="grid lg:grid-cols-[1.15fr_0.85fr] gap-12 lg:gap-20 items-end"
+            className="grid lg:grid-cols-[1.15fr_0.85fr] gap-8 sm:gap-12 lg:gap-20 items-end"
           >
             <div className="space-y-8 text-left">
               <div className="flex flex-wrap items-center gap-3">
@@ -8320,7 +8322,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
             variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-            className="flex flex-wrap justify-center gap-6 mb-10"
+            className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 mb-8 sm:mb-10"
           >
             {[
               { icon: <Shield size={13} className="text-white/40" />, label: language === 'DE' ? '7-Tage Geld-zurück-Garantie' : language === 'FR' ? 'Garantie 7 jours' : language === 'IT' ? 'Garanzia 7 giorni' : '7-day money-back guarantee' },
@@ -8344,7 +8346,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
             variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-            className="grid lg:grid-cols-3 gap-8 mb-16"
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-16"
           >
             {/* GRATIS */}
             <motion.div
@@ -8643,8 +8645,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- FOOTER --- */}
       <footer className="bg-[#1A1A18] text-white/50 px-6 lg:px-12 py-24 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-24">
-            <div className="col-span-2 lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 mb-16 lg:mb-24">
+            <div className="sm:col-span-2 lg:col-span-2 space-y-6">
               <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-serif tracking-tight text-white">
                 Stell<span className="text-[#00A854]">ify</span>
               </a>
