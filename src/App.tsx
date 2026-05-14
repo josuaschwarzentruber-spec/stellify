@@ -1323,20 +1323,25 @@ function StellifyApp() {
   }, [activeView]);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb') => {
+  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (view === 'pricing') {
+      // Wait one tick for the section to mount, then smooth-scroll
+      setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   useEffect(() => {
     const onPop = (e: PopStateEvent) => {
-      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | 'datenschutz' | 'impressum' | 'agb' | undefined;
+      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | undefined;
       if (view) {
         setActiveView(view);
         setActiveTool(null);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (view !== 'pricing') window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
         setActiveView('dashboard');
         setActiveTool(null);
@@ -6379,7 +6384,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.search_type_job}
                 </button>
                 <button
-                  onClick={() => { setActiveView('pricing'); setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50); }}
+                  onClick={() => navigate('pricing')}
                   className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'pricing' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.pricing}
@@ -6533,7 +6538,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
                   <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
-                  <button onClick={() => { setActiveView('pricing'); setIsMenuOpen(false); setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
+                  <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
                 </>
               ) : (
                 <>
@@ -9612,14 +9617,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       )}
                     </motion.div>
                   ) : isProcessingTool ? (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 dark:bg-[#1A1A18]/80 backdrop-blur-sm z-10">
-                      <div className="w-12 h-12 border-4 border-[#004225]/10 dark:border-[#FAFAF8]/10 border-t-[#004225] dark:border-t-[#FAFAF8] rounded-full animate-spin mb-4" />
-                      <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.tool_analyzing}</p>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/90 dark:bg-[#1A1A18]/90 backdrop-blur-md z-10">
+                      <div className="relative mb-6">
+                        <div className="absolute inset-0 bg-[#004225]/20 dark:bg-[#6FCF97]/20 blur-2xl animate-pulse" />
+                        <motion.div
+                          className="relative w-14 h-14 border-2 border-[#004225]/20 dark:border-[#6FCF97]/20 border-t-[#004225] dark:border-t-[#6FCF97] rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Sparkles size={18} className="text-[#004225] dark:text-[#6FCF97]" />
+                        </div>
+                      </div>
+                      <motion.p
+                        key={Math.floor(Date.now() / 2400) % 4}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                        className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#6FCF97]"
+                      >
+                        {t.tool_analyzing}
+                      </motion.p>
+                      <p className="mt-2 text-[9px] text-[#9A9A94] font-light max-w-xs text-center px-4">
+                        {language === 'EN' ? 'Stella is consulting Swiss market data and applying recruiter standards' : language === 'FR' ? 'Stella consulte les données du marché suisse et applique les standards recruteurs' : language === 'IT' ? 'Stella consulta i dati del mercato svizzero e applica gli standard dei recruiter' : 'Stella prüft Schweizer Marktdaten und wendet Recruiter-Standards an'}
+                      </p>
                     </div>
                   ) : toolResult ? (
                     <motion.div
-                      initial={{ opacity: 0, y: 10 }}
+                      initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                       className="h-full flex flex-col"
                     >
                       {/* ── Premium Result Header ── */}
@@ -9803,7 +9830,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         ) : (
                           /* ── Premium Markdown Result ── */
-                          <div className="space-y-0">
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.4, delay: 0.1 }}
+                            className="space-y-0 relative"
+                          >
+                            {/* Subtle ambient glow */}
+                            <div
+                              aria-hidden="true"
+                              className="absolute -top-8 left-1/2 -translate-x-1/2 w-[60%] h-32 bg-[#004225]/4 dark:bg-[#6FCF97]/5 blur-3xl pointer-events-none"
+                            />
                             {/* Tool-specific banner */}
                             {(activeTool.id === 'cv-premium' || activeTool.id === 'career-roadmap' || activeTool.id === 'cv-gen' || activeTool.id === 'zeugnis' || activeTool.id === 'cv-optimizer' || activeTool.id === 'linkedin-job') && (
                               <div className="mb-6 flex items-center gap-3 p-3.5 bg-gradient-to-r from-[#004225]/8 to-transparent border-l-4 border-[#004225]">
@@ -9877,7 +9914,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <span>Stellify · Swiss AI</span>
                               </div>
                             </div>
-                          </div>
+                          </motion.div>
                         )}
                       </div>
                     </motion.div>
