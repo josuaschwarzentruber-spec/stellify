@@ -9093,11 +9093,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- STELLA CHAT WINDOW --- */}
       <AnimatePresence>
         {isStellaOpen && (
-          <motion.div 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsStellaOpen(false)}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[99] xl:hidden"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isStellaOpen && (
+          <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 left-4 sm:left-auto w-auto sm:w-[420px] lg:w-[450px] max-w-[calc(100vw-2rem)] sm:max-w-[90vw] h-[calc(100vh-7rem)] sm:h-[640px] lg:h-[700px] sm:max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
+            className="fixed bottom-20 xl:bottom-24 right-4 xl:right-6 left-4 xl:left-auto w-auto xl:w-[440px] 2xl:w-[460px] max-w-[calc(100vw-2rem)] xl:max-w-[90vw] h-[calc(100vh-7rem)] xl:h-[680px] 2xl:h-[720px] xl:max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
           >
             <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
               <div className="flex items-center gap-3">
