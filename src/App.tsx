@@ -6348,58 +6348,60 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   return (
     <div className="min-h-screen bg-[#FDFCFB] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">
       {/* --- NAVIGATION --- */}
-      <nav className="sticky top-0 z-50 bg-[#FDFCFB]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-6 lg:px-12 h-16 flex items-center justify-between transition-colors duration-300">
-        <div className="flex items-center gap-8">
+      <nav className="sticky top-0 z-50 bg-[#FDFCFB]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-3 transition-colors duration-300">
+        <div className="flex items-center gap-4 sm:gap-8 min-w-0">
           <button
             onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity"
+            className="text-xl sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0"
           >
             Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
           </button>
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 rounded-full p-1">
             {user ? (
               <>
                 <button
                   onClick={() => navigate('dashboard')}
-                  className={`text-sm font-medium transition-colors ${activeView === 'dashboard' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'dashboard' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.dashboard}
                 </button>
                 <button
                   onClick={() => navigate('tools')}
-                  className={`text-sm font-medium transition-colors ${activeView === 'tools' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.tools}
                 </button>
                 <button
                   onClick={() => navigate('jobs')}
-                  className={`text-sm font-medium transition-colors ${activeView === 'jobs' ? 'text-[#004225] dark:text-[#00A854]' : 'text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'}`}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'jobs' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.search_type_job}
                 </button>
                 <button
                   onClick={() => { document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }}
-                  className="text-sm font-medium transition-colors text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854]"
+                  className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5"
                 >
                   {t.pricing}
                 </button>
               </>
             ) : (
               <>
-                <a href="#features" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.features}</a>
-                <a href="#success" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.success_stories}</a>
-                <a href="#how" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.how_it_works}</a>
-                <a href="#pricing" className="text-sm font-medium text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors">{t.pricing}</a>
+                <a href="#features" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.features}</a>
+                <a href="#success" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.success_stories}</a>
+                <a href="#how" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.how_it_works}</a>
+                <a href="#pricing" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.pricing}</a>
               </>
             )}
-            <div className="relative border-l border-black/5 dark:border-white/5 pl-6" ref={langDropdownRef}>
-              <button 
+            </div>
+            <div className="relative" ref={langDropdownRef}>
+              <button
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
-                className="flex items-center gap-2 text-xs font-bold text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors uppercase tracking-widest"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/10 transition-all uppercase tracking-widest"
               >
-                <Globe size={14} />
+                <Globe size={13} />
                 {language}
-                <ChevronDown size={12} className={`transition-transform duration-200 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown size={11} className={`transition-transform duration-200 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
               <AnimatePresence>
@@ -6466,36 +6468,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             <Search size={20} />
           </button>
-          <button 
+          <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 hover:bg-black/5 rounded-full transition-colors"
+            className="md:hidden p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
           {user ? (
-            <div className="flex items-center gap-4">
-              <button 
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="p-2 hover:bg-black/5 rounded-full transition-colors text-[#5C5C58]"
+                className="p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
                 title={t.nav_settings}
               >
-                <Settings size={18} />
+                <Settings size={16} />
               </button>
 
-              <span className="text-sm font-medium hidden sm:inline">{t.nav_greeting}, {user.firstName}</span>
-              <button 
+              <span className="text-[13px] font-medium hidden lg:inline text-[#5C5C58] dark:text-[#9A9A94]">{t.nav_greeting}, {user.firstName}</span>
+              <button
                 onClick={handleLogout}
-                className="p-2 hover:bg-black/5 rounded-full transition-colors"
+                className="p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
                 title={t.nav_logout}
               >
-                <LogOut size={18} />
+                <LogOut size={16} />
               </button>
             </div>
           ) : (
             <>
-              <button 
+              <button
                 onClick={() => { setAuthTab('login'); setIsAuthModalOpen(true); }}
-                className="text-sm font-medium text-[#5C5C58] hover:text-[#1A1A18] transition-colors px-4 py-2"
+                className="hidden sm:inline-flex text-[13px] font-medium text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] rounded-full transition-all px-4 py-1.5"
               >
                 {t.nav_login}
               </button>
@@ -6519,36 +6521,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- MOBILE MENU --- */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden fixed inset-x-0 top-16 bg-white border-b border-black/5 z-40 p-6 space-y-6 shadow-xl"
+            className="md:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#1A1A18] border-b border-black/8 dark:border-white/8 z-40 p-4 sm:p-6 space-y-5 shadow-xl"
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {user ? (
                 <>
-                  <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'dashboard' ? 'text-[#004225]' : ''}`}>{t.dashboard}</button>
-                  <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'tools' ? 'text-[#004225]' : ''}`}>{t.tools}</button>
-                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`text-lg font-medium text-left ${activeView === 'jobs' ? 'text-[#004225]' : ''}`}>{t.search_type_job}</button>
-                  <button onClick={() => { setIsMenuOpen(false); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-lg font-medium text-left">{t.pricing}</button>
+                  <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
+                  <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
+                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
+                  <button onClick={() => { setIsMenuOpen(false); document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }); }} className="px-4 py-3 text-base font-medium text-left rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</button>
                 </>
               ) : (
                 <>
-                  <a href="#features" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium">{t.features}</a>
-                  <a href="#how" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium">{t.how_it_works}</a>
-                  <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="text-lg font-medium">{t.pricing}</a>
+                  <a href="#features" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.features}</a>
+                  <a href="#how" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.how_it_works}</a>
+                  <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</a>
                 </>
               )}
             </div>
-            <div className="pt-6 border-t border-black/5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-4">Sprache / Langue / Lingua</p>
-              <div className="flex flex-wrap gap-3">
+            <div className="pt-6 border-t border-black/8 dark:border-white/8">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-3">Sprache / Langue / Lingua</p>
+              <div className="flex flex-wrap gap-2">
                 {['DE', 'EN', 'FR', 'IT'].map((lang) => (
                   <button
                     key={lang}
                     onClick={() => { setLanguage(lang as any); setIsMenuOpen(false); }}
-                    className={`px-4 py-2 text-xs font-bold border ${language === lang ? 'bg-[#004225] text-white border-[#004225]' : 'border-black/10 text-[#5C5C58] dark:text-[#9A9A94] dark:border-white/10'}`}
+                    className={`px-4 py-1.5 text-[11px] font-bold rounded-full transition-colors ${language === lang ? 'bg-[#004225] text-white' : 'bg-black/[0.04] dark:bg-white/[0.04] text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/[0.08] dark:hover:bg-white/[0.08]'}`}
                   >
                     {lang}
                   </button>
@@ -7413,28 +7415,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </section>
       ) : (
-        <section className="px-6 lg:px-12 py-20 lg:py-32 grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto transition-colors">
-          <motion.div 
+        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl mx-auto transition-colors">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8 min-w-0"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-xs font-bold tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#FDFCFB] animate-pulse" />
               {t.hero_precision}
             </div>
-            <h1 className="text-5xl lg:text-7xl font-serif leading-[1.1] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
+            <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl xl:text-7xl font-serif leading-[1.05] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] text-balance">
               {t.hero_intro} <br />
               <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_title.split(' ').pop()}</span>
             </h1>
-            <p className="text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
+            <p className="text-base sm:text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
               {t.hero_desc}
             </p>
             {language === 'DE' ? (
-              <div className="flex flex-nowrap items-center gap-x-1 overflow-x-auto">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
                 {([
-                  ['1', 'Lebenslauf (CV) hochladen'],
+                  ['1', 'Lebenslauf hochladen'],
                   ['2', 'KI-Analyse'],
                   ['3', 'Bewerbung optimieren'],
                   ['4', 'Interview meistern'],
@@ -7444,7 +7446,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <span className="w-4 h-4 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
                       <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] whitespace-nowrap">{label}</span>
                     </div>
-                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5">→</span>}
+                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5 hidden sm:inline">→</span>}
                   </React.Fragment>
                 ))}
               </div>
@@ -7478,7 +7480,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
-                className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest"
+                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[9px] font-bold uppercase tracking-widest"
               >
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
@@ -7703,8 +7705,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ))}
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="p-8 border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
+          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
+            <div className="p-6 sm:p-8 border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
               <h3 className="text-lg font-medium text-red-900 dark:text-red-400 mb-6 flex items-center gap-2">
                 <X size={20} className="text-red-500" />
                 {t.comparison_bad_title}
@@ -7918,7 +7920,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="grid lg:grid-cols-[1.15fr_0.85fr] gap-12 lg:gap-20 items-end"
+            className="grid lg:grid-cols-[1.15fr_0.85fr] gap-8 sm:gap-12 lg:gap-20 items-end"
           >
             <div className="space-y-8 text-left">
               <div className="flex flex-wrap items-center gap-3">
@@ -8310,7 +8312,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             whileInView="visible"
             viewport={{ once: true, margin: '-40px' }}
             variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-            className="flex flex-wrap justify-center gap-6 mb-10"
+            className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 mb-8 sm:mb-10"
           >
             {[
               { icon: <Shield size={13} className="text-white/40" />, label: language === 'DE' ? '7-Tage Geld-zurück-Garantie' : language === 'FR' ? 'Garantie 7 jours' : language === 'IT' ? 'Garanzia 7 giorni' : '7-day money-back guarantee' },
@@ -8334,7 +8336,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
             variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-            className="grid lg:grid-cols-3 gap-8 mb-16"
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-16"
           >
             {/* GRATIS */}
             <motion.div
@@ -8633,8 +8635,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- FOOTER --- */}
       <footer className="bg-[#1A1A18] text-white/50 px-6 lg:px-12 py-24 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-24">
-            <div className="col-span-2 lg:col-span-2 space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 mb-16 lg:mb-24">
+            <div className="sm:col-span-2 lg:col-span-2 space-y-6">
               <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-serif tracking-tight text-white">
                 Stell<span className="text-[#00A854]">ify</span>
               </a>
@@ -9083,11 +9085,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- STELLA CHAT WINDOW --- */}
       <AnimatePresence>
         {isStellaOpen && (
-          <motion.div 
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setIsStellaOpen(false)}
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[99] xl:hidden"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isStellaOpen && (
+          <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 w-[450px] h-[700px] max-w-[90vw] max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
+            className="fixed bottom-20 xl:bottom-24 right-4 xl:right-6 left-4 xl:left-auto w-auto xl:w-[440px] 2xl:w-[460px] max-w-[calc(100vw-2rem)] xl:max-w-[90vw] h-[calc(100vh-7rem)] xl:h-[680px] 2xl:h-[720px] xl:max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
           >
             <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
               <div className="flex items-center gap-3">
@@ -9194,9 +9209,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </AnimatePresence>
 
       {/* --- STELLA FAB --- */}
-      <button 
+      <button
         onClick={() => setIsStellaOpen(prev => !prev)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-[#004225] text-white shadow-2xl flex items-center justify-center z-[100] group"
+        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-[#004225] text-white shadow-2xl flex items-center justify-center z-[100] group"
       >
         <div className="absolute inset-0 bg-[#004225] animate-ping opacity-20 group-hover:opacity-40 transition-opacity" />
         <span className="relative font-serif text-xl">S</span>
