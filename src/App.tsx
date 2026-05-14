@@ -7423,28 +7423,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </section>
       ) : (
-        <section className="px-6 lg:px-12 py-20 lg:py-32 grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto transition-colors">
-          <motion.div 
+        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl mx-auto transition-colors">
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="space-y-8"
+            className="space-y-6 sm:space-y-8 min-w-0"
           >
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-xs font-bold tracking-widest uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#FDFCFB] animate-pulse" />
               {t.hero_precision}
             </div>
-            <h1 className="text-5xl lg:text-7xl font-serif leading-[1.1] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
+            <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl xl:text-7xl font-serif leading-[1.05] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] text-balance">
               {t.hero_intro} <br />
               <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_title.split(' ').pop()}</span>
             </h1>
-            <p className="text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
+            <p className="text-base sm:text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
               {t.hero_desc}
             </p>
             {language === 'DE' ? (
-              <div className="flex flex-nowrap items-center gap-x-1 overflow-x-auto">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
                 {([
-                  ['1', 'Lebenslauf (CV) hochladen'],
+                  ['1', 'Lebenslauf hochladen'],
                   ['2', 'KI-Analyse'],
                   ['3', 'Bewerbung optimieren'],
                   ['4', 'Interview meistern'],
@@ -7454,7 +7454,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <span className="w-4 h-4 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
                       <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] whitespace-nowrap">{label}</span>
                     </div>
-                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5">→</span>}
+                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5 hidden sm:inline">→</span>}
                   </React.Fragment>
                 ))}
               </div>
@@ -7488,7 +7488,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
-                className="flex items-center justify-center gap-2 text-[9px] font-bold uppercase tracking-widest"
+                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[9px] font-bold uppercase tracking-widest"
               >
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
@@ -9097,7 +9097,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 w-[450px] h-[700px] max-w-[90vw] max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
+            className="fixed bottom-20 sm:bottom-24 right-4 sm:right-6 left-4 sm:left-auto w-auto sm:w-[420px] lg:w-[450px] max-w-[calc(100vw-2rem)] sm:max-w-[90vw] h-[calc(100vh-7rem)] sm:h-[640px] lg:h-[700px] sm:max-h-[80vh] bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl z-[100] flex flex-col transition-colors"
           >
             <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
               <div className="flex items-center gap-3">
@@ -9204,9 +9204,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </AnimatePresence>
 
       {/* --- STELLA FAB --- */}
-      <button 
+      <button
         onClick={() => setIsStellaOpen(prev => !prev)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-[#004225] text-white shadow-2xl flex items-center justify-center z-[100] group"
+        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-[#004225] text-white shadow-2xl flex items-center justify-center z-[100] group"
       >
         <div className="absolute inset-0 bg-[#004225] animate-ping opacity-20 group-hover:opacity-40 transition-opacity" />
         <span className="relative font-serif text-xl">S</span>
