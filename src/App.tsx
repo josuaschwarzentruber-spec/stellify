@@ -1390,6 +1390,7 @@ function StellifyApp() {
   const [toolResultEditable, setToolResultEditable] = useState<string>('');
   const [isEditingToolResult, setIsEditingToolResult] = useState(false);
   const [parsedSalaryResult, setParsedSalaryResult] = useState<any | null>(null);
+  const [parsedInterviewResult, setParsedInterviewResult] = useState<any | null>(null);
   const [interviewSession, setInterviewSession] = useState<{
     questions: Array<{q: string; tip: string; model: string; mistakes: string}>;
     jobContext: string;
@@ -2871,6 +2872,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setToolResultEditable('');
     setIsEditingToolResult(false);
     setParsedSalaryResult(null);
+    setParsedInterviewResult(null);
 
     const isUnlimited = user?.role === 'unlimited' || user?.role === 'admin';
     const isPro = user?.role === 'pro' || isUnlimited;
@@ -3235,13 +3237,23 @@ Bewerte in 3 Kategorien (je 0–100%):
             CV: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards'}.
             SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
 
-            AUFGABE: Erstelle 5 massgeschneiderte, anspruchsvolle Interviewfragen für Schweizer Unternehmen.
-            Für jede Frage: die Frage selbst, was der Recruiter wissen will, optimale Antwortstrategie, Musterantwort auf Schweizer Hochdeutsch, häufige Fehler.
+            AUFGABE: Erstelle eine massgeschneiderte Interview-Vorbereitung für Schweizer Unternehmen.
 
             ${scoringGrid}
 
-            ABSCHLUSS: 3 konkrete Schweizer Interview-Tipps (Pünktlichkeit, Unterlagen, Kultur).
-            WICHTIG: Schreibe als fliessenden, strukturierten Text ohne Sternchen oder Aufzählungszeichen.
+            ANTWORTFORMAT: Antworte AUSSCHLIESSLICH mit gültigem JSON (keine Markdown-Codeblöcke, kein Text davor/danach):
+            {
+              "title": "Interview-Vorbereitung",
+              "subtitle": "<kurze Zusammenfassung Qualifikation · Zielposition, max 90 Zeichen>",
+              "tags": ["<3-5 zentrale Themen, je 1-3 Wörter>"],
+              "stats": { "questions": <Anzahl Fragen als Zahl>, "topics": <Anzahl Kernthemen als Zahl>, "match": <Eignungs-Score 0-100 als Zahl> },
+              "elevatorPitch": "<überzeugender Elevator Pitch in 3-4 Sätzen auf Schweizer Hochdeutsch, Ich-Form>",
+              "questions": [
+                { "question": "<anspruchsvolle Interviewfrage in Anführungszeichen>", "answer": "<optimale Musterantwort auf Schweizer Hochdeutsch, 2-4 Sätze>" }
+              ],
+              "tips": ["<5-6 konkrete Coaching-Tipps: Zahlen nennen, Gehaltsgespräch, Körpersprache, Gegenfragen, Schweizer Kultur>"]
+            }
+            Erstelle 5-7 Fragen. Alle Texte auf Schweizer Hochdeutsch (kein ß, verwende ss). Kein Markdown, nur reines JSON.
           `;
           break;
         }
@@ -3653,7 +3665,41 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           setToolResult(resultText || (language === 'FR' ? 'Le calcul de salaire n\'a pas pu être traité. Veuillez réessayer.' : language === 'IT' ? 'Il calcolo dello stipendio non ha potuto essere elaborato. Riprova.' : language === 'EN' ? 'Salary calculation could not be processed. Please try again.' : 'Gehaltsberechnung konnte nicht ausgewertet werden. Bitte versuche es erneut.'));
         }
       }
-      
+
+      // Special handling for Interview-Coach (structured JSON → premium card)
+      if (activeTool.id === 'interview') {
+        try {
+          const jsonMatch = resultText.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            const iv = JSON.parse(jsonMatch[0]);
+            if (iv && (iv.questions || iv.elevatorPitch)) {
+              setParsedInterviewResult(iv);
+              if (user) {
+                await addDoc(collection(db, 'tool_results'), { user_id: user.id, tool: 'interview', data: iv, created_at: new Date().toISOString() }).catch(() => {});
+              }
+              // Plain-text fallback for copy/PDF/export
+              resultText = [
+                iv.title || 'Interview-Vorbereitung',
+                iv.subtitle ? iv.subtitle : '',
+                '',
+                'ELEVATOR PITCH',
+                iv.elevatorPitch || '',
+                '',
+                'TYPISCHE FRAGEN & MUSTERANTWORTEN',
+                ...(iv.questions || []).flatMap((q: any) => [q.question, q.answer, '']),
+                'COACHING-TIPPS',
+                ...(iv.tips || []).map((tp: string) => `- ${tp}`),
+                '',
+                'Generiert von Stellify Swiss AI',
+              ].filter(Boolean).join('\n');
+            }
+          }
+        } catch (e) {
+          console.error("Error parsing Interview JSON:", e);
+          // Leave resultText as-is → falls back to markdown render
+        }
+      }
+
       // Handle Grounding Metadata for Search
       if (useSearch && toolSources.length > 0) {
         const sourcesLabel = language === 'FR' ? 'Sources' : language === 'IT' ? 'Fonti' : language === 'EN' ? 'Sources' : 'Quellen';
@@ -9242,7 +9288,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold mt-0.5 opacity-80">{activeTool.badge}</p>
                   </div>
                 </div>
-                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
+                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setParsedInterviewResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
                   <X size={20} />
                 </button>
               </div>
@@ -9277,6 +9323,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => {
                             setActiveTool(null);
                             setParsedSalaryResult(null);
+                            setParsedInterviewResult(null);
                             const pricingSection = document.getElementById('pricing');
                             pricingSection?.scrollIntoView({ behavior: 'smooth' });
                           }}
@@ -9285,7 +9332,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {t.tool_see_plans}
                         </button>
                         <button
-                          onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setInterviewSession(null); setInterviewAnswer(''); }}
+                          onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setParsedInterviewResult(null); setInterviewSession(null); setInterviewAnswer(''); }}
                           className="w-full py-3 border border-black/10 text-[10px] font-bold uppercase tracking-widest hover:bg-black/5 transition-all"
                         >
                           {t.tool_maybe_later}
@@ -9649,7 +9696,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
                       className="h-full flex flex-col"
                     >
-                      {/* ── Premium Result Header ── */}
+                      {/* ── Premium Result Header (hidden for interview card — it has its own) ── */}
+                      {!(activeTool.id === 'interview' && parsedInterviewResult) && (
                       <div className="flex flex-col gap-5 mb-6 pb-5 border-b border-black/8 dark:border-white/8">
                         {/* Title row */}
                         <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -9699,6 +9747,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </button>
                         </div>
                       </div>
+                      )}
 
                       {/* ── Result Content ── */}
                       <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -9790,6 +9839,157 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               </div>
                             );
                           })()
+                        ) : activeTool.id === 'interview' && parsedInterviewResult ? (
+                          /* ── Interview-Coach Premium Card ── */
+                          <motion.div
+                            initial={{ opacity: 0, y: 16 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+                            className="bg-white dark:bg-[#1A1A18] border border-[#004225]/15 dark:border-white/10 overflow-hidden shadow-xl"
+                          >
+                            {/* Header */}
+                            <div className="relative overflow-hidden bg-[#004225] px-6 sm:px-7 pt-7 pb-6">
+                              <div className="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/[0.04]" />
+                              <div className="absolute -bottom-16 right-16 w-36 h-36 rounded-full bg-white/[0.03]" />
+                              <div className="relative">
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.85 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  transition={{ duration: 0.4, delay: 0.1 }}
+                                  className="inline-flex items-center gap-1.5 bg-white/[0.12] border border-white/20 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-white/85 mb-3.5"
+                                >
+                                  <ShieldCheck size={11} />
+                                  AI-Verified · Stellify Swiss AI
+                                </motion.div>
+                                <h3 className="text-xl sm:text-2xl font-serif text-white tracking-tight leading-tight mb-1">{parsedInterviewResult.title || 'Interview-Vorbereitung'}</h3>
+                                {parsedInterviewResult.subtitle && (
+                                  <p className="text-[13px] text-white/60 font-light">{parsedInterviewResult.subtitle}</p>
+                                )}
+                                {Array.isArray(parsedInterviewResult.tags) && parsedInterviewResult.tags.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mt-4">
+                                    {parsedInterviewResult.tags.map((tag: string, i: number) => (
+                                      <span key={i} className="bg-white/10 border border-white/[0.18] rounded-md px-2.5 py-1 text-[11px] text-white/80">{tag}</span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Score row */}
+                            {parsedInterviewResult.stats && (
+                              <div className="grid grid-cols-3 gap-px bg-black/8 dark:bg-white/10 border-b border-black/8 dark:border-white/10">
+                                {[
+                                  { n: parsedInterviewResult.stats.questions, l: language === 'EN' ? 'Questions' : language === 'FR' ? 'Questions' : language === 'IT' ? 'Domande' : 'Fragen' },
+                                  { n: parsedInterviewResult.stats.topics, l: language === 'EN' ? 'Key topics' : language === 'FR' ? 'Thèmes clés' : language === 'IT' ? 'Temi chiave' : 'Kernthemen' },
+                                  { n: parsedInterviewResult.stats.match != null ? `${parsedInterviewResult.stats.match}%` : '—', l: language === 'EN' ? 'Match' : language === 'IT' ? 'Affinità' : language === 'FR' ? 'Affinité' : 'Match', accent: true },
+                                ].map((s, i) => (
+                                  <div key={i} className="bg-white dark:bg-[#1A1A18] py-3.5 text-center">
+                                    <div className={`text-xl font-semibold leading-none ${s.accent ? 'text-[#2a7a4a] dark:text-[#6FCF97]' : 'text-[#004225] dark:text-[#FAFAF8]'}`}>{s.n ?? '—'}</div>
+                                    <div className="text-[10px] text-[#8a9e8d] dark:text-[#9A9A94] mt-1 uppercase tracking-wide">{s.l}</div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+
+                            {/* Body */}
+                            <div className="px-5 sm:px-6 py-6 flex flex-col gap-6">
+                              {/* Elevator Pitch */}
+                              {parsedInterviewResult.elevatorPitch && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 14 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.45, delay: 0.15 }}
+                                >
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-7 h-7 rounded-lg bg-[#004225]/8 dark:bg-[#6FCF97]/10 flex items-center justify-center shrink-0">
+                                      <UserIcon size={14} className="text-[#004225] dark:text-[#6FCF97]" />
+                                    </div>
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-[#004225] dark:text-[#6FCF97]">Elevator Pitch</span>
+                                  </div>
+                                  <div className="relative bg-[#004225]/[0.04] dark:bg-[#6FCF97]/[0.06] rounded-lg p-4 pl-7">
+                                    <span className="absolute top-0 left-2.5 text-5xl font-serif text-[#004225]/15 leading-none select-none">&ldquo;</span>
+                                    <p className="relative text-[13px] italic leading-relaxed text-[#2a4a30] dark:text-[#CDE8D5]">{parsedInterviewResult.elevatorPitch}</p>
+                                  </div>
+                                </motion.div>
+                              )}
+
+                              {/* Questions */}
+                              {Array.isArray(parsedInterviewResult.questions) && parsedInterviewResult.questions.length > 0 && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 14 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.45, delay: 0.25 }}
+                                >
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-7 h-7 rounded-lg bg-[#004225]/8 dark:bg-[#6FCF97]/10 flex items-center justify-center shrink-0">
+                                      <HelpCircle size={14} className="text-[#004225] dark:text-[#6FCF97]" />
+                                    </div>
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-[#004225] dark:text-[#6FCF97]">
+                                      {language === 'EN' ? 'Typical questions & model answers' : language === 'FR' ? 'Questions typiques & réponses modèles' : language === 'IT' ? 'Domande tipiche & risposte modello' : 'Typische Fragen & Musterantworten'}
+                                    </span>
+                                  </div>
+                                  <div className="space-y-2.5">
+                                    {parsedInterviewResult.questions.map((q: any, i: number) => (
+                                      <div key={i} className="bg-[#004225]/[0.03] dark:bg-white/[0.03] rounded-lg border-l-[3px] border-[#004225] p-3.5">
+                                        <p className="text-[13px] font-semibold text-[#111] dark:text-[#FAFAF8] leading-snug mb-2">{q.question}</p>
+                                        <p className="text-[12.5px] text-[#4a6050] dark:text-[#9FBCA8] leading-relaxed">{q.answer}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+
+                              {/* Tips */}
+                              {Array.isArray(parsedInterviewResult.tips) && parsedInterviewResult.tips.length > 0 && (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 14 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.45, delay: 0.35 }}
+                                >
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-7 h-7 rounded-lg bg-[#004225]/8 dark:bg-[#6FCF97]/10 flex items-center justify-center shrink-0">
+                                      <Lightbulb size={14} className="text-[#004225] dark:text-[#6FCF97]" />
+                                    </div>
+                                    <span className="text-xs font-semibold uppercase tracking-wider text-[#004225] dark:text-[#6FCF97]">
+                                      {language === 'EN' ? 'Coaching tips' : language === 'FR' ? 'Conseils de coaching' : language === 'IT' ? 'Consigli di coaching' : 'Coaching-Tipps'}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    {parsedInterviewResult.tips.map((tip: string, i: number) => (
+                                      <div key={i} className="flex items-start gap-2.5 py-2.5 border-b border-[#004225]/8 dark:border-white/8 last:border-b-0">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#6FCF97] shrink-0 mt-1.5" />
+                                        <p className="text-[12.5px] text-[#4a6050] dark:text-[#9FBCA8] leading-relaxed">{tip}</p>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </div>
+
+                            {/* Footer */}
+                            <div className="px-5 sm:px-6 py-3.5 border-t border-[#004225]/10 dark:border-white/8 bg-[#004225]/[0.03] dark:bg-white/[0.02] flex items-center gap-2 flex-wrap">
+                              <button
+                                onClick={() => { navigator.clipboard.writeText(toolResult); showToast(t.tool_copy); }}
+                                className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold rounded-md border border-[#004225]/20 text-[#004225] dark:text-[#6FCF97] dark:border-white/15 hover:bg-[#004225]/5 dark:hover:bg-white/5 transition-colors"
+                              >
+                                <Copy size={12} /> {t.tool_copy}
+                              </button>
+                              <button
+                                onClick={downloadAsPDF}
+                                className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold rounded-md border border-[#004225]/20 text-[#004225] dark:text-[#6FCF97] dark:border-white/15 hover:bg-[#004225]/5 dark:hover:bg-white/5 transition-colors"
+                              >
+                                <FileText size={12} /> PDF
+                              </button>
+                              <div className="flex-1" />
+                              <span className="text-[11px] text-[#b0c2b3] dark:text-[#5C5C58]">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</span>
+                              <button
+                                onClick={() => { setToolResultEditable(toolResult); setIsEditingToolResult(true); }}
+                                className="flex items-center gap-1.5 px-4 py-2 text-[11px] font-semibold rounded-md bg-[#004225] text-white hover:bg-[#00331d] shadow-sm transition-colors"
+                              >
+                                <FileText size={12} /> {language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
+                              </button>
+                            </div>
+                          </motion.div>
                         ) : activeTool.id === 'salary-calc' && parsedSalaryResult ? (
                           /* ── Salary Result ── */
                           <div className="space-y-8 py-4">
