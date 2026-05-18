@@ -55,8 +55,11 @@ import Markdown from 'react-markdown';
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
-const PRO_MODEL = "gemini-2.5-pro";
-const FLASH_MODEL = "gemini-2.5-flash";
+// gemini-2.0-flash: best free-tier quota (1500/day) + still high quality.
+// Avoids the tiny free limits of 2.5-pro/2.5-flash. The backend keeps the
+// 2.5 models as last-resort fallback. Revisit if a paid key is added.
+const PRO_MODEL = "gemini-2.0-flash";
+const FLASH_MODEL = "gemini-2.0-flash";
 
 // --- TYPES ---
 interface Message {
