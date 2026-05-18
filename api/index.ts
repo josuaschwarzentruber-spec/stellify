@@ -364,7 +364,7 @@ app.use(express.json());
 // stays reliable without a paid key. gemini-2.0-flash = 1500 req/day free;
 // 2.5-pro/2.5-flash have very low free limits and are kept as last resort.
 const PRO_MODEL = 'gemini-2.0-flash';
-const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-2.5-flash', 'gemini-1.5-pro', 'gemini-2.5-pro'];
+const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-pro'];
 const MAX_INPUT_CHARS = 32000;   // ~8k tokens
 const MAX_OUTPUT_TOKENS = 2000;  // soft cap (Gemini config)
 
