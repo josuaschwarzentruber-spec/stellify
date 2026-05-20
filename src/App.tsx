@@ -686,7 +686,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
 
   return (
     <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
-      <div className="max-w-3xl mx-auto">
+      <div className={`${activeView === 'ueber-uns' ? 'max-w-4xl' : 'max-w-3xl'} mx-auto`}>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"
@@ -1109,134 +1109,205 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
         )}
 
         {/* ======= ÜBER UNS ======= */}
-        {activeView === 'ueber-uns' && (
+        {activeView === 'ueber-uns' && (() => {
+          const c = isDE ? {
+            eyebrow: 'Unsere Geschichte', h1: 'Über Uns',
+            lede: 'Wie aus zwei Wörtern eine Mission wurde.',
+            founderLabel: 'Vom Gründer',
+            founderQuote: 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.',
+            founderAttr: 'Der Gründer',
+            whyTitle: 'Warum es Stellify gibt',
+            whyP1: 'Die Idee entstand aus persönlicher Erfahrung. Lange Zeit gab es zwar zahlreiche künstliche Intelligenzen am Markt, aber keine, die sich auf die Schweiz spezialisiert hat. Keine, die Schweizer Bewerbungsstandards kennt, Schweizer Gehaltsbänder versteht und mit allen vier Landessprachen arbeitet.',
+            whyP2: 'Stellify füllt diese Lücke. Eine KI, die nicht generisch berät, sondern den Schweizer Berufsalltag wirklich kennt. Mit präzisen Werkzeugen für jede Phase deiner Karriere. Vom ersten Lebenslauf über das Bewerbungsgespräch bis zur Gehaltsverhandlung.',
+            whyP3: 'Das Versprechen ist einfach. Schweizer Exzellenz, automatisiert. Für jeden zugänglich.',
+            nameTitle: 'Der Name',
+            nameIntro: 'Hinter Stellify stehen zwei Bedeutungen, die sich in einem einzigen Wort vereinen.',
+            stellDesc: 'Vom deutschen Wort Stellen. Wir helfen dir, die passende Stelle zu finden, die zu dir passt.',
+            ifyDesc: 'Vom lateinischen stellificare, dem klassischen Wort für die Verwandlung in einen Stern. In Ovids Metamorphosen beschreibt es die Verklärung Sterblicher zu Himmelskörpern.',
+            nameSummary: 'Stellify bedeutet damit wörtlich, jemanden zum Stern zu machen. Eine berufliche Identität, die strahlt.',
+            stellaTitle: 'Stella, deine KI Karrierebegleiterin',
+            stellaDesc: 'Unsere KI Assistentin heisst Stella. Der Name kommt aus dem Lateinischen, wo stella einfach Stern bedeutet. Stella ist rund um die Uhr für dich da, beantwortet deine Fragen und begleitet dich durch jede Phase deiner Karriere. Wie ein Stern, der dir den Weg zeigt.',
+            statLanguages: 'Sprachen', statAvailable: 'Verfügbar', statHq: 'Schweizer Sitz', statLaw: 'Recht und Datenschutz',
+            swissTitle: 'Made in Switzerland',
+            swissDesc: 'Stellify wurde in der Schweiz gegründet und entwickelt. Wir verbinden Schweizer Sorgfalt, Datenschutz und Präzision mit moderner künstlicher Intelligenz. Unser Sitz ist in Zug, im Herzen der Schweizer Innovation.',
+          } : isFR ? {
+            eyebrow: 'Notre histoire', h1: 'À Propos',
+            lede: 'Comment deux mots sont devenus une mission.',
+            founderLabel: 'Du fondateur',
+            founderQuote: "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse.",
+            founderAttr: 'Le fondateur',
+            whyTitle: 'Pourquoi Stellify existe',
+            whyP1: "L'idée est née d'une expérience personnelle. Pendant longtemps, de nombreuses intelligences artificielles existaient déjà sur le marché, mais aucune spécialisée pour la Suisse. Aucune qui connaisse les standards de candidature suisses, comprenne les fourchettes salariales suisses et travaille dans les quatre langues nationales.",
+            whyP2: "Stellify comble ce manque. Une IA qui ne conseille pas de manière générique, mais qui connaît réellement le quotidien professionnel suisse. Avec des outils précis pour chaque phase de ta carrière. Du premier CV à l'entretien d'embauche en passant par la négociation salariale.",
+            whyP3: "La promesse est simple. L'excellence suisse, automatisée. Accessible à tous.",
+            nameTitle: 'Le nom',
+            nameIntro: 'Derrière Stellify se rejoignent deux significations dans un seul mot.',
+            stellDesc: "Du mot allemand Stellen, qui signifie «postes». Nous t'aidons à trouver le poste qui te correspond.",
+            ifyDesc: "Du latin stellificare, le mot classique pour la transformation en étoile. Dans les Métamorphoses d'Ovide, il décrit la transfiguration des mortels en corps célestes.",
+            nameSummary: 'Stellify signifie ainsi littéralement transformer quelqu\'un en étoile. Une identité professionnelle qui brille.',
+            stellaTitle: 'Stella, ton assistante IA',
+            stellaDesc: "Notre assistante IA s'appelle Stella. Le nom vient du latin, où stella signifie simplement étoile. Stella est disponible 24h sur 24, répond à tes questions et t'accompagne à chaque étape de ta carrière. Comme une étoile qui te montre le chemin.",
+            statLanguages: 'Langues', statAvailable: 'Disponible', statHq: 'Siège suisse', statLaw: 'Droit et confidentialité',
+            swissTitle: 'Made in Switzerland',
+            swissDesc: "Stellify a été fondée et développée en Suisse. Nous allions soin suisse, protection des données et précision avec une IA moderne. Notre siège est à Zoug, au cœur de l'innovation suisse.",
+          } : isIT ? {
+            eyebrow: 'La nostra storia', h1: 'Chi Siamo',
+            lede: 'Come due parole sono diventate una missione.',
+            founderLabel: 'Dal fondatore',
+            founderQuote: 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.',
+            founderAttr: 'Il fondatore',
+            whyTitle: 'Perché esiste Stellify',
+            whyP1: "L'idea è nata da un'esperienza personale. Per molto tempo erano già presenti sul mercato numerose intelligenze artificiali, ma nessuna specializzata per la Svizzera. Nessuna che conoscesse gli standard di candidatura svizzeri, comprendesse le fasce salariali svizzere e lavorasse in tutte e quattro le lingue nazionali.",
+            whyP2: "Stellify colma questa lacuna. Un'IA che non consiglia in modo generico, ma conosce davvero la quotidianità professionale svizzera. Con strumenti precisi per ogni fase della tua carriera. Dal primo CV al colloquio di lavoro fino alla trattativa salariale.",
+            whyP3: "La promessa è semplice. L'eccellenza svizzera, automatizzata. Accessibile a tutti.",
+            nameTitle: 'Il nome',
+            nameIntro: 'Dietro Stellify si incontrano due significati in una sola parola.',
+            stellDesc: 'Dalla parola tedesca Stellen, che significa «posizioni». Ti aiutiamo a trovare la posizione giusta per te.',
+            ifyDesc: "Dal latino stellificare, la parola classica per la trasformazione in stella. Nelle Metamorfosi di Ovidio descrive la trasfigurazione dei mortali in corpi celesti.",
+            nameSummary: "Stellify significa quindi letteralmente trasformare qualcuno in una stella. Un'identità professionale che brilla.",
+            stellaTitle: 'Stella, la tua assistente IA',
+            stellaDesc: 'La nostra assistente IA si chiama Stella. Il nome viene dal latino, dove stella significa semplicemente stella. Stella è disponibile 24 ore su 24, risponde alle tue domande e ti accompagna in ogni fase della carriera. Come una stella che ti mostra la strada.',
+            statLanguages: 'Lingue', statAvailable: 'Disponibile', statHq: 'Sede svizzera', statLaw: 'Diritto e privacy',
+            swissTitle: 'Made in Switzerland',
+            swissDesc: "Stellify è stata fondata e sviluppata in Svizzera. Uniamo cura svizzera, protezione dei dati e precisione con un'IA moderna. La nostra sede è a Zugo, nel cuore dell'innovazione svizzera.",
+          } : {
+            eyebrow: 'Our Story', h1: 'About Us',
+            lede: 'How two words became one mission.',
+            founderLabel: 'From the founder',
+            founderQuote: "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market.",
+            founderAttr: 'The founder',
+            whyTitle: 'Why Stellify exists',
+            whyP1: "The idea came from personal experience. For a long time, many artificial intelligences already existed on the market, but none specialised for Switzerland. None that knew Swiss application standards, understood Swiss salary ranges and worked across all four national languages.",
+            whyP2: "Stellify fills that gap. An AI that doesn't advise generically, but truly understands the Swiss working world. With precise tools for every phase of your career. From your first CV through the interview to salary negotiation.",
+            whyP3: 'The promise is simple. Swiss excellence, automated. Accessible to everyone.',
+            nameTitle: 'The name',
+            nameIntro: 'Two meanings meet in a single word Stellify.',
+            stellDesc: 'From the German word Stellen, meaning positions or jobs. We help you find the position that fits you.',
+            ifyDesc: "From the Latin stellificare, the classical word for transformation into a star. In Ovid's Metamorphoses it describes the transfiguration of mortals into heavenly bodies.",
+            nameSummary: 'Stellify thus literally means to turn someone into a star. A professional identity that shines.',
+            stellaTitle: 'Stella, your AI career companion',
+            stellaDesc: 'Our AI assistant is named Stella. The name comes from Latin, where stella simply means star. Stella is available around the clock, answers your questions, and guides you through every stage of your career. Like a star showing you the way.',
+            statLanguages: 'Languages', statAvailable: 'Available', statHq: 'Swiss HQ', statLaw: 'Law and Privacy',
+            swissTitle: 'Made in Switzerland',
+            swissDesc: 'Stellify was founded and developed in Switzerland. We combine Swiss care, data protection, and precision with modern AI. Our home is in Zug, at the heart of Swiss innovation.',
+          };
+
+          return (
           <article>
-            <header className="mb-12">
-              <p className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-3">
-                {isDE ? 'Unsere Geschichte' : isFR ? 'Notre histoire' : isIT ? 'La nostra storia' : 'Our Story'}
+            {/* HERO */}
+            <header className="mb-20 max-w-3xl">
+              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#004225] dark:text-[#00A854] mb-6">
+                {c.eyebrow}
               </p>
-              <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">
-                {isDE ? 'Über Uns' : isFR ? 'À Propos' : isIT ? 'Chi Siamo' : 'About Us'}
+              <h1 className="text-5xl md:text-7xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-8 leading-[0.95] tracking-tight">
+                {c.h1}
               </h1>
-              <p className="text-base font-serif italic text-[#6B6B66] dark:text-[#9A9A94]">
-                {isDE ? 'Wie aus zwei Wörtern eine Mission wurde.'
-                  : isFR ? 'Comment deux mots sont devenus une mission.'
-                  : isIT ? 'Come due parole sono diventate una missione.'
-                  : 'How two words became one mission.'}
+              <p className="text-xl md:text-2xl text-[#4A4A45] dark:text-[#9A9A94] font-serif italic leading-snug">
+                {c.lede}
               </p>
             </header>
 
-            {isDE ? <>
-              <Section title="Die Idee">
-                <p>Wir glauben, dass jede Karriere mit dem richtigen Schritt beginnt — und dass jeder Mensch das Potenzial hat, in seinem Beruf zu glänzen. Daraus ist Stellify entstanden: eine Schweizer KI-Plattform, die Menschen hilft, nicht irgendeine Stelle zu finden, sondern die <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">richtige</strong> — und in ihrer Karriere zum Stern zu werden.</p>
-              </Section>
-              <Section title="Woher der Name kommt">
-                <p>Hinter «Stellify» stehen zwei Bedeutungen, die sich in einem einzigen Wort treffen:</p>
-                <div className="mt-4 space-y-3">
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2">Stell<span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span></p>
-                    <p className="text-sm">Wie das deutsche Wort <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellen</strong>. Wir helfen dir, deine Stelle zu finden — die, die zu dir passt.</p>
-                  </div>
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2"><span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span>ify</p>
-                    <p className="text-sm">Die englische Endung, abgeleitet vom lateinischen <em>stellificare</em>: «zum Stern machen». In der römischen Mythologie beschrieb dieses Wort die Verwandlung Sterblicher in Sterne — eine Art Unsterblichkeit durch Leuchten.</p>
-                  </div>
+            {/* FOUNDER PULL QUOTE */}
+            <div className="my-20 py-14 border-t border-b border-[#004225]/15 dark:border-white/10">
+              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#004225] dark:text-[#00A854] mb-8">
+                {c.founderLabel}
+              </p>
+              <blockquote className="font-serif text-2xl md:text-4xl text-[#1A1A18] dark:text-[#FAFAF8] leading-tight mb-8 max-w-3xl">
+                «{c.founderQuote}»
+              </blockquote>
+              <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#6B6B66] dark:text-[#9A9A94]">
+                {c.founderAttr}
+              </p>
+            </div>
+
+            {/* WARUM ES STELLIFY GIBT */}
+            <div className="mb-24 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-10 leading-tight">
+                {c.whyTitle}
+              </h2>
+              <div className="space-y-6 text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
+                <p>{c.whyP1}</p>
+                <p>{c.whyP2}</p>
+                <p className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">{c.whyP3}</p>
+              </div>
+            </div>
+
+            {/* DER NAME */}
+            <div className="mb-24">
+              <h2 className="text-3xl md:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-10 leading-tight max-w-2xl">
+                {c.nameTitle}
+              </h2>
+              <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light max-w-2xl mb-12">
+                {c.nameIntro}
+              </p>
+
+              {/* Big wordmark display */}
+              <div className="text-center my-16 py-16 border-y border-[#004225]/10 dark:border-white/10">
+                <p className="font-serif text-7xl md:text-9xl text-[#1A1A18] dark:text-[#FAFAF8] tracking-tight leading-none" style={{paddingBottom: '.1em'}}>
+                  Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
+                </p>
+              </div>
+
+              {/* Two columns: Stell- and -ify */}
+              <div className="grid md:grid-cols-2 gap-12 md:gap-20 mb-12">
+                <div>
+                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] mb-5 tracking-tight leading-none">Stell<span className="opacity-30">·</span></p>
+                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mb-6"></div>
+                  <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
+                    {c.stellDesc}
+                  </p>
                 </div>
-                <p className="mt-5"><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellify</strong> bedeutet damit wörtlich: jemanden zum Stern machen. Wir helfen dir, die richtige Stelle zu finden — und in deiner Karriere zu glänzen.</p>
-              </Section>
-              <Section title="Stella, deine KI-Karrierebegleiterin">
-                <p>Unsere KI-Assistentin heisst <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stella</strong> — vom lateinischen <em>stella</em>, dem Wort für Stern. Stella ist rund um die Uhr für dich da, beantwortet deine Fragen und führt dich durch jede Phase deiner Karriere. Wie ein Stern, der dir den Weg zeigt.</p>
-              </Section>
-              <Section title="Nach den Sternen greifen">
-                <p>Wer hoch hinaus will, muss nach den Sternen greifen. Wir geben dir die Werkzeuge dazu: KI-gestützte CV-Optimierung, persönliches Interview-Coaching, Schweizer Gehaltsanalysen und massgeschneiderte Job-Empfehlungen. Damit du deine Karriere selbst gestaltest — und deinen Traumberuf erreichst.</p>
-              </Section>
-              <Section title="Made in Switzerland">
-                <p>Stellify wurde in der Schweiz gegründet. Wir verbinden Schweizer Sorgfalt, Datenschutz und Präzision mit modernster KI. Unser Sitz ist in <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zug</strong> — im Herzen der Schweizer Innovation.</p>
-              </Section>
-            </> : isFR ? <>
-              <Section title="L'idée">
-                <p>Nous croyons que chaque carrière commence par le bon pas — et que chacun a le potentiel de briller dans son métier. C'est de là qu'est né Stellify : une plateforme suisse alimentée par l'IA, qui aide à trouver non pas n'importe quel poste, mais <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">le bon</strong> — et à devenir une étoile dans sa carrière.</p>
-              </Section>
-              <Section title="L'histoire du nom">
-                <p>Derrière «Stellify» se rejoignent deux significations dans un seul mot :</p>
-                <div className="mt-4 space-y-3">
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2">Stell<span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span></p>
-                    <p className="text-sm">Du mot allemand <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellen</strong>, qui signifie «postes». Nous t'aidons à trouver ton poste — celui qui te correspond.</p>
-                  </div>
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2"><span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span>ify</p>
-                    <p className="text-sm">Un suffixe anglais dérivé du latin <em>stellificare</em> : «transformer en étoile». Dans la mythologie romaine, ce mot décrivait la transformation des mortels en étoiles — une forme d'immortalité par l'éclat.</p>
-                  </div>
+                <div>
+                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] mb-5 tracking-tight leading-none italic"><span className="opacity-30 not-italic">·</span>ify</p>
+                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mb-6"></div>
+                  <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
+                    {c.ifyDesc}
+                  </p>
                 </div>
-                <p className="mt-5"><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellify</strong> signifie littéralement : transformer quelqu'un en étoile. Nous t'aidons à trouver le bon poste — et à briller dans ta carrière.</p>
-              </Section>
-              <Section title="Stella, ton assistante IA">
-                <p>Notre assistante IA s'appelle <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stella</strong> — du latin <em>stella</em>, qui signifie étoile. Stella est disponible 24h/24, répond à tes questions et te guide à chaque étape de ta carrière. Comme une étoile qui te montre le chemin.</p>
-              </Section>
-              <Section title="Décrocher les étoiles">
-                <p>Qui vise haut doit savoir décrocher les étoiles. Nous t'en donnons les outils : optimisation de CV par IA, coaching d'entretien personnalisé, analyses salariales suisses et recommandations d'emploi sur mesure. Pour que tu façonnes ta carrière — et atteignes le métier dont tu rêves.</p>
-              </Section>
-              <Section title="Made in Switzerland">
-                <p>Stellify a été fondée en Suisse. Nous allions soin suisse, protection des données et précision avec une IA de pointe. Notre siège est à <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zoug</strong> — au cœur de l'innovation suisse.</p>
-              </Section>
-            </> : isIT ? <>
-              <Section title="L'idea">
-                <p>Crediamo che ogni carriera inizi con il passo giusto — e che ognuno abbia il potenziale per brillare nella propria professione. Da qui è nato Stellify: una piattaforma svizzera basata sull'IA che aiuta a trovare non un lavoro qualsiasi, ma <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">quello giusto</strong> — e a diventare stelle nella propria carriera.</p>
-              </Section>
-              <Section title="La storia del nome">
-                <p>Dietro «Stellify» si incontrano due significati in una sola parola:</p>
-                <div className="mt-4 space-y-3">
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2">Stell<span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span></p>
-                    <p className="text-sm">Dalla parola tedesca <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellen</strong>, che significa «posizioni». Ti aiutiamo a trovare la tua posizione — quella giusta per te.</p>
-                  </div>
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2"><span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span>ify</p>
-                    <p className="text-sm">Un suffisso inglese derivato dal latino <em>stellificare</em>: «trasformare in stella». Nella mitologia romana, questa parola descriveva la trasformazione dei mortali in stelle — una forma di immortalità attraverso il brillare.</p>
-                  </div>
+              </div>
+
+              <p className="text-base md:text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-relaxed font-light max-w-2xl">
+                {c.nameSummary}
+              </p>
+            </div>
+
+            {/* STELLA */}
+            <div className="mb-24 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-10 leading-tight">
+                {c.stellaTitle}
+              </h2>
+              <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
+                {c.stellaDesc}
+              </p>
+            </div>
+
+            {/* STATS GRID */}
+            <div className="my-20 grid grid-cols-2 md:grid-cols-4 gap-px bg-[#004225]/15 dark:bg-white/10 border border-[#004225]/15 dark:border-white/10">
+              {[
+                ['4', c.statLanguages],
+                ['24/7', c.statAvailable],
+                ['Zug', c.statHq],
+                ['CH', c.statLaw],
+              ].map(([num, label], i) => (
+                <div key={i} className="bg-[#FDFCFB] dark:bg-[#1A1A18] p-6 md:p-8">
+                  <p className="font-serif text-4xl md:text-5xl text-[#004225] dark:text-[#00A854] mb-3 leading-none">{num}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6B6B66] dark:text-[#9A9A94]">{label}</p>
                 </div>
-                <p className="mt-5"><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellify</strong> significa letteralmente: trasformare qualcuno in una stella. Ti aiutiamo a trovare la posizione giusta — e a brillare nella tua carriera.</p>
-              </Section>
-              <Section title="Stella, la tua assistente IA">
-                <p>La nostra assistente IA si chiama <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stella</strong> — dal latino <em>stella</em>, parola per stella. Stella è disponibile 24 ore su 24, risponde alle tue domande e ti guida in ogni fase della carriera. Come una stella che ti mostra la strada.</p>
-              </Section>
-              <Section title="Toccare le stelle">
-                <p>Chi punta in alto deve saper toccare le stelle. Ti diamo gli strumenti per farlo: ottimizzazione del CV con IA, coaching personalizzato per i colloqui, analisi salariali svizzere e raccomandazioni di lavoro su misura. Così plasmi la tua carriera — e raggiungi il lavoro dei tuoi sogni.</p>
-              </Section>
-              <Section title="Made in Switzerland">
-                <p>Stellify è stata fondata in Svizzera. Uniamo cura, protezione dei dati e precisione svizzera con un'IA all'avanguardia. La nostra sede è a <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zugo</strong> — nel cuore dell'innovazione svizzera.</p>
-              </Section>
-            </> : <>
-              <Section title="The Idea">
-                <p>We believe every career begins with the right step — and that everyone has the potential to shine in their profession. That's where Stellify was born: a Swiss AI platform that helps people find not just any job, but <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">the right one</strong> — and become stars in their careers.</p>
-              </Section>
-              <Section title="The Story Behind the Name">
-                <p>Two meanings meet in a single word «Stellify»:</p>
-                <div className="mt-4 space-y-3">
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2">Stell<span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span></p>
-                    <p className="text-sm">Echoing the German word <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellen</strong>, meaning «positions» or «jobs». We help you find your position — the one that fits.</p>
-                  </div>
-                  <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26]">
-                    <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] mb-2"><span className="text-[#1A1A18]/40 dark:text-[#FAFAF8]/40">-</span>ify</p>
-                    <p className="text-sm">An English suffix derived from the Latin <em>stellificare</em>: «to turn into a star». In Roman mythology, this word described the transformation of mortals into stars — a kind of immortality through brilliance.</p>
-                  </div>
-                </div>
-                <p className="mt-5"><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stellify</strong> literally means: to turn someone into a star. We help you find the right position — and shine in your career.</p>
-              </Section>
-              <Section title="Stella, your AI Career Companion">
-                <p>Our AI assistant is named <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stella</strong> — from the Latin <em>stella</em>, the word for star. Stella is available 24/7, answers your questions, and guides you through every stage of your career. Like a star showing you the way.</p>
-              </Section>
-              <Section title="Reach for the Stars">
-                <p>Those who aim high must learn to reach for the stars. We give you the tools to do it: AI-powered CV optimisation, personal interview coaching, Swiss salary analyses, and tailored job recommendations. So you shape your own career — and reach the role you've always wanted.</p>
-              </Section>
-              <Section title="Made in Switzerland">
-                <p>Stellify was founded in Switzerland. We combine Swiss care, data protection, and precision with cutting-edge AI. Our home is in <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zug</strong> — at the heart of Swiss innovation.</p>
-              </Section>
-            </>}
+              ))}
+            </div>
+
+            {/* MADE IN SWITZERLAND */}
+            <div className="mb-12 max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-10 leading-tight">
+                {c.swissTitle}
+              </h2>
+              <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
+                {c.swissDesc}
+              </p>
+            </div>
           </article>
-        )}
+          );
+        })()}
       </div>
     </section>
   );
