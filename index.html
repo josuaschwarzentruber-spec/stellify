@@ -108,40 +108,7 @@
         100% { transform: translate(0, 0); }
       }
 
-      /* Star Ignition — glimmender Brand-Funke vom Icon (kein weisses Flash, pure forest glow) */
-      #stellify-splash .ignition-anchor {
-        position: fixed;
-        top: 50%; left: 50%;
-        width: 0; height: 0;
-        transform: translateY(-92px); /* roughly icon center */
-        z-index: 5;
-        pointer-events: none;
-      }
-      #stellify-splash .ignition {
-        position: absolute;
-        top: 0; left: 0;
-        width: 70vmax; height: 70vmax;
-        margin-top: -35vmax; margin-left: -35vmax;
-        border-radius: 50%;
-        background: radial-gradient(circle,
-          rgba(77,214,138,.18) 0%,
-          rgba(0,168,84,.12) 18%,
-          rgba(0,168,84,.06) 38%,
-          rgba(0,168,84,.02) 55%,
-          transparent 75%);
-        transform: scale(.04);
-        opacity: 0;
-        filter: blur(42px);
-        animation: stellifyIgnition 3s cubic-bezier(.16,1,.3,1) .8s forwards;
-        will-change: transform, opacity;
-      }
-      @keyframes stellifyIgnition {
-        0%   { transform: scale(.04); opacity: 0; }
-        22%  { transform: scale(.14); opacity: .85; }
-        100% { transform: scale(1.5);  opacity: 0; }
-      }
-
-      /* Icon "ignites" — kurzer, sanfter Helligkeits-Puls synchron mit Funke */
+      /* Icon "ignites" — kurzer, sanfter Helligkeits-Puls zum Wordmark-Moment */
       #stellify-splash .icon-outer {
         animation: stellifyIconIgnite 1.6s ease-out .82s forwards;
       }
@@ -298,14 +265,12 @@
       @media (prefers-reduced-motion: reduce) {
         #stellify-splash .aurora,
         #stellify-splash .grain,
-        #stellify-splash .ignition,
         #stellify-splash .icon-outer,
         #stellify-splash .icon-outer::before,
         #stellify-splash .wordmark .w,
         #stellify-splash .wordmark .g { animation: none !important; }
         #stellify-splash .wordmark .w { background: #fafaf8; -webkit-background-clip: text; background-clip: text; color: transparent; }
         #stellify-splash .wordmark .g { background: #00A854; -webkit-background-clip: text; background-clip: text; color: transparent; }
-        #stellify-splash .ignition { opacity: 0; }
         #stellify-splash .aurora { opacity: 1; }
         #stellify-splash #content { transition: none; }
         #stellify-splash #footer  { transition: none; }
@@ -320,7 +285,6 @@
     <div id="stellify-splash">
       <div class="aurora"></div>
       <canvas id="mc"></canvas>
-      <div class="ignition-anchor"><div class="ignition"></div></div>
       <div class="vignette"></div>
       <div class="grain"></div>
 
