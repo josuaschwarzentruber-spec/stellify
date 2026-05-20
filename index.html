@@ -198,20 +198,22 @@
         50%     { opacity: .65; transform: scale(1.06); }
       }
 
-      /* Wortmarke — Canonical Brand Logo (Playfair white, single color) */
+      /* Wortmarke — Canonical Brand Logo (Forest Green, matches App dark-mode #00A854) */
       #stellify-splash .wordmark {
         font-family: 'Playfair Display', Georgia, 'Palatino Linotype', serif;
         font-size: clamp(54px, 10vw, 88px);
-        font-weight: 400; letter-spacing: -1.5px; line-height: 1;
+        font-weight: 400; letter-spacing: -1.5px;
+        line-height: 1.15;          /* Platz für Descender (y, g, p) */
+        padding-bottom: .12em;       /* Background-clip:text Cushion für 'y' */
         font-style: normal;
-        margin-bottom: 22px;
+        margin-bottom: 14px;
         position: relative;
         display: inline-block;
         color: transparent;
         background-image: linear-gradient(115deg,
-          #fafaf8 0%, #fafaf8 42%,
-          #ffffff 50%, #f8f8f4 54%,
-          #fafaf8 62%, #fafaf8 100%);
+          #00A854 0%, #00A854 42%,
+          #4DD68A 50%, #1AC078 54%,
+          #00A854 62%, #00A854 100%);
         background-size: 250% 100%;
         background-position: 200% 50%;
         -webkit-background-clip: text;
@@ -288,7 +290,7 @@
         #stellify-splash .icon-outer,
         #stellify-splash .icon-outer::before,
         #stellify-splash .wordmark { animation: none !important; }
-        #stellify-splash .wordmark { background: #fafaf8; -webkit-background-clip: text; background-clip: text; color: transparent; }
+        #stellify-splash .wordmark { background: #00A854; -webkit-background-clip: text; background-clip: text; color: transparent; }
         #stellify-splash .ignition { opacity: 0; }
         #stellify-splash .aurora { opacity: 1; }
         #stellify-splash #content { transition: none; }
