@@ -52,6 +52,12 @@ import mammoth from 'mammoth';
 
 import Markdown from 'react-markdown';
 
+declare global {
+  interface Window {
+    stellifyReady?: () => void;
+  }
+}
+
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
@@ -1117,7 +1123,7 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
 );
 
 export default function App() {
-  useEffect(() => { (window as any).stellifyReady?.(); }, []);
+  useEffect(() => { window.stellifyReady?.(); }, []);
   return (
     <ErrorBoundary>
       <StellifyApp />
@@ -1260,7 +1266,6 @@ function StellifyApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [splashMinDone, setSplashMinDone] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
@@ -1286,12 +1291,6 @@ function StellifyApp() {
   // Safety net: if auth hasn't resolved in 2s (e.g. network error), dismiss splash
   useEffect(() => {
     const timer = setTimeout(() => setIsAuthReady(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // Minimum splash duration: 3.2s so all animations complete fully
-  useEffect(() => {
-    const timer = setTimeout(() => setSplashMinDone(true), 3200);
     return () => clearTimeout(timer);
   }, []);
 
@@ -6257,148 +6256,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
-  if (!isAuthReady || !splashMinDone) {
-    const features = language === 'EN'
-      ? ['CV Analysis', 'Interview Coach', 'Cover Letter', 'Salary Calculator', 'Premium CV Rewrite', 'Certificate Decoder', 'LinkedIn Import', 'Career Roadmap']
-      : language === 'FR'
-      ? ['Analyse CV', 'Coach Entretien', 'Lettre de motivation', 'Calculateur salaire', 'CV Premium', 'Décodeur certificat', 'Import LinkedIn', 'Feuille de route carrière']
-      : language === 'IT'
-      ? ['Analisi CV', 'Coach Colloquio', 'Lettera motivazione', 'Calcolo stipendio', 'CV Premium', 'Decoder certificato', 'Import LinkedIn', 'Roadmap carriera']
-      : ['Lebenslauf-Analyse', 'Interview-Coach', 'Bewerbungsschreiben', 'Gehaltsrechner', 'Lebenslauf Premium', 'Zeugnis-Decoder', 'LinkedIn-Import', 'Karriere-Roadmap'];
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#0D0D0B] overflow-hidden relative select-none">
-
-        {/* Subtle grid overlay */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'linear-gradient(#00A854 1px, transparent 1px), linear-gradient(90deg, #00A854 1px, transparent 1px)',
-          backgroundSize: '60px 60px'
-        }} />
-
-        {/* Large pulsing glow – center */}
-        <motion.div
-          className="absolute rounded-full pointer-events-none"
-          style={{ width: 700, height: 700, background: 'radial-gradient(circle, rgba(0,66,37,0.4) 0%, transparent 65%)', top: '50%', left: '50%', x: '-50%', y: '-50%' }}
-          animate={{ scale: [1, 1.12, 1], opacity: [0.6, 1, 0.6] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        {/* Secondary orb – top right */}
-        <motion.div
-          className="absolute rounded-full pointer-events-none"
-          style={{ width: 400, height: 400, background: 'radial-gradient(circle, rgba(0,168,84,0.12) 0%, transparent 70%)', top: '10%', right: '10%' }}
-          animate={{ scale: [1.1, 0.85, 1.1], opacity: [0.2, 0.5, 0.2] }}
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        />
-        {/* Tertiary orb – bottom left */}
-        <motion.div
-          className="absolute rounded-full pointer-events-none"
-          style={{ width: 300, height: 300, background: 'radial-gradient(circle, rgba(0,66,37,0.2) 0%, transparent 70%)', bottom: '15%', left: '8%' }}
-          animate={{ scale: [0.9, 1.15, 0.9], opacity: [0.3, 0.6, 0.3] }}
-          transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        />
-
-        {/* Center content */}
-        <div className="relative flex flex-col items-center gap-10 px-8 text-center">
-
-          {/* Spark / icon above logo */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="w-14 h-14 rounded-2xl border border-[#004225]/60 bg-[#004225]/20 flex items-center justify-center"
-          >
-            <motion.div
-              animate={{ rotate: [0, 15, -10, 0], scale: [1, 1.15, 1] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              className="text-[#00A854] text-2xl"
-            >✦</motion.div>
-          </motion.div>
-
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.88 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="text-7xl md:text-8xl font-serif tracking-tight text-[#FAFAF8]"
-          >
-            Stell<span className="text-[#00A854]">ify</span>
-          </motion.div>
-
-          {/* Tagline */}
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="text-[11px] font-bold uppercase tracking-[0.5em] text-[#00A854]/60"
-          >
-            Swiss Career Excellence
-          </motion.p>
-
-          {/* Divider line */}
-          <motion.div
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={{ scaleX: 1, opacity: 1 }}
-            transition={{ duration: 1.2, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-            className="w-48 h-px bg-gradient-to-r from-transparent via-[#00A854]/60 to-transparent origin-center"
-          />
-
-          {/* Feature pills */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.1, duration: 0.5 }}
-            className="flex flex-wrap justify-center gap-3"
-          >
-            {features.map((feat, i) => (
-              <motion.span
-                key={feat}
-                initial={{ opacity: 0, y: 10, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: 1.2 + i * 0.18, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00A854]/80 border border-[#004225]/40 rounded-full bg-[#004225]/10"
-              >
-                {feat}
-              </motion.span>
-            ))}
-          </motion.div>
-
-          {/* Progress bar */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.6, duration: 0.4 }}
-            className="w-56 h-px bg-[#004225]/20 rounded-full overflow-hidden relative"
-          >
-            <motion.div
-              className="absolute left-0 top-0 h-full bg-gradient-to-r from-[#004225] to-[#00A854] rounded-full"
-              initial={{ width: '0%' }}
-              animate={{ width: '100%' }}
-              transition={{ delay: 1.2, duration: 1.8, ease: 'easeInOut' }}
-            />
-          </motion.div>
-
-          {/* Status text */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.8, duration: 0.4 }}
-            className="text-[9px] font-bold uppercase tracking-[0.35em] text-[#FAFAF8]/20"
-          >
-            {t.app_initializing}
-          </motion.p>
-        </div>
-
-        {/* Bottom badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute bottom-10 text-[9px] font-bold uppercase tracking-[0.3em] text-[#FAFAF8]/15"
-        >
-          Made in Switzerland
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">

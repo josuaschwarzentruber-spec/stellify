@@ -193,8 +193,18 @@
       let stateFrame = 0;
       let stopped    = false;
       const INTRO_F   = 72;
-      const RUNNING_F = 180;
       const OUTRO_F   = 65;
+      const MINIMUM_MS = 4000;
+      const startTime  = Date.now();
+      let   readyComplete = false;
+      let   readyCalled   = false;
+
+      window.stellifyReady = () => {
+        if (readyCalled) return;
+        readyCalled = true;
+        const waitMore = Math.max(0, MINIMUM_MS - (Date.now() - startTime));
+        setTimeout(() => { readyComplete = true; }, waitMore);
+      };
 
       let dialScale     = 0;
       let particleAlpha = 0;
@@ -442,32 +452,6 @@
         ctx.restore();
       }
 
-      /* ── Ladefortschritt ─────────────────────────────── */
-      let externalProgress = null;
-      window.stellifySetProgress = p => { externalProgress = Math.max(0, Math.min(1, p)); };
-
-      const MINIMUM_MS = 1500;
-      const startTime  = Date.now();
-      let   readyCalled = false;
-
-      window.stellifyReady = () => {
-        if (readyCalled) return;
-        readyCalled = true;
-        const elapsed  = Date.now() - startTime;
-        const waitMore = Math.max(0, MINIMUM_MS - elapsed);
-        setTimeout(() => {
-          externalProgress = 1;
-        }, waitMore);
-      };
-
-      function updateProgress() {
-        const p = externalProgress !== null
-          ? externalProgress
-          : Math.min(0.92, stateFrame / RUNNING_F);
-        progFill.style.width = (p * 100) + '%';
-        return p;
-      }
-
       function removeSplash() {
         if (stopped) return;
         stopped = true;
@@ -505,10 +489,10 @@
         }
         else if (state === 'running') {
           dialScale = 1; particleAlpha = 1; outerAlpha = 1;
-          const prog = updateProgress();
-          if (prog >= 1) {
-            state = 'outro'; stateFrame = 0;
-          }
+          const elapsed = Date.now() - startTime;
+          const progress = readyComplete ? 1 : Math.min(0.92, elapsed / MINIMUM_MS);
+          progFill.style.width = (progress * 100) + '%';
+          if (readyComplete) { state = 'outro'; stateFrame = 0; }
         }
         else if (state === 'outro') {
           const t   = Math.min(stateFrame / OUTRO_F, 1);
