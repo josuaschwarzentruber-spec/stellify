@@ -24,9 +24,538 @@
       und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="de_CH">
+    <style>
+      /* ── Stellify Opening Screen ──────────────────────── */
+      body.stellify-splashing { overflow: hidden; }
+
+      #stellify-splash {
+        position: fixed; inset: 0;
+        background: #030c06;
+        z-index: 999999;
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      }
+      #stellify-splash *, #stellify-splash *::before, #stellify-splash *::after {
+        box-sizing: border-box; margin: 0; padding: 0;
+      }
+      #stellify-splash #mc {
+        position: fixed; inset: 0;
+        width: 100%; height: 100%;
+        z-index: 1;
+      }
+
+      /* Eck-Brackets */
+      #stellify-splash .corner { position: fixed; width: 22px; height: 22px; z-index: 5; }
+      #stellify-splash .corner.tl { top:22px; left:22px;   border-top:1px solid rgba(31,219,98,.3); border-left:1px solid rgba(31,219,98,.3); }
+      #stellify-splash .corner.tr { top:22px; right:22px;  border-top:1px solid rgba(31,219,98,.3); border-right:1px solid rgba(31,219,98,.3); }
+      #stellify-splash .corner.bl { bottom:22px; left:22px;  border-bottom:1px solid rgba(31,219,98,.3); border-left:1px solid rgba(31,219,98,.3); }
+      #stellify-splash .corner.br { bottom:22px; right:22px; border-bottom:1px solid rgba(31,219,98,.3); border-right:1px solid rgba(31,219,98,.3); }
+
+      /* Inhalt */
+      #stellify-splash #content {
+        position: fixed; inset: 0; z-index: 6;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; text-align: center;
+        opacity: 0; transform: translateY(14px);
+        transition: opacity .9s ease, transform .9s ease;
+        pointer-events: none;
+      }
+      #stellify-splash #content.visible { opacity: 1; transform: translateY(0); }
+      #stellify-splash #content.hiding  { opacity: 0; transform: translateY(-10px); }
+
+      /* Icon */
+      #stellify-splash .icon-outer {
+        width: 64px; height: 64px;
+        background: #061310;
+        border: 1px solid rgba(31,219,98,.42);
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 42px;
+        animation: stellifyIconPulse 3.2s ease-in-out infinite;
+      }
+      @keyframes stellifyIconPulse {
+        0%,80%,100% { box-shadow: 0 0 0 9px rgba(31,219,98,.04); }
+        90%         { box-shadow: 0 0 0 16px rgba(31,219,98,.08), 0 0 0 9px rgba(31,219,98,.05); }
+      }
+
+      /* Wortmarke */
+      #stellify-splash .wordmark {
+        font-family: Georgia, 'Palatino Linotype', serif;
+        font-size: clamp(52px, 10vw, 82px);
+        font-weight: 400; letter-spacing: -2px; line-height: 1;
+        margin-bottom: 20px;
+      }
+      #stellify-splash .wordmark .w { color: #f4f4ef; }
+      #stellify-splash .wordmark .g { color: #1fdb62; }
+
+      #stellify-splash .sep { width: 28px; height: 1px; background: rgba(31,219,98,.22); margin: 0 auto 16px; }
+
+      /* Tagline – Buchstabe für Buchstabe */
+      #stellify-splash #tagline {
+        color: rgba(31,219,98,.42);
+        font-size: 10px; letter-spacing: 7px;
+        margin-bottom: 64px;
+        min-height: 14px;
+      }
+      #stellify-splash .letter {
+        display: inline-block;
+        opacity: 0;
+        animation: stellifyLetterIn .3s ease forwards;
+      }
+      @keyframes stellifyLetterIn {
+        from { opacity: 0; transform: translateY(5px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Echter Ladebalken – Breite via JS */
+      #stellify-splash .progress-track {
+        width: 140px; height: 1px;
+        background: rgba(255,255,255,.05);
+        position: relative; overflow: hidden;
+      }
+      #stellify-splash #progress-fill {
+        position: absolute; left: 0; top: 0;
+        height: 100%; width: 0%;
+        background: linear-gradient(90deg, rgba(31,219,98,.3), rgba(31,219,98,.8));
+        transition: width .12s linear;
+      }
+
+      /* Footer */
+      #stellify-splash #footer {
+        position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+        z-index: 6; display: flex; align-items: center; gap: 9px;
+        opacity: 0; transition: opacity .9s ease;
+      }
+      #stellify-splash #footer.visible { opacity: 1; }
+      #stellify-splash .ch { width:16px; height:16px; border:1px solid rgba(31,219,98,0.32); border-radius:3px; position:relative; }
+      #stellify-splash .ch::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:9px; height:1.5px; background:rgba(31,219,98,0.65); }
+      #stellify-splash .ch::after  { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:1.5px; height:9px; background:rgba(31,219,98,0.65); }
+      #stellify-splash .footer-txt { color:rgba(31,219,98,0.28); font-size:9px; letter-spacing:4px; }
+
+      /* Fade-out wenn Outro fertig */
+      #stellify-splash.stellify-removing {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .35s ease;
+      }
+
+      /* Reduced Motion – alle Animationen deaktivieren */
+      @media (prefers-reduced-motion: reduce) {
+        #stellify-splash #content   { transition: none; }
+        #stellify-splash #footer    { transition: none; }
+        #stellify-splash .letter    { animation: none; opacity: 1; }
+        #stellify-splash .icon-outer{ animation: none; box-shadow: 0 0 0 9px rgba(31,219,98,.04); }
+        #stellify-splash #progress-fill { transition: none; }
+      }
+    </style>
   </head>
-  <body style="background-color:#0D0D0B;margin:0">
+  <body style="background-color:#0D0D0B;margin:0" class="stellify-splashing">
+
+    <div id="stellify-splash">
+      <canvas id="mc"></canvas>
+
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+
+      <div id="content">
+        <div class="icon-outer">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+            <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#1fdb62"/>
+          </svg>
+        </div>
+        <div class="wordmark"><span class="w">Stell</span><span class="g">ify</span></div>
+        <div class="sep"></div>
+        <div id="tagline"></div>
+        <div class="progress-track"><div id="progress-fill"></div></div>
+      </div>
+
+      <div id="footer"><div class="ch"></div><span class="footer-txt">MADE IN SWITZERLAND</span></div>
+    </div>
+
     <div id="root"></div>
+
+    <script>
+    (function () {
+      /* ── Reduced Motion Check ─────────────────────────── */
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      /* ── DOM ──────────────────────────────────────────── */
+      const splashEl  = document.getElementById('stellify-splash');
+      const cvs       = document.getElementById('mc');
+      const contentEl = document.getElementById('content');
+      const footerEl  = document.getElementById('footer');
+      const tagEl     = document.getElementById('tagline');
+      const progFill  = document.getElementById('progress-fill');
+      const ctx       = cvs.getContext('2d');
+      const G         = '31,219,98';
+
+      /* ── State ────────────────────────────────────────── */
+      let state      = 'intro';
+      let stateFrame = 0;
+      let stopped    = false;
+      const INTRO_F   = 72;
+      const RUNNING_F = 180;
+      const OUTRO_F   = 65;
+
+      let dialScale     = 0;
+      let particleAlpha = 0;
+      let outerAlpha    = 0;
+      let dpr           = 1;
+
+      /* ── Dimensionen & Dial-Radius ───────────────────── */
+      let W, H, cx, cy, DIAL_R;
+
+      function computeDimensions() {
+        dpr    = window.devicePixelRatio || 1;
+        W      = window.innerWidth;
+        H      = window.innerHeight;
+        cx     = W / 2;
+        cy     = H / 2;
+        DIAL_R = Math.min(Math.min(W, H) * 0.38, 280);
+      }
+
+      function resizeCanvas() {
+        computeDimensions();
+        cvs.width        = W * dpr;
+        cvs.height       = H * dpr;
+        cvs.style.width  = W + 'px';
+        cvs.style.height = H + 'px';
+      }
+
+      /* ── Maus ─────────────────────────────────────────── */
+      let mouseX = -9999, mouseY = -9999;
+      window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+      window.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+
+      /* ── Partikel ─────────────────────────────────────── */
+      let inner = [], outer = [];
+
+      function initInner() {
+        inner = [];
+        for (let i = 0; i < 50; i++) {
+          const a = Math.random() * Math.PI * 2;
+          const r = 14 + Math.random() * (DIAL_R - 38);
+          inner.push({
+            x: cx + r * Math.cos(a), y: cy + r * Math.sin(a),
+            vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
+            size: .9 + Math.random() * .8,
+            speed: .7 + Math.random() * .6,
+            lit: false, lt: 0
+          });
+        }
+      }
+
+      function initOuter() {
+        outer = [];
+        let t = 0;
+        while (outer.length < 30 && t++ < 800) {
+          const x = 20 + Math.random() * (W - 40);
+          const y = 20 + Math.random() * (H - 40);
+          const dx = x - cx, dy = y - cy;
+          if (Math.sqrt(dx*dx + dy*dy) > DIAL_R + 24)
+            outer.push({
+              x, y,
+              vx: (Math.random() - .5) * .18,
+              vy: (Math.random() - .5) * .18,
+              size: .7 + Math.random() * .9
+            });
+        }
+      }
+
+      /* ── Radar ────────────────────────────────────────── */
+      let radarAngle = -Math.PI / 2;
+      const RADAR_SPEED = 0.0055;
+
+      /* ── Easing ───────────────────────────────────────── */
+      const easeOut   = t => 1 - (1-t)*(1-t);
+      const easeInOut = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+
+      /* ── Tagline Buchstabe für Buchstabe ─────────────── */
+      function buildTagline(startDelaySec) {
+        const text = 'SWISS CAREER EXCELLENCE';
+        tagEl.innerHTML = '';
+        if (reducedMotion) {
+          tagEl.textContent = text;
+          return;
+        }
+        text.split('').forEach((ch, i) => {
+          const s = document.createElement('span');
+          s.className   = 'letter';
+          s.textContent = ch === ' ' ? ' ' : ch;
+          s.style.animationDelay = `${startDelaySec + i * 0.045}s`;
+          tagEl.appendChild(s);
+        });
+      }
+
+      /* ── Zeichnen: Zifferblatt ───────────────────────── */
+      function drawDial(r, alpha) {
+        if (alpha < .01 || r < 3) return;
+        ctx.save(); ctx.globalAlpha = alpha;
+
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(${G},.13)`; ctx.lineWidth = 1; ctx.stroke();
+
+        const innerR = Math.max(.5, r - 22);
+        ctx.beginPath(); ctx.arc(cx, cy, innerR, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(${G},.05)`; ctx.lineWidth = .5; ctx.stroke();
+
+        for (let i = 0; i < 60; i++) {
+          const a   = (i*6 - 90) * Math.PI / 180;
+          const isH = i % 5 === 0;
+          const r1  = Math.max(0, r - (isH ? 20 : 9));
+          ctx.beginPath();
+          ctx.moveTo(cx + r1*Math.cos(a), cy + r1*Math.sin(a));
+          ctx.lineTo(cx + r *Math.cos(a), cy + r *Math.sin(a));
+          ctx.strokeStyle = `rgba(${G},${isH ? .18 : .07})`;
+          ctx.lineWidth   = isH ? 1.5 : .7;
+          ctx.stroke();
+        }
+
+        ctx.beginPath(); ctx.arc(cx, cy, 2.5, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(${G},.25)`; ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx-14, cy); ctx.lineTo(cx+14, cy);
+        ctx.moveTo(cx, cy-14); ctx.lineTo(cx, cy+14);
+        ctx.strokeStyle = `rgba(${G},.15)`; ctx.lineWidth = .6; ctx.stroke();
+
+        ctx.restore();
+      }
+
+      /* ── Zeichnen: Radar ──────────────────────────────── */
+      function drawRadar(r, alpha) {
+        if (alpha < .01 || r < 10) return;
+        ctx.save(); ctx.globalAlpha = alpha;
+
+        for (let i = 0; i < 60; i++) {
+          const frac = i / 60;
+          const a    = radarAngle - Math.PI * .65 * frac;
+          ctx.beginPath();
+          ctx.moveTo(cx, cy);
+          ctx.lineTo(cx + (r-2)*Math.cos(a), cy + (r-2)*Math.sin(a));
+          ctx.strokeStyle = `rgba(${G},${((1-frac)*.11).toFixed(3)})`;
+          ctx.lineWidth   = 1.5; ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + (r-2)*Math.cos(radarAngle), cy + (r-2)*Math.sin(radarAngle));
+        ctx.strokeStyle = `rgba(${G},.6)`; ctx.lineWidth = 1.2; ctx.stroke();
+
+        if (r > 10) {
+          const tx = cx + (r-5)*Math.cos(radarAngle);
+          const ty = cy + (r-5)*Math.sin(radarAngle);
+          ctx.beginPath(); ctx.arc(tx, ty, 2.5, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(${G},.75)`; ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      /* ── Zeichnen: Innere Partikel ──────────────────── */
+      function drawInner(dialR, alpha) {
+        if (alpha < .01 || dialR < 22) return;
+        ctx.save(); ctx.globalAlpha = alpha;
+
+        inner.forEach(p => {
+          const pa   = Math.atan2(p.y - cy, p.x - cx);
+          const diff = ((pa - radarAngle) + Math.PI*4) % (Math.PI*2);
+          if (diff < .13) { p.lit = true; p.lt = 22; }
+          if (p.lt > 0)   { p.lt--; if (p.lt === 0) p.lit = false; }
+
+          inner.forEach(q => {
+            if (p === q) return;
+            const dx = p.x-q.x, dy = p.y-q.y, d = Math.sqrt(dx*dx+dy*dy);
+            if (d < 85) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(${G},${(0.12*(1-d/85)).toFixed(3)})`;
+              ctx.lineWidth   = .6;
+              ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+            }
+          });
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.lit ? p.size*2 : p.size, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(${G},${p.lit ? .95 : .3})`; ctx.fill();
+
+          p.x += p.vx * p.speed;
+          p.y += p.vy * p.speed;
+
+          const dx = p.x-cx, dy = p.y-cy, dist = Math.sqrt(dx*dx+dy*dy);
+          if (dist > dialR - 18) {
+            const nx = dx/dist, ny = dy/dist;
+            const dot = p.vx*nx + p.vy*ny;
+            p.vx -= 2*dot*nx; p.vy -= 2*dot*ny;
+            p.x = cx + (dialR-20)*dx/dist;
+            p.y = cy + (dialR-20)*dy/dist;
+          }
+        });
+        ctx.restore();
+      }
+
+      /* ── Zeichnen: Äussere Partikel + Cursor-Reaktion ── */
+      function drawOuter(alpha) {
+        if (alpha < .01) return;
+        ctx.save(); ctx.globalAlpha = alpha;
+
+        for (let i = 0; i < outer.length; i++) {
+          for (let j = i+1; j < outer.length; j++) {
+            const dx = outer[i].x-outer[j].x, dy = outer[i].y-outer[j].y;
+            const d  = Math.sqrt(dx*dx+dy*dy);
+            if (d < 110) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(${G},${(0.05*(1-d/110)).toFixed(3)})`;
+              ctx.lineWidth   = .5;
+              ctx.moveTo(outer[i].x, outer[i].y);
+              ctx.lineTo(outer[j].x, outer[j].y); ctx.stroke();
+            }
+          }
+
+          ctx.beginPath();
+          ctx.arc(outer[i].x, outer[i].y, outer[i].size, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(${G},.15)`; ctx.fill();
+
+          const p = outer[i];
+          p.x += p.vx; p.y += p.vy;
+
+          const cdx = p.x - mouseX, cdy = p.y - mouseY;
+          const cd  = Math.sqrt(cdx*cdx + cdy*cdy);
+          if (cd < 80 && cd > 0) {
+            const force = (80 - cd) / 80 * 0.4;
+            p.vx += (cdx/cd) * force;
+            p.vy += (cdy/cd) * force;
+            const spd = Math.sqrt(p.vx*p.vx + p.vy*p.vy);
+            if (spd > 1.2) { p.vx = (p.vx/spd)*1.2; p.vy = (p.vy/spd)*1.2; }
+          }
+
+          p.vx *= .98; p.vy *= .98;
+
+          if (p.x < 12 || p.x > W-12) p.vx *= -1;
+          if (p.y < 12 || p.y > H-12) p.vy *= -1;
+
+          const dx = p.x-cx, dy = p.y-cy;
+          if (Math.sqrt(dx*dx+dy*dy) < DIAL_R + 14) {
+            const a = Math.atan2(dy, dx);
+            p.x = cx + (DIAL_R+16)*Math.cos(a);
+            p.y = cy + (DIAL_R+16)*Math.sin(a);
+            p.vx *= -1; p.vy *= -1;
+          }
+        }
+        ctx.restore();
+      }
+
+      /* ── Ladefortschritt ─────────────────────────────── */
+      let externalProgress = null;
+      window.stellifySetProgress = p => { externalProgress = Math.max(0, Math.min(1, p)); };
+
+      const MINIMUM_MS = 1500;
+      const startTime  = Date.now();
+      let   readyCalled = false;
+
+      window.stellifyReady = () => {
+        if (readyCalled) return;
+        readyCalled = true;
+        const elapsed  = Date.now() - startTime;
+        const waitMore = Math.max(0, MINIMUM_MS - elapsed);
+        setTimeout(() => {
+          externalProgress = 1;
+        }, waitMore);
+      };
+
+      function updateProgress() {
+        const p = externalProgress !== null
+          ? externalProgress
+          : Math.min(0.92, stateFrame / RUNNING_F);
+        progFill.style.width = (p * 100) + '%';
+        return p;
+      }
+
+      function removeSplash() {
+        if (stopped) return;
+        stopped = true;
+        if (splashEl) {
+          splashEl.classList.add('stellify-removing');
+          setTimeout(() => {
+            if (splashEl && splashEl.parentNode) splashEl.parentNode.removeChild(splashEl);
+            document.body.classList.remove('stellify-splashing');
+          }, 380);
+        }
+      }
+
+      /* ── Haupt-Loop ──────────────────────────────────── */
+      function frame() {
+        if (stopped) return;
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+
+        stateFrame++;
+        radarAngle = (radarAngle + (reducedMotion ? 0 : RADAR_SPEED)) % (Math.PI*2);
+
+        if (state === 'intro') {
+          const t   = Math.min(stateFrame / INTRO_F, 1);
+          dialScale     = easeOut(t);
+          particleAlpha = easeOut(Math.max(0, (t-.4)/.6));
+          outerAlpha    = easeOut(Math.max(0, (t-.5)/.5));
+
+          if (t >= .55 && !contentEl.classList.contains('visible')) {
+            contentEl.classList.add('visible');
+            footerEl.classList.add('visible');
+            buildTagline(0.1);
+          }
+          if (stateFrame >= INTRO_F) { state = 'running'; stateFrame = 0; }
+        }
+        else if (state === 'running') {
+          dialScale = 1; particleAlpha = 1; outerAlpha = 1;
+          const prog = updateProgress();
+          if (prog >= 1) {
+            state = 'outro'; stateFrame = 0;
+          }
+        }
+        else if (state === 'outro') {
+          const t   = Math.min(stateFrame / OUTRO_F, 1);
+          dialScale     = easeInOut(1-t);
+          particleAlpha = Math.max(0, 1 - t*1.4);
+          outerAlpha    = Math.max(0, 1 - t*1.2);
+          if (t >= .3) {
+            contentEl.classList.add('hiding');
+            contentEl.classList.remove('visible');
+            footerEl.classList.remove('visible');
+          }
+          if (stateFrame >= OUTRO_F) {
+            removeSplash();
+            return;
+          }
+        }
+
+        const R = Math.max(0, DIAL_R * dialScale);
+        drawOuter(outerAlpha * .9);
+        drawDial(R, dialScale);
+        drawRadar(R, particleAlpha);
+        drawInner(R, particleAlpha);
+
+        requestAnimationFrame(frame);
+      }
+
+      window.addEventListener('resize', () => {
+        if (stopped) return;
+        resizeCanvas();
+        initOuter();
+      });
+
+      resizeCanvas();
+      initInner();
+      initOuter();
+
+      if (reducedMotion) {
+        dialScale = 1; particleAlpha = 1; outerAlpha = 1;
+        state = 'running';
+        contentEl.classList.add('visible');
+        footerEl.classList.add('visible');
+        buildTagline(0);
+      }
+
+      frame();
+    })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
