@@ -108,7 +108,7 @@
         100% { transform: translate(0, 0); }
       }
 
-      /* Star Ignition — Bloom emaniert vom Icon (literal "stellify": der Stern zündet) */
+      /* Star Ignition — glimmender Brand-Funke vom Icon (kein weisses Flash, pure forest glow) */
       #stellify-splash .ignition-anchor {
         position: fixed;
         top: 50%; left: 50%;
@@ -120,34 +120,34 @@
       #stellify-splash .ignition {
         position: absolute;
         top: 0; left: 0;
-        width: 60vmax; height: 60vmax;
-        margin-top: -30vmax; margin-left: -30vmax;
+        width: 70vmax; height: 70vmax;
+        margin-top: -35vmax; margin-left: -35vmax;
         border-radius: 50%;
         background: radial-gradient(circle,
-          rgba(255,255,255,.40) 0%,
-          rgba(198,246,213,.20) 12%,
-          rgba(0,168,84,.12) 28%,
-          rgba(0,168,84,.05) 45%,
-          transparent 70%);
-        transform: scale(.05);
+          rgba(77,214,138,.18) 0%,
+          rgba(0,168,84,.12) 18%,
+          rgba(0,168,84,.06) 38%,
+          rgba(0,168,84,.02) 55%,
+          transparent 75%);
+        transform: scale(.04);
         opacity: 0;
-        filter: blur(32px);
-        animation: stellifyIgnition 2.4s cubic-bezier(.16,1,.3,1) .85s forwards;
+        filter: blur(42px);
+        animation: stellifyIgnition 3s cubic-bezier(.16,1,.3,1) .8s forwards;
         will-change: transform, opacity;
       }
       @keyframes stellifyIgnition {
-        0%   { transform: scale(.05); opacity: 0; }
-        18%  { transform: scale(.15); opacity: 1; }
-        100% { transform: scale(1.4); opacity: 0; }
+        0%   { transform: scale(.04); opacity: 0; }
+        22%  { transform: scale(.14); opacity: .85; }
+        100% { transform: scale(1.5);  opacity: 0; }
       }
 
-      /* Icon "ignites" — kurzer Helligkeits-Puls synchron mit Bloom */
+      /* Icon "ignites" — kurzer, sanfter Helligkeits-Puls synchron mit Funke */
       #stellify-splash .icon-outer {
-        animation: stellifyIconIgnite 1.4s ease-out .82s forwards;
+        animation: stellifyIconIgnite 1.6s ease-out .82s forwards;
       }
       @keyframes stellifyIconIgnite {
         0%   { filter: brightness(1); }
-        15%  { filter: brightness(1.55); }
+        18%  { filter: brightness(1.35); }
         100% { filter: brightness(1); }
       }
 
