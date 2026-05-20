@@ -1128,6 +1128,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             stellaTitle: 'Stella, deine KI Karrierebegleiterin',
             stellaDesc: 'Unsere KI Assistentin heisst Stella. Der Name kommt aus dem Lateinischen, wo stella einfach Stern bedeutet. Stella ist rund um die Uhr für dich da, beantwortet deine Fragen und begleitet dich durch jede Phase deiner Karriere. Wie ein Stern, der dir den Weg zeigt.',
             statLanguages: 'Sprachen', statAvailable: 'Verfügbar', statHq: 'Schweizer Sitz', statLaw: 'Recht und Datenschutz',
+            oneClickTitle: 'Mit einem Klick zum Resultat',
+            oneClickLabel: 'Klick',
+            oneClickP1: 'Was früher Stunden gebraucht hat, geschieht heute in Sekunden. Lebenslauf-Analyse, Interview-Vorbereitung, Lohnverhandlungs-Strategie, ATS-Optimierung.',
+            oneClickP2: 'Die KI übernimmt die Recherche, die Formulierung, die Schweizer Marktanalyse. Du bekommst das fertige Resultat. Präzise. Sofort einsatzbereit.',
             swissTitle: 'Made in Switzerland',
             swissDesc: 'Stellify wurde in der Schweiz gegründet und entwickelt. Wir verbinden Schweizer Sorgfalt, Datenschutz und Präzision mit moderner künstlicher Intelligenz. Unser Sitz ist in Zug, im Herzen der Schweizer Innovation.',
           } : isFR ? {
@@ -1148,6 +1152,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             stellaTitle: 'Stella, ton assistante IA',
             stellaDesc: "Notre assistante IA s'appelle Stella. Le nom vient du latin, où stella signifie simplement étoile. Stella est disponible 24h sur 24, répond à tes questions et t'accompagne à chaque étape de ta carrière. Comme une étoile qui te montre le chemin.",
             statLanguages: 'Langues', statAvailable: 'Disponible', statHq: 'Siège suisse', statLaw: 'Droit et confidentialité',
+            oneClickTitle: 'En un clic, le résultat',
+            oneClickLabel: 'Clic',
+            oneClickP1: "Ce qui prenait des heures se passe désormais en secondes. Analyse de CV, préparation aux entretiens, stratégie de négociation salariale, optimisation ATS.",
+            oneClickP2: "L'IA prend en charge la recherche, la formulation, l'analyse du marché suisse. Tu reçois le résultat fini. Précis. Prêt à l'emploi immédiatement.",
             swissTitle: 'Made in Switzerland',
             swissDesc: "Stellify a été fondée et développée en Suisse. Nous allions soin suisse, protection des données et précision avec une IA moderne. Notre siège est à Zoug, au cœur de l'innovation suisse.",
           } : isIT ? {
@@ -1168,6 +1176,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             stellaTitle: 'Stella, la tua assistente IA',
             stellaDesc: 'La nostra assistente IA si chiama Stella. Il nome viene dal latino, dove stella significa semplicemente stella. Stella è disponibile 24 ore su 24, risponde alle tue domande e ti accompagna in ogni fase della carriera. Come una stella che ti mostra la strada.',
             statLanguages: 'Lingue', statAvailable: 'Disponibile', statHq: 'Sede svizzera', statLaw: 'Diritto e privacy',
+            oneClickTitle: 'In un click, il risultato',
+            oneClickLabel: 'Click',
+            oneClickP1: "Quello che prima richiedeva ore, oggi avviene in secondi. Analisi del CV, preparazione al colloquio, strategia di negoziazione salariale, ottimizzazione ATS.",
+            oneClickP2: "L'IA si occupa della ricerca, della formulazione, dell'analisi del mercato svizzero. Ricevi il risultato finito. Preciso. Pronto all'uso.",
             swissTitle: 'Made in Switzerland',
             swissDesc: "Stellify è stata fondata e sviluppata in Svizzera. Uniamo cura svizzera, protezione dei dati e precisione con un'IA moderna. La nostra sede è a Zugo, nel cuore dell'innovazione svizzera.",
           } : {
@@ -1188,6 +1200,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             stellaTitle: 'Stella, your AI career companion',
             stellaDesc: 'Our AI assistant is named Stella. The name comes from Latin, where stella simply means star. Stella is available around the clock, answers your questions, and guides you through every stage of your career. Like a star showing you the way.',
             statLanguages: 'Languages', statAvailable: 'Available', statHq: 'Swiss HQ', statLaw: 'Law and Privacy',
+            oneClickTitle: 'One click. Done.',
+            oneClickLabel: 'Click',
+            oneClickP1: 'What used to take hours now happens in seconds. CV analysis, interview preparation, salary negotiation strategy, ATS optimisation.',
+            oneClickP2: 'The AI handles the research, the wording, the Swiss market analysis. You get the finished result. Precise. Ready to use immediately.',
             swissTitle: 'Made in Switzerland',
             swissDesc: 'Stellify was founded and developed in Switzerland. We combine Swiss care, data protection, and precision with modern AI. Our home is in Zug, at the heart of Swiss innovation.',
           };
@@ -1279,6 +1295,28 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
                 {c.stellaDesc}
               </p>
+            </div>
+
+            {/* MIT EINEM KLICK ZUM RESULTAT */}
+            <div className="my-24 py-16 border-t border-b border-[#004225]/15 dark:border-white/10">
+              <h2 className="text-3xl md:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-12 leading-tight max-w-2xl">
+                {c.oneClickTitle}
+              </h2>
+              <div className="grid md:grid-cols-12 gap-10 md:gap-16 items-start">
+                <div className="md:col-span-4">
+                  <div className="font-serif text-8xl md:text-9xl text-[#004225] dark:text-[#00A854] leading-none tracking-tight" style={{paddingBottom: '.05em'}}>
+                    1
+                  </div>
+                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mt-4 mb-4"></div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#6B6B66] dark:text-[#9A9A94]">
+                    {c.oneClickLabel}
+                  </p>
+                </div>
+                <div className="md:col-span-8 space-y-5 text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
+                  <p>{c.oneClickP1}</p>
+                  <p className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">{c.oneClickP2}</p>
+                </div>
+              </div>
             </div>
 
             {/* STATS GRID */}
@@ -8501,6 +8539,66 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* --- ABOUT / BRAND STORY PREVIEW --- */}
+      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+            {/* Left — wordmark + etymology */}
+            <div className="lg:col-span-5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#004225] dark:text-[#00A854] mb-6">
+                {language === 'FR' ? 'Notre histoire' : language === 'IT' ? 'La nostra storia' : language === 'EN' ? 'Our Story' : 'Unsere Geschichte'}
+              </p>
+              <p className="font-serif text-6xl md:text-7xl text-[#1A1A18] dark:text-[#FAFAF8] leading-[0.95] tracking-tight mb-10" style={{paddingBottom: '.08em'}}>
+                Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] leading-none mb-1">Stell<span className="opacity-30">·</span></p>
+                  <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
+                    {language === 'FR' ? "Du mot allemand Stellen. Trouve ton poste."
+                      : language === 'IT' ? 'Dal tedesco Stellen. Trova la tua posizione.'
+                      : language === 'EN' ? 'From the German Stellen. Find your position.'
+                      : 'Vom deutschen Stellen. Finde deine Position.'}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] leading-none mb-1 italic"><span className="opacity-30 not-italic">·</span>ify</p>
+                  <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
+                    {language === 'FR' ? 'Du latin stellificare. Deviens une étoile.'
+                      : language === 'IT' ? 'Dal latino stellificare. Diventa una stella.'
+                      : language === 'EN' ? 'From the Latin stellificare. Become a star.'
+                      : 'Vom lateinischen stellificare. Werde zum Stern.'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right — founder quote + CTA */}
+            <div className="lg:col-span-7">
+              <div className="border-l-2 border-[#004225]/25 dark:border-[#00A854]/40 pl-8 lg:pl-10 mb-10">
+                <blockquote className="font-serif italic text-2xl md:text-3xl lg:text-4xl text-[#1A1A18] dark:text-[#FAFAF8] leading-snug mb-6">
+                  «{language === 'FR' ? "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse."
+                    : language === 'IT' ? 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.'
+                    : language === 'EN' ? "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market."
+                    : 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.'}»
+                </blockquote>
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6B6B66] dark:text-[#9A9A94]">
+                  {language === 'FR' ? 'Le fondateur' : language === 'IT' ? 'Il fondatore' : language === 'EN' ? 'The Founder' : 'Der Gründer'}
+                </p>
+              </div>
+
+              <button
+                onClick={() => navigate('ueber-uns')}
+                className="group inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] hover:gap-4 transition-all"
+              >
+                {language === 'FR' ? 'Lire notre histoire' : language === 'IT' ? 'Leggi la nostra storia' : language === 'EN' ? 'Read our story' : 'Unsere Geschichte lesen'}
+                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
