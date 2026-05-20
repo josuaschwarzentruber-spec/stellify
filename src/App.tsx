@@ -3461,23 +3461,6 @@ Bewerte in 3 Kategorien (je 0–100%):
           `;
           break;
         }
-        case 'linkedin-posts':
-          prompt = `
-            HANDLUNGSANWEISUNG: Generiere 3 massgeschneiderte LinkedIn-Posts im Schweizer Stil.
-            THEMA/FOKUS: ${toolInput.topic || 'Allgemeine Karriere in der Schweiz'}.
-            KONTEXT: CV des Kandidaten: ${cvContext || 'Nicht vorhanden'}.
-            ANFORDERUNGEN:
-            - STIL: Professionell, authentisch, "Swiss Premium" (keine übertriebenen US-Marketing-Floskeln).
-            - SPRACHE: Schweizer Hochdeutsch (KEIN "ß", verwende "ss").
-            - STRUKTUR: 
-              Post 1: Fachliche Expertise/Insight (Thought Leadership).
-              Post 2: Persönlicher Meilenstein oder Learning (Storytelling).
-              Post 3: Netzwerk-Fokus/Call-to-Action (Engagement).
-            - DETAILS: Nutze branchenspezifische Begriffe aus dem Schweizer Markt (z.B. KMU, Kantone, spezifische Branchen-Events).
-            - FORMAT: Inklusive passender Emojis (dezent) und 3-5 relevanter Hashtags (z.B. #KarriereSchweiz, #NetworkingCH).
-            - VERBOTEN: Generische Phrasen wie "I am thrilled to announce...", "Exciting news...", "In today's fast-paced world...".
-          `;
-          break;
         case 'skill-gap':
           prompt = `
             HANDLUNGSANWEISUNG: Skill-Gap Analyse.
@@ -3657,40 +3640,6 @@ Bewerte in 3 Kategorien (je 0–100%):
             - DON'T: Druck machen, emotionale Argumente, Vergleiche mit Kollegen
 
             AUSGABE: Fliessender Text, professionell, keine Aufzählungszeichen ausser in den Formulierungsabschnitten.
-          `;
-          break;
-        }
-        case 'hr-email': {
-          const recipientName = toolInput.hrName || '';
-          const company = toolInput.company || '';
-          const position = toolInput.position || '';
-          const senderName = (toolInput.firstName || '') + (toolInput.lastName ? ' ' + toolInput.lastName : '');
-          prompt = `
-            HANDLUNGSANWEISUNG: Erstelle eine perfekte, professionelle Bewerbungsmail für den Schweizer Arbeitsmarkt.
-            EMPFÄNGER: ${recipientName ? `${recipientName} (HR-Verantwortliche/r)` : 'Zuständige HR-Person'} bei ${company || '[Unternehmen]'}.
-            STELLE: ${position || 'Initiativbewerbung'}.
-            BEWERBER: ${senderName || 'Der Kandidat'}.
-            CV-KONTEXT: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Stärken.'}
-            BESONDERE WÜNSCHE: ${toolInput.notes || 'Keine'}.
-
-            ANFORDERUNGEN AN DIE MAIL:
-            - Betreffzeile: Klar, professionell, mit Stellenbezeichnung
-            - Anrede: Personalisiert falls HR-Name vorhanden, sonst "Sehr geehrte Damen und Herren,"
-            - Einleitung: Aufmerksamkeitsstarker erster Satz (KEIN "hiermit bewerbe ich mich")
-            - Hauptteil: Warum diese Firma, warum diese Stelle, was der Kandidat einbringt (Konkret mit Beispielen aus dem CV)
-            - Abschluss: Selbstbewusster Call-to-Action für ein Gespräch
-            - Grussformel: Schweizer Standard ("Mit freundlichen Grüssen")
-            - Signatur: Vollständiger Name
-            - SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss)
-            - LÄNGE: Max. 250 Wörter – jeder Satz zählt
-            - STIL: Professionell, selbstbewusst, präzise – kein Unterwürfigkeitston
-
-            AUSGABE-FORMAT:
-            Betreff: [Betreffzeile]
-
-            [Vollständiger E-Mail-Text ab der Anrede]
-
-            Bitte NUR den Mail-Text ausgeben, ohne Erklärungen oder Kommentare.
           `;
           break;
         }
@@ -4733,14 +4682,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_ad_placeholder: 'Kopiere das Stelleninserat hierher...',
           tutorial: 'Beispiel: Dein LinkedIn-Profil + Inserat von Swisscom. Wir generieren die 3 stärksten Argumente, warum genau du der Match bist.'
         },
-        'linkedin-posts': { 
-          title: 'LinkedIn-Posts', 
-          desc: '3 massgeschneiderte Posts im Schweizer Stil – keine Corporate-Floskeln.', 
-          input_label: 'Thema oder Fokus', 
-          input_placeholder: 'z.B. Neuer Job...',
-          tutorial: 'Beispiel: Post über deinen neuen Job bei der Credit Suisse. Professionell, bescheiden und doch wirkungsvoll im Schweizer Stil.'
-        },
-        'cv-premium': { 
+        'cv-premium': {
           title: 'Premium Lebenslauf-Rewrite',
           desc: 'Vollständige Optimierung deines Lebenslaufs auf Schweizer Premium-Standard (kein ß, Schweizer Präzision).', 
           input_label: 'Dein aktueller Lebenslauf-Text',
@@ -4785,14 +4727,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'z.B. Ich möchte von 95k auf 115k CHF aufsteigen...',
           tutorial: 'Beispiel: Verhandlung bei der Zurich Insurance. Wir liefern 5 konkrete Argumente, die perfekte Einstiegsforderung und Reaktionen auf typische Einwände.'
         },
-        'hr-email': {
-          title: 'HR-Bewerbungsmail',
-          desc: 'Generiert eine perfekte, professionelle Bewerbungsmail an HR-Verantwortliche, Recruiter oder Firmen – bereit zum Absenden.',
-          badge: 'NEU',
-          input_label: 'HR-Kontakt Name (optional)',
-          input_placeholder: 'z.B. Frau Müller',
-          tutorial: 'Beispiel: Initiativbewerbung bei Novartis. Stella generiert eine präzise, selbstbewusste Mail mit deinen Stärken – du kopierst sie einfach und sendest sie ab.'
-        }
       }
     },
     FR: {
@@ -5214,7 +5148,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'wiedereinstieg': { title: 'Check retour à l\'emploi', desc: 'Longue pause ? Nous comblons la lacune de manière convaincante.', input_label: 'Raison de la pause', input_placeholder: 'ex: Congé parental...' },
         'karriere-checkup': { title: 'Check-up carrière', desc: 'Vous avez un job mais voulez plus ? Testez votre potentiel.', input_label: 'Poste actuel', input_placeholder: 'ex: Chef de projet' },
         'linkedin-job': { title: 'LinkedIn → Candidature', desc: 'Profil + Annonce → Lettre de motivation & arguments.', input_profile: 'Texte du profil LinkedIn', input_profile_placeholder: 'Copiez votre profil LinkedIn (À propos & Expérience)...', input_ad: 'Annonce d\'emploi', input_ad_placeholder: 'Copiez l\'annonce ici...' },
-        'linkedin-posts': { title: 'Posts LinkedIn', desc: '3 posts sur mesure dans le style suisse – pas de clichés corporate.', input_label: 'Sujet ou focus', input_placeholder: 'ex: Nouveau job...' },
         'cv-premium': { title: 'Réécriture CV Premium', desc: 'Optimisation complète de votre CV selon les standards premium suisses (précision suisse, pas de ß).', input_label: 'Votre texte de CV actuel', input_placeholder: 'Copiez ici tout le contenu de votre CV...' },
         'career-roadmap': { title: 'Feuille de route de carrière', desc: 'Crée un plan de bataille personnel pour votre carrière en Suisse, y compris la formation et les emplois.', input_label: 'Votre objectif de carrière (optionnel)', input_placeholder: 'ex: CTO dans une Fintech' },
         'job-search': { 
@@ -5248,14 +5181,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'ex: Je souhaite passer de 95k à 115k CHF...',
           tutorial: 'Exemple : Négociation chez Zurich Insurance. Nous fournissons 5 arguments concrets, la demande initiale idéale et les réponses aux objections typiques.'
         },
-        'hr-email': {
-          title: 'E-mail de Candidature RH',
-          desc: 'Génère un e-mail de candidature parfait et professionnel à envoyer aux responsables RH, recruteurs ou entreprises.',
-          badge: 'NOUVEAU',
-          input_label: 'Nom du contact RH (optionnel)',
-          input_placeholder: 'ex. Mme Dupont',
-          tutorial: 'Exemple : Candidature spontanée chez Nestlé. Stella génère un e-mail précis et percutant avec tes points forts – tu n\'as plus qu\'à l\'envoyer.'
-        }
       }
     },
     IT: {
@@ -5677,7 +5602,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'wiedereinstieg': { title: 'Check rientro al lavoro', desc: 'Lunga pausa? Colmiamo la lacuna in modo convincente.', input_label: 'Motivo della pausa', input_placeholder: 'es. Congedo parentale...' },
         'karriere-checkup': { title: 'Check-up carriera', desc: 'Hai un lavoro ma vuoi di più? Testiamo il tuo potenziale.', input_label: 'Lavoro attuale', input_placeholder: 'es. Responsabile di progetto' },
         'linkedin-job': { title: 'LinkedIn → Candidatura', desc: 'Profilo + Annuncio → Lettera di motivazione & argomenti.', input_profile: 'Testo del profilo LinkedIn', input_profile_placeholder: 'Copia il tuo profilo LinkedIn (Informazioni & Esperienza)...', input_ad: 'Annuncio di lavoro', input_ad_placeholder: 'Copia l\'annuncio qui...' },
-        'linkedin-posts': { title: 'Post LinkedIn', desc: '3 post su misura in stile svizzero – niente cliché aziendali.', input_label: 'Argomento o focus', input_placeholder: 'es. Nuovo lavoro...' },
         'cv-premium': { title: 'Riscrittura CV Premium', desc: 'Ottimizzazione completa del tuo CV secondo gli standard premium svizzeri (precisione svizzera, niente ß).', input_label: 'Il tuo testo attuale del CV', input_placeholder: 'Copia qui tutto il contenuto del tuo CV...' },
         'career-roadmap': { title: 'Tabella di marcia della carriera', desc: 'Crea un piano di battaglia personale per la tua carriera in Svizzera, inclusi formazione e lavoro.', input_label: 'Il tuo obiettivo di carriera (opzionale)', input_placeholder: 'es. CTO in una Fintech' },
         'job-search': { 
@@ -5711,14 +5635,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'es: Voglio passare da 95k a 115k CHF...',
           tutorial: 'Esempio: Trattativa da Zurich Insurance. Forniamo 5 argomenti concreti, la domanda iniziale ideale e le risposte alle obiezioni tipiche.'
         },
-        'hr-email': {
-          title: 'Email Candidatura HR',
-          desc: 'Genera una email di candidatura perfetta e professionale da inviare a responsabili HR, recruiter o aziende.',
-          badge: 'NUOVO',
-          input_label: 'Nome contatto HR (opzionale)',
-          input_placeholder: 'es. Sig.ra Rossi',
-          tutorial: 'Esempio: Candidatura spontanea da Novartis. Stella genera una email precisa e incisiva con i tuoi punti di forza – devi solo inviarla.'
-        }
       }
     },
     EN: {
@@ -6140,7 +6056,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'wiedereinstieg': { title: 'Re-entry Check', desc: 'Took a longer break? We fill the gap in your CV professionally and convincingly.', input_label: 'Reason for break', input_placeholder: 'e.g. Parental leave...' },
         'karriere-checkup': { title: 'Career Checkup', desc: 'You have a job but want more? We check your current market potential.', input_label: 'Current Job', input_placeholder: 'e.g. Project Manager' },
         'linkedin-job': { title: 'LinkedIn → Application', desc: 'Profile + Ad → Cover letter & arguments.', input_profile: 'LinkedIn Profile Text', input_profile_placeholder: 'Copy your LinkedIn profile (About & Experience)...', input_ad: 'Job Ad', input_ad_placeholder: 'Copy the job ad here...' },
-        'linkedin-posts': { title: 'LinkedIn Posts', desc: '3 tailored posts in Swiss style.', input_label: 'Topic or focus', input_placeholder: 'e.g. New job...' },
         'cv-premium': { title: 'Premium CV Rewrite', desc: 'Full optimization of your resume to Swiss premium standards (no ß, Swiss precision).', input_label: 'Your current CV text', input_placeholder: 'Paste your entire CV content here...' },
         'career-roadmap': { title: 'Career Roadmap', desc: 'Creates a personal battle plan for your career in Switzerland including further education & jobs.', input_label: 'Your Career Goal (optional)', input_placeholder: 'e.g. CTO in a Fintech' },
         'job-search': { 
@@ -6174,14 +6089,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_placeholder: 'e.g. I want to go from 95k to 115k CHF...',
           tutorial: 'Example: Negotiation at Zurich Insurance. We provide 5 concrete arguments, the ideal opening demand and responses to typical objections.'
         },
-        'hr-email': {
-          title: 'HR Application Email',
-          desc: 'Generates a perfect, professional job application email to send to HR contacts, recruiters or companies – ready to send.',
-          badge: 'NEW',
-          input_label: 'HR Contact Name (optional)',
-          input_placeholder: 'e.g. Ms. Johnson',
-          tutorial: 'Example: Speculative application at UBS. Stella generates a precise, confident email highlighting your strengths – you just send it.'
-        }
       }
     }
   };
@@ -6388,15 +6295,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ]
     },
     {
-      id: 'linkedin-posts',
-      title: t.tools_data['linkedin-posts'].title,
-      desc: t.tools_data['linkedin-posts'].desc,
-      icon: <Share2 size={20} />,
-      badge: 'Personal Brand',
-      type: 'pro',
-      inputs: [{ key: 'topic', label: t.tools_data['linkedin-posts'].input_label, type: 'text', placeholder: t.tools_data['linkedin-posts'].input_placeholder }]
-    },
-    {
       id: 'interview-live',
       title: t.tools_data['interview-live'].title,
       desc: t.tools_data['interview-live'].desc,
@@ -6421,23 +6319,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { key: 'targetSalary', label: t.tools_data['salary-negotiation'].input_label, type: 'text', placeholder: t.tools_data['salary-negotiation'].input_placeholder }
       ]
     },
-    {
-      id: 'hr-email',
-      title: t.tools_data['hr-email'].title,
-      desc: t.tools_data['hr-email'].desc,
-      icon: <Mail size={20} />,
-      badge: t.tools_data['hr-email'].badge,
-      type: 'gratis',
-      inputs: [
-        { key: 'firstName', label: language === 'FR' ? 'Prénom' : language === 'IT' ? 'Nome' : language === 'EN' ? 'First name' : 'Vorname', type: 'text', placeholder: language === 'FR' ? 'ex. Anna' : language === 'IT' ? 'es. Anna' : language === 'EN' ? 'e.g. Anna' : 'z.B. Anna' },
-        { key: 'lastName', label: language === 'FR' ? 'Nom de famille' : language === 'IT' ? 'Cognome' : language === 'EN' ? 'Last name' : 'Nachname', type: 'text', placeholder: language === 'FR' ? 'ex. Müller' : language === 'IT' ? 'es. Müller' : language === 'EN' ? 'e.g. Müller' : 'z.B. Müller' },
-        { key: 'company', label: language === 'FR' ? 'Entreprise cible' : language === 'IT' ? 'Azienda' : language === 'EN' ? 'Target company' : 'Ziel-Unternehmen', type: 'text', placeholder: language === 'FR' ? 'ex. Nestlé SA' : language === 'IT' ? 'es. Novartis AG' : language === 'EN' ? 'e.g. Roche Ltd' : 'z.B. Novartis AG' },
-        { key: 'position', label: language === 'FR' ? 'Poste / Offre' : language === 'IT' ? 'Posizione' : language === 'EN' ? 'Position / Role' : 'Stelle / Position', type: 'text', placeholder: language === 'FR' ? 'ex. Marketing Manager' : language === 'IT' ? 'es. Project Manager' : language === 'EN' ? 'e.g. Software Engineer' : 'z.B. Projektleiter' },
-        { key: 'hrName', label: t.tools_data['hr-email'].input_label, type: 'text', placeholder: t.tools_data['hr-email'].input_placeholder },
-        { key: 'hrEmail', label: language === 'FR' ? 'E-mail HR (pour envoi direct)' : language === 'IT' ? 'E-mail HR (per invio diretto)' : language === 'EN' ? 'HR email (for direct send)' : 'HR E-Mail (für direkten Versand)', type: 'text', placeholder: 'hr@firma.ch' },
-        { key: 'notes', label: language === 'FR' ? 'Notes / Souhaits particuliers' : language === 'IT' ? 'Note / Desideri particolari' : language === 'EN' ? 'Notes / Special wishes' : 'Besondere Wünsche / Hinweise', type: 'textarea', placeholder: language === 'FR' ? 'ex. Candidature spontanée, référence à une annonce...' : language === 'IT' ? 'es. Candidatura spontanea, riferimento a annuncio...' : language === 'EN' ? 'e.g. speculative application, reference to a job posting...' : 'z.B. Initiativbewerbung, Bezug auf Stelleninserat...' },
-      ]
-    }
   ];
 
   const faqs = [
@@ -9825,83 +9706,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               {language === 'FR' ? 'Annuler' : language === 'IT' ? 'Annulla' : language === 'EN' ? 'Cancel' : 'Abbrechen'}
                             </button>
                           </div>
-                        ) : activeTool.id === 'hr-email' ? (
-                          /* ── HR Email Preview ── */
-                          (() => {
-                            const lines = toolResult.split('\n');
-                            const subjectLine = lines.find(l => l.toLowerCase().startsWith('betreff:') || l.toLowerCase().startsWith('subject:') || l.toLowerCase().startsWith('objet:') || l.toLowerCase().startsWith('oggetto:'));
-                            const subject = subjectLine ? subjectLine.replace(/^(betreff|subject|objet|oggetto):\s*/i, '').trim() : (language === 'EN' ? 'Job Application' : language === 'FR' ? 'Candidature' : language === 'IT' ? 'Candidatura' : 'Bewerbung');
-                            const body = lines.filter(l => !l.toLowerCase().startsWith('betreff:') && !l.toLowerCase().startsWith('subject:') && !l.toLowerCase().startsWith('objet:') && !l.toLowerCase().startsWith('oggetto:')).join('\n').trim();
-                            const hrEmail = toolInput.hrEmail || '';
-                            const mailtoHref = hrEmail ? `mailto:${hrEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}` : `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                            return (
-                              <div className="space-y-4">
-                                {/* Email client mockup */}
-                                <div className="border border-black/10 dark:border-white/10 rounded-none overflow-hidden shadow-lg">
-                                  {/* Email client bar */}
-                                  <div className="bg-[#004225] px-4 py-3 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <Mail size={14} className="text-[#6FCF97]" />
-                                      <span className="text-[10px] font-bold uppercase tracking-widest text-white">
-                                        {language === 'FR' ? 'Aperçu de l\'e-mail' : language === 'IT' ? 'Anteprima email' : language === 'EN' ? 'Email Preview' : 'E-Mail Vorschau'}
-                                      </span>
-                                    </div>
-                                    <div className="flex gap-1.5">
-                                      <div className="w-2.5 h-2.5 rounded-full bg-red-400 opacity-70" />
-                                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 opacity-70" />
-                                      <div className="w-2.5 h-2.5 rounded-full bg-green-400 opacity-70" />
-                                    </div>
-                                  </div>
-                                  {/* Email metadata */}
-                                  <div className="bg-[#F8F7F3] dark:bg-[#1E1E1A] border-b border-black/8 px-5 py-3 space-y-2">
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] w-12 shrink-0">{language === 'EN' ? 'TO' : language === 'FR' ? 'À' : language === 'IT' ? 'A' : 'AN'}</span>
-                                      <span className="text-[11px] text-[#1A1A18] dark:text-[#FAFAF8] font-medium">{toolInput.hrEmail || toolInput.hrName || (language === 'EN' ? 'HR Department' : language === 'FR' ? 'Département RH' : language === 'IT' ? 'Ufficio HR' : 'HR-Abteilung')}{toolInput.company ? ` · ${toolInput.company}` : ''}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] w-12 shrink-0">CC</span>
-                                      <span className="text-[10px] text-[#9A9A94] italic">{language === 'EN' ? '— optional —' : language === 'FR' ? '— optionnel —' : language === 'IT' ? '— opzionale —' : '— optional —'}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] w-12 shrink-0">{language === 'EN' ? 'SUBJ.' : language === 'FR' ? 'OBJET' : language === 'IT' ? 'OGG.' : 'BETR.'}</span>
-                                      <span className="text-[12px] font-semibold text-[#004225] dark:text-[#6FCF97] leading-tight">{subject}</span>
-                                    </div>
-                                  </div>
-                                  {/* Email body */}
-                                  <div className="bg-white dark:bg-[#18181A] px-6 py-5 max-h-72 overflow-y-auto custom-scrollbar">
-                                    <div className="font-serif text-[13px] leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] whitespace-pre-wrap">{body}</div>
-                                  </div>
-                                  {/* Email attachment hint */}
-                                  <div className="bg-[#F8F7F3] dark:bg-[#1E1E1A] border-t border-black/8 px-5 py-3 flex items-center gap-2">
-                                    <div className="flex items-center gap-2 text-[#9A9A94]">
-                                      <FileUp size={12} />
-                                      <span className="text-[9px] font-medium">{language === 'EN' ? 'Attach CV, diplomas, references before sending' : language === 'FR' ? 'Joindre CV, diplômes, références avant d\'envoyer' : language === 'IT' ? 'Allegare CV, diplomi, referenze prima di inviare' : 'CV, Zeugnisse, Referenzen beifügen vor dem Versand'}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                {/* Action buttons */}
-                                <div className="grid grid-cols-2 gap-3">
-                                  <a
-                                    href={mailtoHref}
-                                    className="flex items-center justify-center gap-2 py-3.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-md"
-                                  >
-                                    <Mail size={13} />
-                                    {language === 'EN' ? 'Open in Mail Client' : language === 'FR' ? 'Ouvrir dans client mail' : language === 'IT' ? 'Apri nel client mail' : 'In Mail-App öffnen'}
-                                  </a>
-                                  <button
-                                    onClick={() => { navigator.clipboard.writeText(`Betreff: ${subject}\n\n${body}`); showToast(t.tool_copy); }}
-                                    className="flex items-center justify-center gap-2 py-3.5 border border-[#004225]/30 text-[#004225] dark:text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/5 transition-all"
-                                  >
-                                    <Copy size={13} />
-                                    {language === 'EN' ? 'Copy Email' : language === 'FR' ? 'Copier l\'e-mail' : language === 'IT' ? 'Copia email' : 'E-Mail kopieren'}
-                                  </button>
-                                </div>
-                                <p className="text-[9px] text-[#9A9A94] text-center leading-relaxed px-4">
-                                  {language === 'EN' ? '✦ Generated by Stella AI · Review before sending · Attach CV if required' : language === 'FR' ? '✦ Généré par Stella AI · Vérifier avant d\'envoyer · Joindre CV si requis' : language === 'IT' ? '✦ Generato da Stella AI · Verificare prima di inviare · Allegare CV se richiesto' : '✦ Von Stella KI generiert · Vor Versand prüfen · CV beifügen wenn nötig'}
-                                </p>
-                              </div>
-                            );
-                          })()
                         ) : activeTool.id === 'interview' && parsedInterviewResult ? (
                           /* ── Interview-Coach Premium Card ── */
                           <motion.div
