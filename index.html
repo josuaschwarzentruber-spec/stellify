@@ -53,15 +53,22 @@
         filter: blur(40px);
         opacity: 0;
         animation: stellifyAuroraIn 2.6s cubic-bezier(.22,.61,.36,1) .15s forwards,
-                   stellifyAuroraDrift 14s ease-in-out 2.6s infinite;
+                   stellifyAuroraDrift 9s ease-in-out 2.6s infinite,
+                   stellifyAuroraBreathe 6s ease-in-out 2.6s infinite;
       }
       @keyframes stellifyAuroraIn {
         from { opacity: 0; transform: scale(.94); }
         to   { opacity: 1; transform: scale(1); }
       }
       @keyframes stellifyAuroraDrift {
-        0%,100% { transform: scale(1)   translate(0,0); }
-        50%     { transform: scale(1.04) translate(1.5%, -1%); }
+        0%,100% { transform: scale(1)    translate(0,0); }
+        25%     { transform: scale(1.05) translate(2.5%, -1.5%); }
+        50%     { transform: scale(1.03) translate(-1.5%, 2%); }
+        75%     { transform: scale(1.06) translate(1.5%, 1%); }
+      }
+      @keyframes stellifyAuroraBreathe {
+        0%,100% { filter: blur(40px) brightness(1); }
+        50%     { filter: blur(46px) brightness(1.18); }
       }
 
       /* Canvas — sternenfeld + plexus */
@@ -349,23 +356,38 @@
 
       /* ── Stars ──────────────────────────────────────── */
       let stars = [];
+      // Sternenfarben — realer Nachthimmel ist nicht monochrom
+      const STAR_PALETTES = [
+        [225, 248, 232], // cool white-green (häufigste)
+        [240, 245, 232], // warm off-white
+        [200, 250, 220], // grünlich
+        [220, 232, 250], // bläulich-weiß
+        [250, 240, 220], // warm gold (selten)
+      ];
       function initStars() {
         stars = [];
-        const target = Math.min(140, Math.max(60, Math.floor((W * H) / 14000)));
+        const target = Math.min(150, Math.max(70, Math.floor((W * H) / 13000)));
         for (let i = 0; i < target; i++) {
           // Weighted radius: mostly tiny, occasionally bright
-          const r = Math.pow(Math.random(), 2.4) * 1.6 + .35;
+          const r = Math.pow(Math.random(), 2.4) * 1.7 + .35;
+          // Weighted palette: häufig kühl-weiß, selten gold
+          const palIdx = Math.random() < .55 ? 0
+                       : Math.random() < .6  ? 1
+                       : Math.random() < .55 ? 2
+                       : Math.random() < .7  ? 3
+                       : 4;
           stars.push({
             x: Math.random() * W,
             y: Math.random() * H,
             r,
-            baseAlpha: .12 + Math.random() * .55,
+            baseAlpha: .15 + Math.random() * .55,
             twinkle: 0,
             twinkleDur: 0,
-            vx: (Math.random() - .5) * .04,
-            vy: (Math.random() - .5) * .04,
+            vx: (Math.random() - .5) * .14,
+            vy: (Math.random() - .5) * .14,
             // Depth for parallax (0=far, 1=near)
             depth: Math.pow(Math.random(), 1.4),
+            color: STAR_PALETTES[palIdx],
           });
         }
       }
@@ -402,6 +424,10 @@
       }
 
       /* ── Zeichnen: Plexus + Stars ───────────────────── */
+      // Sanfte globale Rotation des Feldes — ~0.6°/sec
+      const ROT = 0.00018;
+      const ROT_COS = Math.cos(ROT), ROT_SIN = Math.sin(ROT);
+
       function drawStars(globalAlpha) {
         if (globalAlpha < .01) return;
         ctx.save();
@@ -411,17 +437,21 @@
         mxSmooth += (mouseX - mxSmooth) * .04;
         mySmooth += (mouseY - mySmooth) * .04;
 
+        // Plexus pulse — Verbindungen "atmen"
+        const pulseT = Date.now() * 0.0004;
+        const plexusMul = 0.78 + Math.sin(pulseT) * 0.22;
+
         // Compute parallax-adjusted positions once
         const px = new Float32Array(stars.length);
         const py = new Float32Array(stars.length);
         for (let i = 0; i < stars.length; i++) {
           const s = stars[i];
-          const off = 10 * s.depth;
+          const off = 12 * s.depth;
           px[i] = s.x - mxSmooth * off;
           py[i] = s.y - mySmooth * off;
         }
 
-        // Plexus connections (only near stars; cap by depth similarity for organic feel)
+        // Plexus connections (only near stars; depth-aware for 3D feel)
         const MAX_D = 95;
         for (let i = 0; i < stars.length; i++) {
           for (let j = i + 1; j < stars.length; j++) {
@@ -430,7 +460,10 @@
             const d2 = dx*dx + dy*dy;
             if (d2 < MAX_D * MAX_D) {
               const d = Math.sqrt(d2);
-              const a = 0.10 * (1 - d / MAX_D);
+              // Verbindungen schwächer bei großem Tiefenunterschied
+              const depthAffinity = 1 - Math.abs(stars[i].depth - stars[j].depth) * .5;
+              const a = 0.11 * (1 - d / MAX_D) * plexusMul * depthAffinity;
+              if (a < .005) continue;
               ctx.beginPath();
               ctx.strokeStyle = `rgba(${G},${a.toFixed(3)})`;
               ctx.lineWidth = .5;
@@ -445,14 +478,14 @@
         for (let i = 0; i < stars.length; i++) {
           const s = stars[i];
           // Random twinkle ignition
-          if (s.twinkleDur <= 0 && Math.random() < .0009) {
+          if (s.twinkleDur <= 0 && Math.random() < .0012) {
             s.twinkleDur = 70 + Math.random() * 50;
             s.twinkle = s.twinkleDur;
           }
           let alpha = s.baseAlpha;
           if (s.twinkle > 0) {
             const t = 1 - (s.twinkle / s.twinkleDur);
-            alpha = Math.min(1, s.baseAlpha + Math.sin(t * Math.PI) * .7);
+            alpha = Math.min(1, s.baseAlpha + Math.sin(t * Math.PI) * .75);
             s.twinkle--;
           }
 
@@ -467,8 +500,9 @@
             ctx.fill();
           }
 
-          // Star core (warm white with green tint)
-          ctx.fillStyle = `rgba(225,248,232,${alpha.toFixed(3)})`;
+          // Star core — Farbvarianz wie echter Nachthimmel
+          const c = s.color;
+          ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${alpha.toFixed(3)})`;
           ctx.beginPath();
           ctx.arc(px[i], py[i], s.r, 0, Math.PI*2);
           ctx.fill();
@@ -476,6 +510,13 @@
           // Drift
           s.x += s.vx;
           s.y += s.vy;
+
+          // Sanfte globale Rotation um Zentrum
+          const dx0 = s.x - cx, dy0 = s.y - cy;
+          s.x = cx + dx0 * ROT_COS - dy0 * ROT_SIN;
+          s.y = cy + dx0 * ROT_SIN + dy0 * ROT_COS;
+
+          // Wrap
           if (s.x < -10) s.x = W + 10;
           if (s.x > W + 10) s.x = -10;
           if (s.y < -10) s.y = H + 10;
@@ -566,8 +607,8 @@
           const elapsed = Date.now() - startTime;
           const progress = readyComplete ? 1 : Math.min(0.92, elapsed / MINIMUM_MS);
           progFill.style.width = (progress * 100) + '%';
-          // Occasional second shooting star around 2.5s mark
-          if (!reducedMotion && !shoot && Math.random() < .003 && elapsed > 1800 && elapsed < 3400) {
+          // Wiederkehrende Shooting Stars im Hintergrund
+          if (!reducedMotion && !shoot && Math.random() < .012 && elapsed > 1500 && elapsed < 3700) {
             spawnShoot();
           }
           if (readyComplete) { state = 'outro'; stateFrame = 0; }
