@@ -52,6 +52,12 @@ import mammoth from 'mammoth';
 
 import Markdown from 'react-markdown';
 
+declare global {
+  interface Window {
+    stellifyReady?: () => void;
+  }
+}
+
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
@@ -1117,7 +1123,7 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
 );
 
 export default function App() {
-  useEffect(() => { (window as any).stellifyReady?.(); }, []);
+  useEffect(() => { window.stellifyReady?.(); }, []);
   return (
     <ErrorBoundary>
       <StellifyApp />
