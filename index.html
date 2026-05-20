@@ -198,7 +198,7 @@
         50%     { opacity: .65; transform: scale(1.06); }
       }
 
-      /* Wortmarke — Canonical Brand Logo (Forest Green, matches App dark-mode #00A854) */
+      /* Wortmarke — Canonical Brand Logo (Stell white + ify forest-green, matches App header/footer/auth) */
       #stellify-splash .wordmark {
         font-family: 'Playfair Display', Georgia, 'Palatino Linotype', serif;
         font-size: clamp(54px, 10vw, 88px);
@@ -209,16 +209,28 @@
         margin-bottom: 14px;
         position: relative;
         display: inline-block;
+      }
+      #stellify-splash .wordmark .w,
+      #stellify-splash .wordmark .g {
+        background-clip: text;
+        -webkit-background-clip: text;
         color: transparent;
+        background-size: 250% 100%;
+        background-position: 200% 50%;
+        animation: stellifyShimmer 2.8s cubic-bezier(.65,0,.35,1) 1.05s forwards;
+        font-style: normal;
+      }
+      #stellify-splash .wordmark .w {
+        background-image: linear-gradient(115deg,
+          #fafaf8 0%, #fafaf8 42%,
+          #ffffff 50%, #f8f8f4 54%,
+          #fafaf8 62%, #fafaf8 100%);
+      }
+      #stellify-splash .wordmark .g {
         background-image: linear-gradient(115deg,
           #00A854 0%, #00A854 42%,
           #4DD68A 50%, #1AC078 54%,
           #00A854 62%, #00A854 100%);
-        background-size: 250% 100%;
-        background-position: 200% 50%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        animation: stellifyShimmer 2.8s cubic-bezier(.65,0,.35,1) 1.05s forwards;
       }
       @keyframes stellifyShimmer {
         0%   { background-position: 200% 50%; }
@@ -289,8 +301,10 @@
         #stellify-splash .ignition,
         #stellify-splash .icon-outer,
         #stellify-splash .icon-outer::before,
-        #stellify-splash .wordmark { animation: none !important; }
-        #stellify-splash .wordmark { background: #00A854; -webkit-background-clip: text; background-clip: text; color: transparent; }
+        #stellify-splash .wordmark .w,
+        #stellify-splash .wordmark .g { animation: none !important; }
+        #stellify-splash .wordmark .w { background: #fafaf8; -webkit-background-clip: text; background-clip: text; color: transparent; }
+        #stellify-splash .wordmark .g { background: #00A854; -webkit-background-clip: text; background-clip: text; color: transparent; }
         #stellify-splash .ignition { opacity: 0; }
         #stellify-splash .aurora { opacity: 1; }
         #stellify-splash #content { transition: none; }
@@ -319,7 +333,7 @@
             <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
           </svg>
         </div>
-        <div class="wordmark">Stellify</div>
+        <div class="wordmark"><span class="w">Stell</span><span class="g">ify</span></div>
         <div class="sep"></div>
         <div id="tagline"></div>
         <div class="progress-track"><div id="progress-fill"></div></div>
