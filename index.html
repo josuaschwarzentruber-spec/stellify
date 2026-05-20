@@ -446,7 +446,7 @@
       let externalProgress = null;
       window.stellifySetProgress = p => { externalProgress = Math.max(0, Math.min(1, p)); };
 
-      const MINIMUM_MS = 1500;
+      const MINIMUM_MS = 4000;
       const startTime  = Date.now();
       let   readyCalled = false;
 
