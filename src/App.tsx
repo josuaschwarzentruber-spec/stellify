@@ -1117,6 +1117,7 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
 );
 
 export default function App() {
+  useEffect(() => { (window as any).stellifyReady?.(); }, []);
   return (
     <ErrorBoundary>
       <StellifyApp />
