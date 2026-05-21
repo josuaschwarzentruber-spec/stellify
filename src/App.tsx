@@ -1123,7 +1123,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             nameTitle: 'Der Name',
             nameIntro: 'Hinter Stellify stehen zwei Bedeutungen, die sich in einem einzigen Wort vereinen.',
             stellDesc: 'Vom deutschen Wort Stellen. Wir helfen dir, die passende Stelle zu finden, die zu dir passt.',
-            ifyDesc: 'Vom lateinischen stellificare, dem klassischen Wort für die Verwandlung in einen Stern. In Ovids Metamorphosen beschreibt es die Verklärung Sterblicher zu Himmelskörpern.',
+            ifyDesc: 'Vom lateinischen stellificare. Das bedeutet so viel wie zum Stern werden. Eine alte Vorstellung aus der römischen Mythologie, nach der grosse Persönlichkeiten zu Sternen am Himmel wurden.',
             nameSummary: 'Stellify bedeutet damit wörtlich, jemanden zum Stern zu machen. Eine berufliche Identität, die strahlt.',
             stellaTitle: 'Stella, deine KI Karrierebegleiterin',
             stellaDesc: 'Unsere KI Assistentin heisst Stella. Der Name kommt aus dem Lateinischen, wo stella einfach Stern bedeutet. Stella ist rund um die Uhr für dich da, beantwortet deine Fragen und begleitet dich durch jede Phase deiner Karriere. Wie ein Stern, der dir den Weg zeigt.',
@@ -1147,7 +1147,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             nameTitle: 'Le nom',
             nameIntro: 'Derrière Stellify se rejoignent deux significations dans un seul mot.',
             stellDesc: "Du mot allemand Stellen, qui signifie «postes». Nous t'aidons à trouver le poste qui te correspond.",
-            ifyDesc: "Du latin stellificare, le mot classique pour la transformation en étoile. Dans les Métamorphoses d'Ovide, il décrit la transfiguration des mortels en corps célestes.",
+            ifyDesc: "Du latin stellificare. Cela signifie devenir une étoile. Une vieille idée de la mythologie romaine selon laquelle les grandes personnalités devenaient des étoiles dans le ciel.",
             nameSummary: 'Stellify signifie ainsi littéralement transformer quelqu\'un en étoile. Une identité professionnelle qui brille.',
             stellaTitle: 'Stella, ton assistante IA',
             stellaDesc: "Notre assistante IA s'appelle Stella. Le nom vient du latin, où stella signifie simplement étoile. Stella est disponible 24h sur 24, répond à tes questions et t'accompagne à chaque étape de ta carrière. Comme une étoile qui te montre le chemin.",
@@ -1171,7 +1171,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             nameTitle: 'Il nome',
             nameIntro: 'Dietro Stellify si incontrano due significati in una sola parola.',
             stellDesc: 'Dalla parola tedesca Stellen, che significa «posizioni». Ti aiutiamo a trovare la posizione giusta per te.',
-            ifyDesc: "Dal latino stellificare, la parola classica per la trasformazione in stella. Nelle Metamorfosi di Ovidio descrive la trasfigurazione dei mortali in corpi celesti.",
+            ifyDesc: "Dal latino stellificare. Significa diventare una stella. Un'antica idea della mitologia romana, secondo cui le grandi personalità diventavano stelle nel cielo.",
             nameSummary: "Stellify significa quindi letteralmente trasformare qualcuno in una stella. Un'identità professionale che brilla.",
             stellaTitle: 'Stella, la tua assistente IA',
             stellaDesc: 'La nostra assistente IA si chiama Stella. Il nome viene dal latino, dove stella significa semplicemente stella. Stella è disponibile 24 ore su 24, risponde alle tue domande e ti accompagna in ogni fase della carriera. Come una stella che ti mostra la strada.',
@@ -1195,7 +1195,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             nameTitle: 'The name',
             nameIntro: 'Two meanings meet in a single word Stellify.',
             stellDesc: 'From the German word Stellen, meaning positions or jobs. We help you find the position that fits you.',
-            ifyDesc: "From the Latin stellificare, the classical word for transformation into a star. In Ovid's Metamorphoses it describes the transfiguration of mortals into heavenly bodies.",
+            ifyDesc: "From the Latin stellificare. It means becoming a star. An old idea from Roman mythology that great figures would turn into stars in the sky.",
             nameSummary: 'Stellify thus literally means to turn someone into a star. A professional identity that shines.',
             stellaTitle: 'Stella, your AI career companion',
             stellaDesc: 'Our AI assistant is named Stella. The name comes from Latin, where stella simply means star. Stella is available around the clock, answers your questions, and guides you through every stage of your career. Like a star showing you the way.',
@@ -1258,8 +1258,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </p>
 
               {/* Big wordmark display */}
-              <div className="text-center my-16 py-16 border-y border-[#004225]/10 dark:border-white/10">
-                <p className="font-serif text-7xl md:text-9xl text-[#1A1A18] dark:text-[#FAFAF8] tracking-tight leading-none" style={{paddingBottom: '.1em'}}>
+              <div className="text-center my-16 pt-16 pb-20 border-y border-[#004225]/10 dark:border-white/10">
+                <p className="font-serif text-7xl md:text-9xl text-[#1A1A18] dark:text-[#FAFAF8] tracking-tight leading-none" style={{paddingBottom: '.22em'}}>
                   Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
                 </p>
               </div>
@@ -1267,15 +1267,15 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               {/* Two columns: Stell- and -ify */}
               <div className="grid md:grid-cols-2 gap-12 md:gap-20 mb-12">
                 <div>
-                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] mb-5 tracking-tight leading-none">Stell<span className="opacity-30">·</span></p>
-                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mb-6"></div>
+                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] tracking-tight leading-none" style={{paddingBottom: '.18em'}}>Stell<span className="opacity-30">·</span></p>
+                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mt-2 mb-6"></div>
                   <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
                     {c.stellDesc}
                   </p>
                 </div>
                 <div>
-                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] mb-5 tracking-tight leading-none italic"><span className="opacity-30 not-italic">·</span>ify</p>
-                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mb-6"></div>
+                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] tracking-tight leading-none italic" style={{paddingBottom: '.22em'}}><span className="opacity-30 not-italic">·</span>ify</p>
+                  <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mt-2 mb-6"></div>
                   <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
                     {c.ifyDesc}
                   </p>
