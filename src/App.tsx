@@ -686,7 +686,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
 
   return (
     <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
-      <div className={`${activeView === 'ueber-uns' ? 'max-w-4xl' : 'max-w-3xl'} mx-auto`}>
+      <div className={`${activeView === 'about' ? 'max-w-4xl' : 'max-w-3xl'} mx-auto`}>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"
@@ -1109,7 +1109,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
         )}
 
         {/* ======= ÜBER UNS ======= */}
-        {activeView === 'ueber-uns' && (() => {
+        {activeView === 'about' && (() => {
           const c = isDE ? {
             eyebrow: 'Unsere Geschichte', h1: 'Über Uns',
             lede: 'Wie aus zwei Wörtern eine Mission wurde.',
@@ -1505,7 +1505,7 @@ function StellifyApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'ueber-uns'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -1565,7 +1565,7 @@ function StellifyApp() {
   }, [activeView]);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'ueber-uns') => {
+  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
@@ -1578,8 +1578,18 @@ function StellifyApp() {
   };
 
   useEffect(() => {
+    type RouteView = 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
+    const validViews: RouteView[] = ['dashboard', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about'];
+    const viewFromPath = (path: string): RouteView | null => {
+      const slug = path.replace(/^\/+/, '').replace(/\/+$/, '');
+      if (!slug) return 'dashboard';
+      // Backwards-compat: /ueber-uns still routes to about
+      if (slug === 'ueber-uns') return 'about';
+      return (validViews as string[]).includes(slug) ? (slug as RouteView) : null;
+    };
+
     const onPop = (e: PopStateEvent) => {
-      const view = e.state?.view as 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | undefined;
+      const view = (e.state?.view as RouteView | undefined) ?? viewFromPath(window.location.pathname);
       if (view) {
         setActiveView(view);
         setActiveTool(null);
@@ -1596,8 +1606,13 @@ function StellifyApp() {
       window.location.hash.includes('refresh_token=') ||
       window.location.search.includes('code=');
     if (!hasOAuthCallbackData) {
-      // Set initial history entry so first back-press works
-      window.history.replaceState({ view: activeView }, '', window.location.pathname);
+      // Parse initial path so direct links (e.g. /about) land on the right view
+      const initial = viewFromPath(window.location.pathname);
+      if (initial && initial !== activeView) {
+        setActiveView(initial);
+      }
+      const target = initial ?? activeView;
+      window.history.replaceState({ view: target }, '', target === 'dashboard' ? '/' : `/${target}`);
     }
     return () => window.removeEventListener('popstate', onPop);
   }, []);
@@ -6594,12 +6609,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </AnimatePresence>
 
       {/* --- LEGAL PAGES + ABOUT --- */}
-      {(activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'ueber-uns') && (
+      {(activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about') && (
         <LegalPages activeView={activeView} onBack={() => navigate(user ? 'dashboard' : 'dashboard')} language={language} />
       )}
 
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'ueber-uns') && (user ? (
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about') && (user ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
@@ -8591,7 +8606,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <button
-                onClick={() => navigate('ueber-uns')}
+                onClick={() => navigate('about')}
                 className="group inline-flex items-center gap-3 text-sm font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] hover:gap-4 transition-all"
               >
                 {language === 'FR' ? 'Lire notre histoire' : language === 'IT' ? 'Leggi la nostra storia' : language === 'EN' ? 'Read our story' : 'Unsere Geschichte lesen'}
@@ -8761,7 +8776,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{language === 'DE' ? 'Unternehmen' : language === 'FR' ? 'Entreprise' : language === 'IT' ? 'Azienda' : 'Company'}</h4>
               <ul className="space-y-4 text-sm font-light">
-                <li><button onClick={() => navigate('ueber-uns')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
+                <li><button onClick={() => navigate('about')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
                 <li><a href="#success" className="hover:text-white transition-colors">{t.success_stories}</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">{t.pricing}</a></li>
                 <li><a href={`mailto:support.stellify@gmail.com?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
