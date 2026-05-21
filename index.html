@@ -24,6 +24,17 @@
       und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="de_CH">
+    <meta property="og:url" content="https://stellify.ch">
+    <meta property="og:site_name" content="Stellify">
+    <meta property="og:image" content="https://stellify.ch/og-image.svg">
+    <meta property="og:image:type" content="image/svg+xml">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Stellify – Swiss Career Excellence">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Stellify – Dein KI-Karriere-Copilot">
+    <meta name="twitter:description" content="CV-Optimierung, Interview-Coach und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
+    <meta name="twitter:image" content="https://stellify.ch/og-image.svg">
     <!-- Favicon — matches Splash icon (dark forest tile, green star, subtle green border) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='7' fill='%23061410' stroke='%2300A854' stroke-opacity='0.55' stroke-width='1.5'/%3E%3Cpath d='M16 5.5L18.7 13L26 16L18.7 19L16 26.5L13.3 19L6 16L13.3 13Z' fill='%2300A854'/%3E%3C/svg%3E">
     <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect x='6' y='6' width='168' height='168' rx='38' fill='%23061410' stroke='%2300A854' stroke-opacity='0.55' stroke-width='6'/%3E%3Cpath d='M90 30L106 75L150 90L106 105L90 150L74 105L30 90L74 75Z' fill='%2300A854'/%3E%3C/svg%3E">
@@ -265,6 +276,16 @@
         transition: opacity .55s cubic-bezier(.55,0,.65,.2);
       }
 
+      /* Low-power Modus — schwächere Geräte (weniger CPU/RAM oder reduced-motion) */
+      #stellify-splash.low-power .grain { display: none; }
+      #stellify-splash.low-power .aurora {
+        filter: blur(20px);
+        animation: stellifyAuroraIn 1.6s ease-out forwards;
+        opacity: .7;
+      }
+      #stellify-splash.low-power .icon-outer { backdrop-filter: none; -webkit-backdrop-filter: none; }
+      #stellify-splash.low-power .icon-outer::before { animation: none; opacity: .35; }
+
       /* Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
         #stellify-splash .aurora,
@@ -314,11 +335,22 @@
 
     <script>
     (function () {
-      /* ── Reduced Motion ─────────────────────────────── */
+      /* ── Reduced Motion + Low-power Detection ────────── */
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const isLowPower = (() => {
+        if (reducedMotion) return true;
+        const cores = navigator.hardwareConcurrency || 4;
+        const mem = navigator.deviceMemory || 4;
+        const conn = navigator.connection && navigator.connection.effectiveType;
+        if (cores <= 2) return true;
+        if (mem <= 2) return true;
+        if (conn === 'slow-2g' || conn === '2g' || conn === '3g') return true;
+        return false;
+      })();
 
       /* ── DOM ────────────────────────────────────────── */
       const splashEl  = document.getElementById('stellify-splash');
+      if (isLowPower && splashEl) splashEl.classList.add('low-power');
       const cvs       = document.getElementById('mc');
       const contentEl = document.getElementById('content');
       const footerEl  = document.getElementById('footer');
@@ -359,6 +391,7 @@
       }
       function resizeCanvas() {
         computeDimensions();
+        if (isLowPower) dpr = 1; // cap DPR on weak devices
         cvs.width        = W * dpr;
         cvs.height       = H * dpr;
         cvs.style.width  = W + 'px';
@@ -391,7 +424,10 @@
       ];
       function initStars() {
         stars = [];
-        const target = Math.min(150, Math.max(70, Math.floor((W * H) / 13000)));
+        const density = isLowPower ? 30000 : 13000;
+        const maxStars = isLowPower ? 50 : 150;
+        const minStars = isLowPower ? 25 : 70;
+        const target = Math.min(maxStars, Math.max(minStars, Math.floor((W * H) / density)));
         for (let i = 0; i < target; i++) {
           // Weighted radius: mostly tiny, occasionally bright
           const r = Math.pow(Math.random(), 2.4) * 1.7 + .35;
@@ -625,7 +661,7 @@
           }
           if (!shootScheduled && stateFrame === Math.floor(INTRO_F * .55)) {
             shootScheduled = true;
-            if (!reducedMotion) spawnShoot();
+            if (!reducedMotion && !isLowPower) spawnShoot();
           }
           if (stateFrame >= INTRO_F) { state = 'running'; stateFrame = 0; }
         }
@@ -634,8 +670,8 @@
           const elapsed = Date.now() - startTime;
           const progress = readyComplete ? 1 : Math.min(0.92, elapsed / MINIMUM_MS);
           progFill.style.width = (progress * 100) + '%';
-          // Wiederkehrende Shooting Stars im Hintergrund
-          if (!reducedMotion && !shoot && Math.random() < .012 && elapsed > 1500 && elapsed < 3700) {
+          // Wiederkehrende Shooting Stars im Hintergrund (skip auf low-power)
+          if (!reducedMotion && !isLowPower && !shoot && Math.random() < .012 && elapsed > 1500 && elapsed < 3700) {
             spawnShoot();
           }
           if (readyComplete) { state = 'outro'; stateFrame = 0; }
