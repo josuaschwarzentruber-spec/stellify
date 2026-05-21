@@ -6399,9 +6399,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="flex items-center gap-4 sm:gap-8 min-w-0">
           <button
             onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="text-xl sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0"
+            className="text-xl sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0 inline-flex items-center gap-2"
           >
-            Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
+            <svg width="20" height="20" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] shrink-0" aria-hidden="true">
+              <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+            </svg>
+            <span>Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
           </button>
           <div className="hidden md:flex items-center gap-2">
             <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 rounded-full p-1">
@@ -7619,7 +7622,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             <div className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 p-8 shadow-2xl relative z-10 transition-colors">
               <div className="flex items-center gap-4 mb-8 pb-6 border-b border-black/5 dark:border-white/5">
-                <div className="w-12 h-12 bg-[#004225] flex items-center justify-center text-white font-serif text-xl">S</div>
+                <div className="w-12 h-12 bg-[#004225] flex items-center justify-center text-white">
+                  <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
+                    <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                  </svg>
+                </div>
                 <div>
                   <h3 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{t.stella_name}</h3>
                   <p className="text-xs text-[#059669] flex items-center gap-1.5">
@@ -8744,8 +8751,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 mb-16 lg:mb-24">
             <div className="sm:col-span-2 lg:col-span-2 space-y-6">
-              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-serif tracking-tight text-white">
-                Stell<span className="text-[#00A854]">ify</span>
+              <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-serif tracking-tight text-white inline-flex items-center gap-2.5">
+                <svg width="22" height="22" viewBox="0 0 32 32" className="text-[#00A854] shrink-0" aria-hidden="true">
+                  <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                </svg>
+                <span>Stell<span className="text-[#00A854]">ify</span></span>
               </a>
               <p className="text-sm font-light leading-relaxed max-w-xs">
                 {t.footer_desc}
@@ -9214,7 +9224,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             <div className="p-4 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#004225] flex items-center justify-center text-white font-serif">S</div>
+                <div className="w-10 h-10 bg-[#004225] flex items-center justify-center text-white">
+                  <svg width="20" height="20" viewBox="0 0 32 32" aria-hidden="true">
+                    <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                  </svg>
+                </div>
                 <div>
                   <h3 className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stella</h3>
                   <div className="flex items-center gap-3">
@@ -9264,7 +9278,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <div className="pl-4 pr-4 pt-3 pb-3 bg-gradient-to-br from-white to-[#F2F8F5] dark:from-[#1E2B23] dark:to-[#1A1A18] border border-[#004225]/10 dark:border-[#004225]/20 shadow-[0_2px_20px_-6px_rgba(0,66,37,0.12)]">
                         <div className="flex items-center gap-2 mb-2.5 pb-2 border-b border-[#004225]/10 dark:border-[#004225]/20">
                           <div className="w-4 h-4 rounded-full bg-[#004225] flex items-center justify-center flex-shrink-0 shadow-sm">
-                            <span className="text-white font-serif text-[9px] leading-none">S</span>
+                            <svg width="9" height="9" viewBox="0 0 32 32" aria-hidden="true" className="text-white">
+                              <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                            </svg>
                           </div>
                           <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854]">Stella AI</span>
                           <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#059669] shadow-[0_0_6px_rgba(5,150,105,0.5)]" />
@@ -9322,7 +9338,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-[#004225] text-white shadow-2xl flex items-center justify-center z-[100] group"
       >
         <div className="absolute inset-0 bg-[#004225] animate-ping opacity-20 group-hover:opacity-40 transition-opacity" />
-        <span className="relative font-serif text-xl">S</span>
+        <svg width="22" height="22" viewBox="0 0 32 32" aria-hidden="true" className="relative">
+          <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+        </svg>
       </button>
 
       {/* --- TOOL MODAL --- */}
@@ -10386,7 +10404,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="text-center mb-8">
-                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
+                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] inline-flex items-center gap-2">
+                  <svg width="22" height="22" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] shrink-0" aria-hidden="true">
+                    <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                  </svg>
+                  <span>Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
+                </span>
                 <h3 className="text-xl font-medium mt-4">
                   {authTab === 'login'
                     ? (language === 'FR' ? 'Bon retour chez Stellify' : language === 'IT' ? 'Bentornato su Stellify' : language === 'EN' ? 'Welcome back to Stellify' : 'Willkommen zurück bei Stellify')

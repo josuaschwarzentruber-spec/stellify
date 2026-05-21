@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0a1d12"/>
+      <stop offset="60%" stop-color="#061410"/>
+      <stop offset="100%" stop-color="#030806"/>
+    </radialGradient>
+    <radialGradient id="aurora" cx="50%" cy="50%" r="40%">
+      <stop offset="0%" stop-color="#00A854" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#00A854" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#00A854" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#aurora)"/>
+
+  <!-- Subtle star field -->
+  <g fill="#fafaf8" opacity="0.6">
+    <circle cx="120" cy="80" r="1"/>
+    <circle cx="280" cy="180" r="0.8"/>
+    <circle cx="940" cy="120" r="1.2"/>
+    <circle cx="1080" cy="240" r="0.9"/>
+    <circle cx="180" cy="380" r="1"/>
+    <circle cx="1040" cy="490" r="1.1"/>
+    <circle cx="320" cy="540" r="0.7"/>
+    <circle cx="880" cy="560" r="1"/>
+    <circle cx="50" cy="280" r="0.9"/>
+    <circle cx="1150" cy="380" r="1.3"/>
+    <circle cx="420" cy="60" r="0.7"/>
+    <circle cx="760" cy="50" r="0.9"/>
+  </g>
+  <g fill="#C6F6D5" opacity="0.5">
+    <circle cx="640" cy="100" r="1.5"/>
+    <circle cx="200" cy="500" r="1.2"/>
+    <circle cx="1020" cy="160" r="1.4"/>
+  </g>
+
+  <!-- Brand icon: rounded tile + star -->
+  <g transform="translate(515, 130)">
+    <rect width="170" height="170" rx="36"
+          fill="#061410"
+          stroke="#00A854" stroke-opacity="0.55" stroke-width="2"/>
+    <path d="M85 28 L100 70 L145 85 L100 100 L85 142 L70 100 L25 85 L70 70 Z"
+          fill="#00A854"/>
+  </g>
+
+  <!-- Wordmark: Stell (cream) + ify (forest-green) -->
+  <text x="600" y="400"
+        text-anchor="middle"
+        font-family="'Playfair Display', Georgia, serif"
+        font-size="120"
+        font-weight="400"
+        letter-spacing="-3">
+    <tspan fill="#fafaf8">Stell</tspan><tspan fill="#00A854">ify</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text x="600" y="465"
+        text-anchor="middle"
+        font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif"
+        font-size="20"
+        font-weight="500"
+        letter-spacing="7"
+        fill="#C6F6D5"
+        opacity="0.65">
+    SWISS CAREER EXCELLENCE
+  </text>
+
+  <!-- Footer Swiss mark + label -->
+  <g transform="translate(560, 545)">
+    <rect x="0" y="0" width="22" height="22" fill="none" stroke="#00A854" stroke-opacity="0.5" stroke-width="1.5"/>
+    <rect x="9.5" y="5" width="3" height="12" fill="#00A854" fill-opacity="0.7"/>
+    <rect x="5" y="9.5" width="12" height="3" fill="#00A854" fill-opacity="0.7"/>
+    <text x="36" y="16"
+          font-family="-apple-system, sans-serif"
+          font-size="11"
+          font-weight="700"
+          letter-spacing="4"
+          fill="#fafaf8"
+          fill-opacity="0.5">
+      MADE IN SWITZERLAND
+    </text>
+  </g>
+</svg>
