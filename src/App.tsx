@@ -1274,7 +1274,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   </p>
                 </div>
                 <div>
-                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] tracking-tight leading-none italic" style={{paddingBottom: '.22em'}}><span className="opacity-30 not-italic">·</span>ify</p>
+                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] tracking-tight leading-none" style={{paddingBottom: '.22em'}}><span className="opacity-30">·</span>ify</p>
                   <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mt-2 mb-6"></div>
                   <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
                     {c.ifyDesc}
@@ -8565,7 +8565,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </p>
                 </div>
                 <div>
-                  <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] leading-none mb-1 italic"><span className="opacity-30 not-italic">·</span>ify</p>
+                  <p className="font-serif text-2xl text-[#004225] dark:text-[#00A854] leading-none mb-1"><span className="opacity-30">·</span>ify</p>
                   <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
                     {language === 'FR' ? 'Du latin stellificare. Deviens une étoile.'
                       : language === 'IT' ? 'Dal latino stellificare. Diventa una stella.'
