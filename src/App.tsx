@@ -6476,10 +6476,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
                     <a href="#success" onClick={handleAnchor('success')} className={goToAnchor('success')}>{t.success_stories}</a>
                     <a href="#how" onClick={handleAnchor('how')} className={goToAnchor('how')}>{t.how_it_works}</a>
+                    <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                     <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
                     </button>
-                    <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                   </>;
                 })()}
               </>
@@ -6625,8 +6625,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <>
                   <a href="#features" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.features}</a>
                   <a href="#how" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.how_it_works}</a>
-                  <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className="px-4 py-3 text-base font-medium rounded-full text-left text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                   <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</a>
+                  <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className="px-4 py-3 text-base font-medium rounded-full text-left text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
               )}
             </div>
