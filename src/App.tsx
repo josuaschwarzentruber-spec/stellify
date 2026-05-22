@@ -7495,8 +7495,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </section>
       ) : (
-        <section className="px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl mx-auto transition-colors">
-          <motion.div
+        <section className="relative px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl mx-auto transition-colors overflow-hidden">
+          {/* Premium ambient backdrop — slow aurora + subtle drift, matches splash */}
+          <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden" aria-hidden="true">
+            <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full opacity-[0.55] dark:opacity-30"
+                 style={{
+                   background: 'radial-gradient(circle, rgba(0,168,84,0.18) 0%, rgba(0,168,84,0.06) 35%, transparent 70%)',
+                   filter: 'blur(60px)',
+                   animation: 'stellifyHeroDriftA 18s ease-in-out infinite',
+                 }} />
+            <div className="absolute bottom-[-25%] right-[-10%] w-[55vw] h-[55vw] rounded-full opacity-[0.45] dark:opacity-25"
+                 style={{
+                   background: 'radial-gradient(circle, rgba(108,240,161,0.16) 0%, rgba(0,168,84,0.05) 40%, transparent 70%)',
+                   filter: 'blur(60px)',
+                   animation: 'stellifyHeroDriftB 22s ease-in-out infinite',
+                 }} />
+            <style>{`
+              @keyframes stellifyHeroDriftA {
+                0%,100% { transform: translate(0,0) scale(1); }
+                50%     { transform: translate(3%, -2%) scale(1.06); }
+              }
+              @keyframes stellifyHeroDriftB {
+                0%,100% { transform: translate(0,0) scale(1); }
+                50%     { transform: translate(-3%, 2%) scale(1.08); }
+              }
+              @media (prefers-reduced-motion: reduce) {
+                [data-hero-aurora] { animation: none !important; }
+              }
+            `}</style>
+          </div>
+<motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
