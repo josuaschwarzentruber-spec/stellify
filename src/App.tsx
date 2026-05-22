@@ -2310,8 +2310,20 @@ function StellifyApp() {
         type: 'profile'
       }] : [];
 
-      // Tools first (discovery-first), then tips, then FAQs — no direct job listings
-      const results = [...userResult, ...filteredTools, ...filteredSearchData, ...filteredFaqs];
+      // Pages (Über uns, AGB, Datenschutz, Impressum, Preise) — always discoverable
+      const pages = [
+        { view: 'about',       keys: ['über uns','about','geschichte','story','team','founder','gründer'], title: language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns', content: language === 'FR' ? 'Notre histoire, le fondateur et le sens du nom Stellify.' : language === 'IT' ? 'La nostra storia, il fondatore e il significato del nome Stellify.' : language === 'EN' ? 'Our story, the founder and the meaning behind the name Stellify.' : 'Unsere Geschichte, der Gründer und die Bedeutung des Namens Stellify.' },
+        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Ultimate. Sans renouvellement automatique.' : language === 'IT' ? 'Piani Gratuito, Pro e Ultimate. Senza rinnovo automatico.' : language === 'EN' ? 'Free, Pro and Ultimate plans. No auto-renewal.' : 'Gratis-, Pro- und Ultimate-Plan. Ohne automatische Verlängerung.' },
+        { view: 'datenschutz', keys: ['datenschutz','privacy','dsgvo','dsg','privacidad','vie privée'], title: language === 'FR' ? 'Politique de confidentialité' : language === 'IT' ? 'Informativa sulla privacy' : language === 'EN' ? 'Privacy Policy' : 'Datenschutz', content: language === 'FR' ? 'Comment nous traitons tes données personnelles selon LPD et RGPD.' : language === 'IT' ? 'Come trattiamo i tuoi dati personali secondo LPD e GDPR.' : language === 'EN' ? 'How we process your personal data under Swiss DPA and GDPR.' : 'Wie wir deine persönlichen Daten gemäss DSG und DSGVO bearbeiten.' },
+        { view: 'agb',         keys: ['agb','terms','bedingungen','widerruf','kündigung'], title: language === 'FR' ? 'CGV' : language === 'IT' ? 'Termini' : language === 'EN' ? 'Terms' : 'AGB', content: language === 'FR' ? 'Conditions générales, paiement et droit de rétractation.' : language === 'IT' ? 'Condizioni generali, pagamento e diritto di recesso.' : language === 'EN' ? 'Terms, payment and right of withdrawal.' : 'Geschäftsbedingungen, Zahlung und Widerrufsrecht.' },
+        { view: 'impressum',   keys: ['impressum','kontakt','contact','imprint','jtsp','zug','firma'], title: language === 'FR' ? 'Mentions légales' : language === 'IT' ? 'Informazioni legali' : language === 'EN' ? 'Imprint' : 'Impressum', content: language === 'FR' ? "Coordonnées de l'exploitant et juridiction." : language === 'IT' ? 'Dati del gestore e giurisdizione.' : language === 'EN' ? 'Operator details and jurisdiction.' : 'Betreiber-Angaben und Gerichtsstand.' },
+      ];
+      const filteredPages = pages
+        .filter(p => p.keys.some(k => k.includes(q)) || p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q))
+        .map(p => ({ id: p.view, title: p.title, content: p.content, category: language === 'FR' ? 'Page' : language === 'IT' ? 'Pagina' : language === 'EN' ? 'Page' : 'Seite', type: 'page', view: p.view }));
+
+      // Tools first (discovery-first), then tips, then FAQs, plus pages — no direct job listings
+      const results = [...userResult, ...filteredTools, ...filteredPages, ...filteredSearchData, ...filteredFaqs];
       setSearchResults(results);
       setSelectedSearchIndex(results.length > 0 ? 0 : -1);
     } else {
@@ -6398,7 +6410,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       <nav className="sticky top-0 z-50 bg-[#FDFCFB]/90 dark:bg-[#1A1A18]/90 backdrop-blur-md border-b border-black/5 dark:border-white/5 px-4 sm:px-6 lg:px-12 h-16 flex items-center justify-between gap-3 transition-colors duration-300">
         <div className="flex items-center gap-4 sm:gap-8 min-w-0">
           <button
-            onClick={() => { if (user) navigate('dashboard'); else window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onClick={() => {
+              const onLegal = activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about';
+              if (user) navigate('dashboard');
+              else if (onLegal) navigate('dashboard');
+              else window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
             className="text-xl sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0 inline-flex items-center gap-2"
           >
             <svg width="20" height="20" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] shrink-0" aria-hidden="true">
@@ -6437,10 +6454,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </>
             ) : (
               <>
-                <a href="#features" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.features}</a>
-                <a href="#success" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.success_stories}</a>
-                <a href="#how" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.how_it_works}</a>
-                <a href="#pricing" className="px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all">{t.pricing}</a>
+                {(() => {
+                  const onLegal = activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about';
+                  const goToAnchor = (id: string) => {
+                    const linkClass = "px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all";
+                    return linkClass;
+                  };
+                  const handleAnchor = (id: string) => (e: React.MouseEvent) => {
+                    e.preventDefault();
+                    if (onLegal) {
+                      navigate('dashboard');
+                      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 80);
+                    } else {
+                      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  };
+                  return <>
+                    <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
+                    <a href="#success" onClick={handleAnchor('success')} className={goToAnchor('success')}>{t.success_stories}</a>
+                    <a href="#how" onClick={handleAnchor('how')} className={goToAnchor('how')}>{t.how_it_works}</a>
+                    <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
+                  </>;
+                })()}
               </>
             )}
             </div>
@@ -6486,15 +6521,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
 
-        <div className="flex-1 max-w-md mx-8 hidden xl:block">
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            className="w-full flex items-center gap-3 bg-black/5 dark:bg-white/5 border border-transparent hover:border-[#004225]/20 hover:bg-white dark:hover:bg-[#2A2A26] pl-3 pr-3 py-2 text-sm font-light text-left transition-all rounded-lg group"
-          >
-            <Search size={15} className="text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors shrink-0" />
-            <span className="flex-1 text-[#9A9A94] dark:text-[#5C5C58] text-sm">{t.search_placeholder}</span>
-          </button>
-        </div>
+        {/* Spacer that lets nav breathe at wider screens */}
+        <div className="flex-1 hidden xl:block"></div>
 
         <div className="flex items-center gap-4">
           {/* Theme Toggle */}
@@ -6514,7 +6542,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </button>
           <button
             onClick={() => setIsSearchOpen(true)}
-            className="xl:hidden p-2 hover:bg-black/5 rounded-full transition-colors"
+            aria-label={t.search_placeholder}
+            title={t.search_placeholder}
+            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]"
           >
             <Search size={20} />
           </button>
@@ -7662,8 +7692,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </section>
       ))}
 
-      {/* --- MARKETING SECTIONS + FOOTER (hidden on legal pages) --- */}
-      {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && <>
+      {/* --- MARKETING SECTIONS (hidden on legal pages) --- */}
+      {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
       {/* --- TOOLS SHOWCASE SECTION --- */}
       <section className="px-6 lg:px-12 py-20 bg-[#FDFCFB] dark:bg-[#111110] transition-colors">
@@ -8209,7 +8239,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- TOOLS GRID --- */}
-      <section id="features" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-end mb-16">
             <div>
@@ -8746,7 +8776,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
 
-      {/* --- FOOTER --- */}
+      </> /* end marketing sections */}
+
+      {/* --- FOOTER (always visible — also on legal pages) --- */}
       <footer className="bg-[#1A1A18] text-white/50 px-6 lg:px-12 py-24 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 mb-16 lg:mb-24">
@@ -8821,8 +8853,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </footer>
-
-      </> /* end marketing sections */}
 
       {/* Mobile Back-to-Top Button */}
       <button
@@ -9012,6 +9042,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           handleToolClick(result.id);
                         } else if (result.type === 'job') {
                           handleJobClick(result.id);
+                        } else if (result.type === 'page') {
+                          navigate(result.view);
                         } else if (result.link) {
                           window.location.hash = result.link;
                         }
@@ -9100,14 +9132,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {type === 'job' && <Briefcase size={10} />}
                             {type === 'tip' && <Lightbulb size={10} />}
                             {type === 'faq' && <HelpCircle size={10} />}
-                            {type === 'profile' ? t.search_type_profile : type === 'tool' ? t.search_type_tool : type === 'job' ? t.search_type_job : type === 'tip' ? t.search_type_tip : t.search_type_faq}
+                            {type === 'page' && <Globe size={10} />}
+                            {type === 'profile' ? t.search_type_profile : type === 'tool' ? t.search_type_tool : type === 'job' ? t.search_type_job : type === 'tip' ? t.search_type_tip : type === 'page' ? (language === 'FR' ? 'Pages' : language === 'IT' ? 'Pagine' : language === 'EN' ? 'Pages' : 'Seiten') : t.search_type_faq}
                           </h5>
                           <div className="grid gap-1">
                             {items.map((result, i) => {
                               const globalIndex = searchResults.indexOf(result);
                               const isSelected = globalIndex === selectedSearchIndex;
                               return (
-                                <div 
+                                <div
                                   key={i}
                                   onClick={() => {
                                     if (result.type === 'profile') {
@@ -9117,10 +9150,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                       handleToolClick(result.id);
                                     } else if (result.type === 'job') {
                                       handleJobClick(result.id);
+                                    } else if (result.type === 'page') {
+                                      navigate(result.view);
                                     } else if (result.link) {
                                       window.location.hash = result.link;
                                     }
                                     setIsSearchOpen(false);
+                                    setSearchQuery('');
                                   }}
                                   className={`p-3 transition-all cursor-pointer group rounded-lg border-2 ${
                                     isSelected 
@@ -10367,20 +10403,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- AUTH MODAL --- */}
       <AnimatePresence>
         {isAuthModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
-            <motion.div 
+          <div className="fixed inset-0 z-[200] flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto">
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm z-10"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-10"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 24 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 24 }}
               transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-              className="bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] w-full max-w-md p-8 sm:p-10 relative z-20 shadow-2xl border border-black/8 dark:border-white/8"
+              className="bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] w-full max-w-md my-4 sm:my-8 p-6 sm:p-8 md:p-10 relative z-20 shadow-2xl border border-black/8 dark:border-white/8 max-h-[calc(100vh-2rem)] overflow-y-auto custom-scrollbar"
             >
               <button
                 onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
