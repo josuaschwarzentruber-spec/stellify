@@ -6476,6 +6476,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
                     <a href="#success" onClick={handleAnchor('success')} className={goToAnchor('success')}>{t.success_stories}</a>
                     <a href="#how" onClick={handleAnchor('how')} className={goToAnchor('how')}>{t.how_it_works}</a>
+                    <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
+                      {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
+                    </button>
                     <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                   </>;
                 })()}
@@ -6622,6 +6625,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <>
                   <a href="#features" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.features}</a>
                   <a href="#how" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.how_it_works}</a>
+                  <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className="px-4 py-3 text-base font-medium rounded-full text-left text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                   <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</a>
                 </>
               )}
@@ -8579,9 +8583,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#004225] dark:text-[#00A854] mb-6">
                 {language === 'FR' ? 'Notre histoire' : language === 'IT' ? 'La nostra storia' : language === 'EN' ? 'Our Story' : 'Unsere Geschichte'}
               </p>
-              <svg width="44" height="44" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] mb-5" aria-hidden="true">
-                <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
-              </svg>
               <p className="font-serif text-6xl md:text-7xl text-[#1A1A18] dark:text-[#FAFAF8] leading-[0.95] tracking-tight mb-10" style={{paddingBottom: '.08em'}}>
                 Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
               </p>
