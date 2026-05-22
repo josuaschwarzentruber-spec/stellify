@@ -7723,62 +7723,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- MARKETING SECTIONS (hidden on legal pages) --- */}
       {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
-      {/* --- TOOLS SHOWCASE SECTION --- */}
-      <section className="px-6 lg:px-12 py-20 bg-[#FDFCFB] dark:bg-[#111110] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
-              {t.tools_section_badge}
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-3">
-              {t.tools_section_title}
-            </h2>
-            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl mx-auto">
-              {t.tools_section_desc}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
-            {([
-              { id: 'cv-analysis', icon: <Search size={18} />, pro: false },
-              { id: 'interview', icon: <Mic size={18} />, pro: false },
-              { id: 'cv-gen', icon: <FileText size={18} />, pro: false },
-              { id: 'salary-calc', icon: <Coins size={18} />, pro: false },
-              { id: 'cv-premium', icon: <Sparkles size={18} />, pro: true },
-              { id: 'zeugnis', icon: <Shield size={18} />, pro: true },
-              { id: 'linkedin-job', icon: <Linkedin size={18} />, pro: false },
-              { id: 'career-roadmap', icon: <Compass size={18} />, pro: false },
-            ] as { id: string; icon: React.ReactNode; pro: boolean }[]).map((tool, i) => (
-              <div
-                key={i}
-                onClick={() => user ? handleToolClick(tool.id) : (setAuthTab('register'), setIsAuthModalOpen(true))}
-                className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 p-5 hover:border-[#004225]/40 hover:shadow-md transition-all cursor-pointer group"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-9 h-9 bg-[#004225]/8 dark:bg-[#FDFCFB]/8 flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] group-hover:bg-[#004225] group-hover:text-white transition-colors">
-                    {tool.icon}
-                  </div>
-                  {tool.pro && (
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-[#004225] dark:text-[#00A854] border border-[#004225]/20 dark:border-[#00A854]/30 px-1.5 py-0.5">Pro</span>
-                  )}
-                </div>
-                <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{t.tools_data[tool.id]?.title}</p>
-                <p className="text-xs text-[#9A9A94] font-light leading-relaxed">{t.tools_data[tool.id]?.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <button
-              onClick={() => user ? setActiveView('tools') : (setAuthTab('register'), setIsAuthModalOpen(true))}
-              className="text-sm text-[#004225] dark:text-[#00A854] font-medium hover:underline underline-offset-4 transition-all"
-            >
-              {t.tools_section_cta}
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* --- WHY STELLIFY SECTION --- */}
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
