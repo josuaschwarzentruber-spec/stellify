@@ -1257,8 +1257,11 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 {c.nameIntro}
               </p>
 
-              {/* Big wordmark display */}
+              {/* Big wordmark display — full brand lockup */}
               <div className="text-center my-16 pt-16 pb-20 border-y border-[#004225]/10 dark:border-white/10">
+                <svg width="56" height="56" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] mx-auto mb-8" aria-hidden="true">
+                  <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                </svg>
                 <p className="font-serif text-7xl md:text-9xl text-[#1A1A18] dark:text-[#FAFAF8] tracking-tight leading-none" style={{paddingBottom: '.22em'}}>
                   Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
                 </p>
@@ -8576,6 +8579,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#004225] dark:text-[#00A854] mb-6">
                 {language === 'FR' ? 'Notre histoire' : language === 'IT' ? 'La nostra storia' : language === 'EN' ? 'Our Story' : 'Unsere Geschichte'}
               </p>
+              <svg width="44" height="44" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] mb-5" aria-hidden="true">
+                <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+              </svg>
               <p className="font-serif text-6xl md:text-7xl text-[#1A1A18] dark:text-[#FAFAF8] leading-[0.95] tracking-tight mb-10" style={{paddingBottom: '.08em'}}>
                 Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span>
               </p>
