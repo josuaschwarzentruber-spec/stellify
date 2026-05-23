@@ -95,26 +95,69 @@ interface UserData {
 class ErrorBoundary extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    (this as any).state = { hasError: false, error: null };
+    (this as any).state = { hasError: false, error: null, errorInfo: null };
   }
   static getDerivedStateFromError(error: any) { return { hasError: true, error }; }
+  componentDidCatch(error: any, errorInfo: any) {
+    // Surface the actual error so it shows up in browser logs and any monitoring
+    try {
+      console.error('[Stellify] Uncaught render error:', error, errorInfo);
+      // Best-effort: avoid loops by limiting writes
+      const key = '__stellify_last_error';
+      const payload = JSON.stringify({
+        message: String(error?.message || error),
+        stack: String(error?.stack || ''),
+        componentStack: String(errorInfo?.componentStack || ''),
+        time: new Date().toISOString(),
+        url: window.location.href,
+      });
+      localStorage.setItem(key, payload);
+    } catch { /* swallow logging errors */ }
+    (this as any).setState({ errorInfo });
+  }
   render() {
     if ((this as any).state.hasError) {
       const lang = (() => { try { return localStorage.getItem('language') || 'DE'; } catch { return 'DE'; } })();
       const title = lang === 'FR' ? 'Une erreur inattendue s\'est produite.' : lang === 'IT' ? 'Si è verificato un errore imprevisto.' : lang === 'EN' ? 'An unexpected error has occurred.' : 'Ein unerwarteter Fehler ist aufgetreten.';
-      const desc = lang === 'FR' ? 'Nous nous excusons pour la gêne occasionnée. Nous travaillons déjà à une solution.' : lang === 'IT' ? 'Ci scusiamo per l\'inconveniente. Stiamo già lavorando a una soluzione.' : lang === 'EN' ? 'We apologise for the inconvenience. We are already working on a solution.' : 'Bitte entschuldigen Sie die Unannehmlichkeit. Wir arbeiten bereits an einer Lösung.';
+      const desc = lang === 'FR' ? 'Wir arbeiten daran. Versuche es bitte erneut oder gehe zurück zur Startseite.' : lang === 'IT' ? 'Ci scusiamo. Riprova o torna alla pagina iniziale.' : lang === 'EN' ? 'We apologise. Please try again or go back to the homepage.' : 'Bitte entschuldige. Versuche es erneut oder gehe zurück zur Startseite.';
       const btn = lang === 'FR' ? 'Recharger la page' : lang === 'IT' ? 'Ricarica la pagina' : lang === 'EN' ? 'Reload page' : 'Seite neu laden';
+      const home = lang === 'FR' ? 'Accueil' : lang === 'IT' ? 'Home' : lang === 'EN' ? 'Home' : 'Startseite';
+      const supportLabel = lang === 'FR' ? 'Contacter le support' : lang === 'IT' ? 'Contatta il supporto' : lang === 'EN' ? 'Contact support' : 'Support kontaktieren';
+      const errMsg = (() => {
+        try { return String((this as any).state.error?.message || ''); } catch { return ''; }
+      })();
+      const showDetails = typeof window !== 'undefined' && window.location.hostname === 'localhost';
       return (
-        <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] p-12 text-center">
+        <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] dark:bg-[#1A1A18] p-6 sm:p-12 text-center">
           <div className="max-w-md space-y-6">
-            <h1 className="text-3xl font-serif text-[#004225]">{title}</h1>
-            <p className="text-sm text-[#5C5C58] font-light leading-relaxed">{desc}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-[#004225] text-white px-8 py-3 text-sm font-medium hover:bg-[#00331d] transition-all"
+            <svg width="48" height="48" viewBox="0 0 32 32" className="mx-auto text-[#004225] dark:text-[#00A854]" aria-hidden="true">
+              <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+            </svg>
+            <h1 className="text-2xl sm:text-3xl font-serif text-[#004225] dark:text-[#00A854]">{title}</h1>
+            <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{desc}</p>
+            {showDetails && errMsg && (
+              <pre className="text-[10px] text-left bg-black/5 dark:bg-white/5 p-3 overflow-auto max-h-32 font-mono text-[#5C5C58] dark:text-[#9A9A94]">{errMsg}</pre>
+            )}
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-[#004225] text-white px-8 py-3 text-sm font-medium hover:bg-[#00331d] transition-all"
+              >
+                {btn}
+              </button>
+              <a
+                href="/"
+                className="border border-[#004225]/30 text-[#004225] dark:border-[#00A854]/40 dark:text-[#00A854] px-8 py-3 text-sm font-medium hover:bg-[#004225]/5 transition-all"
+              >
+                {home}
+              </a>
+            </div>
+            <a
+              href="mailto:support.stellify@gmail.com?subject=Stellify%20Error"
+              className="block text-xs text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mt-4"
             >
-              {btn}
-            </button>
+              {supportLabel} →
+            </a>
           </div>
         </div>
       );
@@ -624,19 +667,19 @@ const CookieBanner = ({ t, onAccept, onEssential, onPrivacyLink }: { t: any; onA
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: 120, opacity: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed bottom-0 left-0 right-0 z-[200] p-4 md:p-6"
+      className="fixed bottom-0 left-0 right-0 z-[200] p-3 sm:p-4 md:p-6"
     >
-      <div className="max-w-4xl mx-auto bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 shadow-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6">
-        {/* Icon */}
-        <div className="flex-shrink-0 w-10 h-10 bg-[#004225]/8 flex items-center justify-center text-[#004225] dark:text-[#00C060]">
+      <div className="max-w-4xl mx-auto bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 shadow-2xl p-4 sm:p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-3 md:gap-6">
+        {/* Icon — hidden on tiny screens to save space */}
+        <div className="hidden sm:flex flex-shrink-0 w-10 h-10 bg-[#004225]/8 items-center justify-center text-[#004225] dark:text-[#00C060]">
           <Shield size={20} />
         </div>
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8] mb-1">
+          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8] mb-1">
             {t.cookie_title}
           </p>
-          <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">
+          <p className="text-[11px] sm:text-xs text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">
             {t.cookie_desc}{' '}
             <button
               onClick={onPrivacyLink}
@@ -646,17 +689,17 @@ const CookieBanner = ({ t, onAccept, onEssential, onPrivacyLink }: { t: any; onA
             </button>
           </p>
         </div>
-        {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-2 flex-shrink-0 w-full md:w-auto">
+        {/* Buttons — grid on mobile so both buttons fit on one row */}
+        <div className="grid grid-cols-2 sm:flex sm:flex-row gap-2 flex-shrink-0 w-full md:w-auto">
           <button
             onClick={onEssential}
-            className="px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border border-black/15 dark:border-white/15 text-[#4A4A45] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+            className="px-3 sm:px-4 py-3 sm:py-2.5 text-[10px] font-bold uppercase tracking-widest border border-black/15 dark:border-white/15 text-[#4A4A45] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all min-h-[44px]"
           >
             {t.cookie_essential}
           </button>
           <button
             onClick={onAccept}
-            className="px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331D] transition-all"
+            className="px-4 sm:px-6 py-3 sm:py-2.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331D] transition-all min-h-[44px]"
           >
             {t.cookie_accept}
           </button>
@@ -1365,7 +1408,23 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
 );
 
 export default function App() {
-  useEffect(() => { window.stellifyReady?.(); }, []);
+  useEffect(() => {
+    window.stellifyReady?.();
+    // Surface unhandled promise rejections (Firebase/Supabase/fetch fails) into the console
+    // without taking the whole app down. Local-only log; no remote reporting yet.
+    const onRejection = (e: PromiseRejectionEvent) => {
+      console.error('[Stellify] Unhandled promise rejection:', e.reason);
+    };
+    const onError = (e: ErrorEvent) => {
+      console.error('[Stellify] Window error:', e.message, e.error);
+    };
+    window.addEventListener('unhandledrejection', onRejection);
+    window.addEventListener('error', onError);
+    return () => {
+      window.removeEventListener('unhandledrejection', onRejection);
+      window.removeEventListener('error', onError);
+    };
+  }, []);
   return (
     <ErrorBoundary>
       <StellifyApp />
