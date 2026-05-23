@@ -7636,16 +7636,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 onClickOverride={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
               />
 
-              {/* Primary CTA */}
+              {/* Primary CTA — Premium glow */}
               <motion.button
                 onClick={() => { setAuthTab('register'); setIsAuthModalOpen(true); }}
                 whileHover={{ y: -2 }}
                 whileTap={{ y: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                className="w-full bg-[#004225] text-white px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-[#00331d] transition-colors flex items-center justify-center gap-3 group shadow-lg hover:shadow-2xl shadow-[#004225]/25"
+                className="relative w-full bg-gradient-to-br from-[#004225] via-[#00592F] to-[#003820] text-white px-8 py-4 text-sm font-bold uppercase tracking-[0.25em] transition-all flex items-center justify-center gap-3 group shadow-xl shadow-[#004225]/30 hover:shadow-2xl hover:shadow-[#004225]/50 overflow-hidden"
               >
-                {t.cta_free}
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                {/* Subtle inner shine on hover */}
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-out" />
+                {/* Soft outer glow ring */}
+                <span className="absolute -inset-0.5 bg-gradient-to-br from-[#00A854]/0 via-[#00A854]/40 to-[#00A854]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm" style={{ zIndex: -1 }} />
+                <span className="relative">{t.cta_free}</span>
+                <ArrowRight size={18} className="relative group-hover:translate-x-1 transition-transform" />
               </motion.button>
 
               {/* 3-step funnel */}
@@ -8145,16 +8149,37 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
 
       {/* --- PRICING SECTION --- */}
-      <section id="pricing" className="px-6 lg:px-12 py-24 bg-[#1A1A18] text-white relative overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <img 
-            src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=2070" 
-            alt="Pricing Background"
-            className="w-full h-full object-cover opacity-10 grayscale mix-blend-overlay"
-            referrerPolicy="no-referrer"
+      <section id="pricing" className="px-6 lg:px-12 py-24 bg-[#0a1410] text-white relative overflow-hidden">
+        {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0a1d12] via-[#0a1410] to-[#030806]" />
+          {/* Forest aurora blob top-left */}
+          <div
+            className="absolute top-[-20%] left-[-15%] w-[70vw] h-[70vw] rounded-full opacity-30"
+            style={{
+              background: 'radial-gradient(circle, rgba(0,168,84,0.22) 0%, rgba(0,168,84,0.06) 35%, transparent 70%)',
+              filter: 'blur(80px)',
+              animation: 'stellifyPricingDriftA 22s ease-in-out infinite',
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1A1A18] via-[#1A1A18]/90 to-[#1A1A18]" />
+          {/* Subtle gold accent blob bottom-right (very low opacity, premium feel) */}
+          <div
+            className="absolute bottom-[-25%] right-[-15%] w-[60vw] h-[60vw] rounded-full opacity-20"
+            style={{
+              background: 'radial-gradient(circle, rgba(212,175,55,0.10) 0%, rgba(0,168,84,0.04) 40%, transparent 70%)',
+              filter: 'blur(90px)',
+              animation: 'stellifyPricingDriftB 28s ease-in-out infinite',
+            }}
+          />
+          {/* Soft dot grid for swiss precision feel */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
+          <style>{`
+            @keyframes stellifyPricingDriftA { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(3%, 2%) scale(1.08);} }
+            @keyframes stellifyPricingDriftB { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-3%, -2%) scale(1.1);} }
+            @media (prefers-reduced-motion: reduce) {
+              section#pricing [style*="stellifyPricingDrift"] { animation: none !important; }
+            }
+          `}</style>
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -8238,20 +8263,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
             className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-16"
           >
-            {/* GRATIS */}
+            {/* GRATIS — Glassmorphism */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
-              className="p-10 bg-white/5 border border-white/10 flex flex-col"
+              whileHover={{ y: -4 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+              className="group relative p-10 bg-white/[0.04] backdrop-blur-xl border border-white/10 flex flex-col transition-all hover:bg-white/[0.06] hover:border-white/20"
             >
-              <div className="mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/50 letter-spacing-widest">Gratis</span>
+              <div className="absolute inset-0 bg-gradient-to-br from-white/[0.04] via-transparent to-transparent pointer-events-none" />
+              <div className="relative mb-8">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Gratis</span>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif">CHF 0</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
                 <p className="text-xs text-white/70 mt-2 font-light">{t.pricing_gratis_desc}</p>
               </div>
-              <ul className="space-y-4 mb-12 flex-1">
+              <ul className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_free_f.map((f: string, i: number) => (
                   <li key={i} className="flex items-center gap-3 text-sm font-light text-white/70">
                     <CheckCircle2 size={14} className="text-white/30 shrink-0" />
@@ -8261,20 +8289,31 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </ul>
               <button
                 onClick={() => user ? setActiveView('dashboard') : (setAuthTab('register'), setIsAuthModalOpen(true))}
-                className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium"
+                className="relative w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium min-h-[52px]"
               >{user ? t.dashboard : t.pricing_cta_free}</button>
             </motion.div>
 
-            {/* PRO */}
+            {/* PRO — Premium glass with gold accent */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
-              className="p-10 bg-[#004225]/10 border-2 border-[#004225] relative flex flex-col shadow-xl shadow-[#004225]/30"
+              whileHover={{ y: -6 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+              className="group relative p-10 bg-[#004225]/15 backdrop-blur-xl border border-[#00A854]/40 flex flex-col shadow-2xl shadow-[#004225]/40 overflow-hidden"
+              style={{ boxShadow: '0 0 0 1px rgba(0,168,84,0.2) inset, 0 30px 60px -20px rgba(0,66,37,0.6)' }}
             >
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest px-4 py-1 rounded-full">{t.pricing_recommended}</div>
-              <div className="mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/60">Pro</span>
+              {/* Subtle aurora glow on top */}
+              <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#00A854]/20 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#D4AF37]/[0.08] rounded-full blur-3xl pointer-events-none" />
+
+              {/* Recommended badge with gold underline */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center gap-2 bg-gradient-to-r from-[#004225] to-[#00592F] text-white text-[10px] font-bold uppercase tracking-[0.3em] px-5 py-1.5 rounded-full border border-[#D4AF37]/30 shadow-lg shadow-[#004225]/30">
+                <span className="w-1 h-1 rounded-full bg-[#D4AF37]" />
+                {t.pricing_recommended}
+              </div>
+              <div className="relative mb-8">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/70">Pro</span>
                 <div className="flex items-baseline gap-1 mt-4">
-                  <span className="text-4xl font-serif">CHF {prices.pro}</span>
+                  <span className="text-4xl font-serif text-white">CHF {prices.pro}</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
                 {billingCycle === 'yearly' && (
@@ -8284,10 +8323,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
-              <ul className="space-y-4 mb-12 flex-1">
+              <ul className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_pro_f.map((f: string, i: number) => (
                   <li key={i} className="flex items-center gap-3 text-sm font-medium text-white">
-                    <CheckCircle2 size={14} className="text-white/50 shrink-0" />
+                    <CheckCircle2 size={14} className="text-[#6FCF97] shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -8295,19 +8334,22 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <button
                 onClick={() => handleSubscription('pro')}
                 disabled={isSubscribing}
-                className="w-full py-4 bg-[#004225] hover:bg-[#00331d] shadow-md hover:shadow-lg shadow-[#004225]/20 transition-all text-[11px] font-bold uppercase tracking-widest disabled:opacity-50 disabled:shadow-none"
+                className="relative w-full py-4 bg-white text-[#004225] hover:bg-[#FAFAF8] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl"
               >
                 {isSubscribing ? '...' : t.pricing_cta_pro}
               </button>
             </motion.div>
 
-            {/* ULTIMATE */}
+            {/* ULTIMATE — Glass with restrained gold accent */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
-              className="p-10 bg-white/5 border border-white/10 flex flex-col"
+              whileHover={{ y: -4 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+              className="group relative p-10 bg-white/[0.04] backdrop-blur-xl border border-white/10 flex flex-col transition-all hover:bg-white/[0.06] hover:border-[#D4AF37]/30 overflow-hidden"
             >
-              <div className="mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#D4AF37]">Ultimate ♾️</span>
+              <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#D4AF37]/[0.05] rounded-full blur-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative mb-8">
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Ultimate</span>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif">CHF {prices.ultimate}</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
@@ -8319,10 +8361,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
-              <ul className="space-y-4 mb-12 flex-1">
+              <ul className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_ultimate_f.map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-light text-white/70">
-                    <CheckCircle2 size={14} className="text-[#D4AF37]" />
+                  <li key={i} className="flex items-center gap-3 text-sm font-light text-white/80">
+                    <CheckCircle2 size={14} className="text-[#D4AF37] shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -8330,7 +8372,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <button
                 onClick={() => handleSubscription('ultimate')}
                 disabled={isSubscribing}
-                className="w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-[11px] font-bold uppercase tracking-widest disabled:opacity-50"
+                className="relative w-full py-4 border border-[#D4AF37]/40 hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] text-[#D4AF37]"
               >
                 {isSubscribing ? '...' : t.pricing_cta_ultimate}
               </button>
