@@ -1526,6 +1526,30 @@ function StellifyApp() {
   // --- STATE ---
   const [user, setUser] = useState<UserData | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  // Auth modal: ESC closes, body scroll locked while open, autofocus email input
+  useEffect(() => {
+    if (!isAuthModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsAuthModalOpen(false);
+        setConfirmPassword('');
+        setAuthError('');
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    // Focus first input shortly after mount (after framer-motion animation kicks in)
+    const focusTimer = setTimeout(() => {
+      authEmailRef.current?.focus();
+    }, 150);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+      clearTimeout(focusTimer);
+    };
+  }, [isAuthModalOpen]);
   const authEmailRef = useRef<HTMLInputElement>(null);
   const justLoggedIn = useRef(false);
   const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
@@ -10484,24 +10508,52 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- AUTH MODAL --- */}
       <AnimatePresence>
         {isAuthModalOpen && (
-          <div className="fixed inset-0 z-[200] flex items-start sm:items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          <div
+            className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-modal-title"
+          >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
               onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-10"
+              className="fixed inset-0 bg-black/50 backdrop-blur-md z-10"
+              aria-hidden="true"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 24 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 24 }}
-              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-              className="bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] w-full max-w-md my-4 sm:my-8 p-6 sm:p-8 md:p-10 relative z-20 shadow-2xl border border-black/8 dark:border-white/8 max-h-[calc(100vh-2rem)] overflow-y-auto custom-scrollbar"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ type: 'spring', stiffness: 320, damping: 32 }}
+              className="
+                relative z-20 w-full sm:max-w-md
+                bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8]
+                shadow-2xl border border-black/10 dark:border-white/10
+                overflow-y-auto custom-scrollbar
+                /* Mobile: bottom-sheet style, fills width, max 90vh, respects safe area */
+                rounded-t-2xl sm:rounded-none
+                max-h-[92vh] sm:max-h-[calc(100vh-3rem)]
+                px-5 pt-6 sm:p-8 md:p-10
+                pb-[max(1.5rem,env(safe-area-inset-bottom))]
+                /* Soft glass tint on backdrop */
+                backdrop-blur-2xl
+              "
+              style={{
+                // iOS Safari: dynamic viewport unit (`100dvh`) where supported
+                ['--auth-modal-min' as any]: 'auto',
+              }}
             >
+              {/* Mobile-only grab handle for the bottom-sheet feel */}
+              <div className="sm:hidden flex justify-center mb-3 -mt-1" aria-hidden="true">
+                <span className="block w-10 h-1 rounded-full bg-black/15 dark:bg-white/15" />
+              </div>
               <button
                 onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
-                className="absolute top-4 right-4 p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]"
+                aria-label={language === 'FR' ? 'Fermer' : language === 'IT' ? 'Chiudi' : language === 'EN' ? 'Close' : 'Schliessen'}
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 w-11 h-11 flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#1A1A18] dark:text-[#FAFAF8]"
               >
                 <X size={20} />
               </button>
@@ -10527,7 +10579,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </svg>
                   <span>Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
                 </span>
-                <h3 className="text-xl font-medium mt-4">
+                <h3 id="auth-modal-title" className="text-xl font-medium mt-4">
                   {authTab === 'login'
                     ? (language === 'FR' ? 'Bon retour chez Stellify' : language === 'IT' ? 'Bentornato su Stellify' : language === 'EN' ? 'Welcome back to Stellify' : 'Willkommen zurück bei Stellify')
                     : authTab === 'register'
@@ -10600,7 +10652,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         required
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        className="w-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 pl-10 pr-4 py-3 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none focus:border-[#004225] dark:focus:border-[#00A854] transition-all"
+                        className="w-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 pl-10 pr-4 py-3.5 text-base font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none focus:border-[#004225] dark:focus:border-[#00A854] transition-all min-h-[48px]"
                         placeholder={t.auth_placeholder_name}
                       />
                     </div>
@@ -10634,7 +10686,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           setPassword(e.target.value);
                           if (authTab === 'register') checkPasswordStrength(e.target.value);
                         }}
-                        className="w-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 pl-10 pr-10 py-3 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none focus:border-[#004225] dark:focus:border-[#00A854] transition-all"
+                        className="w-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 pl-10 pr-12 py-3.5 text-base font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none focus:border-[#004225] dark:focus:border-[#00A854] transition-all min-h-[48px]"
                         placeholder="••••••••"
                       />
                       <button
@@ -10692,7 +10744,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         required
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full bg-white dark:bg-[#2A2A26] border pl-10 pr-4 py-3 text-sm font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none transition-all ${
+                        className={`w-full bg-white dark:bg-[#2A2A26] border pl-10 pr-10 py-3.5 text-base font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none transition-all min-h-[48px] ${
                           confirmPassword && confirmPassword !== password
                             ? 'border-red-400 focus:border-red-400'
                             : confirmPassword && confirmPassword === password
@@ -10751,7 +10803,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <button
                   type="submit"
                   disabled={isAuthLoading}
-                  className="w-full bg-[#004225] text-white py-4 text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] shadow-md hover:shadow-lg shadow-[#004225]/20 transition-all mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none"
+                  className="w-full bg-[#004225] text-white py-4 min-h-[52px] text-[11px] font-bold uppercase tracking-[0.25em] hover:bg-[#00331d] shadow-md hover:shadow-lg shadow-[#004225]/25 transition-all mt-4 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:shadow-none"
                 >
                   {isAuthLoading ? (
                     <RefreshCw className="animate-spin" size={18} />
@@ -10787,7 +10839,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       type="button"
                       onClick={handleGoogleAuth}
                       disabled={isAuthLoading}
-                      className="w-full border border-black/10 dark:border-white/10 py-3 text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-3 disabled:opacity-70"
+                      className="w-full border border-black/15 dark:border-white/15 py-3.5 min-h-[52px] text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 hover:border-black/25 dark:hover:border-white/25 transition-all flex items-center justify-center gap-3 disabled:opacity-70"
                     >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
