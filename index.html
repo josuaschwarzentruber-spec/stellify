@@ -165,20 +165,7 @@
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
       }
-      #stellify-splash .icon-outer::before {
-        content: '';
-        position: absolute; inset: -3px;
-        border-radius: 17px;
-        background: linear-gradient(135deg, rgba(0,168,84,.55), transparent 45%, rgba(0,168,84,.25));
-        filter: blur(10px);
-        opacity: .35;
-        z-index: -1;
-        animation: stellifyIconGlow 4.5s ease-in-out infinite;
-      }
-      @keyframes stellifyIconGlow {
-        0%,100% { opacity: .3;  transform: scale(1); }
-        50%     { opacity: .65; transform: scale(1.06); }
-      }
+      /* Icon glow halo removed for a cleaner mark — only the brightness pulse stays */
 
       /* Wortmarke — Canonical Brand Logo (Stell white + ify forest-green, matches App header/footer/auth) */
       #stellify-splash .wordmark {
@@ -219,11 +206,7 @@
         100% { background-position: -100% 50%; }
       }
 
-      #stellify-splash .sep {
-        width: 32px; height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(0,168,84,.35), transparent);
-        margin: 0 auto 18px;
-      }
+      #stellify-splash .sep { display: none; }
 
       /* Tagline – Buchstabe für Buchstabe */
       #stellify-splash #tagline {
@@ -284,14 +267,12 @@
         opacity: .7;
       }
       #stellify-splash.low-power .icon-outer { backdrop-filter: none; -webkit-backdrop-filter: none; }
-      #stellify-splash.low-power .icon-outer::before { animation: none; opacity: .35; }
 
       /* Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
         #stellify-splash .aurora,
         #stellify-splash .grain,
         #stellify-splash .icon-outer,
-        #stellify-splash .icon-outer::before,
         #stellify-splash .wordmark .w,
         #stellify-splash .wordmark .g { animation: none !important; }
         #stellify-splash .wordmark .w { background: #fafaf8; -webkit-background-clip: text; background-clip: text; color: transparent; }
