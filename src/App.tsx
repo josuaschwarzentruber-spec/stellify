@@ -4617,12 +4617,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Alles in einer Plattform, perfekt abgestimmt"
       ],
       why_stellify_points: [
-        { title: "Schweizer Präzision", desc: "Wir beherrschen die Nuancen des Schweizer Marktes – von der korrekten Rechtschreibung bis hin zu kantonalen Besonderheiten.", icon: "Target" },
-        { title: "Zeugnis-Code Entschlüsselt", desc: "Verstehe endlich, was wirklich in deinen Arbeitszeugnissen steht. Stella erkennt versteckte Botschaften sofort.", icon: "ShieldCheck" },
-        { title: "Mehrsprachigkeit", desc: "Bewirb dich nahtlos auf Deutsch, Englisch, Französisch oder Italienisch – perfekt für den multilingualen Schweizer Markt.", icon: "Globe" },
+        { title: "Schweizer Präzision", desc: "Wir kennen den Schweizer Arbeitsmarkt im Detail. Von der korrekten Rechtschreibung bis zu kantonalen Besonderheiten.", icon: "Target" },
+        { title: "Arbeitszeugnis verstehen", desc: "Verstehe endlich, was wirklich in deinen Arbeitszeugnissen steht. Stella erkennt versteckte Botschaften sofort.", icon: "ShieldCheck" },
+        { title: "Vier Sprachen", desc: "Bewirb dich auf Deutsch, Englisch, Französisch oder Italienisch. Perfekt für den mehrsprachigen Schweizer Markt.", icon: "Globe" },
         { title: "Bewerbungs-Scanner-Optimierung", desc: "Unsere KI ist auf die Systeme grosser Schweizer Arbeitgeber trainiert, damit dein Lebenslauf garantiert gelesen wird.", icon: "Cpu" },
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
-        { title: "Datenschutz 'Made in CH'", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
+        { title: "Datenschutz aus der Schweiz", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
       pricing_free_f: ["3× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
       pricing_pro_f: ["50× Bewerbungen / Nutzungen pro Monat", "20× Aktionen pro Tag", "Zeugnis-Decoder (Pro)", "Interview-Coach"],
@@ -5177,7 +5177,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Tout sur une seule plateforme, parfaitement coordonné"
       ],
       why_stellify_points: [
-        { title: "Précision suisse", desc: "Nous maîtrisons les nuances du marché suisse – de l'orthographe correcte aux spécificités cantonales.", icon: "Target" },
+        { title: "Précision suisse", desc: "Nous connaissons le marché du travail suisse dans le détail. De l'orthographe correcte aux particularités cantonales.", icon: "Target" },
         { title: "Code des certificats décodé", desc: "Comprenez enfin ce qui est réellement écrit dans vos certificats de travail. Stella détecte immédiatement les messages cachés.", icon: "ShieldCheck" },
         { title: "Multilinguisme", desc: "Postulez sans transition en allemand, anglais, français ou italien – parfait pour le marché suisse multilingue.", icon: "Globe" },
         { title: "Optimisation ATS", desc: "Notre IA est formée aux systèmes des grands employeurs suisses, garantissant que votre CV soit lu.", icon: "Cpu" },
@@ -5631,7 +5631,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Tutto in un'unica piattaforma, perfettamente coordinato"
       ],
       why_stellify_points: [
-        { title: "Precisione svizzera", desc: "Padroneggiamo le sfumature del mercato svizzero – dall'ortografia corretta alle specificità cantonali.", icon: "Target" },
+        { title: "Precisione svizzera", desc: "Conosciamo il mercato del lavoro svizzero nei dettagli. Dall'ortografia corretta alle particolarità cantonali.", icon: "Target" },
         { title: "Codice dei certificati decodificato", desc: "Capisci finalmente cosa c'è scritto veramente nei tuoi certificati di lavoro. Stella rileva immediatamente i messaggi nascosti.", icon: "ShieldCheck" },
         { title: "Multilinguismo", desc: "Candidati senza problemi in tedesco, inglese, francese e italiano – perfetto per il mercato svizzero multilingue.", icon: "Globe" },
         { title: "Ottimizzazione ATS", desc: "La nostra IA è addestrata sui sistemi dei grandi datori di lavoro svizzeri, garantendo che il tuo CV venga letto.", icon: "Cpu" },
@@ -6085,7 +6085,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Everything in one platform, perfectly coordinated"
       ],
       why_stellify_points: [
-        { title: "Swiss Precision", desc: "We master the nuances of the Swiss market – from correct spelling to cantonal specificities.", icon: "Target" },
+        { title: "Swiss Precision", desc: "We know the Swiss job market in detail. From correct spelling to cantonal specifics.", icon: "Target" },
         { title: "Certificate Code Decoded", desc: "Finally understand what is really written in your work certificates. Stella detects hidden messages immediately.", icon: "ShieldCheck" },
         { title: "Multilingualism", desc: "Apply seamlessly in German, English, French or Italian – perfect for the multilingual Swiss market.", icon: "Globe" },
         { title: "ATS Optimization", desc: "Our AI is trained on the systems of major Swiss employers, ensuring your CV is guaranteed to be read.", icon: "Cpu" },
