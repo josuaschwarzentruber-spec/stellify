@@ -8,6 +8,7 @@ import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
@@ -59,54 +60,112 @@ function normaliseRole(planId: string): string {
 
 // ── Email Helper ──────────────────────────────────────────────────────────────
 function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string) {
+  // Canonical brand-mark as inline SVG (no remote image = no spam-filter / load issues)
+  const brandMark = `
+    <span style="display:inline-block;vertical-align:middle;margin-right:10px;">
+      <svg width="22" height="22" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="#6FCF97"/>
+      </svg>
+    </span>
+    <span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#FDFCFB;letter-spacing:-0.5px;vertical-align:middle;">Stell<span style="color:#6FCF97;">ify</span></span>
+  `;
   return `<!DOCTYPE html>
 <html lang="de">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F5F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F4F0;padding:40px 0;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>${title}</title>
+</head>
+<body style="margin:0;padding:0;background:#F5F4F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1A1A18;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F5F4F0;padding:32px 16px;">
     <tr><td align="center">
-      <table width="560" cellpadding="0" cellspacing="0" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:560px;width:100%;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:560px;width:100%;">
         <!-- Header -->
         <tr>
-          <td style="background:#004225;padding:28px 40px;">
-            <span style="font-family:Georgia,serif;font-size:24px;color:#FDFCFB;letter-spacing:-0.5px;">Stell<span style="color:#6FCF97;">ify</span></span>
+          <td style="background:#004225;padding:24px 32px;">
+            ${brandMark}
           </td>
         </tr>
         <!-- Body -->
         <tr>
-          <td style="padding:40px 40px 32px;">
-            <h1 style="margin:0 0 20px;font-size:20px;font-weight:600;color:#1A1A18;line-height:1.3;">${title}</h1>
-            ${bodyLines.map(l => `<p style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.6;">${l}</p>`).join('')}
-            <div style="margin:32px 0;">
-              <a href="${ctaUrl}" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:14px;font-weight:600;padding:14px 28px;letter-spacing:0.3px;">${ctaText}</a>
+          <td style="padding:36px 32px 28px;">
+            <h1 style="margin:0 0 20px;font-size:22px;font-weight:600;color:#1A1A18;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
+            ${bodyLines.map(l => `<p style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.65;">${l}</p>`).join('')}
+            <div style="margin:32px 0 8px;">
+              <a href="${ctaUrl}" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
             </div>
-            <p style="margin:0;font-size:13px;color:#9A9A94;">Bei Fragen erreichst du uns unter <a href="mailto:support.stellify@gmail.com" style="color:#004225;">support.stellify@gmail.com</a></p>
+            <p style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">Bei Fragen erreichst du uns unter <a href="mailto:support.stellify@gmail.com" style="color:#004225;">support.stellify@gmail.com</a></p>
           </td>
         </tr>
         <!-- Footer -->
         <tr>
-          <td style="padding:20px 40px;border-top:1px solid #E8E6E0;">
-            <p style="margin:0;font-size:12px;color:#9A9A94;">© ${new Date().getFullYear()} Stellify · Zug, Schweiz · <a href="https://stellify.ch" style="color:#9A9A94;">stellify.ch</a></p>
+          <td style="padding:20px 32px;border-top:1px solid #E8E6E0;">
+            <p style="margin:0;font-size:11px;color:#9A9A94;line-height:1.6;">© ${new Date().getFullYear()} Stellify · Zug, Schweiz · <a href="https://stellify.ch" style="color:#9A9A94;text-decoration:none;">stellify.ch</a></p>
           </td>
         </tr>
       </table>
+      <p style="margin:16px 0 0;font-size:11px;color:#9A9A94;">Du erhältst diese E-Mail, weil du bei Stellify ein Konto hast.</p>
     </td></tr>
   </table>
 </body>
 </html>`;
 }
 
-async function sendRenewalReminder(to: string, firstName: string, planType: 'monthly' | 'annual', daysLeft: number) {
+// ── Unified email sender — Resend preferred, Gmail fallback ──────────────────
+// RESEND_API_KEY (preferred) + EMAIL_FROM (e.g. "Stellify <noreply@stellify.ch>")
+// Falls back to nodemailer + EMAIL_USER / EMAIL_PASS for legacy Gmail setups.
+let resendClient: Resend | null = null;
+async function sendEmail(opts: { to: string; subject: string; html: string; text?: string }) {
+  const resendKey = process.env.RESEND_API_KEY;
+  if (resendKey) {
+    if (!resendClient) resendClient = new Resend(resendKey);
+    const from = process.env.EMAIL_FROM || 'Stellify <noreply@stellify.ch>';
+    try {
+      const r = await resendClient.emails.send({
+        from,
+        to: opts.to,
+        subject: opts.subject,
+        html: opts.html,
+        text: opts.text,
+      });
+      if ((r as any).error) {
+        console.error('[EMAIL] Resend error:', (r as any).error);
+        // Fall through to Gmail fallback
+      } else {
+        console.log(`[EMAIL] Sent via Resend to ${opts.to} (id: ${(r as any).data?.id || 'unknown'})`);
+        return true;
+      }
+    } catch (err) {
+      console.error('[EMAIL] Resend threw:', err);
+      // Fall through to Gmail fallback
+    }
+  }
+
+  // Fallback: Gmail
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
   if (!emailUser || !emailPass) {
-    console.warn('[EMAIL] EMAIL_USER / EMAIL_PASS not set — skipping email.');
-    return;
+    console.warn('[EMAIL] No mail provider configured (RESEND_API_KEY or EMAIL_USER/EMAIL_PASS) — email skipped.');
+    return false;
   }
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: emailUser, pass: emailPass },
-  });
+  try {
+    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
+    await transporter.sendMail({
+      from: `"Stellify" <${emailUser}>`,
+      to: opts.to,
+      subject: opts.subject,
+      text: opts.text || opts.html.replace(/<[^>]+>/g, ''),
+      html: opts.html,
+    });
+    console.log(`[EMAIL] Sent via Gmail to ${opts.to}`);
+    return true;
+  } catch (err) {
+    console.error('[EMAIL] Gmail send failed:', err);
+    return false;
+  }
+}
+
+async function sendRenewalReminder(to: string, firstName: string, planType: 'monthly' | 'annual', daysLeft: number) {
   const isAnnual = planType === 'annual';
   const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
@@ -121,8 +180,8 @@ async function sendRenewalReminder(to: string, firstName: string, planType: 'mon
     title = `Dein ${cycleLabel}sabo läuft bald ab`;
     bodyLines = [
       `Hallo ${firstName},`,
-      `dein ${cycleLabel}s-Abonnement bei Stellify läuft in <strong>${daysLeft} Tag${daysLeft === 1 ? '' : 'en'}</strong> ab. Danach wird dein Konto automatisch auf den kostenlosen Plan umgestellt — ohne dass du etwas tun musst.`,
-      `Möchtest du weiterhin alle Funktionen nutzen? Verlängere jetzt einfach dein Abonnement — dein Zugang verlängert sich nahtlos um einen weiteren ${isAnnual ? 'Jahr' : 'Monat'}.`,
+      `dein ${cycleLabel}s-Abonnement bei Stellify läuft in <strong>${daysLeft} Tag${daysLeft === 1 ? '' : 'en'}</strong> ab. Danach wird dein Konto automatisch auf den kostenlosen Plan umgestellt, ohne dass du etwas tun musst.`,
+      `Möchtest du weiterhin alle Funktionen nutzen? Verlängere jetzt dein Abonnement und dein Zugang verlängert sich nahtlos um einen weiteren ${isAnnual ? 'Jahr' : 'Monat'}.`,
     ];
     ctaText = 'Jetzt verlängern';
   } else {
@@ -136,14 +195,12 @@ async function sendRenewalReminder(to: string, firstName: string, planType: 'mon
     ctaText = 'Neues Abo abschliessen';
   }
 
-  await transporter.sendMail({
-    from: `"Stellify" <${emailUser}>`,
+  await sendEmail({
     to,
     subject,
-    text: bodyLines.join('\n\n') + `\n\n${ctaText}: ${siteUrl}/?view=pricing\n\nDas Stellify-Team`,
     html: buildEmailHtml(title, bodyLines, ctaText, `${siteUrl}/?view=pricing`),
+    text: bodyLines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${ctaText}: ${siteUrl}/?view=pricing\n\nDas Stellify-Team`,
   });
-  console.log(`[EMAIL] Renewal reminder sent to ${to}`);
 }
 
 // ── Express App ───────────────────────────────────────────────────────────────
@@ -254,29 +311,23 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
         });
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
         if (existingUser?.email) {
-          const emailUser = process.env.EMAIL_USER;
-          const emailPass = process.env.EMAIL_PASS;
-          if (emailUser && emailPass) {
-            const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
-            const planLabel = planId === 'ultimate' ? 'Ultimate' : 'Pro';
-            const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
-            await transporter.sendMail({
-              from: `"Stellify" <${emailUser}>`,
-              to: existingUser.email,
-              subject: `Willkommen im ${planLabel}-Plan — Dein Stellify-Abo ist aktiv`,
-              text: `Hallo ${existingUser.first_name || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement!\n\nDas Stellify-Team`,
-              html: buildEmailHtml(
-                `Willkommen im ${planLabel}-Plan!`,
-                [
-                  `Hallo ${existingUser.first_name || 'Nutzer'},`,
-                  `vielen Dank — dein ${cycleLabel}s-Abonnement ist jetzt aktiv.`,
-                  `Dein Abo ist gültig bis zum <strong>${expiresAt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.`,
-                ],
-                'Zum Dashboard',
-                (process.env.SITE_URL || 'https://stellify.ch') + '/'
-              ),
-            }).catch(console.error);
-          }
+          const planLabel = planId === 'ultimate' ? 'Ultimate' : 'Pro';
+          const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
+          await sendEmail({
+            to: existingUser.email,
+            subject: `Willkommen im ${planLabel}-Plan, dein Stellify-Abo ist aktiv`,
+            html: buildEmailHtml(
+              `Willkommen im ${planLabel}-Plan`,
+              [
+                `Hallo ${existingUser.first_name || 'Nutzer'},`,
+                `vielen Dank, dein ${cycleLabel}s-Abonnement ist jetzt aktiv.`,
+                `Dein Abo ist gültig bis zum <strong>${expiresAt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.`,
+              ],
+              'Zum Dashboard',
+              (process.env.SITE_URL || 'https://stellify.ch') + '/'
+            ),
+            text: `Hallo ${existingUser.first_name || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement!\n\nDas Stellify-Team`,
+          }).catch(console.error);
         }
       } catch (err) {
         console.error(`[WEBHOOK] Firestore update failed:`, err);
@@ -351,6 +402,61 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
       } catch (err) {
         console.error(`[WEBHOOK] invoice.payment_succeeded handler failed:`, err);
       }
+    }
+  }
+
+  // Payment failure — keep access but warn the user so they can update their card
+  if (event.type === "invoice.payment_failed") {
+    const invoice = event.data.object as any;
+    if (invoice.subscription) {
+      try {
+        const { adminDb } = getAdminServices();
+        const sub = await getStripe().subscriptions.retrieve(invoice.subscription as string);
+        const customerId = sub.customer as string;
+        const usersSnap = await adminDb.collection('users').where('stripe_customer_id', '==', customerId).limit(1).get();
+        if (!usersSnap.empty) {
+          const userDoc = usersSnap.docs[0];
+          const u = userDoc.data() as any;
+          const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+          if (u.email) {
+            await sendEmail({
+              to: u.email,
+              subject: 'Stellify, deine Zahlung ist fehlgeschlagen',
+              html: buildEmailHtml(
+                'Zahlung fehlgeschlagen',
+                [
+                  `Hallo ${u.first_name || 'Nutzer'},`,
+                  `wir konnten deine letzte Zahlung für dein Stellify-Abo nicht einziehen. Häufige Gründe sind eine abgelaufene Karte oder ein unzureichendes Guthaben.`,
+                  `Bitte aktualisiere deine Zahlungsmethode in den nächsten Tagen, damit dein Zugang ohne Unterbrechung bestehen bleibt.`,
+                ],
+                'Zahlungsmethode aktualisieren',
+                `${siteUrl}/?view=pricing`
+              ),
+              text: `Hallo ${u.first_name || 'Nutzer'},\n\ndeine Zahlung für dein Stellify-Abo ist fehlgeschlagen. Bitte aktualisiere deine Zahlungsmethode unter ${siteUrl}/?view=pricing\n\nDas Stellify-Team`,
+            }).catch(console.error);
+          }
+          console.log(`[WEBHOOK] payment_failed notice sent to ${userDoc.id}`);
+        }
+      } catch (err) {
+        console.error(`[WEBHOOK] invoice.payment_failed handler failed:`, err);
+      }
+    }
+  }
+
+  // First-time subscription creation (separate from checkout.session.completed for completeness)
+  if (event.type === "customer.subscription.created") {
+    const sub = event.data.object as Stripe.Subscription;
+    try {
+      const { adminDb } = getAdminServices();
+      const customerId = sub.customer as string;
+      const usersSnap = await adminDb.collection('users').where('stripe_customer_id', '==', customerId).limit(1).get();
+      if (!usersSnap.empty) {
+        const userDoc = usersSnap.docs[0];
+        // checkout.session.completed already set the role, just log here for auditability
+        console.log(`[WEBHOOK] subscription.created for user ${userDoc.id}, status: ${sub.status}`);
+      }
+    } catch (err) {
+      console.error(`[WEBHOOK] subscription.created handler failed:`, err);
     }
   }
 
@@ -894,12 +1000,11 @@ app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
       }
       throw linkError;
     }
-    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
-    await transporter.sendMail({
-      from: `"Stellify" <${emailUser}>`,
+    await sendEmail({
       to: email,
       subject: copy.subject,
       html: buildEmailHtml(copy.title, copy.lines, copy.cta, resetLink),
+      text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${copy.cta}: ${resetLink}\n\nDas Stellify-Team`,
     });
     res.json({ ok: true });
   } catch (err: any) {
@@ -926,10 +1031,7 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
 app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
   const { email, firstName, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
-  if (!emailUser || !emailPass) return res.json({ ok: true });
   const name = firstName || '';
   const lang = language || 'DE';
   const welcomeCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
@@ -960,37 +1062,37 @@ app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
   };
   const copy = welcomeCopy[lang] || welcomeCopy['DE'];
   try {
-    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
-    await transporter.sendMail({
-      from: `"Stellify" <${emailUser}>`,
+    await sendEmail({
       to: email,
       subject: copy.subject,
       html: buildEmailHtml(copy.title, copy.lines, copy.cta, `${siteUrl}/`),
+      text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${copy.cta}: ${siteUrl}/\n\nDas Stellify-Team`,
     });
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[AUTH] Welcome email failed:', err.message);
+    // Don't fail registration if email sending fails
     res.json({ ok: true });
   }
 });
 
 // ── Test Email ────────────────────────────────────────────────────────────────
 async function handleTestEmail(to: string, res: any) {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-  if (!emailUser || !emailPass) {
-    return res.status(500).json({ error: 'EMAIL_USER / EMAIL_PASS not configured' });
-  }
+  if (!to) return res.status(400).json({ error: 'Missing "to" address' });
   try {
-    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
-    await transporter.sendMail({
-      from: `"Stellify" <${emailUser}>`,
+    const ok = await sendEmail({
       to,
-      subject: 'Stellify – Test-E-Mail',
-      text: `Hallo,\n\ndies ist eine Test-E-Mail von Stellify um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.\n\nDas Stellify-Team`,
+      subject: 'Stellify, Test-E-Mail',
+      html: buildEmailHtml(
+        'Test-E-Mail',
+        ['Hallo,', 'dies ist eine Test-E-Mail von Stellify, um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.'],
+        'Zur Website',
+        process.env.SITE_URL || 'https://stellify.ch'
+      ),
+      text: 'Hallo,\n\ndies ist eine Test-E-Mail von Stellify, um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.\n\nDas Stellify-Team',
     });
-    console.log(`[EMAIL] Test email sent to ${to}`);
-    res.json({ ok: true, sentTo: to });
+    if (!ok) return res.status(500).json({ error: 'No email provider configured' });
+    res.json({ ok: true, sentTo: to, provider: process.env.RESEND_API_KEY ? 'resend' : 'gmail' });
   } catch (err: any) {
     console.error('[EMAIL] Test email failed:', err.message);
     res.status(500).json({ error: err.message });
@@ -999,8 +1101,7 @@ async function handleTestEmail(to: string, res: any) {
 app.get("/api/send-test-email", async (req, res) => {
   const secret = process.env.ADMIN_SECRET;
   if (!secret || req.query.secret !== secret) return res.status(401).json({ error: 'Unauthorized' });
-  const emailUser = process.env.EMAIL_USER;
-  const to = (req.query.to as string) || emailUser || '';
+  const to = (req.query.to as string) || process.env.EMAIL_USER || '';
   await handleTestEmail(to, res);
 });
 app.post("/api/send-test-email", emailLimiter, requireAuth, async (req, res) => {
