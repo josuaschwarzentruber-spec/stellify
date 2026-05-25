@@ -1737,10 +1737,13 @@ function StellifyApp() {
   const [showArchived, setShowArchived] = useState(false);
   const filteredApplications = useMemo(() => {
     const q = trackerSearch.trim().toLowerCase();
+    const isSearching = q.length > 0;
     return applications.filter((a) => {
-      if (!showArchived && a.archived) return false;
-      if (!q) return true;
-      return [a.company, a.position, a.location, a.notes]
+      // Archive toggle only controls default view; an active search ignores it
+      // so users always find what they're looking for, even when archived.
+      if (!isSearching && !showArchived && a.archived) return false;
+      if (!isSearching) return true;
+      return [a.company, a.position, a.location, a.notes, a.salary, a.status]
         .some((v) => v && String(v).toLowerCase().includes(q));
     });
   }, [applications, trackerSearch, showArchived]);
