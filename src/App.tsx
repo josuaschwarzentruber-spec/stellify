@@ -7246,35 +7246,29 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                   </div>
                                 )}
                               </div>
-                              <div className="mt-3 pt-3 border-t border-black/5">
-                                <div className="flex items-center justify-between gap-2 mb-2">
-                                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                                    {language === 'FR' ? 'Verschieben zu' : language === 'IT' ? 'Sposta a' : language === 'EN' ? 'Move to' : 'Verschieben zu'}
-                                  </span>
-                                  <span className="text-[9px] text-[#9A9A94] font-mono">
-                                    {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' }) : ''}
-                                  </span>
+                              <div className="mt-3 pt-3 border-t border-black/5 flex items-center justify-between gap-2">
+                                <div className="relative flex-1 min-w-0">
+                                  <label className="block text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">
+                                    {language === 'FR' ? 'Statut' : language === 'IT' ? 'Stato' : language === 'EN' ? 'Status' : 'Status'}
+                                  </label>
+                                  <select
+                                    value={status}
+                                    onChange={(e) => updateApplicationStatus(app.id, e.target.value)}
+                                    className="w-full text-[11px] font-medium text-[#004225] bg-white border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2.5 py-1.5 pr-7 cursor-pointer transition-all appearance-none"
+                                    style={{ backgroundImage: "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' stroke='%23004225' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center' }}
+                                  >
+                                    <option value="Wishlist">{t.tracker_wishlist}</option>
+                                    <option value="Applied">{t.tracker_applied}</option>
+                                    <option value="Interview">{t.tracker_interview}</option>
+                                    <option value="Offer">{t.tracker_offer}</option>
+                                    <option value="Rejected">{t.tracker_rejected}</option>
+                                  </select>
                                 </div>
-                                <div className="grid grid-cols-2 gap-1.5">
-                                  {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].filter(s => s !== status).slice(0, 2).map(s => {
-                                    const label =
-                                      s === 'Wishlist' ? t.tracker_wishlist :
-                                      s === 'Applied' ? t.tracker_applied :
-                                      s === 'Interview' ? t.tracker_interview :
-                                      s === 'Offer' ? t.tracker_offer :
-                                      t.tracker_rejected;
-                                    return (
-                                      <button
-                                        key={s}
-                                        onClick={() => updateApplicationStatus(app.id, s)}
-                                        className="text-[10px] font-medium text-[#004225]/70 hover:text-[#004225] hover:bg-[#004225]/5 border border-[#004225]/15 hover:border-[#004225]/30 px-2 py-1.5 transition-all flex items-center justify-center gap-1 min-h-[28px]"
-                                      >
-                                        <ArrowRight size={10} />
-                                        <span className="truncate">{label}</span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
+                                {app.updatedAt?.toDate && (
+                                  <span className="text-[9px] text-[#9A9A94] font-mono shrink-0 self-end pb-1.5">
+                                    {app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' })}
+                                  </span>
+                                )}
                               </div>
                             </motion.div>
                           ))}
