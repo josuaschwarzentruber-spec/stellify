@@ -6568,6 +6568,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 >
                   {t.pricing}
                 </button>
+                <button
+                  onClick={() => navigate('about')}
+                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'about' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                >
+                  {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
+                </button>
               </>
             ) : (
               <>
@@ -6734,6 +6740,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
                   <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
                   <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
+                  <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'about' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
               ) : (
                 <>
@@ -7188,64 +7195,86 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         </div>
                         <div className="space-y-3 min-h-[100px]">
                           {applications.filter(a => a.status === status).map((app) => (
-                            <motion.div 
+                            <motion.div
                               layoutId={app.id}
                               key={app.id}
-                              className="p-4 bg-white border border-black/5 shadow-sm hover:border-[#004225]/20 transition-all group relative"
+                              className="p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative"
                             >
-                              <div className="space-y-2">
-                                <div className="flex justify-between items-start">
-                                  <h4 className="text-xs font-bold text-[#1A1A18] truncate pr-4">{app.company}</h4>
-                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
-                                    <button 
+                              <div className="space-y-2.5">
+                                <div className="flex justify-between items-start gap-2">
+                                  <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words" title={app.company}>{app.company}</h4>
+                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
+                                    <button
                                       onClick={() => setEditingApp(app)}
-                                      className="p-1 text-[#004225]/60 hover:bg-[#004225]/5 transition-all"
+                                      title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
+                                      className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
                                     >
                                       <Edit2 size={12} />
                                     </button>
-                                    <button 
+                                    <button
                                       onClick={() => deleteApplication(app.id)}
-                                      className="p-1 text-red-500 hover:bg-red-50 transition-all"
+                                      title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
+                                      className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
                                     >
                                       <Trash2 size={12} />
                                     </button>
                                   </div>
                                 </div>
-                                <p className="text-[10px] text-[#6B6B66] font-light truncate">{app.position}</p>
+                                <p className="text-xs text-[#5C5C58] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
                                 {app.location && (
-                                  <div className="flex items-center gap-1 text-[9px] text-[#9A9A94]">
-                                    <MapPin size={10} />
-                                    <span>{app.location}</span>
+                                  <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
+                                    <MapPin size={11} />
+                                    <span className="truncate">{app.location}</span>
                                   </div>
                                 )}
                                 {app.salary && (
-                                  <div className="flex items-center gap-1 text-[9px] text-[#004225]/60">
-                                    <DollarSign size={10} />
-                                    <span>{app.salary}</span>
+                                  <div className="flex items-center gap-1.5 text-[11px] text-[#004225] font-medium">
+                                    <span className="text-[10px] font-bold tracking-widest">CHF</span>
+                                    <span>{(() => {
+                                      const num = String(app.salary).replace(/[^\d.]/g, '');
+                                      if (!num) return app.salary;
+                                      const n = parseFloat(num);
+                                      if (isNaN(n)) return app.salary;
+                                      return n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
+                                    })()}</span>
                                   </div>
                                 )}
                                 {app.notes && (
-                                  <div className="flex items-center gap-1 text-[9px] text-[#9A9A94] italic">
+                                  <div className="flex items-center gap-1.5 text-[10px] text-[#9A9A94] italic">
                                     <FileText size={10} />
-                                    <span className="truncate max-w-[100px]">{t.tracker_notes_badge}</span>
+                                    <span className="truncate">{t.tracker_notes_badge}</span>
                                   </div>
                                 )}
                               </div>
-                              <div className="mt-3 pt-3 border-t border-black/5 flex justify-between items-center">
-                                <div className="flex gap-1">
-                                  {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].filter(s => s !== status).slice(0, 2).map(s => (
-                                    <button 
-                                      key={s}
-                                      onClick={() => updateApplicationStatus(app.id, s)}
-                                      className="text-[8px] font-bold uppercase tracking-tighter text-[#004225]/40 hover:text-[#004225] transition-colors"
-                                    >
-                                      → {s === 'Wishlist' ? 'W' : s === 'Applied' ? 'B' : s === 'Interview' ? 'I' : s === 'Offer' ? 'A' : 'X'}
-                                    </button>
-                                  ))}
+                              <div className="mt-3 pt-3 border-t border-black/5">
+                                <div className="flex items-center justify-between gap-2 mb-2">
+                                  <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                                    {language === 'FR' ? 'Verschieben zu' : language === 'IT' ? 'Sposta a' : language === 'EN' ? 'Move to' : 'Verschieben zu'}
+                                  </span>
+                                  <span className="text-[9px] text-[#9A9A94] font-mono">
+                                    {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' }) : ''}
+                                  </span>
                                 </div>
-                                <span className="text-[8px] text-[#9A9A94] font-mono">
-                                  {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' }) : ''}
-                                </span>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].filter(s => s !== status).slice(0, 2).map(s => {
+                                    const label =
+                                      s === 'Wishlist' ? t.tracker_wishlist :
+                                      s === 'Applied' ? t.tracker_applied :
+                                      s === 'Interview' ? t.tracker_interview :
+                                      s === 'Offer' ? t.tracker_offer :
+                                      t.tracker_rejected;
+                                    return (
+                                      <button
+                                        key={s}
+                                        onClick={() => updateApplicationStatus(app.id, s)}
+                                        className="text-[10px] font-medium text-[#004225]/70 hover:text-[#004225] hover:bg-[#004225]/5 border border-[#004225]/15 hover:border-[#004225]/30 px-2 py-1.5 transition-all flex items-center justify-center gap-1 min-h-[28px]"
+                                      >
+                                        <ArrowRight size={10} />
+                                        <span className="truncate">{label}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
                               </div>
                             </motion.div>
                           ))}
