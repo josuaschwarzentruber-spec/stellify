@@ -2420,14 +2420,24 @@ function StellifyApp() {
 
   useEffect(() => {
     if (!user) return;
+    // Sort client-side to avoid requiring a Firestore composite index
     const appsQuery = query(
       collection(db, 'applications'),
-      where('user_id', '==', user.id),
-      orderBy('created_at', 'desc')
+      where('user_id', '==', user.id)
     );
-    const unsubApps = onSnapshot(appsQuery, (snap) => {
-      setApplications(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-    });
+    const unsubApps = onSnapshot(
+      appsQuery,
+      (snap) => {
+        const docs = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
+        // Sort newest first based on created_at (string ISO date)
+        docs.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+        setApplications(docs);
+      },
+      (err) => {
+        console.error('[applications] snapshot error:', err);
+        showToast(`Bewerbungen konnten nicht geladen werden: ${err?.message || 'unknown'}`, 'error');
+      }
+    );
     return () => unsubApps();
   }, [user]);
 
