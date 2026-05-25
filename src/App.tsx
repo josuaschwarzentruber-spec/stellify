@@ -1412,6 +1412,26 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
   </div>
 );
 
+// Small icon button with a custom tooltip that appears below the icon on hover/focus.
+function CardActionButton({ onClick, label, icon, className }: { onClick: () => void; label: string; icon: React.ReactNode; className?: string }) {
+  return (
+    <div className="relative group/btn">
+      <button
+        type="button"
+        onClick={onClick}
+        title={label}
+        aria-label={label}
+        className={`p-1.5 rounded transition-all ${className || ''}`}
+      >
+        {icon}
+      </button>
+      <span className="pointer-events-none absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-[#1A1A18] text-white text-[10px] font-medium uppercase tracking-wider whitespace-nowrap opacity-0 group-hover/btn:opacity-100 transition-opacity duration-150 shadow-lg z-20">
+        {label}
+      </span>
+    </div>
+  );
+}
+
 // Cross-platform draggable card (desktop, mobile, iPad) via @dnd-kit
 function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onStatusChange, isDragging }: any) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: app.id });
@@ -1426,33 +1446,31 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
       {...listeners}
       className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing overflow-hidden ${isDragging ? 'opacity-40' : ''}`}
     >
+      <div
+        className="absolute top-2 right-2 z-10 flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
+        onPointerDown={(e) => e.stopPropagation()}
+      >
+        <CardActionButton
+          onClick={() => onEdit(app)}
+          label={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
+          className="text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225]"
+          icon={<Edit2 size={12} />}
+        />
+        <CardActionButton
+          onClick={() => onArchive(app.id, !app.archived)}
+          label={app.archived ? t.tracker_unarchive : t.tracker_archive}
+          className="text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18]"
+          icon={app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
+        />
+        <CardActionButton
+          onClick={() => onDelete(app.id)}
+          label={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
+          className="text-red-500 hover:bg-red-50"
+          icon={<Trash2 size={12} />}
+        />
+      </div>
       <div className="space-y-2.5">
-        <div className="flex justify-between items-start gap-2 min-w-0">
-          <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words min-w-0 flex-1" title={app.company}>{app.company}</h4>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0" onPointerDown={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => onEdit(app)}
-              title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
-              className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
-            >
-              <Edit2 size={12} />
-            </button>
-            <button
-              onClick={() => onArchive(app.id, !app.archived)}
-              title={app.archived ? t.tracker_unarchive : t.tracker_archive}
-              className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all"
-            >
-              {app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
-            </button>
-            <button
-              onClick={() => onDelete(app.id)}
-              title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
-              className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
-            >
-              <Trash2 size={12} />
-            </button>
-          </div>
-        </div>
+        <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words pr-20" title={app.company}>{app.company}</h4>
         <p className="text-xs text-[#5C5C58] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
         {app.location && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
