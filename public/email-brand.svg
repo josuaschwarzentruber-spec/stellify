@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" width="320" height="80">
+  <rect width="320" height="80" fill="#004225"/>
+  <g transform="translate(20, 20)">
+    <path d="M20 4L24 18L36 22L24 26L20 40L16 26L4 22L16 18Z" fill="#6FCF97"/>
+  </g>
+  <text x="68" y="50" font-family="Georgia, 'Times New Roman', serif" font-size="32" fill="#FDFCFB" letter-spacing="-0.5">Stell<tspan fill="#6FCF97">ify</tspan></text>
+</svg>

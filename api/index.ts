@@ -60,15 +60,9 @@ function normaliseRole(planId: string): string {
 
 // ── Email Helper ──────────────────────────────────────────────────────────────
 function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string) {
-  // Canonical brand-mark as inline SVG (no remote image = no spam-filter / load issues)
-  const brandMark = `
-    <span style="display:inline-block;vertical-align:middle;margin-right:10px;">
-      <svg width="22" height="22" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="#6FCF97"/>
-      </svg>
-    </span>
-    <span style="font-family:Georgia,'Times New Roman',serif;font-size:24px;color:#FDFCFB;letter-spacing:-0.5px;vertical-align:middle;">Stell<span style="color:#6FCF97;">ify</span></span>
-  `;
+  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  // Hosted brand image (Gmail / Outlook reliably render <img>, inline SVG is filtered)
+  const brandImage = `<img src="${siteUrl}/email-brand.svg" alt="Stellify" width="160" height="40" style="display:block;border:0;outline:none;text-decoration:none;height:40px;width:160px;"/>`;
   return `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -83,7 +77,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
         <!-- Header -->
         <tr>
           <td style="background:#004225;padding:24px 32px;">
-            ${brandMark}
+            ${brandImage}
           </td>
         </tr>
         <!-- Body -->
