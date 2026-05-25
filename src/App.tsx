@@ -1579,6 +1579,9 @@ function StellifyApp() {
   };
   const [applications, setApplications] = useState<any[]>([]);
   const [isAddingApp, setIsAddingApp] = useState(false);
+  // Drag-and-drop state for tracker (desktop). Mobile uses the dropdown.
+  const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
+  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
   const [editingApp, setEditingApp] = useState<any | null>(null);
   const [newApp, setNewApp] = useState({ company: '', position: '', status: 'Applied' as any, location: '', salary: '', notes: '' });
   const [messages, setMessages] = useState<Message[]>([]);
@@ -7181,7 +7184,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
                   <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                     {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
-                      <div key={status} className="space-y-4">
+                      <div
+                        key={status}
+                        className="space-y-4"
+                        onDragOver={(e) => { e.preventDefault(); if (dragOverStatus !== status) setDragOverStatus(status); }}
+                        onDragLeave={() => { if (dragOverStatus === status) setDragOverStatus(null); }}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          const id = e.dataTransfer.getData('text/plain') || draggedAppId;
+                          if (id) {
+                            const dragged = applications.find(a => a.id === id);
+                            if (dragged && dragged.status !== status) {
+                              updateApplicationStatus(id, status);
+                            }
+                          }
+                          setDraggedAppId(null);
+                          setDragOverStatus(null);
+                        }}
+                      >
                         <div className="flex items-center justify-between px-1">
                           <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">
                             {status === 'Wishlist' ? t.tracker_wishlist :
@@ -7193,12 +7213,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {applications.filter(a => a.status === status).length}
                           </span>
                         </div>
-                        <div className="space-y-3 min-h-[100px]">
+                        <div className={`space-y-3 min-h-[100px] transition-all ${dragOverStatus === status && draggedAppId ? 'bg-[#004225]/5 border-2 border-dashed border-[#004225]/40 rounded-md p-1' : 'border-2 border-transparent'}`}>
                           {applications.filter(a => a.status === status).map((app) => (
                             <motion.div
                               layoutId={app.id}
                               key={app.id}
-                              className="p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative"
+                              draggable
+                              onDragStart={(e: any) => {
+                                setDraggedAppId(app.id);
+                                if (e.dataTransfer) {
+                                  e.dataTransfer.setData('text/plain', app.id);
+                                  e.dataTransfer.effectAllowed = 'move';
+                                }
+                              }}
+                              onDragEnd={() => { setDraggedAppId(null); setDragOverStatus(null); }}
+                              className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing ${draggedAppId === app.id ? 'opacity-40' : ''}`}
                             >
                               <div className="space-y-2.5">
                                 <div className="flex justify-between items-start gap-2">
