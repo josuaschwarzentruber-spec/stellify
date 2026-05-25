@@ -1424,11 +1424,11 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
       style={style}
       {...attributes}
       {...listeners}
-      className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-40' : ''}`}
+      className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing overflow-hidden ${isDragging ? 'opacity-40' : ''}`}
     >
       <div className="space-y-2.5">
-        <div className="flex justify-between items-start gap-2">
-          <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words" title={app.company}>{app.company}</h4>
+        <div className="flex justify-between items-start gap-2 min-w-0">
+          <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words min-w-0 flex-1" title={app.company}>{app.company}</h4>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0" onPointerDown={(e) => e.stopPropagation()}>
             <button
               onClick={() => onEdit(app)}
@@ -1735,18 +1735,21 @@ function StellifyApp() {
   const [trackerSearch, setTrackerSearch] = useState('');
   const [trackerView, setTrackerView] = useState<'kanban' | 'table'>('kanban');
   const [showArchived, setShowArchived] = useState(false);
-  const filteredApplications = useMemo(() => {
+  // Main view list — affected only by the archive toggle.
+  const viewApplications = useMemo(
+    () => applications.filter((a) => showArchived || !a.archived),
+    [applications, showArchived],
+  );
+  // Search hits — feed the dropdown under the search input. Scans every
+  // field (including archived) so users always find what they're looking for.
+  const searchMatches = useMemo(() => {
     const q = trackerSearch.trim().toLowerCase();
-    const isSearching = q.length > 0;
-    return applications.filter((a) => {
-      // Archive toggle only controls default view; an active search ignores it
-      // so users always find what they're looking for, even when archived.
-      if (!isSearching && !showArchived && a.archived) return false;
-      if (!isSearching) return true;
-      return [a.company, a.position, a.location, a.notes, a.salary, a.status]
-        .some((v) => v && String(v).toLowerCase().includes(q));
-    });
-  }, [applications, trackerSearch, showArchived]);
+    if (!q) return [] as any[];
+    return applications.filter((a) =>
+      [a.company, a.position, a.location, a.notes, a.salary, a.status]
+        .some((v) => v && String(v).toLowerCase().includes(q)),
+    );
+  }, [applications, trackerSearch]);
   const archivedCount = useMemo(() => applications.filter((a) => a.archived).length, [applications]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -7250,7 +7253,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {applications.length > 0 && (
                     <div className="flex flex-col md:flex-row md:items-center gap-3">
                       <div className="relative flex-1">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94]" />
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94] pointer-events-none z-10" />
                         <input
                           type="text"
                           value={trackerSearch}
@@ -7261,11 +7264,55 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         {trackerSearch && (
                           <button
                             onClick={() => setTrackerSearch('')}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#9A9A94] hover:text-[#1A1A18] rounded"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#9A9A94] hover:text-[#1A1A18] rounded z-10"
                             aria-label="clear"
                           >
                             <X size={14} />
                           </button>
+                        )}
+                        {trackerSearch.trim() && (
+                          <div className="absolute left-0 right-0 top-full mt-2 z-30 bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 shadow-xl max-h-80 overflow-y-auto">
+                            {searchMatches.length === 0 ? (
+                              <div className="px-4 py-6 text-center text-sm text-[#6B6B66] dark:text-[#9A9A94]">
+                                {t.tracker_no_results}
+                              </div>
+                            ) : (
+                              <>
+                                <div className="px-4 py-2 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] border-b border-black/5 dark:border-white/5 bg-[#FAFAF8] dark:bg-[#1A1A18]">
+                                  {searchMatches.length} {searchMatches.length === 1 ? (language === 'FR' ? 'résultat' : language === 'IT' ? 'risultato' : language === 'EN' ? 'result' : 'Treffer') : (language === 'FR' ? 'résultats' : language === 'IT' ? 'risultati' : language === 'EN' ? 'results' : 'Treffer')}
+                                </div>
+                                {searchMatches.map((app) => {
+                                  const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
+                                    app.status === 'Applied' ? t.tracker_applied :
+                                    app.status === 'Interview' ? t.tracker_interview :
+                                    app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
+                                  return (
+                                    <button
+                                      key={app.id}
+                                      onClick={() => { setEditingApp(app); setTrackerSearch(''); }}
+                                      className="w-full text-left px-4 py-3 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] border-b border-black/5 dark:border-white/5 last:border-b-0 transition-all flex items-center gap-3"
+                                    >
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-bold text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{app.company}</span>
+                                          {app.archived && <Archive size={11} className="text-[#9A9A94] shrink-0" />}
+                                        </div>
+                                        <div className="text-xs text-[#5C5C58] dark:text-[#9A9A94] truncate">
+                                          {app.position}
+                                          {app.location && <span className="text-[#9A9A94]"> · {app.location}</span>}
+                                          {app.salary && <span className="text-[#004225] font-medium"> · CHF {(() => {
+                                            const n = parseFloat(String(app.salary).replace(/[^\d.]/g, ''));
+                                            return isNaN(n) ? app.salary : n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
+                                          })()}</span>}
+                                        </div>
+                                      </div>
+                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#004225] bg-[#004225]/8 px-2 py-1 shrink-0">{statusLabel}</span>
+                                    </button>
+                                  );
+                                })}
+                              </>
+                            )}
+                          </div>
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
@@ -7476,11 +7523,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   )}
 
-                  {applications.length > 0 && filteredApplications.length === 0 ? (
-                    <div className="py-16 text-center border border-dashed border-black/10">
-                      <p className="text-sm text-[#6B6B66]">{t.tracker_no_results}</p>
-                    </div>
-                  ) : trackerView === 'kanban' ? (
+                  {trackerView === 'kanban' ? (
                     <DndContext
                       sensors={dndSensors}
                       onDragStart={(event: DragStartEvent) => setDraggedAppId(String(event.active.id))}
@@ -7503,7 +7546,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             status={status}
                             t={t}
                             language={language}
-                            applications={filteredApplications}
+                            applications={viewApplications}
                             activeId={draggedAppId}
                             onEdit={setEditingApp}
                             onDelete={deleteApplication}
@@ -7540,7 +7583,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </tr>
                         </thead>
                         <tbody>
-                          {filteredApplications.map((app) => {
+                          {viewApplications.map((app) => {
                             const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
                               app.status === 'Applied' ? t.tracker_applied :
                               app.status === 'Interview' ? t.tracker_interview :
