@@ -2947,24 +2947,42 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   };
 
   const addApplication = async () => {
-    if (!user || !newApp.company || !newApp.position) return;
+    if (!user) {
+      showToast(language === 'FR' ? 'Veuillez vous connecter' : language === 'IT' ? 'Effettua il login' : language === 'EN' ? 'Please log in' : 'Bitte melde dich an', 'error');
+      return;
+    }
+    if (!newApp.company?.trim() || !newApp.position?.trim()) {
+      showToast(language === 'FR' ? "Entreprise et poste sont obligatoires" : language === 'IT' ? 'Azienda e posizione sono obbligatorie' : language === 'EN' ? 'Company and position are required' : 'Firma und Position sind Pflichtfelder', 'error');
+      return;
+    }
     try {
       await addDoc(collection(db, 'applications'), { ...newApp, user_id: user.id, created_at: new Date().toISOString() });
       setIsAddingApp(false);
       setNewApp({ company: '', position: '', status: 'Applied', location: '', salary: '', notes: '' });
-    } catch (e) {
+      showToast(language === 'FR' ? 'Candidature ajoutée' : language === 'IT' ? 'Candidatura aggiunta' : language === 'EN' ? 'Application added' : 'Bewerbung hinzugefügt', 'success');
+    } catch (e: any) {
       handleDbError(e, 'db', `applications`);
+      const msg = e?.code === 'permission-denied'
+        ? (language === 'FR' ? "Accès refusé. Vérifie que tu es connecté." : language === 'IT' ? 'Accesso negato. Verifica di aver eseguito il login.' : language === 'EN' ? 'Access denied. Please make sure you are logged in.' : 'Zugriff verweigert. Bitte stelle sicher dass du angemeldet bist.')
+        : (language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`);
+      showToast(msg, 'error');
     }
   };
 
   const updateApplication = async () => {
-    if (!user || !editingApp || !editingApp.company || !editingApp.position) return;
+    if (!user || !editingApp) return;
+    if (!editingApp.company?.trim() || !editingApp.position?.trim()) {
+      showToast(language === 'FR' ? "Entreprise et poste sont obligatoires" : language === 'IT' ? 'Azienda e posizione sono obbligatorie' : language === 'EN' ? 'Company and position are required' : 'Firma und Position sind Pflichtfelder', 'error');
+      return;
+    }
     try {
       const { id, user_id, created_at, ...fields } = editingApp;
       await updateDoc(doc(db, 'applications', editingApp.id), { ...fields, updated_at: new Date().toISOString() });
       setEditingApp(null);
-    } catch (e) {
+      showToast(language === 'FR' ? 'Modifications enregistrées' : language === 'IT' ? 'Modifiche salvate' : language === 'EN' ? 'Changes saved' : 'Änderungen gespeichert', 'success');
+    } catch (e: any) {
       handleDbError(e, 'db', `applications/${editingApp.id}`);
+      showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
     }
   };
 
@@ -2972,8 +2990,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (!user) return;
     try {
       await updateDoc(doc(db, 'applications', appId), { status: newStatus, updated_at: new Date().toISOString() });
-    } catch (e) {
+    } catch (e: any) {
       handleDbError(e, 'db', `applications/${appId}`);
+      showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
     }
   };
 
@@ -2981,8 +3000,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (!user) return;
     try {
       await deleteDoc(doc(db, 'applications', appId));
-    } catch (e) {
+      showToast(language === 'FR' ? 'Candidature supprimée' : language === 'IT' ? 'Candidatura eliminata' : language === 'EN' ? 'Application deleted' : 'Bewerbung gelöscht', 'success');
+    } catch (e: any) {
       handleDbError(e, 'db', `applications/${appId}`);
+      showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
     }
   };
 
