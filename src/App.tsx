@@ -8,6 +8,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import { useDropzone } from 'react-dropzone';
+import {
+  DndContext, useSensor, useSensors, PointerSensor, TouchSensor, KeyboardSensor,
+  useDraggable, useDroppable, DragOverlay, type DragEndEvent, type DragStartEvent,
+} from '@dnd-kit/core';
 import { 
   TrendingUp,
   Globe,
@@ -1407,6 +1411,136 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
   </div>
 );
 
+// Cross-platform draggable card (desktop, mobile, iPad) via @dnd-kit
+function DraggableAppCard({ app, t, language, onEdit, onDelete, onStatusChange, isDragging }: any) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: app.id });
+  const style: React.CSSProperties = transform
+    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 50, touchAction: 'none' }
+    : { touchAction: 'manipulation' };
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-40' : ''}`}
+    >
+      <div className="space-y-2.5">
+        <div className="flex justify-between items-start gap-2">
+          <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words" title={app.company}>{app.company}</h4>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0" onPointerDown={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => onEdit(app)}
+              title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
+              className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
+            >
+              <Edit2 size={12} />
+            </button>
+            <button
+              onClick={() => onDelete(app.id)}
+              title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
+              className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-[#5C5C58] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
+        {app.location && (
+          <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
+            <MapPin size={11} />
+            <span className="truncate">{app.location}</span>
+          </div>
+        )}
+        {app.salary && (
+          <div className="flex items-center gap-1.5 text-[11px] text-[#004225] font-medium">
+            <span className="text-[10px] font-bold tracking-widest">CHF</span>
+            <span>{(() => {
+              const num = String(app.salary).replace(/[^\d.]/g, '');
+              if (!num) return app.salary;
+              const n = parseFloat(num);
+              if (isNaN(n)) return app.salary;
+              return n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
+            })()}</span>
+          </div>
+        )}
+        {app.notes && (
+          <div className="flex items-center gap-1.5 text-[10px] text-[#9A9A94] italic">
+            <FileText size={10} />
+            <span className="truncate">{t.tracker_notes_badge}</span>
+          </div>
+        )}
+      </div>
+      <div className="mt-3 pt-3 border-t border-black/5 flex items-center justify-between gap-2" onPointerDown={(e) => e.stopPropagation()}>
+        <div className="relative flex-1 min-w-0">
+          <label className="block text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">
+            {language === 'FR' ? 'Statut' : language === 'IT' ? 'Stato' : language === 'EN' ? 'Status' : 'Status'}
+          </label>
+          <select
+            value={app.status}
+            onChange={(e) => onStatusChange(app.id, e.target.value)}
+            className="w-full text-[11px] font-medium text-[#004225] bg-white border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2.5 py-1.5 pr-7 cursor-pointer transition-all appearance-none"
+            style={{ backgroundImage: "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' stroke='%23004225' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center' }}
+          >
+            <option value="Wishlist">{t.tracker_wishlist}</option>
+            <option value="Applied">{t.tracker_applied}</option>
+            <option value="Interview">{t.tracker_interview}</option>
+            <option value="Offer">{t.tracker_offer}</option>
+            <option value="Rejected">{t.tracker_rejected}</option>
+          </select>
+        </div>
+        {app.updatedAt?.toDate && (
+          <span className="text-[9px] text-[#9A9A94] font-mono shrink-0 self-end pb-1.5">
+            {app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' })}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function DroppableStatusColumn({ status, t, language, applications, activeId, onEdit, onDelete, onStatusChange }: any) {
+  const { setNodeRef, isOver } = useDroppable({ id: status });
+  const filtered = applications.filter((a: any) => a.status === status);
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between px-1">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">
+          {status === 'Wishlist' ? t.tracker_wishlist :
+           status === 'Applied' ? t.tracker_applied :
+           status === 'Interview' ? t.tracker_interview :
+           status === 'Offer' ? t.tracker_offer : t.tracker_rejected}
+        </h3>
+        <span className="text-[10px] font-mono text-[#9A9A94] bg-black/5 px-2 py-0.5 rounded-full">
+          {filtered.length}
+        </span>
+      </div>
+      <div
+        ref={setNodeRef}
+        className={`space-y-3 min-h-[100px] transition-all ${isOver && activeId ? 'bg-[#004225]/5 border-2 border-dashed border-[#004225]/40 rounded-md p-1' : 'border-2 border-transparent'}`}
+      >
+        {filtered.map((app: any) => (
+          <DraggableAppCard
+            key={app.id}
+            app={app}
+            t={t}
+            language={language}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onStatusChange={onStatusChange}
+            isDragging={activeId === app.id}
+          />
+        ))}
+        {filtered.length === 0 && (
+          <div className="h-20 border border-dashed border-black/5 flex items-center justify-center">
+            <span className="text-[9px] text-[#9A9A94] uppercase tracking-widest opacity-30">{t.tracker_empty}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   useEffect(() => {
     window.stellifyReady?.();
@@ -1579,9 +1713,14 @@ function StellifyApp() {
   };
   const [applications, setApplications] = useState<any[]>([]);
   const [isAddingApp, setIsAddingApp] = useState(false);
-  // Drag-and-drop state for tracker (desktop). Mobile uses the dropdown.
+  // Active drag id — drives ghost overlay and source-card opacity. @dnd-kit handles
+  // pointer, touch and keyboard so the tracker works on laptop, mobile and iPad.
   const [draggedAppId, setDraggedAppId] = useState<string | null>(null);
-  const [dragOverStatus, setDragOverStatus] = useState<string | null>(null);
+  const dndSensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor),
+  );
   const [editingApp, setEditingApp] = useState<any | null>(null);
   const [newApp, setNewApp] = useState({ company: '', position: '', status: 'Applied' as any, location: '', salary: '', notes: '' });
   const [messages, setMessages] = useState<Message[]>([]);
@@ -7182,134 +7321,49 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
-                      <div
-                        key={status}
-                        className="space-y-4"
-                        onDragOver={(e) => { e.preventDefault(); if (dragOverStatus !== status) setDragOverStatus(status); }}
-                        onDragLeave={() => { if (dragOverStatus === status) setDragOverStatus(null); }}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          const id = e.dataTransfer.getData('text/plain') || draggedAppId;
-                          if (id) {
-                            const dragged = applications.find(a => a.id === id);
-                            if (dragged && dragged.status !== status) {
-                              updateApplicationStatus(id, status);
-                            }
-                          }
-                          setDraggedAppId(null);
-                          setDragOverStatus(null);
-                        }}
-                      >
-                        <div className="flex items-center justify-between px-1">
-                          <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">
-                            {status === 'Wishlist' ? t.tracker_wishlist :
-                             status === 'Applied' ? t.tracker_applied :
-                             status === 'Interview' ? t.tracker_interview :
-                             status === 'Offer' ? t.tracker_offer : t.tracker_rejected}
-                          </h3>
-                          <span className="text-[10px] font-mono text-[#9A9A94] bg-black/5 px-2 py-0.5 rounded-full">
-                            {applications.filter(a => a.status === status).length}
-                          </span>
-                        </div>
-                        <div className={`space-y-3 min-h-[100px] transition-all ${dragOverStatus === status && draggedAppId ? 'bg-[#004225]/5 border-2 border-dashed border-[#004225]/40 rounded-md p-1' : 'border-2 border-transparent'}`}>
-                          {applications.filter(a => a.status === status).map((app) => (
-                            <motion.div
-                              layoutId={app.id}
-                              key={app.id}
-                              draggable
-                              onDragStart={(e: any) => {
-                                setDraggedAppId(app.id);
-                                if (e.dataTransfer) {
-                                  e.dataTransfer.setData('text/plain', app.id);
-                                  e.dataTransfer.effectAllowed = 'move';
-                                }
-                              }}
-                              onDragEnd={() => { setDraggedAppId(null); setDragOverStatus(null); }}
-                              className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing ${draggedAppId === app.id ? 'opacity-40' : ''}`}
-                            >
-                              <div className="space-y-2.5">
-                                <div className="flex justify-between items-start gap-2">
-                                  <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words" title={app.company}>{app.company}</h4>
-                                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all shrink-0">
-                                    <button
-                                      onClick={() => setEditingApp(app)}
-                                      title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
-                                      className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
-                                    >
-                                      <Edit2 size={12} />
-                                    </button>
-                                    <button
-                                      onClick={() => deleteApplication(app.id)}
-                                      title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
-                                      className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                  </div>
-                                </div>
-                                <p className="text-xs text-[#5C5C58] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
-                                {app.location && (
-                                  <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
-                                    <MapPin size={11} />
-                                    <span className="truncate">{app.location}</span>
-                                  </div>
-                                )}
-                                {app.salary && (
-                                  <div className="flex items-center gap-1.5 text-[11px] text-[#004225] font-medium">
-                                    <span className="text-[10px] font-bold tracking-widest">CHF</span>
-                                    <span>{(() => {
-                                      const num = String(app.salary).replace(/[^\d.]/g, '');
-                                      if (!num) return app.salary;
-                                      const n = parseFloat(num);
-                                      if (isNaN(n)) return app.salary;
-                                      return n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
-                                    })()}</span>
-                                  </div>
-                                )}
-                                {app.notes && (
-                                  <div className="flex items-center gap-1.5 text-[10px] text-[#9A9A94] italic">
-                                    <FileText size={10} />
-                                    <span className="truncate">{t.tracker_notes_badge}</span>
-                                  </div>
-                                )}
-                              </div>
-                              <div className="mt-3 pt-3 border-t border-black/5 flex items-center justify-between gap-2">
-                                <div className="relative flex-1 min-w-0">
-                                  <label className="block text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">
-                                    {language === 'FR' ? 'Statut' : language === 'IT' ? 'Stato' : language === 'EN' ? 'Status' : 'Status'}
-                                  </label>
-                                  <select
-                                    value={status}
-                                    onChange={(e) => updateApplicationStatus(app.id, e.target.value)}
-                                    className="w-full text-[11px] font-medium text-[#004225] bg-white border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2.5 py-1.5 pr-7 cursor-pointer transition-all appearance-none"
-                                    style={{ backgroundImage: "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' stroke='%23004225' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center' }}
-                                  >
-                                    <option value="Wishlist">{t.tracker_wishlist}</option>
-                                    <option value="Applied">{t.tracker_applied}</option>
-                                    <option value="Interview">{t.tracker_interview}</option>
-                                    <option value="Offer">{t.tracker_offer}</option>
-                                    <option value="Rejected">{t.tracker_rejected}</option>
-                                  </select>
-                                </div>
-                                {app.updatedAt?.toDate && (
-                                  <span className="text-[9px] text-[#9A9A94] font-mono shrink-0 self-end pb-1.5">
-                                    {app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' })}
-                                  </span>
-                                )}
-                              </div>
-                            </motion.div>
-                          ))}
-                          {applications.filter(a => a.status === status).length === 0 && (
-                            <div className="h-20 border border-dashed border-black/5 flex items-center justify-center">
-                              <span className="text-[9px] text-[#9A9A94] uppercase tracking-widest opacity-30">{t.tracker_empty}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  <DndContext
+                    sensors={dndSensors}
+                    onDragStart={(event: DragStartEvent) => setDraggedAppId(String(event.active.id))}
+                    onDragEnd={(event: DragEndEvent) => {
+                      setDraggedAppId(null);
+                      const { active, over } = event;
+                      if (!over) return;
+                      const newStatus = String(over.id);
+                      const dragged = applications.find((a) => a.id === active.id);
+                      if (dragged && dragged.status !== newStatus) {
+                        updateApplicationStatus(String(active.id), newStatus);
+                      }
+                    }}
+                    onDragCancel={() => setDraggedAppId(null)}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                      {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
+                        <DroppableStatusColumn
+                          key={status}
+                          status={status}
+                          t={t}
+                          language={language}
+                          applications={applications}
+                          activeId={draggedAppId}
+                          onEdit={setEditingApp}
+                          onDelete={deleteApplication}
+                          onStatusChange={updateApplicationStatus}
+                        />
+                      ))}
+                    </div>
+                    <DragOverlay dropAnimation={null}>
+                      {draggedAppId ? (() => {
+                        const a = applications.find((x) => x.id === draggedAppId);
+                        if (!a) return null;
+                        return (
+                          <div className="p-4 bg-white border border-[#004225]/40 shadow-2xl rotate-2 cursor-grabbing pointer-events-none">
+                            <h4 className="text-sm font-bold text-[#1A1A18] leading-tight">{a.company}</h4>
+                            <p className="text-xs text-[#5C5C58] mt-1">{a.position}</p>
+                          </div>
+                        );
+                      })() : null}
+                    </DragOverlay>
+                  </DndContext>
                 </div>
 
                 {/* Quick Tools */}
