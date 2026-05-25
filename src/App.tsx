@@ -5,7 +5,7 @@
 
 /// <reference types="vite/client" />
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import { useDropzone } from 'react-dropzone';
 import {
@@ -36,7 +36,8 @@ import {
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon,
-  Pause, Volume2, VolumeX
+  Pause, Volume2, VolumeX,
+  Archive, ArchiveRestore, LayoutGrid, List as ListIcon
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -1412,7 +1413,7 @@ const Avatar = ({ name, color, src }: { name: string, color: string, src?: strin
 );
 
 // Cross-platform draggable card (desktop, mobile, iPad) via @dnd-kit
-function DraggableAppCard({ app, t, language, onEdit, onDelete, onStatusChange, isDragging }: any) {
+function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onStatusChange, isDragging }: any) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: app.id });
   const style: React.CSSProperties = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 50, touchAction: 'none' }
@@ -1435,6 +1436,13 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onStatusChange, 
               className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
             >
               <Edit2 size={12} />
+            </button>
+            <button
+              onClick={() => onArchive(app.id, !app.archived)}
+              title={app.archived ? t.tracker_unarchive : t.tracker_archive}
+              className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all"
+            >
+              {app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
             </button>
             <button
               onClick={() => onDelete(app.id)}
@@ -1499,7 +1507,7 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onStatusChange, 
   );
 }
 
-function DroppableStatusColumn({ status, t, language, applications, activeId, onEdit, onDelete, onStatusChange }: any) {
+function DroppableStatusColumn({ status, t, language, applications, activeId, onEdit, onDelete, onArchive, onStatusChange }: any) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
   const filtered = applications.filter((a: any) => a.status === status);
   return (
@@ -1527,6 +1535,7 @@ function DroppableStatusColumn({ status, t, language, applications, activeId, on
             language={language}
             onEdit={onEdit}
             onDelete={onDelete}
+            onArchive={onArchive}
             onStatusChange={onStatusChange}
             isDragging={activeId === app.id}
           />
@@ -1723,6 +1732,19 @@ function StellifyApp() {
   );
   const [editingApp, setEditingApp] = useState<any | null>(null);
   const [newApp, setNewApp] = useState({ company: '', position: '', status: 'Applied' as any, location: '', salary: '', notes: '' });
+  const [trackerSearch, setTrackerSearch] = useState('');
+  const [trackerView, setTrackerView] = useState<'kanban' | 'table'>('kanban');
+  const [showArchived, setShowArchived] = useState(false);
+  const filteredApplications = useMemo(() => {
+    const q = trackerSearch.trim().toLowerCase();
+    return applications.filter((a) => {
+      if (!showArchived && a.archived) return false;
+      if (!q) return true;
+      return [a.company, a.position, a.location, a.notes]
+        .some((v) => v && String(v).toLowerCase().includes(q));
+    });
+  }, [applications, trackerSearch, showArchived]);
+  const archivedCount = useMemo(() => applications.filter((a) => a.archived).length, [applications]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -3153,6 +3175,22 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     try {
       await deleteDoc(doc(db, 'applications', appId));
       showToast(language === 'FR' ? 'Candidature supprimée' : language === 'IT' ? 'Candidatura eliminata' : language === 'EN' ? 'Application deleted' : 'Bewerbung gelöscht', 'success');
+    } catch (e: any) {
+      handleDbError(e, 'db', `applications/${appId}`);
+      showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
+    }
+  };
+
+  const setApplicationArchived = async (appId: string, archived: boolean) => {
+    if (!user) return;
+    try {
+      await updateDoc(doc(db, 'applications', appId), { archived, updated_at: new Date().toISOString() });
+      showToast(
+        archived
+          ? (language === 'FR' ? 'Archivée' : language === 'IT' ? 'Archiviata' : language === 'EN' ? 'Archived' : 'Archiviert')
+          : (language === 'FR' ? 'Restaurée' : language === 'IT' ? 'Ripristinata' : language === 'EN' ? 'Restored' : 'Wiederhergestellt'),
+        'success',
+      );
     } catch (e: any) {
       handleDbError(e, 'db', `applications/${appId}`);
       showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
@@ -4711,6 +4749,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_rejected: "Abgelehnt",
       tracker_notes_badge: "Notizen vorhanden",
       tracker_empty: "Leer",
+      tracker_search_ph: "Suche Firma, Position, Ort…",
+      tracker_view_kanban: "Kanban",
+      tracker_view_table: "Tabelle",
+      tracker_show_archived: "Archiv anzeigen",
+      tracker_hide_archived: "Archiv ausblenden",
+      tracker_archive: "Archivieren",
+      tracker_unarchive: "Wiederherstellen",
+      tracker_no_results: "Keine Bewerbungen gefunden",
+      tracker_col_company: "Firma",
+      tracker_col_position: "Position",
+      tracker_col_status: "Status",
+      tracker_col_location: "Ort",
+      tracker_col_salary: "Gehalt",
+      tracker_col_updated: "Aktualisiert",
+      tracker_col_actions: "",
       quick_tools: "Quick Tools",
       all_tools: "Alle Tools",
       recent_docs: "Deine letzten Dokumente",
@@ -5271,6 +5324,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_rejected: "Refusé",
       tracker_notes_badge: "Notes disponibles",
       tracker_empty: "Vide",
+      tracker_search_ph: "Rechercher entreprise, poste, lieu…",
+      tracker_view_kanban: "Kanban",
+      tracker_view_table: "Tableau",
+      tracker_show_archived: "Afficher les archives",
+      tracker_hide_archived: "Masquer les archives",
+      tracker_archive: "Archiver",
+      tracker_unarchive: "Restaurer",
+      tracker_no_results: "Aucune candidature trouvée",
+      tracker_col_company: "Entreprise",
+      tracker_col_position: "Poste",
+      tracker_col_status: "Statut",
+      tracker_col_location: "Lieu",
+      tracker_col_salary: "Salaire",
+      tracker_col_updated: "Mis à jour",
+      tracker_col_actions: "",
       quick_tools: "Outils rapides",
       all_tools: "Tous les outils",
       recent_docs: "Vos derniers documents",
@@ -5725,6 +5793,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_rejected: "Rifiutato",
       tracker_notes_badge: "Note disponibili",
       tracker_empty: "Vuoto",
+      tracker_search_ph: "Cerca azienda, posizione, luogo…",
+      tracker_view_kanban: "Kanban",
+      tracker_view_table: "Tabella",
+      tracker_show_archived: "Mostra archivio",
+      tracker_hide_archived: "Nascondi archivio",
+      tracker_archive: "Archivia",
+      tracker_unarchive: "Ripristina",
+      tracker_no_results: "Nessuna candidatura trovata",
+      tracker_col_company: "Azienda",
+      tracker_col_position: "Posizione",
+      tracker_col_status: "Stato",
+      tracker_col_location: "Luogo",
+      tracker_col_salary: "Stipendio",
+      tracker_col_updated: "Aggiornato",
+      tracker_col_actions: "",
       quick_tools: "Strumenti rapidi",
       all_tools: "Tutti gli strumenti",
       recent_docs: "I tuoi ultimi documenti",
@@ -6179,6 +6262,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_rejected: "Rejected",
       tracker_notes_badge: "Notes available",
       tracker_empty: "Empty",
+      tracker_search_ph: "Search company, role, location…",
+      tracker_view_kanban: "Kanban",
+      tracker_view_table: "Table",
+      tracker_show_archived: "Show archive",
+      tracker_hide_archived: "Hide archive",
+      tracker_archive: "Archive",
+      tracker_unarchive: "Restore",
+      tracker_no_results: "No applications found",
+      tracker_col_company: "Company",
+      tracker_col_position: "Role",
+      tracker_col_status: "Status",
+      tracker_col_location: "Location",
+      tracker_col_salary: "Salary",
+      tracker_col_updated: "Updated",
+      tracker_col_actions: "",
       quick_tools: "Quick Tools",
       all_tools: "All Tools",
       recent_docs: "Your Recent Documents",
@@ -7146,6 +7244,60 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </button>
                   </div>
 
+                  {applications.length > 0 && (
+                    <div className="flex flex-col md:flex-row md:items-center gap-3">
+                      <div className="relative flex-1">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94]" />
+                        <input
+                          type="text"
+                          value={trackerSearch}
+                          onChange={(e) => setTrackerSearch(e.target.value)}
+                          placeholder={t.tracker_search_ph}
+                          className="w-full pl-9 pr-9 py-2.5 bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                        />
+                        {trackerSearch && (
+                          <button
+                            onClick={() => setTrackerSearch('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#9A9A94] hover:text-[#1A1A18] rounded"
+                            aria-label="clear"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="inline-flex border border-black/10 bg-white dark:bg-[#2A2A26] dark:border-white/10">
+                          <button
+                            onClick={() => setTrackerView('kanban')}
+                            title={t.tracker_view_kanban}
+                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${trackerView === 'kanban' ? 'bg-[#004225] text-white' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5'}`}
+                          >
+                            <LayoutGrid size={12} />
+                            <span className="hidden sm:inline">{t.tracker_view_kanban}</span>
+                          </button>
+                          <button
+                            onClick={() => setTrackerView('table')}
+                            title={t.tracker_view_table}
+                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${trackerView === 'table' ? 'bg-[#004225] text-white' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5'}`}
+                          >
+                            <ListIcon size={12} />
+                            <span className="hidden sm:inline">{t.tracker_view_table}</span>
+                          </button>
+                        </div>
+                        {archivedCount > 0 && (
+                          <button
+                            onClick={() => setShowArchived((v) => !v)}
+                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${showArchived ? 'bg-[#004225] text-white border-[#004225]' : 'bg-white dark:bg-[#2A2A26] text-[#5C5C58] dark:text-[#9A9A94] border-black/10 dark:border-white/10 hover:bg-black/5'}`}
+                          >
+                            {showArchived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
+                            <span className="hidden sm:inline">{showArchived ? t.tracker_hide_archived : t.tracker_show_archived}</span>
+                            <span className="font-mono text-[9px] opacity-70">({archivedCount})</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {isAddingApp && (
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }}
@@ -7321,49 +7473,137 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   )}
 
-                  <DndContext
-                    sensors={dndSensors}
-                    onDragStart={(event: DragStartEvent) => setDraggedAppId(String(event.active.id))}
-                    onDragEnd={(event: DragEndEvent) => {
-                      setDraggedAppId(null);
-                      const { active, over } = event;
-                      if (!over) return;
-                      const newStatus = String(over.id);
-                      const dragged = applications.find((a) => a.id === active.id);
-                      if (dragged && dragged.status !== newStatus) {
-                        updateApplicationStatus(String(active.id), newStatus);
-                      }
-                    }}
-                    onDragCancel={() => setDraggedAppId(null)}
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                      {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
-                        <DroppableStatusColumn
-                          key={status}
-                          status={status}
-                          t={t}
-                          language={language}
-                          applications={applications}
-                          activeId={draggedAppId}
-                          onEdit={setEditingApp}
-                          onDelete={deleteApplication}
-                          onStatusChange={updateApplicationStatus}
-                        />
-                      ))}
+                  {applications.length > 0 && filteredApplications.length === 0 ? (
+                    <div className="py-16 text-center border border-dashed border-black/10">
+                      <p className="text-sm text-[#6B6B66]">{t.tracker_no_results}</p>
                     </div>
-                    <DragOverlay dropAnimation={null}>
-                      {draggedAppId ? (() => {
-                        const a = applications.find((x) => x.id === draggedAppId);
-                        if (!a) return null;
-                        return (
-                          <div className="p-4 bg-white border border-[#004225]/40 shadow-2xl rotate-2 cursor-grabbing pointer-events-none">
-                            <h4 className="text-sm font-bold text-[#1A1A18] leading-tight">{a.company}</h4>
-                            <p className="text-xs text-[#5C5C58] mt-1">{a.position}</p>
-                          </div>
-                        );
-                      })() : null}
-                    </DragOverlay>
-                  </DndContext>
+                  ) : trackerView === 'kanban' ? (
+                    <DndContext
+                      sensors={dndSensors}
+                      onDragStart={(event: DragStartEvent) => setDraggedAppId(String(event.active.id))}
+                      onDragEnd={(event: DragEndEvent) => {
+                        setDraggedAppId(null);
+                        const { active, over } = event;
+                        if (!over) return;
+                        const newStatus = String(over.id);
+                        const dragged = applications.find((a) => a.id === active.id);
+                        if (dragged && dragged.status !== newStatus) {
+                          updateApplicationStatus(String(active.id), newStatus);
+                        }
+                      }}
+                      onDragCancel={() => setDraggedAppId(null)}
+                    >
+                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
+                          <DroppableStatusColumn
+                            key={status}
+                            status={status}
+                            t={t}
+                            language={language}
+                            applications={filteredApplications}
+                            activeId={draggedAppId}
+                            onEdit={setEditingApp}
+                            onDelete={deleteApplication}
+                            onArchive={setApplicationArchived}
+                            onStatusChange={updateApplicationStatus}
+                          />
+                        ))}
+                      </div>
+                      <DragOverlay dropAnimation={null}>
+                        {draggedAppId ? (() => {
+                          const a = applications.find((x) => x.id === draggedAppId);
+                          if (!a) return null;
+                          return (
+                            <div className="p-4 bg-white border border-[#004225]/40 shadow-2xl rotate-2 cursor-grabbing pointer-events-none">
+                              <h4 className="text-sm font-bold text-[#1A1A18] leading-tight">{a.company}</h4>
+                              <p className="text-xs text-[#5C5C58] mt-1">{a.position}</p>
+                            </div>
+                          );
+                        })() : null}
+                      </DragOverlay>
+                    </DndContext>
+                  ) : (
+                    <div className="overflow-x-auto bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10">
+                      <table className="w-full text-sm">
+                        <thead className="bg-[#FAFAF8] dark:bg-[#1A1A18] border-b border-black/10 dark:border-white/10">
+                          <tr>
+                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
+                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_position}</th>
+                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
+                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_location}</th>
+                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_salary}</th>
+                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden lg:table-cell">{t.tracker_col_updated}</th>
+                            <th className="px-4 py-3"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredApplications.map((app) => {
+                            const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
+                              app.status === 'Applied' ? t.tracker_applied :
+                              app.status === 'Interview' ? t.tracker_interview :
+                              app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
+                            const salaryFmt = (() => {
+                              if (!app.salary) return '';
+                              const num = String(app.salary).replace(/[^\d.]/g, '');
+                              if (!num) return app.salary;
+                              const n = parseFloat(num);
+                              if (isNaN(n)) return app.salary;
+                              return `CHF ${n.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`;
+                            })();
+                            return (
+                              <tr key={app.id} className={`border-b border-black/5 dark:border-white/5 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] transition-all ${app.archived ? 'opacity-60' : ''}`}>
+                                <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{app.company}</td>
+                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94]">{app.position}</td>
+                                <td className="px-4 py-3">
+                                  <select
+                                    value={app.status}
+                                    onChange={(e) => updateApplicationStatus(app.id, e.target.value)}
+                                    className="text-[11px] font-medium text-[#004225] bg-transparent border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2 py-1 cursor-pointer transition-all"
+                                  >
+                                    <option value="Wishlist">{t.tracker_wishlist}</option>
+                                    <option value="Applied">{t.tracker_applied}</option>
+                                    <option value="Interview">{t.tracker_interview}</option>
+                                    <option value="Offer">{t.tracker_offer}</option>
+                                    <option value="Rejected">{t.tracker_rejected}</option>
+                                  </select>
+                                </td>
+                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '—'}</td>
+                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '—'}</td>
+                                <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
+                                  {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '—'}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="flex gap-1 justify-end">
+                                    <button
+                                      onClick={() => setEditingApp(app)}
+                                      title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
+                                      className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
+                                    >
+                                      <Edit2 size={12} />
+                                    </button>
+                                    <button
+                                      onClick={() => setApplicationArchived(app.id, !app.archived)}
+                                      title={app.archived ? t.tracker_unarchive : t.tracker_archive}
+                                      className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all"
+                                    >
+                                      {app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
+                                    </button>
+                                    <button
+                                      onClick={() => deleteApplication(app.id)}
+                                      title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
+                                      className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
+                                    >
+                                      <Trash2 size={12} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
 
                 {/* Quick Tools */}
