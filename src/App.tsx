@@ -1769,6 +1769,34 @@ function StellifyApp() {
     );
   }, [applications, trackerSearch]);
   const archivedCount = useMemo(() => applications.filter((a) => a.archived).length, [applications]);
+  // Headline numbers for the tracker. Stats are computed from active
+  // (non-archived) applications so they reflect the live pipeline.
+  const trackerStats = useMemo(() => {
+    const active = applications.filter((a) => !a.archived);
+    const byStatus = (s: string) => active.filter((a) => a.status === s).length;
+    const wishlist = byStatus('Wishlist');
+    const applied = byStatus('Applied');
+    const interview = byStatus('Interview');
+    const offer = byStatus('Offer');
+    const rejected = byStatus('Rejected');
+    const responded = applied + interview + offer + rejected; // exclude Wishlist
+    const interviewRate = responded > 0 ? Math.round(((interview + offer) / responded) * 100) : 0;
+    const offerRate = responded > 0 ? Math.round((offer / responded) * 100) : 0;
+    const salaries = active
+      .map((a) => parseFloat(String(a.salary || '').replace(/[^\d.]/g, '')))
+      .filter((n) => !isNaN(n) && n > 0);
+    const avgSalary = salaries.length > 0 ? salaries.reduce((a, b) => a + b, 0) / salaries.length : 0;
+    return {
+      total: active.length,
+      inProcess: wishlist + applied + interview,
+      interview,
+      offer,
+      interviewRate,
+      offerRate,
+      avgSalary,
+      salaryCount: salaries.length,
+    };
+  }, [applications]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -4788,6 +4816,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_col_salary: "Gehalt",
       tracker_col_updated: "Aktualisiert",
       tracker_col_actions: "",
+      stat_total: "Gesamt",
+      stat_in_process: "im Prozess",
+      stat_interviews: "Interviews",
+      stat_offers: "Angebote",
+      stat_avg_salary: "Ø Gehalt",
+      stat_rate: "Quote",
+      stat_based_on: "von",
+      stat_no_data: "—",
       quick_tools: "Quick Tools",
       all_tools: "Alle Tools",
       recent_docs: "Deine letzten Dokumente",
@@ -5363,6 +5399,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_col_salary: "Salaire",
       tracker_col_updated: "Mis à jour",
       tracker_col_actions: "",
+      stat_total: "Total",
+      stat_in_process: "en cours",
+      stat_interviews: "Entretiens",
+      stat_offers: "Offres",
+      stat_avg_salary: "Salaire moy.",
+      stat_rate: "Taux",
+      stat_based_on: "sur",
+      stat_no_data: "—",
       quick_tools: "Outils rapides",
       all_tools: "Tous les outils",
       recent_docs: "Vos derniers documents",
@@ -5832,6 +5876,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_col_salary: "Stipendio",
       tracker_col_updated: "Aggiornato",
       tracker_col_actions: "",
+      stat_total: "Totale",
+      stat_in_process: "in corso",
+      stat_interviews: "Colloqui",
+      stat_offers: "Offerte",
+      stat_avg_salary: "Stipendio medio",
+      stat_rate: "Tasso",
+      stat_based_on: "su",
+      stat_no_data: "—",
       quick_tools: "Strumenti rapidi",
       all_tools: "Tutti gli strumenti",
       recent_docs: "I tuoi ultimi documenti",
@@ -6301,6 +6353,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_col_salary: "Salary",
       tracker_col_updated: "Updated",
       tracker_col_actions: "",
+      stat_total: "Total",
+      stat_in_process: "in process",
+      stat_interviews: "Interviews",
+      stat_offers: "Offers",
+      stat_avg_salary: "Avg. salary",
+      stat_rate: "rate",
+      stat_based_on: "of",
+      stat_no_data: "—",
       quick_tools: "Quick Tools",
       all_tools: "All Tools",
       recent_docs: "Your Recent Documents",
@@ -7362,6 +7422,39 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <span className="font-mono text-[9px] opacity-70">({archivedCount})</span>
                           </button>
                         )}
+                      </div>
+                    </div>
+                  )}
+
+                  {trackerStats.total > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_total}</p>
+                        <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.inProcess} {t.stat_in_process}</p>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_interviews}</p>
+                        <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.interview}</p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.interviewRate}% {t.stat_rate}</p>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
+                        <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.offerRate}% {t.stat_rate}</p>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_avg_salary}</p>
+                        <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none whitespace-nowrap">
+                          {trackerStats.avgSalary > 0
+                            ? `CHF ${Math.round(trackerStats.avgSalary).toLocaleString('de-CH')}`
+                            : t.stat_no_data}
+                        </p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">
+                          {trackerStats.salaryCount > 0
+                            ? `${t.stat_based_on} ${trackerStats.salaryCount}`
+                            : ' '}
+                        </p>
                       </div>
                     </div>
                   )}
