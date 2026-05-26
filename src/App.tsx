@@ -1490,6 +1490,23 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
             })()}</span>
           </div>
         )}
+        {app.reminder_at && (() => {
+          const today = new Date(); today.setHours(0, 0, 0, 0);
+          const due = new Date(app.reminder_at);
+          const isOverdue = due < today;
+          const isToday = due.getTime() === today.getTime();
+          const dateStr = due.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
+          return (
+            <div className={`flex items-center gap-1.5 text-[10px] font-medium ${isOverdue ? 'text-red-600' : isToday ? 'text-[#D4AF37]' : 'text-[#004225]'}`}>
+              <Calendar size={10} />
+              <span className="truncate">
+                {isOverdue ? `${t.tracker_reminder_short} ${dateStr} (${t.tracker_reminder_overdue})`
+                  : isToday ? t.tracker_reminder_due
+                  : `${t.tracker_reminder_short} ${dateStr}`}
+              </span>
+            </div>
+          );
+        })()}
         {app.notes && (
           <div className="flex items-center gap-1.5 text-[10px] text-[#9A9A94] italic">
             <FileText size={10} />
@@ -1749,7 +1766,7 @@ function StellifyApp() {
     useSensor(KeyboardSensor),
   );
   const [editingApp, setEditingApp] = useState<any | null>(null);
-  const [newApp, setNewApp] = useState({ company: '', position: '', status: 'Applied' as any, location: '', salary: '', notes: '' });
+  const [newApp, setNewApp] = useState({ company: '', position: '', status: 'Applied' as any, location: '', salary: '', notes: '', reminder_at: '' });
   const [trackerSearch, setTrackerSearch] = useState('');
   const [trackerView, setTrackerView] = useState<'kanban' | 'table'>('kanban');
   const [showArchived, setShowArchived] = useState(false);
@@ -3184,7 +3201,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     try {
       await addDoc(collection(db, 'applications'), { ...newApp, user_id: user.id, created_at: new Date().toISOString() });
       setIsAddingApp(false);
-      setNewApp({ company: '', position: '', status: 'Applied', location: '', salary: '', notes: '' });
+      setNewApp({ company: '', position: '', status: 'Applied', location: '', salary: '', notes: '', reminder_at: '' });
       showToast(language === 'FR' ? 'Candidature ajoutée' : language === 'IT' ? 'Candidatura aggiunta' : language === 'EN' ? 'Application added' : 'Bewerbung hinzugefügt', 'success');
     } catch (e: any) {
       handleDbError(e, 'db', `applications`);
@@ -3231,6 +3248,50 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       handleDbError(e, 'db', `applications/${appId}`);
       showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
     }
+  };
+
+  const exportApplicationsCsv = () => {
+    const headers = [
+      t.tracker_company,
+      t.tracker_position,
+      t.tracker_col_status,
+      t.tracker_location,
+      t.tracker_salary,
+      t.tracker_reminder,
+      t.tracker_notes,
+      t.tracker_col_updated,
+      'Archiviert',
+    ];
+    const statusLabel = (s: string) => s === 'Wishlist' ? t.tracker_wishlist
+      : s === 'Applied' ? t.tracker_applied
+      : s === 'Interview' ? t.tracker_interview
+      : s === 'Offer' ? t.tracker_offer
+      : t.tracker_rejected;
+    const escape = (v: any) => {
+      const s = v == null ? '' : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = applications.map((a) => [
+      a.company || '',
+      a.position || '',
+      statusLabel(a.status || ''),
+      a.location || '',
+      a.salary || '',
+      a.reminder_at || '',
+      a.notes || '',
+      a.created_at ? new Date(a.created_at).toLocaleDateString('de-CH') : '',
+      a.archived ? 'Ja' : 'Nein',
+    ].map(escape).join(','));
+    const csv = '﻿' + [headers.map(escape).join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bewerbungen-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const setApplicationArchived = async (appId: string, archived: boolean) => {
@@ -4824,6 +4885,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_rate: "Quote",
       stat_based_on: "von",
       stat_no_data: "—",
+      tracker_reminder: "Nachfassen am",
+      tracker_reminder_due: "Heute fällig",
+      tracker_reminder_overdue: "überfällig",
+      tracker_reminder_short: "Nachfassen",
+      tracker_export_csv: "CSV-Export",
       quick_tools: "Quick Tools",
       all_tools: "Alle Tools",
       recent_docs: "Deine letzten Dokumente",
@@ -5407,6 +5473,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_rate: "Taux",
       stat_based_on: "sur",
       stat_no_data: "—",
+      tracker_reminder: "Relance le",
+      tracker_reminder_due: "À faire aujourd'hui",
+      tracker_reminder_overdue: "en retard",
+      tracker_reminder_short: "Relance",
+      tracker_export_csv: "Export CSV",
       quick_tools: "Outils rapides",
       all_tools: "Tous les outils",
       recent_docs: "Vos derniers documents",
@@ -5884,6 +5955,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_rate: "Tasso",
       stat_based_on: "su",
       stat_no_data: "—",
+      tracker_reminder: "Ricontatta il",
+      tracker_reminder_due: "Da fare oggi",
+      tracker_reminder_overdue: "scaduto",
+      tracker_reminder_short: "Ricontatta",
+      tracker_export_csv: "Esporta CSV",
       quick_tools: "Strumenti rapidi",
       all_tools: "Tutti gli strumenti",
       recent_docs: "I tuoi ultimi documenti",
@@ -6361,6 +6437,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_rate: "rate",
       stat_based_on: "of",
       stat_no_data: "—",
+      tracker_reminder: "Follow up on",
+      tracker_reminder_due: "Due today",
+      tracker_reminder_overdue: "overdue",
+      tracker_reminder_short: "Follow-up",
+      tracker_export_csv: "Export CSV",
       quick_tools: "Quick Tools",
       all_tools: "All Tools",
       recent_docs: "Your Recent Documents",
@@ -7422,6 +7503,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <span className="font-mono text-[9px] opacity-70">({archivedCount})</span>
                           </button>
                         )}
+                        <button
+                          onClick={exportApplicationsCsv}
+                          title={t.tracker_export_csv}
+                          className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border bg-white dark:bg-[#2A2A26] text-[#5C5C58] dark:text-[#9A9A94] border-black/10 dark:border-white/10 hover:bg-black/5 transition-all"
+                        >
+                          <Download size={12} />
+                          <span className="hidden sm:inline">{t.tracker_export_csv}</span>
+                        </button>
                       </div>
                     </div>
                   )}
@@ -7522,6 +7611,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             placeholder={t.tracker_salary_ph}
                           />
                         </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_reminder}</label>
+                          <input
+                            type="date"
+                            value={newApp.reminder_at}
+                            onChange={(e) => setNewApp({...newApp, reminder_at: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
@@ -7605,6 +7703,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             type="text"
                             value={editingApp.salary}
                             onChange={(e) => setEditingApp({...editingApp, salary: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_reminder}</label>
+                          <input
+                            type="date"
+                            value={editingApp.reminder_at || ''}
+                            onChange={(e) => setEditingApp({...editingApp, reminder_at: e.target.value})}
                             className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
                           />
                         </div>
