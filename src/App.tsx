@@ -7349,11 +7349,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </motion.div>
                 )}
 
-                {import.meta.env.DEV && user?.email === 'weare2bc@gmail.com' && (
+                {user?.email === 'weare2bc@gmail.com' && (
                   <div className="p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
                     <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
                       <Shield size={12} />
-                      Developer Test Tools
+                      Admin Tools
                     </div>
                     <div className="flex flex-wrap gap-3">
                       <button
@@ -7378,7 +7378,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       >
                         Reset to Free
                       </button>
-                      <button 
+                      <button
+                        onClick={async () => {
+                          try {
+                            const res = await fetch('/api/email/test', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ to: user.email }),
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              showToast(`Test-Mail via ${data.provider} an ${data.sentTo} verschickt`, 'success');
+                            } else {
+                              showToast(`Fehler: ${data.error || res.statusText}`, 'error');
+                            }
+                          } catch (e: any) {
+                            showToast(`Netzwerkfehler: ${e?.message || 'unbekannt'}`, 'error');
+                          }
+                        }}
+                        className="px-4 py-2 border border-[#004225] text-[#004225] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/10 transition-all flex items-center gap-2"
+                      >
+                        <Mail size={12} />
+                        Send Test Email
+                      </button>
+                      <button
                         onClick={() => {
                           setToolHistory([]);
                           setMessages([]);
