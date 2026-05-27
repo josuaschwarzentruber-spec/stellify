@@ -7381,16 +7381,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <button
                         onClick={async () => {
                           try {
-                            const res = await fetch('/api/email/test', {
+                            const res = await authFetch('/api/send-test-email', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ to: user.email }),
                             });
-                            const data = await res.json();
-                            if (res.ok) {
-                              showToast(`Test-Mail via ${data.provider} an ${data.sentTo} verschickt`, 'success');
+                            const text = await res.text();
+                            let data: any = null;
+                            try { data = JSON.parse(text); } catch { /* not JSON */ }
+                            if (res.ok && data?.success !== false) {
+                              const provider = data?.provider || data?.via || 'mail';
+                              showToast(`Test-Mail via ${provider} an ${user.email} verschickt`, 'success');
                             } else {
-                              showToast(`Fehler: ${data.error || res.statusText}`, 'error');
+                              const msg = data?.error || data?.message || text.slice(0, 120) || res.statusText;
+                              showToast(`Fehler (${res.status}): ${msg}`, 'error');
                             }
                           } catch (e: any) {
                             showToast(`Netzwerkfehler: ${e?.message || 'unbekannt'}`, 'error');
