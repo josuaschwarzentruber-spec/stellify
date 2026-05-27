@@ -7384,7 +7384,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             const res = await authFetch('/api/send-test-email', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ to: user.email }),
+                              body: JSON.stringify({ to: user.email, language }),
                             });
                             const text = await res.text();
                             let data: any = null;

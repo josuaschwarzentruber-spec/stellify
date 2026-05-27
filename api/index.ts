@@ -62,7 +62,7 @@ function normaliseRole(planId: string): string {
 function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string) {
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
   // Hosted brand image (Gmail / Outlook reliably render <img>, inline SVG is filtered)
-  const brandImage = `<img src="${siteUrl}/email-brand.svg" alt="Stellify" width="160" height="40" style="display:block;border:0;outline:none;text-decoration:none;height:40px;width:160px;"/>`;
+  const brandImage = `<img src="${siteUrl}/email-brand.svg?v=2" alt="Stellify" width="160" height="40" style="display:block;border:0;outline:none;text-decoration:none;height:40px;width:160px;"/>`;
   return `<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -1071,22 +1071,54 @@ app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
 });
 
 // ── Test Email ────────────────────────────────────────────────────────────────
-async function handleTestEmail(to: string, res: any) {
+const TEST_EMAIL_COPY: Record<string, { subject: string; title: string; lines: string[]; cta: string; signoff: string }> = {
+  DE: {
+    subject: 'Stellify – Test-E-Mail',
+    title: 'Test-E-Mail',
+    lines: ['Hallo,', 'dies ist eine Test-E-Mail von Stellify, um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.'],
+    cta: 'Zur Website',
+    signoff: 'Das Stellify-Team',
+  },
+  FR: {
+    subject: 'Stellify – E-mail de test',
+    title: 'E-mail de test',
+    lines: ['Bonjour,', 'ceci est un e-mail de test de Stellify pour confirmer que l\'envoi d\'e-mails est correctement configuré.'],
+    cta: 'Vers le site',
+    signoff: 'L\'équipe Stellify',
+  },
+  IT: {
+    subject: 'Stellify – Email di test',
+    title: 'Email di test',
+    lines: ['Ciao,', 'questa è un\'email di test da Stellify per confermare che l\'invio di email è configurato correttamente.'],
+    cta: 'Vai al sito',
+    signoff: 'Il team Stellify',
+  },
+  EN: {
+    subject: 'Stellify – Test email',
+    title: 'Test email',
+    lines: ['Hello,', 'this is a test email from Stellify to confirm that email delivery is correctly configured.'],
+    cta: 'Open website',
+    signoff: 'The Stellify team',
+  },
+};
+
+async function handleTestEmail(to: string, language: string, res: any) {
   if (!to) return res.status(400).json({ error: 'Missing "to" address' });
+  const copy = TEST_EMAIL_COPY[language] || TEST_EMAIL_COPY['DE'];
   try {
     const ok = await sendEmail({
       to,
-      subject: 'Stellify, Test-E-Mail',
+      subject: copy.subject,
       html: buildEmailHtml(
-        'Test-E-Mail',
-        ['Hallo,', 'dies ist eine Test-E-Mail von Stellify, um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.'],
-        'Zur Website',
+        copy.title,
+        copy.lines,
+        copy.cta,
         process.env.SITE_URL || 'https://stellify.ch'
       ),
-      text: 'Hallo,\n\ndies ist eine Test-E-Mail von Stellify, um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.\n\nDas Stellify-Team',
+      text: `${copy.lines.join('\n\n')}\n\n${copy.signoff}`,
     });
     if (!ok) return res.status(500).json({ error: 'No email provider configured' });
-    res.json({ ok: true, sentTo: to, provider: process.env.RESEND_API_KEY ? 'resend' : 'gmail' });
+    res.json({ ok: true, sentTo: to, provider: process.env.RESEND_API_KEY ? 'resend' : 'gmail', language });
   } catch (err: any) {
     console.error('[EMAIL] Test email failed:', err.message);
     res.status(500).json({ error: err.message });
@@ -1096,12 +1128,14 @@ app.get("/api/send-test-email", async (req, res) => {
   const secret = process.env.ADMIN_SECRET;
   if (!secret || req.query.secret !== secret) return res.status(401).json({ error: 'Unauthorized' });
   const to = (req.query.to as string) || process.env.EMAIL_USER || '';
-  await handleTestEmail(to, res);
+  const lang = ((req.query.language as string) || 'DE').toUpperCase();
+  await handleTestEmail(to, lang, res);
 });
 app.post("/api/send-test-email", emailLimiter, requireAuth, async (req, res) => {
   const emailUser = process.env.EMAIL_USER;
   const to = req.body?.to || emailUser || '';
-  await handleTestEmail(to, res);
+  const lang = (req.body?.language || 'DE').toString().toUpperCase();
+  await handleTestEmail(to, lang, res);
 });
 
 // ── Health ────────────────────────────────────────────────────────────────────
