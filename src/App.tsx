@@ -7370,6 +7370,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <button
                         onClick={async () => {
                           try {
+                            await updateDoc(doc(db, 'users', user.id), { role: 'unlimited' });
+                            setMessages(prev => [...prev, { role: 'ai', content: 'Test-Upgrade: Du bist jetzt UNLIMITED-Nutzer! 🚀' }]);
+                          } catch (e) { console.error(e); }
+                        }}
+                        className="px-4 py-2 bg-[#6FCF97] text-[#004225] text-[10px] font-bold uppercase tracking-widest hover:bg-[#5BBE85] transition-all"
+                      >
+                        Set Unlimited Role
+                      </button>
+                      <button
+                        onClick={async () => {
+                          try {
                             await updateDoc(doc(db, 'users', user.id), { role: 'client' });
                             setMessages(prev => [...prev, { role: 'ai', content: 'Test-Downgrade: Du bist wieder FREE-Nutzer.' }]);
                           } catch (e) { console.error(e); }
