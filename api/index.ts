@@ -199,41 +199,145 @@ async function sendEmail(opts: { to: string; subject: string; html: string; text
   }
 }
 
-async function sendRenewalReminder(to: string, firstName: string, planType: 'monthly' | 'annual', daysLeft: number) {
-  const isAnnual = planType === 'annual';
-  const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
+type Lang = 'DE' | 'FR' | 'IT' | 'EN';
+const RENEWAL_COPY: Record<Lang, {
+  upcoming: (name: string, days: number, cycle: 'monthly' | 'annual') => { subject: string; title: string; lines: string[]; cta: string };
+  expired:  (name: string, cycle: 'monthly' | 'annual') => { subject: string; title: string; lines: string[]; cta: string };
+  signoff: string;
+}> = {
+  DE: {
+    upcoming: (n, d, c) => {
+      const cycle = c === 'annual' ? 'Jahres' : 'Monats';
+      const next = c === 'annual' ? 'Jahr' : 'Monat';
+      return {
+        subject: `Dein Stellify-Abo läuft in ${d} Tag${d === 1 ? '' : 'en'} ab`,
+        title: `Dein ${cycle}sabo läuft bald ab`,
+        lines: [
+          `Hallo ${n},`,
+          `dein ${cycle}s-Abonnement bei Stellify läuft in <strong>${d} Tag${d === 1 ? '' : 'en'}</strong> ab. Danach wird dein Konto automatisch auf den kostenlosen Plan umgestellt, ohne dass du etwas tun musst.`,
+          `Möchtest du weiterhin alle Funktionen nutzen? Verlängere jetzt dein Abonnement und dein Zugang verlängert sich nahtlos um einen weiteren ${next}.`,
+        ],
+        cta: 'Jetzt verlängern',
+      };
+    },
+    expired: (n, c) => {
+      const cycle = c === 'annual' ? 'Jahres' : 'Monats';
+      return {
+        subject: 'Dein Stellify-Abo ist abgelaufen',
+        title: 'Dein Abonnement ist abgelaufen',
+        lines: [
+          `Hallo ${n},`,
+          `dein ${cycle}s-Abonnement bei Stellify ist abgelaufen. Dein Konto wurde automatisch auf den kostenlosen Plan umgestellt.`,
+          `Du kannst jederzeit ein neues Abonnement abschliessen und sofort wieder vollen Zugriff auf alle Funktionen erhalten.`,
+        ],
+        cta: 'Neues Abo abschliessen',
+      };
+    },
+    signoff: 'Das Stellify-Team',
+  },
+  FR: {
+    upcoming: (n, d, c) => {
+      const cycle = c === 'annual' ? 'annuel' : 'mensuel';
+      const next  = c === 'annual' ? 'an' : 'mois';
+      return {
+        subject: `Ton abonnement Stellify expire dans ${d} jour${d === 1 ? '' : 's'}`,
+        title: `Ton abonnement ${cycle} expire bientôt`,
+        lines: [
+          `Bonjour ${n},`,
+          `ton abonnement ${cycle} Stellify expire dans <strong>${d} jour${d === 1 ? '' : 's'}</strong>. Ton compte passera automatiquement au plan gratuit, sans action de ta part.`,
+          `Tu souhaites garder toutes les fonctionnalités? Renouvelle maintenant et ton accès se prolonge d'un ${next} supplémentaire.`,
+        ],
+        cta: 'Renouveler maintenant',
+      };
+    },
+    expired: (n, c) => {
+      const cycle = c === 'annual' ? 'annuel' : 'mensuel';
+      return {
+        subject: 'Ton abonnement Stellify a expiré',
+        title: 'Ton abonnement a expiré',
+        lines: [
+          `Bonjour ${n},`,
+          `ton abonnement ${cycle} Stellify a expiré. Ton compte est passé automatiquement au plan gratuit.`,
+          `Tu peux souscrire à un nouvel abonnement à tout moment et retrouver immédiatement l'accès complet.`,
+        ],
+        cta: 'Reprendre un abonnement',
+      };
+    },
+    signoff: 'L\'équipe Stellify',
+  },
+  IT: {
+    upcoming: (n, d, c) => {
+      const cycle = c === 'annual' ? 'annuale' : 'mensile';
+      const next  = c === 'annual' ? 'anno' : 'mese';
+      return {
+        subject: `Il tuo abbonamento Stellify scade tra ${d} giorn${d === 1 ? 'o' : 'i'}`,
+        title: `Il tuo abbonamento ${cycle} sta per scadere`,
+        lines: [
+          `Ciao ${n},`,
+          `il tuo abbonamento ${cycle} a Stellify scade tra <strong>${d} giorn${d === 1 ? 'o' : 'i'}</strong>. Il tuo account passerà automaticamente al piano gratuito, senza alcuna azione necessaria.`,
+          `Vuoi continuare a usare tutte le funzioni? Rinnova ora e l'accesso si estende di un altro ${next}.`,
+        ],
+        cta: 'Rinnova ora',
+      };
+    },
+    expired: (n, c) => {
+      const cycle = c === 'annual' ? 'annuale' : 'mensile';
+      return {
+        subject: 'Il tuo abbonamento Stellify è scaduto',
+        title: 'Il tuo abbonamento è scaduto',
+        lines: [
+          `Ciao ${n},`,
+          `il tuo abbonamento ${cycle} a Stellify è scaduto. Il tuo account è passato automaticamente al piano gratuito.`,
+          `Puoi sottoscrivere un nuovo abbonamento in qualsiasi momento e riavere subito l'accesso completo.`,
+        ],
+        cta: 'Sottoscrivi di nuovo',
+      };
+    },
+    signoff: 'Il team Stellify',
+  },
+  EN: {
+    upcoming: (n, d, c) => {
+      const cycle = c === 'annual' ? 'annual' : 'monthly';
+      const next  = c === 'annual' ? 'year' : 'month';
+      return {
+        subject: `Your Stellify subscription expires in ${d} day${d === 1 ? '' : 's'}`,
+        title: `Your ${cycle} plan is about to expire`,
+        lines: [
+          `Hello ${n},`,
+          `your ${cycle} Stellify subscription expires in <strong>${d} day${d === 1 ? '' : 's'}</strong>. Your account will automatically switch to the free plan — no action needed from you.`,
+          `Want to keep all features? Renew now and your access extends seamlessly for another ${next}.`,
+        ],
+        cta: 'Renew now',
+      };
+    },
+    expired: (n, c) => {
+      const cycle = c === 'annual' ? 'annual' : 'monthly';
+      return {
+        subject: 'Your Stellify subscription has expired',
+        title: 'Your subscription has expired',
+        lines: [
+          `Hello ${n},`,
+          `your ${cycle} Stellify subscription has expired. Your account was automatically switched to the free plan.`,
+          `You can start a new subscription anytime and regain full access instantly.`,
+        ],
+        cta: 'Start new subscription',
+      };
+    },
+    signoff: 'The Stellify team',
+  },
+};
+
+async function sendRenewalReminder(to: string, firstName: string, planType: 'monthly' | 'annual', daysLeft: number, language: string = 'DE') {
+  const lang = ((language || 'DE').toUpperCase() as Lang);
+  const copy = RENEWAL_COPY[lang] || RENEWAL_COPY.DE;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
-
-  let subject: string;
-  let title: string;
-  let bodyLines: string[];
-  let ctaText: string;
-
-  if (daysLeft > 0) {
-    subject = `Dein Stellify-Abo läuft in ${daysLeft} Tag${daysLeft === 1 ? '' : 'en'} ab`;
-    title = `Dein ${cycleLabel}sabo läuft bald ab`;
-    bodyLines = [
-      `Hallo ${firstName},`,
-      `dein ${cycleLabel}s-Abonnement bei Stellify läuft in <strong>${daysLeft} Tag${daysLeft === 1 ? '' : 'en'}</strong> ab. Danach wird dein Konto automatisch auf den kostenlosen Plan umgestellt, ohne dass du etwas tun musst.`,
-      `Möchtest du weiterhin alle Funktionen nutzen? Verlängere jetzt dein Abonnement und dein Zugang verlängert sich nahtlos um einen weiteren ${isAnnual ? 'Jahr' : 'Monat'}.`,
-    ];
-    ctaText = 'Jetzt verlängern';
-  } else {
-    subject = 'Dein Stellify-Abo ist abgelaufen';
-    title = 'Dein Abonnement ist abgelaufen';
-    bodyLines = [
-      `Hallo ${firstName},`,
-      `dein ${cycleLabel}s-Abonnement bei Stellify ist abgelaufen. Dein Konto wurde automatisch auf den kostenlosen Plan umgestellt.`,
-      `Du kannst jederzeit ein neues Abonnement abschliessen und sofort wieder vollen Zugriff auf alle Funktionen erhalten.`,
-    ];
-    ctaText = 'Neues Abo abschliessen';
-  }
+  const c = daysLeft > 0 ? copy.upcoming(firstName, daysLeft, planType) : copy.expired(firstName, planType);
 
   await sendEmail({
     to,
-    subject,
-    html: buildEmailHtml(title, bodyLines, ctaText, `${siteUrl}/?view=pricing`),
-    text: bodyLines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${ctaText}: ${siteUrl}/?view=pricing\n\nDas Stellify-Team`,
+    subject: c.subject,
+    html: buildEmailHtml(c.title, c.lines, c.cta, `${siteUrl}/?view=pricing`, lang),
+    text: c.lines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${c.cta}: ${siteUrl}/?view=pricing\n\n${copy.signoff}`,
   });
 }
 
@@ -346,21 +450,62 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
         if (existingUser?.email) {
           const planLabel = planId === 'ultimate' ? 'Ultimate' : 'Pro';
-          const cycleLabel = isAnnual ? 'Jahres' : 'Monats';
+          const userLang = ((existingUser?.language || 'DE') as string).toUpperCase() as Lang;
+          const localeMap: Record<Lang, string> = { DE: 'de-CH', FR: 'fr-CH', IT: 'it-CH', EN: 'en-GB' };
+          const dateStr = expiresAt.toLocaleDateString(localeMap[userLang] || 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+          const firstName = existingUser.first_name || (userLang === 'DE' ? 'Nutzer' : userLang === 'FR' ? 'utilisateur' : userLang === 'IT' ? 'utente' : 'there');
+          const planWelcome: Record<Lang, { subject: string; title: string; lines: string[]; cta: string; signoff: string }> = {
+            DE: {
+              subject: `Willkommen im ${planLabel}-Plan, dein Stellify-Abo ist aktiv`,
+              title:   `Willkommen im ${planLabel}-Plan`,
+              lines: [
+                `Hallo ${firstName},`,
+                `vielen Dank, dein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement ist jetzt aktiv.`,
+                `Dein Abo ist gültig bis zum <strong>${dateStr}</strong>.`,
+              ],
+              cta: 'Zum Dashboard',
+              signoff: 'Das Stellify-Team',
+            },
+            FR: {
+              subject: `Bienvenue dans le plan ${planLabel}, ton abonnement Stellify est actif`,
+              title:   `Bienvenue dans le plan ${planLabel}`,
+              lines: [
+                `Bonjour ${firstName},`,
+                `merci, ton abonnement ${isAnnual ? 'annuel' : 'mensuel'} est maintenant actif.`,
+                `Ton abonnement est valable jusqu'au <strong>${dateStr}</strong>.`,
+              ],
+              cta: 'Vers le tableau de bord',
+              signoff: 'L\'équipe Stellify',
+            },
+            IT: {
+              subject: `Benvenuto nel piano ${planLabel}, il tuo abbonamento Stellify è attivo`,
+              title:   `Benvenuto nel piano ${planLabel}`,
+              lines: [
+                `Ciao ${firstName},`,
+                `grazie, il tuo abbonamento ${isAnnual ? 'annuale' : 'mensile'} è ora attivo.`,
+                `Il tuo abbonamento è valido fino al <strong>${dateStr}</strong>.`,
+              ],
+              cta: 'Vai alla dashboard',
+              signoff: 'Il team Stellify',
+            },
+            EN: {
+              subject: `Welcome to the ${planLabel} plan — your Stellify subscription is active`,
+              title:   `Welcome to the ${planLabel} plan`,
+              lines: [
+                `Hello ${firstName},`,
+                `thanks, your ${isAnnual ? 'annual' : 'monthly'} subscription is now active.`,
+                `Your subscription is valid until <strong>${dateStr}</strong>.`,
+              ],
+              cta: 'Open dashboard',
+              signoff: 'The Stellify team',
+            },
+          };
+          const copy = planWelcome[userLang] || planWelcome.DE;
           await sendEmail({
             to: existingUser.email,
-            subject: `Willkommen im ${planLabel}-Plan, dein Stellify-Abo ist aktiv`,
-            html: buildEmailHtml(
-              `Willkommen im ${planLabel}-Plan`,
-              [
-                `Hallo ${existingUser.first_name || 'Nutzer'},`,
-                `vielen Dank, dein ${cycleLabel}s-Abonnement ist jetzt aktiv.`,
-                `Dein Abo ist gültig bis zum <strong>${expiresAt.toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>.`,
-              ],
-              'Zum Dashboard',
-              (process.env.SITE_URL || 'https://stellify.ch') + '/'
-            ),
-            text: `Hallo ${existingUser.first_name || 'Nutzer'},\n\nvielen Dank für dein ${cycleLabel}-Abonnement!\n\nDas Stellify-Team`,
+            subject: copy.subject,
+            html: buildEmailHtml(copy.title, copy.lines, copy.cta, (process.env.SITE_URL || 'https://stellify.ch') + '/', userLang),
+            text: `${copy.lines.join('\n\n').replace(/<[^>]+>/g, '')}\n\n${copy.signoff}`,
           }).catch(console.error);
         }
       } catch (err) {
@@ -381,7 +526,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
         console.log(`[WEBHOOK] Downgraded ${u.id} to free after subscription deletion`);
         if (u.email) {
           const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
-          await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, 0).catch(console.error);
+          await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, 0, u.language || 'DE').catch(console.error);
         }
       }
     } catch (err) {
@@ -404,7 +549,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
             const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
             const threshold = planType === 'annual' ? 14 : 3;
             if (daysLeft <= threshold) {
-              await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, daysLeft).catch(console.error);
+              await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, daysLeft, u.language || 'DE').catch(console.error);
             }
           }
         }
@@ -1410,13 +1555,23 @@ app.get("/api/auth/linkedin/callback", async (req, res) => {
 
 // ── HR Job Application Email ─────────────────────────────────────────────────
 app.post("/api/send-job-email", emailLimiter, requireAuth, async (req, res) => {
-  const { to, subject, body, fromName } = req.body;
+  const { to, subject, body, fromName, language } = req.body;
   if (!to || !subject || !body) return res.status(400).json({ error: 'to, subject und body sind erforderlich' });
 
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-  if (!emailUser || !emailPass) return res.status(500).json({ error: 'E-Mail nicht konfiguriert' });
-
+  const lang = ((language || 'DE') as string).toUpperCase() as Lang;
+  const jobCopy: Record<Lang, { badge: string; tagline: string; defaultFromName: string; htmlLang: string }> = {
+    DE: { badge: 'Bewerbung', tagline: 'Erstellt mit',                defaultFromName: 'Stellify Bewerbung',   htmlLang: 'de' },
+    FR: { badge: 'Candidature', tagline: 'Créé avec',                  defaultFromName: 'Stellify Candidature',  htmlLang: 'fr' },
+    IT: { badge: 'Candidatura', tagline: 'Creato con',                 defaultFromName: 'Stellify Candidatura',  htmlLang: 'it' },
+    EN: { badge: 'Application', tagline: 'Created with',               defaultFromName: 'Stellify Application',  htmlLang: 'en' },
+  };
+  const taglineSuffix: Record<Lang, string> = {
+    DE: '– Schweizer KI-Karriere-Plattform',
+    FR: '– la plateforme suisse de carrière par IA',
+    IT: '– la piattaforma svizzera di carriera AI',
+    EN: '– the Swiss AI career platform',
+  };
+  const copy = jobCopy[lang] || jobCopy.DE;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
   const htmlBody = body
     .split('\n')
@@ -1424,21 +1579,35 @@ app.post("/api/send-job-email", emailLimiter, requireAuth, async (req, res) => {
     .join('');
 
   const html = `<!DOCTYPE html>
-<html lang="de">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#F5F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F5F4F0;padding:40px 0;">
+<html lang="${copy.htmlLang}">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .jm-bg     { background:#1A1A18 !important; }
+      .jm-card   { background:#23231F !important; border-color:#3A3A35 !important; }
+      .jm-text   { color:#FAFAF8 !important; }
+      .jm-muted  { color:#9A9A94 !important; }
+      .jm-footer { border-color:#3A3A35 !important; }
+      .jm-link   { color:#6FCF97 !important; }
+    }
+  </style>
+</head>
+<body class="jm-bg" style="margin:0;padding:0;background:#F5F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" class="jm-bg" style="background:#F5F4F0;padding:40px 0;">
     <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:600px;width:100%;">
+      <table width="600" cellpadding="0" cellspacing="0" class="jm-card" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:600px;width:100%;">
         <tr><td style="background:#004225;padding:24px 40px;">
           <span style="font-family:Georgia,serif;font-size:22px;color:#FDFCFB;letter-spacing:-0.5px;">Stell<span style="color:#6FCF97;">ify</span></span>
-          <span style="font-size:11px;color:#6FCF97;margin-left:16px;font-family:Helvetica,Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;">Bewerbung</span>
+          <span style="font-size:11px;color:#6FCF97;margin-left:16px;font-family:Helvetica,Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;">${copy.badge}</span>
         </td></tr>
-        <tr><td style="padding:40px 40px 32px;">
+        <tr><td class="jm-text" style="padding:40px 40px 32px;color:#1A1A18;">
           ${htmlBody}
         </td></tr>
-        <tr><td style="padding:16px 40px 28px;border-top:1px solid #E8E6E0;">
-          <p style="margin:0;font-size:11px;color:#9A9A94;">Erstellt mit <a href="${siteUrl}" style="color:#004225;text-decoration:none;">Stellify</a> – Schweizer KI-Karriere-Plattform</p>
+        <tr><td class="jm-footer" style="padding:16px 40px 28px;border-top:1px solid #E8E6E0;">
+          <p class="jm-muted" style="margin:0;font-size:11px;color:#9A9A94;">${copy.tagline} <a href="${siteUrl}" class="jm-link" style="color:#004225;text-decoration:none;">Stellify</a> ${taglineSuffix[lang]}</p>
         </td></tr>
       </table>
     </td></tr>
@@ -1447,16 +1616,15 @@ app.post("/api/send-job-email", emailLimiter, requireAuth, async (req, res) => {
 </html>`;
 
   try {
-    const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
-    await transporter.sendMail({
-      from: `"${fromName || 'Stellify Bewerbung'}" <${emailUser}>`,
-      replyTo: fromName ? undefined : emailUser,
+    const fromAddress = process.env.EMAIL_FROM || process.env.EMAIL_USER || 'noreply@stellify.ch';
+    const ok = await sendEmail({
       to,
       subject,
-      text: body,
       html,
+      text: body,
     });
-    console.log(`[JOB EMAIL] Sent to ${to}`);
+    if (!ok) return res.status(500).json({ error: 'No email provider configured' });
+    console.log(`[JOB EMAIL] Sent to ${to} (from=${fromName || copy.defaultFromName}, via=${fromAddress})`);
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[JOB EMAIL ERROR]', err.message);
