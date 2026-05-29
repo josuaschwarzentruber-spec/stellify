@@ -85,6 +85,7 @@ const EMAIL_SHELL_COPY: Record<string, { contact: string; disclaimer: string; ht
 
 function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string, language: string = 'DE') {
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  const supportAddr = process.env.EMAIL_REPLY_TO || REPLY_TO_DEFAULT;
   const lang = (language || 'DE').toUpperCase();
   const shell = EMAIL_SHELL_COPY[lang] || EMAIL_SHELL_COPY.DE;
   // Hosted brand image (Gmail / Outlook reliably render <img>, inline SVG is filtered)
@@ -128,7 +129,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
             <div style="margin:32px 0 8px;">
               <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
             </div>
-            <p class="email-muted" style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">${shell.contact} <a href="mailto:support.stellify@gmail.com" class="email-link" style="color:#004225;">support.stellify@gmail.com</a></p>
+            <p class="email-muted" style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">${shell.contact} <a href="mailto:${supportAddr}" class="email-link" style="color:#004225;">${supportAddr}</a></p>
           </td>
         </tr>
         <!-- Footer -->
