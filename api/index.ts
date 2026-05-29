@@ -146,11 +146,14 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
 }
 
 // ── Unified email sender — Resend preferred, Gmail fallback ──────────────────
-// RESEND_API_KEY (preferred) + EMAIL_FROM (e.g. "Stellify <noreply@stellify.ch>")
+// RESEND_API_KEY (preferred) + EMAIL_FROM (default "Stellify <noreply@stellify.ch>")
+// EMAIL_REPLY_TO (default support.stellify@gmail.com) — where replies should land.
 // Falls back to nodemailer + EMAIL_USER / EMAIL_PASS for legacy Gmail setups.
+const REPLY_TO_DEFAULT = 'support.stellify@gmail.com';
 let resendClient: Resend | null = null;
-async function sendEmail(opts: { to: string; subject: string; html: string; text?: string }) {
+async function sendEmail(opts: { to: string; subject: string; html: string; text?: string; replyTo?: string }) {
   const resendKey = process.env.RESEND_API_KEY;
+  const replyTo = opts.replyTo || process.env.EMAIL_REPLY_TO || REPLY_TO_DEFAULT;
   if (resendKey) {
     if (!resendClient) resendClient = new Resend(resendKey);
     const from = process.env.EMAIL_FROM || 'Stellify <noreply@stellify.ch>';
@@ -161,6 +164,7 @@ async function sendEmail(opts: { to: string; subject: string; html: string; text
         subject: opts.subject,
         html: opts.html,
         text: opts.text,
+        replyTo,
       });
       if ((r as any).error) {
         console.error('[EMAIL] Resend error:', (r as any).error);
@@ -186,6 +190,7 @@ async function sendEmail(opts: { to: string; subject: string; html: string; text
     const transporter = nodemailer.createTransport({ service: 'gmail', auth: { user: emailUser, pass: emailPass } });
     await transporter.sendMail({
       from: `"Stellify" <${emailUser}>`,
+      replyTo,
       to: opts.to,
       subject: opts.subject,
       text: opts.text || opts.html.replace(/<[^>]+>/g, ''),
