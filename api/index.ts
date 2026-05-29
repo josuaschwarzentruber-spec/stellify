@@ -59,21 +59,61 @@ function normaliseRole(planId: string): string {
 }
 
 // ── Email Helper ──────────────────────────────────────────────────────────────
-function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string) {
+// ── Email shell (i18n + dark-mode) ────────────────────────────────────────────
+const EMAIL_SHELL_COPY: Record<string, { contact: string; disclaimer: string; htmlLang: string }> = {
+  DE: {
+    contact: 'Bei Fragen erreichst du uns unter',
+    disclaimer: 'Du erhältst diese E-Mail, weil du bei Stellify ein Konto hast.',
+    htmlLang: 'de',
+  },
+  FR: {
+    contact: 'Pour toute question, écris-nous à',
+    disclaimer: 'Tu reçois cet e-mail parce que tu as un compte Stellify.',
+    htmlLang: 'fr',
+  },
+  IT: {
+    contact: 'Per domande, scrivici a',
+    disclaimer: 'Ricevi questa email perché hai un account Stellify.',
+    htmlLang: 'it',
+  },
+  EN: {
+    contact: 'Questions? Reach us at',
+    disclaimer: 'You\'re receiving this email because you have a Stellify account.',
+    htmlLang: 'en',
+  },
+};
+
+function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, ctaUrl: string, language: string = 'DE') {
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  const lang = (language || 'DE').toUpperCase();
+  const shell = EMAIL_SHELL_COPY[lang] || EMAIL_SHELL_COPY.DE;
   // Hosted brand image (Gmail / Outlook reliably render <img>, inline SVG is filtered)
   const brandImage = `<img src="${siteUrl}/email-brand.svg?v=2" alt="Stellify" width="160" height="40" style="display:block;border:0;outline:none;text-decoration:none;height:40px;width:160px;"/>`;
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${shell.htmlLang}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>${title}</title>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      .email-bg     { background:#1A1A18 !important; }
+      .email-card   { background:#23231F !important; border-color:#3A3A35 !important; }
+      .email-title  { color:#FAFAF8 !important; }
+      .email-body   { color:#C8C8C2 !important; }
+      .email-muted  { color:#9A9A94 !important; }
+      .email-link   { color:#6FCF97 !important; }
+      .email-footer { border-color:#3A3A35 !important; }
+      .email-cta    { background:#6FCF97 !important; color:#0F2A1B !important; }
+    }
+  </style>
 </head>
-<body style="margin:0;padding:0;background:#F5F4F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1A1A18;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#F5F4F0;padding:32px 16px;">
+<body class="email-bg" style="margin:0;padding:0;background:#F5F4F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Helvetica,Arial,sans-serif;color:#1A1A18;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="email-bg" style="background:#F5F4F0;padding:32px 16px;">
     <tr><td align="center">
-      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:560px;width:100%;">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" class="email-card" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:560px;width:100%;">
         <!-- Header -->
         <tr>
           <td style="background:#004225;padding:24px 32px;">
@@ -83,22 +123,22 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
         <!-- Body -->
         <tr>
           <td style="padding:36px 32px 28px;">
-            <h1 style="margin:0 0 20px;font-size:22px;font-weight:600;color:#1A1A18;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
-            ${bodyLines.map(l => `<p style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.65;">${l}</p>`).join('')}
+            <h1 class="email-title" style="margin:0 0 20px;font-size:22px;font-weight:600;color:#1A1A18;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
+            ${bodyLines.map(l => `<p class="email-body" style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.65;">${l}</p>`).join('')}
             <div style="margin:32px 0 8px;">
-              <a href="${ctaUrl}" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
+              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
             </div>
-            <p style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">Bei Fragen erreichst du uns unter <a href="mailto:support.stellify@gmail.com" style="color:#004225;">support.stellify@gmail.com</a></p>
+            <p class="email-muted" style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">${shell.contact} <a href="mailto:support.stellify@gmail.com" class="email-link" style="color:#004225;">support.stellify@gmail.com</a></p>
           </td>
         </tr>
         <!-- Footer -->
         <tr>
-          <td style="padding:20px 32px;border-top:1px solid #E8E6E0;">
-            <p style="margin:0;font-size:11px;color:#9A9A94;line-height:1.6;">© ${new Date().getFullYear()} Stellify · Zug, Schweiz · <a href="https://stellify.ch" style="color:#9A9A94;text-decoration:none;">stellify.ch</a></p>
+          <td class="email-footer" style="padding:20px 32px;border-top:1px solid #E8E6E0;">
+            <p class="email-muted" style="margin:0;font-size:11px;color:#9A9A94;line-height:1.6;">© ${new Date().getFullYear()} Stellify · Zug, Schweiz · <a href="https://stellify.ch" class="email-muted" style="color:#9A9A94;text-decoration:none;">stellify.ch</a></p>
           </td>
         </tr>
       </table>
-      <p style="margin:16px 0 0;font-size:11px;color:#9A9A94;">Du erhältst diese E-Mail, weil du bei Stellify ein Konto hast.</p>
+      <p class="email-muted" style="margin:16px 0 0;font-size:11px;color:#9A9A94;">${shell.disclaimer}</p>
     </td></tr>
   </table>
 </body>
@@ -997,7 +1037,7 @@ app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
     await sendEmail({
       to: email,
       subject: copy.subject,
-      html: buildEmailHtml(copy.title, copy.lines, copy.cta, resetLink),
+      html: buildEmailHtml(copy.title, copy.lines, copy.cta, resetLink, lang),
       text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${copy.cta}: ${resetLink}\n\nDas Stellify-Team`,
     });
     res.json({ ok: true });
@@ -1059,7 +1099,7 @@ app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
     await sendEmail({
       to: email,
       subject: copy.subject,
-      html: buildEmailHtml(copy.title, copy.lines, copy.cta, `${siteUrl}/`),
+      html: buildEmailHtml(copy.title, copy.lines, copy.cta, `${siteUrl}/`, lang),
       text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${copy.cta}: ${siteUrl}/\n\nDas Stellify-Team`,
     });
     res.json({ ok: true });
@@ -1113,7 +1153,8 @@ async function handleTestEmail(to: string, language: string, res: any) {
         copy.title,
         copy.lines,
         copy.cta,
-        process.env.SITE_URL || 'https://stellify.ch'
+        process.env.SITE_URL || 'https://stellify.ch',
+        language
       ),
       text: `${copy.lines.join('\n\n')}\n\n${copy.signoff}`,
     });
