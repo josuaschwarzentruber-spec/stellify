@@ -51,9 +51,6 @@ import {
 } from 'firebase/firestore';
 import { searchData, SearchItem } from './data/searchData';
 import sampleJobs from './data/sampleJobs.json';
-import * as pdfjsLib from 'pdfjs-dist';
-import { jsPDF } from 'jspdf';
-import mammoth from 'mammoth';
 
 import Markdown from 'react-markdown';
 
@@ -67,9 +64,6 @@ declare global {
     stellifyReady?: () => void;
   }
 }
-
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // gemini-2.0-flash: best free-tier quota (1500/day) + still high quality.
 // Avoids the tiny free limits of 2.5-pro/2.5-flash. The backend keeps the
@@ -1721,6 +1715,8 @@ function StellifyApp() {
   // --- HANDLERS ---
   const extractTextFromPDF = async (file: File): Promise<string> => {
     const arrayBuffer = await file.arrayBuffer();
+    const pdfjsLib = await import('pdfjs-dist');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = '';
 
@@ -1738,6 +1734,7 @@ function StellifyApp() {
   const extractTextFromDocx = async (file: File): Promise<string> => {
     const arrayBuffer = await file.arrayBuffer();
     setUploadProgress(50);
+    const { default: mammoth } = await import('mammoth');
     const result = await mammoth.extractRawText({ arrayBuffer });
     setUploadProgress(100);
     return result.value;
@@ -3361,8 +3358,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     }
   };
 
-  const downloadAsPDF = () => {
+  const downloadAsPDF = async () => {
     if (!toolResult || !activeTool) return;
+    const { jsPDF } = await import('jspdf');
     const doc = new jsPDF();
     const margin = 25;
     const pageWidth = doc.internal.pageSize.getWidth();
