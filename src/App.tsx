@@ -355,7 +355,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
 
   const scenes = [
     {
-      chapter: '01 — 05',
+      chapter: '01 / 05',
       tag: isFR ? 'OUVERTURE' : isIT ? 'APERTURA' : isEN ? 'OPENING' : 'ERÖFFNUNG',
       line1: isFR ? 'En Suisse.' : isIT ? 'In Svizzera.' : isEN ? 'In Switzerland.' : 'In der Schweiz.',
       line2: isFR ? 'Chaque mot compte.' : isIT ? 'Ogni parola conta.' : isEN ? 'Every word counts.' : 'Zählt jedes Wort.',
@@ -363,7 +363,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       isCta: false,
     },
     {
-      chapter: '02 — 05',
+      chapter: '02 / 05',
       tag: isFR ? 'VOTRE CV' : isIT ? 'IL TUO CV' : isEN ? 'YOUR CV' : 'DEIN LEBENSLAUF',
       line1: isFR ? 'Ton CV.' : isIT ? 'Il tuo CV.' : isEN ? 'Your CV.' : 'Dein Lebenslauf.',
       line2: isFR ? 'Perfectionné.' : isIT ? 'Perfezionato.' : isEN ? 'Perfected.' : 'Perfektioniert.',
@@ -371,7 +371,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       isCta: false,
     },
     {
-      chapter: '03 — 05',
+      chapter: '03 / 05',
       tag: isFR ? 'L\'ENTRETIEN' : isIT ? 'IL COLLOQUIO' : isEN ? 'THE INTERVIEW' : 'DAS INTERVIEW',
       line1: isFR ? 'L\'entretien.' : isIT ? 'Il colloquio.' : isEN ? 'The interview.' : 'Das Interview.',
       line2: isFR ? 'Maîtrisé.' : isIT ? 'Superato.' : isEN ? 'Mastered.' : 'Gemeistert.',
@@ -379,7 +379,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       isCta: false,
     },
     {
-      chapter: '04 — 05',
+      chapter: '04 / 05',
       tag: 'STELLA AI',
       line1: 'Stella AI.',
       line2: isFR ? 'Ton avantage.' : isIT ? 'Il tuo vantaggio.' : isEN ? 'Your edge.' : 'Dein Vorteil.',
@@ -387,7 +387,7 @@ const PromoSequence = ({ onComplete, t, language }: { onComplete: () => void, t:
       isCta: false,
     },
     {
-      chapter: '05 — 05',
+      chapter: '05 / 05',
       tag: isFR ? 'FIN' : isIT ? 'FINE' : isEN ? 'FIN' : 'ENDE',
       line1: 'Stellify.',
       line2: isFR ? 'Commence maintenant.' : isIT ? 'Inizia ora.' : isEN ? 'Start now.' : 'Jetzt starten.',
@@ -799,7 +799,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookies und lokale Speicherung">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session – Authentifizierung</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session: Authentifizierung</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p><p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv.</p></div>
                 </div>
               </Section>
@@ -854,7 +854,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookies et stockage local">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies nécessaires (toujours actifs)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Session Firebase Auth – authentification</li><li>localStorage : <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies nécessaires (toujours actifs)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Session Firebase Auth : authentification</li><li>localStorage : <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies d'analyse optionnels (avec consentement uniquement)</p><p className="text-xs mt-1">Aucun service d'analyse tiers actuellement actif.</p></div>
                 </div>
               </Section>
@@ -905,7 +905,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookie e memorizzazione locale">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie necessari (sempre attivi)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Sessione Firebase Auth – autenticazione</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie necessari (sempre attivi)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Sessione Firebase Auth: autenticazione</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie analitici opzionali (solo con consenso)</p><p className="text-xs mt-1">Nessun servizio di analisi di terze parti attualmente attivo.</p></div>
                 </div>
               </Section>
@@ -956,7 +956,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="6. Cookies and Local Storage">
                 <div className="mt-3 space-y-3">
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Necessary cookies (always active)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session – authentication</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code> – user preferences</li></ul></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Necessary cookies (always active)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session: authentication</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code>: user preferences</li></ul></div>
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optional analytics cookies (consent required)</p><p className="text-xs mt-1">No third-party analytics services are currently active.</p></div>
                 </div>
               </Section>
@@ -3320,7 +3320,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       setMessages(prev => [
         ...prev,
         userMsg,
-        { role: 'ai', content: language === 'FR' ? 'Pour utiliser Stella, tu dois d\'abord **t\'inscrire gratuitement**. Clique sur "Commencer gratuitement" en haut à droite – ça ne prend que 30 secondes !' : language === 'IT' ? 'Per usare Stella, devi prima **registrarti gratuitamente**. Clicca su "Inizia gratuitamente" in alto a destra – ci vogliono solo 30 secondi!' : language === 'EN' ? 'To use Stella, you must first **register for free**. Click on "Start for free" at the top right – it only takes 30 seconds!' : 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts – es dauert nur 30 Sekunden!' }
+        { role: 'ai', content: language === 'FR' ? 'Pour utiliser Stella, tu dois d\'abord **t\'inscrire gratuitement**. Clique sur "Commencer gratuitement" en haut à droite, ça ne prend que 30 secondes !' : language === 'IT' ? 'Per usare Stella, devi prima **registrarti gratuitamente**. Clicca su "Inizia gratuitamente" in alto a destra, ci vogliono solo 30 secondi!' : language === 'EN' ? 'To use Stella, you must first **register for free**. Click on "Start for free" at the top right, it only takes 30 seconds!' : 'Um Stella zu nutzen, musst du dich zuerst **kostenlos registrieren**. Klicke auf "Kostenlos starten" oben rechts, es dauert nur 30 Sekunden!' }
       ]);
       if (!overrideContent) setInput('');
       setAuthTab('register');
@@ -3400,14 +3400,14 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         BEHAVIOR:
         - Be proactive: Offer the next logical step briefly.
         - Personalize: Use the context of the uploaded CV intensively.
-        - PREMIUM GUIDANCE: When a user asks about advanced features (e.g., unlimited CV analyses, advanced job matching, interview coaching, salary tools, unlimited messages), ALWAYS mention that these are available in the Pro or Ultimate plan on Stellify. Guide them clearly to the pricing/plans section. Example: "This feature is available in the Pro plan — you can upgrade directly in the Stellify pricing section." Adapt to the user's language.
+        - PREMIUM GUIDANCE: When a user asks about advanced features (e.g., unlimited CV analyses, advanced job matching, interview coaching, salary tools, unlimited messages), ALWAYS mention that these are available in the Pro or Ultimate plan on Stellify. Guide them clearly to the pricing/plans section. Example: "This feature is available in the Pro plan, you can upgrade directly in the Stellify pricing section." Adapt to the user's language.
 
         LANGUAGE:
         - Respond in the user's selected language: ${language}.
         - If the language is German, use Swiss High German (no "ß", use "ss").
 
         USER TIER: ${user?.role === 'unlimited' ? 'Unlimited (Highest Priority/Elite)' : user?.role === 'pro' ? 'Pro (Premium)' : 'Gratis (Standard)'}.
-        ${!isPro ? '- FREE USER: This user is on the free plan. When relevant, briefly and elegantly mention the benefits of upgrading to Pro or Ultimate. Do not be pushy — mention it naturally when it adds value.' : ''}
+        ${!isPro ? '- FREE USER: This user is on the free plan. When relevant, briefly and elegantly mention the benefits of upgrading to Pro or Ultimate. Do not be pushy, mention it naturally when it adds value.' : ''}
 
         CONTEXT:
         ${cvContext ? `The candidate has uploaded a CV: ${cvContext}.` : 'The candidate has not yet uploaded a CV. Politely encourage them to do so to receive personalized tips.'}
@@ -3441,10 +3441,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       console.error("Stella Chat Error:", err);
       const isOverloaded = err.message?.includes('overloaded') || err.message?.includes('503') || err.message?.includes('UNAVAILABLE') || err.message?.includes('high demand');
       let errorMsg = isOverloaded
-        ? (language === 'DE' ? 'Stella ist gerade sehr gefragt – bitte warte kurz und versuche es in 1–2 Minuten erneut.'
-          : language === 'FR' ? 'Stella est très demandée en ce moment – réessaie dans 1–2 minutes.'
-          : language === 'IT' ? 'Stella è molto richiesta in questo momento – riprova tra 1–2 minuti.'
-          : 'Stella is very busy right now – please try again in 1–2 minutes.')
+        ? (language === 'DE' ? 'Stella ist gerade sehr gefragt, bitte warte kurz und versuche es in 1–2 Minuten erneut.'
+          : language === 'FR' ? 'Stella est très demandée en ce moment, réessaie dans 1–2 minutes.'
+          : language === 'IT' ? 'Stella è molto richiesta in questo momento, riprova tra 1–2 minuti.'
+          : 'Stella is very busy right now, please try again in 1–2 minutes.')
         : (language === 'DE' ? 'Stella hat gerade ein technisches Problem. Bitte versuche es später noch einmal.'
           : language === 'FR' ? 'Stella rencontre un problème technique. Veuillez réessayer plus tard.'
           : language === 'IT' ? 'Stella ha un problema tecnico. Si prega di riprovare più tardi.'
@@ -3743,10 +3743,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             - Besondere Wünsche: ${toolInput.description || 'Keine'}
 
             OUTPUT-STRUKTUR (als fliessender Text, keine Aufzählungspunkte):
-            1. Motivationsschreiben (Schweizer Standard, kein ß) — vollständiger Brieftext.
-            2. CV-Anpassungsvorschläge — als Fliesstext erklärt.
-            3. Elevator Pitch für die LinkedIn-Recruiter-Nachricht — als fertiger Nachrichtentext.
-            4. Die drei stärksten Argumente, warum der Kandidat perfekt passt — als Absätze formuliert.
+            1. Motivationsschreiben (Schweizer Standard, kein ß): vollständiger Brieftext.
+            2. CV-Anpassungsvorschläge: als Fliesstext erklärt.
+            3. Elevator Pitch für die LinkedIn-Recruiter-Nachricht: als fertiger Nachrichtentext.
+            4. Die drei stärksten Argumente, warum der Kandidat perfekt passt: als Absätze formuliert.
 
             WICHTIG: Verwende KEINE Sternchen (*), KEINE Aufzählungszeichen (-, •) und KEINE Hashtags (#). Schreibe jeden Abschnitt als zusammenhängenden Fliesstext.
           `;
@@ -3861,7 +3861,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
             ANALYSE-STRUKTUR:
             1. GESAMTNOTE (1.0–6.0): Bewertung mit Begründung basierend auf dem Zeugnis-Code.
-            2. SATZ-FÜR-SATZ DECODER: Jeder relevante Satz im Klartext – was bedeutet er wirklich?
+            2. SATZ-FÜR-SATZ DECODER: Jeder relevante Satz im Klartext, was bedeutet er wirklich?
             3. VERSTECKTE BOTSCHAFTEN: Auslassungen, negative Codes, unübliche Reihenfolgen, fehlende Standardformeln.
             4. KRITISCHE PUNKTE: Was bemerkt ein neuer Schweizer Arbeitgeber sofort?
             5. MARKT-POSITIONIERUNG: Konkrete Auswirkungen auf die Chancen im Schweizer Arbeitsmarkt.
@@ -3878,7 +3878,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           const interviewTier = user?.role === 'unlimited' || user?.role === 'admin' ? 'unlimited' : user?.role === 'pro' ? 'pro' : 'free';
           const scoringGrid = interviewTier === 'unlimited'
             ? `
-BEWERTUNGSRASTER (100% – Unlimited):
+BEWERTUNGSRASTER (100%, Unlimited):
 Bewerte den Kandidaten nach dem Interview in 8 Kategorien (je 0–100%):
 1. Erstkontakt & Auftreten (10%)
 2. Fachliche Kompetenz (20%)
@@ -3891,7 +3891,7 @@ Bewerte den Kandidaten nach dem Interview in 8 Kategorien (je 0–100%):
 → Berechne den Gesamtscore und gib eine detaillierte Analyse + konkrete Verbesserungsvorschläge pro Kategorie.`
             : interviewTier === 'pro'
             ? `
-BEWERTUNGSRASTER (Pro – 5 Kategorien):
+BEWERTUNGSRASTER (Pro, 5 Kategorien):
 Bewerte in 5 Kategorien (je 0–100%):
 1. Fachliche Kompetenz (25%)
 2. Kommunikation & Auftreten (25%)
@@ -4683,8 +4683,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Häufige Fragen",
       stella_placeholder: "Frag Stella etwas...",
       stella_secure_data: "SSL-verschlüsselt · Sicher übertragen",
-      hero_title: "Von Bewerbung bis Interview – dein KI-Karriere-Coach",
-      hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch – präzise, diskret und auf den Schweizer Markt zugeschnitten.",
+      hero_title: "Von Bewerbung bis Interview: dein KI-Karriere-Coach",
+      hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch, präzise, diskret und auf den Schweizer Markt zugeschnitten.",
       cta_free: "Kostenlos starten",
       upload_cv: "Lebenslauf hochladen",
       update_cv: "Lebenslauf aktualisieren",
@@ -4711,7 +4711,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abonnement",
       data_privacy: "Datenschutz",
       tools_title: "Profil einmal anlegen. Alle Tools nutzen.",
-      tools_badge: "20+ Tools – Ein Abo",
+      tools_badge: "20+ Tools, ein Abo",
       tools_view_all: "Alle Tools ansehen",
       market_title: "Warum jetzt. Warum Schweiz.",
       market_badge: "Marktpotenzial",
@@ -4719,7 +4719,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Monatlich",
       pricing_yearly: "Jährlich",
       pricing_save: "2 Monate gratis",
-      pricing_gratis_desc: "Kostenlos loslegen – ohne Kreditkarte.",
+      pricing_gratis_desc: "Kostenlos loslegen, ohne Kreditkarte.",
       pricing_pro_desc: "Der Standard für ambitionierte Bewerber.",
       pricing_ultimate_desc: "Maximale Power für deine Karriere.",
       faq_title: "Häufig gestellte Fragen",
@@ -4753,11 +4753,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Bezahle wie du willst",
       payment_secure: "Sicher via Stripe verarbeitet.",
       how_badge: "Der Prozess",
-      how_desc: "Vom Lebenslauf bis zur Vertragsunterschrift – Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
+      how_desc: "Vom Lebenslauf bis zur Vertragsunterschrift: Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
       how_1_t: "Lebenslauf hochladen & analysieren",
-      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn auf Schweizer Niveau – in Sekunden.",
+      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn auf Schweizer Niveau, in Sekunden.",
       how_2_t: "Bewerbung perfektionieren",
-      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und prüfe, ob Recruiter-Software deinen Lebenslauf findet – alles in Schweizer Hochdeutsch.",
+      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und prüfe, ob Recruiter-Software deinen Lebenslauf findet, alles in Schweizer Hochdeutsch.",
       how_3_t: "Interview bestehen",
       how_3_d: "Trainiere mit dem KI-Interview-Coach: echte Schweizer Fragen, dein persönliches Bewertungsraster und konkrete Formulierungsvorschläge für jede Situation.",
       faq_badge: "Häufige Fragen",
@@ -4782,9 +4782,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "Wie sicher sind meine Daten?",
       faq_1_a: "Deine Daten werden ausschliesslich auf Schweizer Servern verarbeitet und nach modernsten Standards verschlüsselt.",
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
-      faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung — du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück — ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Ultimate, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
+      faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung. Du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück, ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Ultimate, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Der Gratis-Plan beinhaltet einmalig drei Tool-Nutzungen sowie drei Nachrichten im Stella-Chat — ideal, um die Plattform unverbindlich kennenzulernen. Diese Nutzungen werden nicht zurückgesetzt. Im Pro-Plan stehen dir monatlich fünfzig Tool-Nutzungen und täglich bis zu zwanzig Aktionen zur Verfügung. Der Ultimate-Plan bietet unbegrenzte Nutzung aller Funktionen ohne jede Einschränkung.",
+      faq_3_a: "Der Gratis-Plan beinhaltet einmalig drei Tool-Nutzungen sowie drei Nachrichten im Stella-Chat, ideal, um die Plattform unverbindlich kennenzulernen. Diese Nutzungen werden nicht zurückgesetzt. Im Pro-Plan stehen dir monatlich fünfzig Tool-Nutzungen und täglich bis zu zwanzig Aktionen zur Verfügung. Der Ultimate-Plan bietet unbegrenzte Nutzung aller Funktionen ohne jede Einschränkung.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -4884,7 +4884,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Ø Gehalt",
       stat_rate: "Quote",
       stat_based_on: "von",
-      stat_no_data: "—",
+      stat_no_data: "–",
       tracker_reminder: "Nachfassen am",
       tracker_reminder_due: "Heute fällig",
       tracker_reminder_overdue: "überfällig",
@@ -4909,8 +4909,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_ch_tips: "Schweiz-Spezifische Tipps",
       stella_short_profile: "Optimiertes Kurzprofil",
       stella_highlights: "Optimierte Highlights",
-      stella_name: "Stella – KI-Assistentin",
-      stella_online: "Online – bereit zu helfen",
+      stella_name: "Stella, KI-Assistentin",
+      stella_online: "Online, bereit zu helfen",
       stella_input_ph: "Schreibe Stella etwas...",
       tool_open: "Öffnen",
       docs_empty: "Noch keine Dokumente generiert. Starte mit einem Tool unten.",
@@ -4930,7 +4930,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Datei laden",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
-      swiss_standard_notice_text: "Präzise auf den Schweizer Arbeitsmarkt ausgerichtet – von der Sprache bis zur Bewerbungsstruktur.",
+      swiss_standard_notice_text: "Präzise auf den Schweizer Arbeitsmarkt ausgerichtet, von der Sprache bis zur Bewerbungsstruktur.",
       footer_rights: "Alle Rechte vorbehalten.",
       footer_privacy: "Datenschutz",
       footer_terms: "AGB",
@@ -4948,7 +4948,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       badge_new: "NEU",
       tools_section_badge: "21 KI-Tools",
       tools_section_title: "Alles, was du für deine Karriere brauchst",
-      tools_section_desc: "Von der Lebenslauf-Analyse bis zur Lohnverhandlung – Stellify begleitet dich durch jeden Schritt.",
+      tools_section_desc: "Von der Lebenslauf-Analyse bis zur Lohnverhandlung: Stellify begleitet dich durch jeden Schritt.",
       tools_section_cta: "Alle 21 Tools ansehen →",
       testimonial_verified: "Verifiziert",
       cv_banner_title: "Lade deinen Lebenslauf hoch für personalisierte KI-Analysen",
@@ -4960,7 +4960,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { name: 'Sarah W.', role: 'HR-Fachfrau', city: 'Zürich', quote: 'Ich sehe täglich hunderte Bewerbungen. Der Zeugnis-Decoder von Stellify ist erschreckend präzise. Er hilft mir nicht nur privat, er gibt mir auch eine neue Perspektive auf den Schweizer Arbeitsmarkt.' },
         { name: 'Hans-Peter K.', role: 'Logistikleiter', city: 'Olten', quote: 'Mit über 50 nochmal neu anfangen war eine Herausforderung. Stellify hat meine jahrzehntelange Erfahrung in moderne, ATS-optimierte Sprache übersetzt. Das öffnete mir Türen, die ich schon für geschlossen hielt.' }
       ],
-      interview_live_promo: "Übe dein nächstes Interview – per Text oder Mikrofon",
+      interview_live_promo: "Übe dein nächstes Interview, per Text oder Mikrofon",
       remaining: "verbleibend",
       search_close_label: "Schliessen",
       search_open_selection: "Auswahl öffnen",
@@ -5032,14 +5032,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       security_item_3_d: "Wir halten uns strikt an das Schweizer Datenschutzgesetz und die europäische DSGVO.",
       comparison_badge: "Warum Stellify?",
       comparison_title: "Der erste echte KI-Karriere-Copilot für die Schweiz.",
-      comparison_subtitle: "Andere Anbieter machen eines. Stellify macht alles – und versteht den Schweizer Markt.",
+      comparison_subtitle: "Andere Anbieter machen eines. Stellify macht alles und versteht den Schweizer Markt.",
       comparison_bad_title: "Standard-KI / Andere Anbieter",
       comparison_bad_items: [
         "Leeres Chatfenster, du weisst nicht, was du eingeben sollst",
         "Kein Schweizer Format/Standard (ss vs ß)",
-        "Kein Lebenslauf-Check – du weisst nicht, ob dein Lebenslauf überhaupt gelesen wird",
-        "Kein Zeugnis-Decoder – Schweizer Code bleibt ein Rätsel",
-        "Keine Stellenvorschläge – du bewirbst dich ins Blaue",
+        "Kein Lebenslauf-Check: du weisst nicht, ob dein Lebenslauf überhaupt gelesen wird",
+        "Kein Zeugnis-Decoder: Schweizer Code bleibt ein Rätsel",
+        "Keine Stellenvorschläge: du bewirbst dich ins Blaue",
         "5 verschiedene Apps, kein roter Faden"
       ],
       comparison_good_title: "Stellify KI-Copilot",
@@ -5066,7 +5066,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Ultimate wählen",
       pricing_recommended: "Empfohlen",
-      value_title: "CHF 19.90 – lohnt sich das?",
+      value_title: "CHF 19.90: lohnt sich das?",
       value_items: [
         "Ein Karriereberater kostet CHF 200–400 / Sitzung",
         "Zeugnis nicht verstanden = falscher Job",
@@ -5085,7 +5085,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'salary-calc': { 
           title: 'KI-Gehaltsrechner CH', 
-          desc: 'Branche, Erfahrung, Kanton – KI analysiert Marktlöhne & gibt dir Verhandlungsbasis.', 
+          desc: 'Branche, Erfahrung, Kanton: KI analysiert Marktlöhne & gibt dir Verhandlungsbasis.',
           input_job: 'Job-Titel', 
           input_job_placeholder: 'z.B. Software Engineer',
           input_industry: 'Branche', 
@@ -5212,7 +5212,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'interview-live': {
           title: 'Live Interview-Coach',
-          desc: 'Übe dein Interview für eine spezifische Stelle live. Stella stellt massgeschneiderte Fragen – du antwortest per Text oder Mikrofon.',
+          desc: 'Übe dein Interview für eine spezifische Stelle live. Stella stellt massgeschneiderte Fragen, du antwortest per Text oder Mikrofon.',
           badge: 'NEU · LIVE',
           input_job: 'Stellenbezeichnung',
           input_job_placeholder: 'z.B. Senior UX Designer bei Digitec',
@@ -5224,7 +5224,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'salary-negotiation': {
           title: 'Lohnverhandlungs-Coach',
-          desc: 'Massgeschneiderter Leitfaden für deine Gehaltsverhandlung – Marktpositionierung, Argumente und Schweizer 13. Monatslohn-Strategie.',
+          desc: 'Massgeschneiderter Leitfaden für deine Gehaltsverhandlung: Marktpositionierung, Argumente und Schweizer 13. Monatslohn-Strategie.',
           badge: 'Pro',
           input_label: 'Aktuelle / Ziel-Vergütung',
           input_placeholder: 'z.B. Ich möchte von 95k auf 115k CHF aufsteigen...',
@@ -5271,8 +5271,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Questions fréquentes",
       stella_placeholder: "Demandez quelque chose à Stella...",
       stella_secure_data: "Traitement sécurisé des données suisses",
-      hero_title: "De la candidature à l'entretien – votre coach carrière IA",
-      hero_desc: "Stellify analyse votre CV, optimise vos candidatures et vous prépare aux entretiens – précisément, discrètement, pour le marché suisse.",
+      hero_title: "De la candidature à l'entretien : votre coach carrière IA",
+      hero_desc: "Stellify analyse votre CV, optimise vos candidatures et vous prépare aux entretiens, précisément, discrètement, pour le marché suisse.",
       cta_free: "Tester gratuitement",
       upload_cv: "Télécharger CV (Lebenslauf)",
       update_cv: "Mettre à jour CV (Lebenslauf)",
@@ -5299,7 +5299,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abonnement",
       data_privacy: "Confidentialité",
       tools_title: "Créez votre profil une fois. Utilisez tous les outils.",
-      tools_badge: "20+ Outils – Un abonnement",
+      tools_badge: "20+ Outils, un abonnement",
       tools_view_all: "Voir tous les outils",
       market_title: "Pourquoi maintenant. Pourquoi la Suisse.",
       market_badge: "Potentiel du marché",
@@ -5307,7 +5307,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Mensuel",
       pricing_yearly: "Annuel",
       pricing_save: "2 mois gratuits",
-      pricing_gratis_desc: "Commencez gratuitement – sans carte de crédit.",
+      pricing_gratis_desc: "Commencez gratuitement, sans carte de crédit.",
       pricing_pro_desc: "Le standard pour les candidats ambitieux.",
       pricing_ultimate_desc: "Puissance maximale pour votre carrière.",
       faq_title: "Foire aux questions",
@@ -5341,11 +5341,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Payez comme vous voulez",
       payment_secure: "Traitement sécurisé via Stripe.",
       how_badge: "Le processus",
-      how_desc: "Du CV à la signature du contrat – Stellify vous accompagne à chaque étape de votre candidature.",
+      how_desc: "Du CV à la signature du contrat : Stellify vous accompagne à chaque étape de votre candidature.",
       how_1_t: "Télécharger & analyser le CV",
       how_1_d: "Téléchargez votre CV en PDF. Stella le lit entièrement, identifie vos points forts et l'optimise selon les standards ATS suisses.",
       how_2_t: "Perfectionner la candidature",
-      how_2_d: "Générez des lettres de motivation sur mesure, optimisez chaque section du CV et simulez le contrôle ATS – en allemand suisse standard.",
+      how_2_d: "Générez des lettres de motivation sur mesure, optimisez chaque section du CV et simulez le contrôle ATS, en allemand suisse standard.",
       how_3_t: "Réussir l'entretien",
       how_3_d: "Entraînez-vous avec le coach d'entretien IA : questions réelles, grille d'évaluation personnalisée et suggestions de formulation concrètes.",
       faq_badge: "Questions fréquentes",
@@ -5370,9 +5370,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "Mes données sont-elles en sécurité ?",
       faq_1_a: "Vos données sont traitées exclusivement sur des serveurs suisses et cryptées selon les normes les plus modernes.",
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
-      faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer — vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement — votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Ultimate, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
+      faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer : vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement. Votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Ultimate, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Le plan Gratuit comprend une seule fois trois utilisations d'outils ainsi que trois messages dans le chat Stella — idéal pour découvrir la plateforme sans engagement. Ces utilisations ne sont pas réinitialisées. Le plan Pro offre cinquante utilisations d'outils par mois et jusqu'à vingt actions par jour. Le plan Ultimate propose une utilisation illimitée de toutes les fonctionnalités, sans aucune restriction.",
+      faq_3_a: "Le plan Gratuit comprend une seule fois trois utilisations d'outils ainsi que trois messages dans le chat Stella, idéal pour découvrir la plateforme sans engagement. Ces utilisations ne sont pas réinitialisées. Le plan Pro offre cinquante utilisations d'outils par mois et jusqu'à vingt actions par jour. Le plan Ultimate propose une utilisation illimitée de toutes les fonctionnalités, sans aucune restriction.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -5472,7 +5472,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Salaire moy.",
       stat_rate: "Taux",
       stat_based_on: "sur",
-      stat_no_data: "—",
+      stat_no_data: "–",
       tracker_reminder: "Relance le",
       tracker_reminder_due: "À faire aujourd'hui",
       tracker_reminder_overdue: "en retard",
@@ -5497,8 +5497,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_ch_tips: "Conseils spécifiques Suisse",
       stella_short_profile: "Profil court optimisé",
       stella_highlights: "Points forts optimisés",
-      stella_name: "Stella – Assistante IA",
-      stella_online: "En ligne – prête à aider",
+      stella_name: "Stella, assistante IA",
+      stella_online: "En ligne, prête à aider",
       stella_input_ph: "Écrivez à Stella...",
       tool_open: "Ouvrir",
       docs_empty: "Aucun document généré pour l'instant. Commencez avec un outil ci-dessous.",
@@ -5518,7 +5518,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Charger fichier",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
-      swiss_standard_notice_text: "Précisément aligné sur le marché du travail suisse – de la langue à la structure de candidature.",
+      swiss_standard_notice_text: "Précisément aligné sur le marché du travail suisse, de la langue à la structure de candidature.",
       footer_rights: "Tous droits réservés.",
       footer_privacy: "Confidentialité",
       footer_terms: "CGV",
@@ -5536,7 +5536,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       badge_new: "NOUVEAU",
       tools_section_badge: "21 Outils IA",
       tools_section_title: "Tout ce dont vous avez besoin pour votre carrière",
-      tools_section_desc: "De l'analyse CV à la négociation salariale – Stellify vous guide à chaque étape.",
+      tools_section_desc: "De l'analyse CV à la négociation salariale : Stellify vous guide à chaque étape.",
       tools_section_cta: "Voir les 21 outils →",
       testimonial_verified: "Vérifié",
       cv_banner_title: "Téléchargez votre CV pour des analyses IA personnalisées",
@@ -5548,7 +5548,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { name: 'Sarah W.', role: 'Spécialiste RH', city: 'Zurich', quote: "Je vois des centaines de candidatures chaque jour. Le décodeur de certificats de Stellify est terriblement précis. Il m'aide non seulement dans ma vie privée, mais me donne aussi une nouvelle perspective sur le marché du travail suisse." },
         { name: 'Hans-Peter K.', role: 'Chef de logistique', city: 'Olten', quote: "Recommencer à plus de 50 ans était un défi. Stellify a traduit mes nombreuses années d'expérience en un langage moderne et optimisé. Cela m'a ouvert des portes que je croyais déjà fermées." }
       ],
-      interview_live_promo: "Entraînez-vous – par texte ou micro",
+      interview_live_promo: "Entraînez-vous, par texte ou micro",
       remaining: "restants",
       search_close_label: "Fermer",
       search_open_selection: "Ouvrir la sélection",
@@ -5620,14 +5620,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       security_item_3_d: "Nous respectons strictement la loi suisse sur la protection des données et le RGPD européen.",
       comparison_badge: "Pourquoi Stellify ?",
       comparison_title: "Le premier véritable copilote de carrière IA pour la Suisse.",
-      comparison_subtitle: "D'autres outils font une chose. Stellify fait tout – et comprend le marché suisse.",
+      comparison_subtitle: "D'autres outils font une chose. Stellify fait tout et comprend le marché suisse.",
       comparison_bad_title: "IA standard / Autres outils",
       comparison_bad_items: [
         "Fenêtre de chat vide, vous ne savez pas quoi saisir",
         "Pas de format/standard suisse",
-        "Pas de check ATS – vous ne savez pas si votre CV est lu",
-        "Pas de décodeur de certificats – le code suisse reste un mystère",
-        "Pas de job-matching – vous postulez au hasard",
+        "Pas de check ATS : vous ne savez pas si votre CV est lu",
+        "Pas de décodeur de certificats : le code suisse reste un mystère",
+        "Pas de job-matching : vous postulez au hasard",
         "5 applications différentes, pas de fil conducteur"
       ],
       comparison_good_title: "Copilote IA Stellify",
@@ -5642,7 +5642,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       why_stellify_points: [
         { title: "Précision suisse", desc: "Nous connaissons le marché du travail suisse dans le détail. De l'orthographe correcte aux particularités cantonales.", icon: "Target" },
         { title: "Code des certificats décodé", desc: "Comprenez enfin ce qui est réellement écrit dans vos certificats de travail. Stella détecte immédiatement les messages cachés.", icon: "ShieldCheck" },
-        { title: "Multilinguisme", desc: "Postulez sans transition en allemand, anglais, français ou italien – parfait pour le marché suisse multilingue.", icon: "Globe" },
+        { title: "Multilinguisme", desc: "Postulez sans transition en allemand, anglais, français ou italien, parfait pour le marché suisse multilingue.", icon: "Globe" },
         { title: "Optimisation ATS", desc: "Notre IA est formée aux systèmes des grands employeurs suisses, garantissant que votre CV soit lu.", icon: "Cpu" },
         { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
@@ -5654,7 +5654,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Ultimate",
       pricing_recommended: "Recommandé",
-      value_title: "CHF 19.90 – cela en vaut-il la peine ?",
+      value_title: "CHF 19.90 : cela en vaut-il la peine ?",
       value_items: [
         "Un conseiller en carrière coûte CHF 200–400 / séance",
         "Certificat non compris = mauvais emploi",
@@ -5665,7 +5665,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       tools_data: {
         'cv-optimizer': { title: 'Optimiseur de CV', desc: 'Analyse votre CV selon les standards suisses et optimise la formulation.', input_label: 'Quelle section optimiser ?', input_placeholder: 'ex: Expérience professionnelle...' },
-        'salary-calc': { title: 'Calculateur de salaire IA CH', desc: 'Secteur, expérience, canton – l\'IA analyse les salaires du marché.', input_job: 'Titre du poste', input_job_placeholder: 'ex: Ingénieur Logiciel', input_industry: 'Secteur', input_industry_placeholder: 'ex: Banque', input_exp: 'Années d\'expérience', input_exp_placeholder: 'ex: 5', input_canton: 'Canton', input_canton_placeholder: 'ex: GE' },
+        'salary-calc': { title: 'Calculateur de salaire IA CH', desc: 'Secteur, expérience, canton : l\'IA analyse les salaires du marché.', input_job: 'Titre du poste', input_job_placeholder: 'ex: Ingénieur Logiciel', input_industry: 'Secteur', input_industry_placeholder: 'ex: Banque', input_exp: 'Années d\'expérience', input_exp_placeholder: 'ex: 5', input_canton: 'Canton', input_canton_placeholder: 'ex: GE' },
         'cv-gen': { title: 'Candidatures', desc: 'Lettre de motivation & CV en 60 secondes, générés en direct.', input_label: 'Annonce d\'emploi (optionnel)', input_placeholder: 'Copiez l\'annonce ici...' },
         'ats-sim': { title: 'Simulation ATS', desc: 'Vérifie si votre CV passe les logiciels de recrutement.', input_label: 'Annonce d\'emploi (optionnel)', input_placeholder: 'Copiez l\'annonce...' },
         'zeugnis': { title: 'Décodeur de certificat Premium', desc: 'Décode le code secret des certificats de travail suisses. Identifie les messages négatifs cachés et évalue votre position sur le marché.', input_label: 'Texte du certificat', input_placeholder: 'Copiez le texte ici...' },
@@ -5694,7 +5694,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'interview-live': {
           title: 'Coach Entretien Live',
-          desc: 'Entraînez-vous pour un entretien spécifique. Stella pose des questions ciblées – répondez par texte ou microphone.',
+          desc: 'Entraînez-vous pour un entretien spécifique. Stella pose des questions ciblées, répondez par texte ou microphone.',
           badge: 'NOUVEAU · LIVE',
           input_job: 'Intitulé du poste',
           input_job_placeholder: 'ex: Senior UX Designer chez Digitec',
@@ -5706,7 +5706,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'salary-negotiation': {
           title: 'Coach Négociation Salariale',
-          desc: 'Guide sur mesure pour votre négociation salariale – positionnement marché, arguments et stratégie du 13e salaire suisse.',
+          desc: 'Guide sur mesure pour votre négociation salariale : positionnement marché, arguments et stratégie du 13e salaire suisse.',
           badge: 'Pro',
           input_label: 'Salaire actuel / cible',
           input_placeholder: 'ex: Je souhaite passer de 95k à 115k CHF...',
@@ -5753,8 +5753,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Domande frequenti",
       stella_placeholder: "Chiedi qualcosa a Stella...",
       stella_secure_data: "Elaborazione sicura dei dati svizzeri",
-      hero_title: "Dal CV al colloquio – il tuo coach carriera con IA",
-      hero_desc: "Stellify analizza il tuo CV, ottimizza le tue candidature e ti prepara ai colloqui – con precisione, discrezione e focus sul mercato svizzero.",
+      hero_title: "Dal CV al colloquio: il tuo coach carriera con IA",
+      hero_desc: "Stellify analizza il tuo CV, ottimizza le tue candidature e ti prepara ai colloqui, con precisione, discrezione e focus sul mercato svizzero.",
       cta_free: "Prova gratuitamente",
       upload_cv: "Carica CV (Lebenslauf)",
       update_cv: "Aggiorna CV (Lebenslauf)",
@@ -5781,7 +5781,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abbonamento",
       data_privacy: "Privacy",
       tools_title: "Crea il tuo profilo una volta. Usa tutti gli strumenti.",
-      tools_badge: "20+ Strumenti – Un abbonamento",
+      tools_badge: "20+ Strumenti, un abbonamento",
       tools_view_all: "Vedi tutti gli strumenti",
       market_title: "Perché ora. Perché la Svizzera.",
       market_badge: "Potenziale di mercato",
@@ -5789,7 +5789,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Mensile",
       pricing_yearly: "Annuale",
       pricing_save: "2 mesi gratis",
-      pricing_gratis_desc: "Inizia gratuitamente – senza carta di credito.",
+      pricing_gratis_desc: "Inizia gratuitamente, senza carta di credito.",
       pricing_pro_desc: "Lo standard per i candidati ambiziosi.",
       pricing_ultimate_desc: "Massima potenza per la tua carriera.",
       faq_title: "Domande frequenti",
@@ -5823,11 +5823,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Paga come vuoi",
       payment_secure: "Elaborazione sicura tramite Stripe.",
       how_badge: "Il processo",
-      how_desc: "Dal CV alla firma del contratto – Stellify ti accompagna in ogni fase della tua candidatura.",
+      how_desc: "Dal CV alla firma del contratto: Stellify ti accompagna in ogni fase della tua candidatura.",
       how_1_t: "Carica & analizza il CV",
       how_1_d: "Carica il tuo CV in PDF. Stella lo legge completamente, individua i tuoi punti di forza e lo ottimizza secondo gli standard ATS svizzeri.",
       how_2_t: "Perfeziona la candidatura",
-      how_2_d: "Genera lettere di motivazione su misura, ottimizza ogni sezione del CV e simula il controllo ATS – in tedesco svizzero standard.",
+      how_2_d: "Genera lettere di motivazione su misura, ottimizza ogni sezione del CV e simula il controllo ATS, in tedesco svizzero standard.",
       how_3_t: "Supera il colloquio",
       how_3_d: "Allenati con il coach per colloqui IA: domande reali, griglia di valutazione personalizzata e suggerimenti concreti per ogni situazione.",
       faq_badge: "Domande frequenti",
@@ -5852,9 +5852,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "Quanto sono sicuri i miei dati?",
       faq_1_a: "I tuoi dati sono elaborati esclusivamente su server svizzeri e crittografati secondo i più moderni standard.",
       faq_2_q: "Come funziona l'abbonamento Stellify?",
-      faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare — hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento — il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Ultimate, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
+      faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare: hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento. Il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Ultimate, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Il piano Gratuito include una volta sola tre utilizzi degli strumenti e tre messaggi nella chat Stella — ideale per scoprire la piattaforma senza impegno. Questi utilizzi non vengono ripristinati. Il piano Pro mette a disposizione cinquanta utilizzi degli strumenti al mese e fino a venti azioni al giorno. Il piano Ultimate offre un utilizzo illimitato di tutte le funzionalità, senza alcuna restrizione.",
+      faq_3_a: "Il piano Gratuito include una volta sola tre utilizzi degli strumenti e tre messaggi nella chat Stella, ideale per scoprire la piattaforma senza impegno. Questi utilizzi non vengono ripristinati. Il piano Pro mette a disposizione cinquanta utilizzi degli strumenti al mese e fino a venti azioni al giorno. Il piano Ultimate offre un utilizzo illimitato di tutte le funzionalità, senza alcuna restrizione.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -5954,7 +5954,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Stipendio medio",
       stat_rate: "Tasso",
       stat_based_on: "su",
-      stat_no_data: "—",
+      stat_no_data: "–",
       tracker_reminder: "Ricontatta il",
       tracker_reminder_due: "Da fare oggi",
       tracker_reminder_overdue: "scaduto",
@@ -5979,8 +5979,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_ch_tips: "Consigli specifici per la Svizzera",
       stella_short_profile: "Profilo breve ottimizzato",
       stella_highlights: "Punti salienti ottimizzati",
-      stella_name: "Stella – Assistente IA",
-      stella_online: "Online – pronta ad aiutare",
+      stella_name: "Stella, assistente IA",
+      stella_online: "Online, pronta ad aiutare",
       stella_input_ph: "Scrivi a Stella...",
       tool_open: "Apri",
       docs_empty: "Nessun documento generato ancora. Inizia con uno strumento qui sotto.",
@@ -6000,7 +6000,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Carica file",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
-      swiss_standard_notice_text: "Precisamente allineato con il mercato del lavoro svizzero – dalla lingua alla struttura della candidatura.",
+      swiss_standard_notice_text: "Precisamente allineato con il mercato del lavoro svizzero, dalla lingua alla struttura della candidatura.",
       footer_rights: "Tutti i diritti riservati.",
       footer_privacy: "Privacy",
       footer_terms: "CGU",
@@ -6018,7 +6018,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       badge_new: "NUOVO",
       tools_section_badge: "21 Strumenti AI",
       tools_section_title: "Tutto ciò di cui hai bisogno per la tua carriera",
-      tools_section_desc: "Dall'analisi del CV alla negoziazione salariale – Stellify ti guida in ogni fase.",
+      tools_section_desc: "Dall'analisi del CV alla negoziazione salariale: Stellify ti guida in ogni fase.",
       tools_section_cta: "Vedi tutti i 21 strumenti →",
       testimonial_verified: "Verificato",
       cv_banner_title: "Carica il tuo CV per analisi AI personalizzate",
@@ -6030,7 +6030,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { name: 'Sarah W.', role: 'Specialista HR', city: 'Zurigo', quote: "Vedo centinaia di candidature ogni giorno. Il decodificatore di certificati di Stellify è terribilmente preciso. Non solo mi aiuta nella vita privata, ma mi dà anche una nuova prospettiva sul mercato del lavoro svizzero." },
         { name: 'Hans-Peter K.', role: 'Responsabile logistica', city: 'Olten', quote: "Ricominciare a oltre 50 anni era una sfida. Stellify ha tradotto i miei tanti anni di esperienza in un linguaggio moderno e ottimizzato per l'ATS. Questo mi ha aperto porte che pensavo già chiuse." }
       ],
-      interview_live_promo: "Pratica il tuo colloquio – testo o microfono",
+      interview_live_promo: "Pratica il tuo colloquio, testo o microfono",
       remaining: "rimanenti",
       search_close_label: "Chiudi",
       search_open_selection: "Apri selezione",
@@ -6102,14 +6102,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       security_item_3_d: "Rispettiamo rigorosamente la legge svizzera sulla protezione dei dati e il GDPR europeo.",
       comparison_badge: "Perché Stellify?",
       comparison_title: "Il primo vero copilota di carriera AI per la Svizzera.",
-      comparison_subtitle: "Altri strumenti fanno una cosa. Stellify fa tutto – e comprende il mercato svizzero.",
+      comparison_subtitle: "Altri strumenti fanno una cosa. Stellify fa tutto e comprende il mercato svizzero.",
       comparison_bad_title: "AI Standard / Altri Strumenti",
       comparison_bad_items: [
         "Finestra di chat vuota, non sai cosa inserire",
         "Nessun formato/standard svizzero",
-        "Nessun controllo ATS – non sai se il tuo CV viene letto",
-        "Nessun decodificatore di certificati – il codice svizzero rimane un mistero",
-        "No job-matching – ti candidi a caso",
+        "Nessun controllo ATS: non sai se il tuo CV viene letto",
+        "Nessun decodificatore di certificati: il codice svizzero rimane un mistero",
+        "No job-matching: ti candidi a caso",
         "5 app diverse, nessun filo conduttore"
       ],
       comparison_good_title: "Copilota AI Stellify",
@@ -6124,7 +6124,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       why_stellify_points: [
         { title: "Precisione svizzera", desc: "Conosciamo il mercato del lavoro svizzero nei dettagli. Dall'ortografia corretta alle particolarità cantonali.", icon: "Target" },
         { title: "Codice dei certificati decodificato", desc: "Capisci finalmente cosa c'è scritto veramente nei tuoi certificati di lavoro. Stella rileva immediatamente i messaggi nascosti.", icon: "ShieldCheck" },
-        { title: "Multilinguismo", desc: "Candidati senza problemi in tedesco, inglese, francese e italiano – perfetto per il mercato svizzero multilingue.", icon: "Globe" },
+        { title: "Multilinguismo", desc: "Candidati senza problemi in tedesco, inglese, francese e italiano, perfetto per il mercato svizzero multilingue.", icon: "Globe" },
         { title: "Ottimizzazione ATS", desc: "La nostra IA è addestrata sui sistemi dei grandi datori di lavoro svizzeri, garantendo che il tuo CV venga letto.", icon: "Cpu" },
         { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
@@ -6136,7 +6136,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Ultimate",
       pricing_recommended: "Consigliato",
-      value_title: "CHF 19.90 – ne vale la pena?",
+      value_title: "CHF 19.90: ne vale la pena?",
       value_items: [
         "Un consulente di carriera costa CHF 200–400 / sessione",
         "Certificato non compreso = lavoro sbagliato",
@@ -6147,7 +6147,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       tools_data: {
         'cv-optimizer': { title: 'Ottimizzatore CV', desc: 'Analizza il tuo CV secondo gli standard svizzeri e ottimizza la formulazione.', input_label: 'Quale sezione ottimizzare?', input_placeholder: 'es. Esperienza professionale...' },
-        'salary-calc': { title: 'Calcolatore stipendio AI CH', desc: 'Settore, esperienza, cantone – l\'IA analizza i salari di mercato.', input_job: 'Titolo del lavoro', input_job_placeholder: 'es: Ingegnere del Software', input_industry: 'Settore', input_industry_placeholder: 'es: Banche', input_exp: 'Anni di esperienza', input_exp_placeholder: 'es: 5', input_canton: 'Cantone', input_canton_placeholder: 'es: TI' },
+        'salary-calc': { title: 'Calcolatore stipendio AI CH', desc: 'Settore, esperienza, cantone: l\'IA analizza i salari di mercato.', input_job: 'Titolo del lavoro', input_job_placeholder: 'es: Ingegnere del Software', input_industry: 'Settore', input_industry_placeholder: 'es: Banche', input_exp: 'Anni di esperienza', input_exp_placeholder: 'es: 5', input_canton: 'Cantone', input_canton_placeholder: 'es: TI' },
         'cv-gen': { title: 'Candidature', desc: 'Lettera di motivazione & CV in 60 secondi, generati dal vivo.', input_label: 'Annuncio di lavoro (opzionale)', input_placeholder: 'Copia l\'annuncio qui...' },
         'ats-sim': { title: 'Simulazione ATS', desc: 'Verifica se il tuo CV passa attraverso i software dei recruiter.', input_label: 'Annuncio di lavoro (opzionale)', input_placeholder: 'Copia l\'annuncio...' },
         'zeugnis': { title: 'Decodificatore certificati Premium', desc: 'Decodifica il codice segreto dei certificati di lavoro svizzeri. Identifica messaggi negativi nascosti e valuta la tua posizione sul mercato.', input_label: 'Testo del certificato', input_placeholder: 'Copia il testo qui...' },
@@ -6176,7 +6176,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'interview-live': {
           title: 'Coach Colloquio Live',
-          desc: 'Esercitati per un colloquio specifico. Stella pone domande mirate – rispondi per testo o microfono.',
+          desc: 'Esercitati per un colloquio specifico. Stella pone domande mirate, rispondi per testo o microfono.',
           badge: 'NUOVO · LIVE',
           input_job: 'Denominazione del posto',
           input_job_placeholder: 'es: Senior UX Designer da Digitec',
@@ -6188,7 +6188,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'salary-negotiation': {
           title: 'Coach Trattativa Salariale',
-          desc: 'Guida su misura per la trattativa salariale – posizionamento mercato, argomenti e strategia del 13° mese svizzero.',
+          desc: 'Guida su misura per la trattativa salariale: posizionamento mercato, argomenti e strategia del 13° mese svizzero.',
           badge: 'Pro',
           input_label: 'Stipendio attuale / obiettivo',
           input_placeholder: 'es: Voglio passare da 95k a 115k CHF...',
@@ -6236,7 +6236,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_placeholder: "Ask Stella something...",
       stella_secure_data: "Secure Swiss Data Processing",
       hero_title: "Ace Every Interview. Land Your Dream Job in Switzerland.",
-      hero_desc: "Stellify prepares you for every stage of the Swiss application process – from CV analysis to interview coaching. AI-powered, precise, and tailored to the Swiss job market.",
+      hero_desc: "Stellify prepares you for every stage of the Swiss application process, from CV analysis to interview coaching. AI-powered, precise, and tailored to the Swiss job market.",
       cta_free: "Test for free",
       upload_cv: "Upload CV (Resume)",
       update_cv: "Update CV (Resume)",
@@ -6263,7 +6263,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Subscription",
       data_privacy: "Privacy",
       tools_title: "Create profile once. Use all tools.",
-      tools_badge: "20+ Tools – One subscription",
+      tools_badge: "20+ Tools, one subscription",
       tools_view_all: "View all tools",
       market_title: "Why now. Why Switzerland.",
       market_badge: "Market Potential",
@@ -6271,7 +6271,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Monthly",
       pricing_yearly: "Yearly",
       pricing_save: "2 months free",
-      pricing_gratis_desc: "Start for free – no credit card required.",
+      pricing_gratis_desc: "Start for free, no credit card required.",
       pricing_pro_desc: "The standard for ambitious candidates.",
       pricing_ultimate_desc: "Maximum power for your career.",
       faq_title: "Frequently Asked Questions",
@@ -6309,7 +6309,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       how_1_t: "Upload & Analyze CV",
       how_1_d: "Upload your CV as a PDF. Stella identifies weaknesses, missing keywords, and optimization potential for Swiss recruiters in seconds.",
       how_2_t: "Perfect Your Application",
-      how_2_d: "Optimize your CV, write tailored cover letters, and prepare for ATS systems of Swiss companies – with AI precision.",
+      how_2_d: "Optimize your CV, write tailored cover letters, and prepare for ATS systems of Swiss companies, with AI precision.",
       how_3_t: "Ace the Interview",
       how_3_d: "Train with realistic interview simulations, get immediate feedback, and learn exactly what Swiss employers look for.",
       faq_badge: "Frequently Asked Questions",
@@ -6334,9 +6334,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "How secure is my data?",
       faq_1_a: "Your data is processed exclusively on Swiss servers and encrypted according to the latest standards.",
       faq_2_q: "How does the Stellify subscription work?",
-      faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required — you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again — your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Ultimate, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
+      faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required: you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again. Your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Ultimate, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "The Free plan includes three tool uses and three messages in the Stella chat — ideal for exploring the platform with no commitment. These uses are one-time only and do not reset. The Pro plan provides fifty tool uses per month and up to twenty actions per day. The Ultimate plan offers unlimited use of all features with no restrictions whatsoever.",
+      faq_3_a: "The Free plan includes three tool uses and three messages in the Stella chat, ideal for exploring the platform with no commitment. These uses are one-time only and do not reset. The Pro plan provides fifty tool uses per month and up to twenty actions per day. The Ultimate plan offers unlimited use of all features with no restrictions whatsoever.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -6436,7 +6436,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Avg. salary",
       stat_rate: "rate",
       stat_based_on: "of",
-      stat_no_data: "—",
+      stat_no_data: "–",
       tracker_reminder: "Follow up on",
       tracker_reminder_due: "Due today",
       tracker_reminder_overdue: "overdue",
@@ -6461,8 +6461,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_ch_tips: "Switzerland-Specific Tips",
       stella_short_profile: "Optimized Short Profile",
       stella_highlights: "Optimized Highlights",
-      stella_name: "Stella – AI Assistant",
-      stella_online: "Online – ready to help",
+      stella_name: "Stella, AI Assistant",
+      stella_online: "Online, ready to help",
       stella_input_ph: "Write to Stella...",
       tool_open: "Open",
       docs_empty: "No documents generated yet. Start with a tool below.",
@@ -6482,7 +6482,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_load_file: "Load file",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
-      swiss_standard_notice_text: "Precisely aligned with the Swiss job market – from language to application structure.",
+      swiss_standard_notice_text: "Precisely aligned with the Swiss job market, from language to application structure.",
       footer_rights: "All rights reserved.",
       footer_privacy: "Privacy",
       footer_terms: "Terms",
@@ -6500,7 +6500,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       badge_new: "NEW",
       tools_section_badge: "21 AI Tools",
       tools_section_title: "Everything you need for your career",
-      tools_section_desc: "From CV analysis to salary negotiation – Stellify guides you every step of the way.",
+      tools_section_desc: "From CV analysis to salary negotiation: Stellify guides you every step of the way.",
       tools_section_cta: "View all 21 tools →",
       testimonial_verified: "Verified",
       cv_banner_title: "Upload your CV for personalised AI analyses",
@@ -6512,7 +6512,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { name: 'Sarah W.', role: 'HR Specialist', city: 'Zurich', quote: "I see hundreds of applications every day. Stellify's certificate decoder is frighteningly accurate. It not only helps me privately but also gives me a new perspective on the Swiss job market." },
         { name: 'Hans-Peter K.', role: 'Logistics Manager', city: 'Olten', quote: "Starting over at over 50 was a challenge. Stellify translated my many years of experience into modern, ATS-optimized language. This opened doors for me that I already thought were closed." }
       ],
-      interview_live_promo: "Practice your next interview – text or microphone",
+      interview_live_promo: "Practice your next interview, text or microphone",
       remaining: "remaining",
       search_close_label: "Close",
       search_open_selection: "Open Selection",
@@ -6584,14 +6584,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       security_item_3_d: "We strictly adhere to the Swiss Federal Act on Data Protection and the European GDPR.",
       comparison_badge: "Why Stellify?",
       comparison_title: "The first real AI career copilot for Switzerland.",
-      comparison_subtitle: "Other tools do one thing. Stellify does everything – and understands the Swiss market.",
+      comparison_subtitle: "Other tools do one thing. Stellify does everything and understands the Swiss market.",
       comparison_bad_title: "Standard AI / Other Tools",
       comparison_bad_items: [
         "Empty chat window, you don't know what to enter",
         "No Swiss format/standard (ss vs ß)",
-        "No ATS check – you don't know if your CV is read",
-        "No certificate decoder – Swiss code remains a mystery",
-        "No job matching – you apply blindly",
+        "No ATS check: you don't know if your CV is read",
+        "No certificate decoder: Swiss code remains a mystery",
+        "No job matching: you apply blindly",
         "5 different apps, no common thread"
       ],
       comparison_good_title: "Stellify AI Copilot",
@@ -6606,7 +6606,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       why_stellify_points: [
         { title: "Swiss Precision", desc: "We know the Swiss job market in detail. From correct spelling to cantonal specifics.", icon: "Target" },
         { title: "Certificate Code Decoded", desc: "Finally understand what is really written in your work certificates. Stella detects hidden messages immediately.", icon: "ShieldCheck" },
-        { title: "Multilingualism", desc: "Apply seamlessly in German, English, French or Italian – perfect for the multilingual Swiss market.", icon: "Globe" },
+        { title: "Multilingualism", desc: "Apply seamlessly in German, English, French or Italian, perfect for the multilingual Swiss market.", icon: "Globe" },
         { title: "ATS Optimization", desc: "Our AI is trained on the systems of major Swiss employers, ensuring your CV is guaranteed to be read.", icon: "Cpu" },
         { title: "Salary Transparency", desc: "Get precise salary forecasts based on Swiss market data for your specific region and industry.", icon: "Coins" },
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
@@ -6618,7 +6618,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Ultimate",
       pricing_recommended: "Recommended",
-      value_title: "CHF 19.90 – is it worth it?",
+      value_title: "CHF 19.90: is it worth it?",
       value_items: [
         "A career counselor costs CHF 200–400 / session",
         "Certificate not understood = wrong job",
@@ -6629,7 +6629,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       tools_data: {
         'cv-optimizer': { title: 'CV Optimizer', desc: 'Analyzes your CV for Swiss standards & optimizes wording.', input_label: 'Which section to optimize?', input_placeholder: 'e.g. Work experience...' },
-        'salary-calc': { title: 'AI Salary Calc CH', desc: 'Industry, experience, canton – AI analyzes market wages & gives you a basis for negotiation.', input_job: 'Job Title', input_job_placeholder: 'e.g. Software Engineer', input_industry: 'Industry', input_industry_placeholder: 'e.g. Banking', input_exp: 'Years of Experience', input_exp_placeholder: 'e.g. 5', input_canton: 'Canton', input_canton_placeholder: 'e.g. ZH' },
+        'salary-calc': { title: 'AI Salary Calc CH', desc: 'Industry, experience, canton: AI analyzes market wages & gives you a basis for negotiation.', input_job: 'Job Title', input_job_placeholder: 'e.g. Software Engineer', input_industry: 'Industry', input_industry_placeholder: 'e.g. Banking', input_exp: 'Years of Experience', input_exp_placeholder: 'e.g. 5', input_canton: 'Canton', input_canton_placeholder: 'e.g. ZH' },
         'cv-gen': { title: 'Applications', desc: 'Cover letter & CV in 60 seconds, generated live.', input_label: 'Job Ad (optional)', input_placeholder: 'Paste the job ad here...' },
         'ats-sim': { title: 'ATS Simulation', desc: 'Checks if your CV passes through recruiter software. With score & tips.', input_label: 'Job Ad (optional)', input_placeholder: 'Paste the job ad...' },
         'zeugnis': { title: 'Premium Certificate Decoder', desc: 'Decodes the secret code of Swiss work certificates. Identifies hidden negative messages and evaluates your market position.', input_label: 'Certificate Text', input_placeholder: 'Paste the text here...' },
@@ -6658,7 +6658,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'interview-live': {
           title: 'Live Interview Coach',
-          desc: 'Practice your interview for a specific role. Stella asks tailored questions – answer by text or microphone.',
+          desc: 'Practice your interview for a specific role. Stella asks tailored questions, answer by text or microphone.',
           badge: 'NEW · LIVE',
           input_job: 'Job Title',
           input_job_placeholder: 'e.g. Senior UX Designer at Digitec',
@@ -6670,7 +6670,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'salary-negotiation': {
           title: 'Salary Negotiation Coach',
-          desc: 'Tailored guide for your salary negotiation – market positioning, arguments and Swiss 13th month salary strategy.',
+          desc: 'Tailored guide for your salary negotiation: market positioning, arguments and Swiss 13th month salary strategy.',
           badge: 'Pro',
           input_label: 'Current / Target Salary',
           input_placeholder: 'e.g. I want to go from 95k to 115k CHF...',
@@ -6694,7 +6694,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { key: 'firstName', label: language === 'FR' ? 'Prénom' : language === 'IT' ? 'Nome' : language === 'EN' ? 'First name' : 'Vorname', type: 'text', placeholder: language === 'FR' ? 'ex. Anna' : language === 'IT' ? 'es. Anna' : language === 'EN' ? 'e.g. Anna' : 'z.B. Anna' },
         { key: 'lastName', label: language === 'FR' ? 'Nom de famille' : language === 'IT' ? 'Cognome' : language === 'EN' ? 'Last name' : 'Nachname', type: 'text', placeholder: language === 'FR' ? 'ex. Müller' : language === 'IT' ? 'es. Müller' : language === 'EN' ? 'e.g. Müller' : 'z.B. Müller' },
         { key: 'jobTitle', label: t.tools_data['interview'].input_label, type: 'text', placeholder: t.tools_data['interview'].input_placeholder },
-        { key: 'applicationType', label: language === 'FR' ? 'Type de candidature' : language === 'IT' ? 'Tipo di candidatura' : language === 'EN' ? 'Application type' : 'Art der Bewerbung', type: 'select', placeholder: language === 'FR' ? '— Veuillez sélectionner —' : language === 'IT' ? '— Seleziona —' : language === 'EN' ? '— Please select —' : '— Bitte wählen —', options: language === 'FR' ? ['Candidature / Présentation', 'Apprentissage', 'Reconversion', 'Travailleur qualifié'] : language === 'IT' ? ['Candidatura / Presentazione', 'Apprendistato', 'Riconversione', 'Lavoratore qualificato'] : language === 'EN' ? ['Application / Introduction', 'Apprenticeship', 'Career change', 'Skilled worker'] : ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'applicationType', label: language === 'FR' ? 'Type de candidature' : language === 'IT' ? 'Tipo di candidatura' : language === 'EN' ? 'Application type' : 'Art der Bewerbung', type: 'select', placeholder: language === 'FR' ? 'Veuillez sélectionner' : language === 'IT' ? 'Seleziona' : language === 'EN' ? 'Please select' : 'Bitte wählen', options: language === 'FR' ? ['Candidature / Présentation', 'Apprentissage', 'Reconversion', 'Travailleur qualifié'] : language === 'IT' ? ['Candidatura / Presentazione', 'Apprendistato', 'Riconversione', 'Lavoratore qualificato'] : language === 'EN' ? ['Application / Introduction', 'Apprenticeship', 'Career change', 'Skilled worker'] : ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
         { key: 'qualifications', label: language === 'FR' ? 'Qualifications' : language === 'IT' ? 'Qualifiche' : language === 'EN' ? 'Qualifications' : 'Qualifikationen', type: 'textarea', placeholder: language === 'FR' ? 'ex. CFC commerce, CAS Marketing, langues...' : language === 'IT' ? 'es. AFC commercio, CAS Marketing, lingue...' : language === 'EN' ? 'e.g. commercial apprenticeship, CAS Marketing, languages...' : 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
         { key: 'description', label: language === 'FR' ? 'Description / Souhaits' : language === 'IT' ? 'Descrizione / Desideri' : language === 'EN' ? 'Description / Wishes' : 'Beschreibung / Wünsche', type: 'textarea', placeholder: language === 'FR' ? 'Sur quoi l\'entraînement d\'entretien doit-il se concentrer ?' : language === 'IT' ? 'Su cosa dovrebbe concentrarsi la simulazione del colloquio?' : language === 'EN' ? 'What should the interview training focus on?' : 'Worauf soll das Interview-Training fokussieren?' },
       ]
@@ -6727,7 +6727,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
         { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
-        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: 'Bitte wählen', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
         { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
         { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
         { key: 'cvText', label: t.tools_data['cv-premium'].input_label, type: 'textarea', placeholder: t.tools_data['cv-premium'].input_placeholder },
@@ -6744,7 +6744,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
         { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
-        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: 'Bitte wählen', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
         { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
         { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
         { key: 'goal', label: t.tools_data['career-roadmap'].input_label, type: 'text', placeholder: t.tools_data['career-roadmap'].input_placeholder },
@@ -6775,7 +6775,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
         { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
-        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: 'Bitte wählen', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
         { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
         { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
         { key: 'jobAd', label: t.tools_data['cv-gen'].input_label, type: 'textarea', placeholder: t.tools_data['cv-gen'].input_placeholder },
@@ -6873,7 +6873,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
         { key: 'lastName', label: 'Nachname', type: 'text', placeholder: 'z.B. Müller' },
-        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: '— Bitte wählen —', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
+        { key: 'applicationType', label: 'Art der Bewerbung', type: 'select', placeholder: 'Bitte wählen', options: ['Bewerbung / Vorstellung', 'Lehrstelle', 'Quereinstieg', 'Qualifizierter Arbeiter'] },
         { key: 'duration', label: 'Wie lange in dieser Position', type: 'text', placeholder: 'z.B. 3 Jahre' },
         { key: 'qualifications', label: 'Qualifikationen', type: 'textarea', placeholder: 'z.B. EFZ Kaufmann, CAS Marketing, Sprachkenntnisse...' },
         { key: 'linkedinProfile', label: t.tools_data['linkedin-job'].input_profile, type: 'textarea', placeholder: t.tools_data['linkedin-job'].input_profile_placeholder },
@@ -7869,10 +7869,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                     <option value="Rejected">{t.tracker_rejected}</option>
                                   </select>
                                 </td>
-                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '—'}</td>
-                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '—'}</td>
+                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '–'}</td>
+                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '–'}</td>
                                 <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
-                                  {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '—'}
+                                  {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '–'}
                                 </td>
                                 <td className="px-4 py-3">
                                   <div className="flex gap-1 justify-end">
@@ -8402,7 +8402,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </button>
                 <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
                 <a href="#pricing" className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
-                  Ab CHF 19.90/Mo — Pläne ansehen →
+                  Ab CHF 19.90/Mo, Pläne ansehen →
                 </a>
               </div>
             </div>
@@ -8468,13 +8468,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
               <div className="space-y-4 mb-8">
                 <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
-                  Grüezi! Dein CV ist analysiert. Für das Interview bei der UBS solltest du auf die Frage "Warum UBS?" vorbereitet sein – ich zeige dir die optimale Antwort.
+                  Grüezi! Dein CV ist analysiert. Für das Interview bei der UBS solltest du auf die Frage "Warum UBS?" vorbereitet sein, ich zeige dir die optimale Antwort.
                 </div>
                 <div className="bg-[#004225] text-white p-4 text-sm font-light leading-relaxed max-w-[85%] ml-auto">
                   Super! Welche Fragen kommen noch? Und wie antworte ich am besten?
                 </div>
                 <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
-                  Starte den Interview-Coach – du erhältst 5 echte Fragen mit Musterantworten und deinem persönlichen Score.
+                  Starte den Interview-Coach: du erhältst 5 echte Fragen mit Musterantworten und deinem persönlichen Score.
                 </div>
               </div>
               <div className="flex gap-2">
@@ -8929,7 +8929,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <p className="text-[11px] text-white/40 font-light">
                 {billingCycle === 'monthly'
                   ? (language === 'DE' ? '→ Jährlich wählen und 2 Monate gratis sparen' : language === 'FR' ? '→ Choisir annuel et économiser 2 mois' : language === 'IT' ? '→ Scegli annuale e risparmia 2 mesi' : '→ Choose yearly and save 2 months')
-                  : (language === 'DE' ? '✓ Jahresabo aktiv – du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel – vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale – risparmi 2 mesi' : '✓ Annual plan active – you save 2 months')}
+                  : (language === 'DE' ? '✓ Jahresabo aktiv, du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel, vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale, risparmi 2 mesi' : '✓ Annual plan active, you save 2 months')}
               </p>
             </div>
           </div>
@@ -9525,7 +9525,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {expiryBanner.daysLeft <= 0
                   ? (language === 'DE' ? 'Dein Abonnement ist abgelaufen. Jetzt verlängern.' : language === 'FR' ? 'Votre abonnement a expiré. Renouvelez maintenant.' : language === 'IT' ? 'Il tuo abbonamento è scaduto. Rinnova ora.' : 'Your subscription has expired. Renew now.')
                   : expiryBanner.daysLeft === 1
-                    ? (language === 'DE' ? 'Dein Abo läuft morgen ab — jetzt verlängern!' : language === 'FR' ? 'Votre abonnement expire demain — renouvelez maintenant !' : language === 'IT' ? 'Il tuo abbonamento scade domani — rinnova ora!' : 'Your subscription expires tomorrow — renew now!')
+                    ? (language === 'DE' ? 'Dein Abo läuft morgen ab, jetzt verlängern!' : language === 'FR' ? 'Votre abonnement expire demain, renouvelez maintenant !' : language === 'IT' ? 'Il tuo abbonamento scade domani, rinnova ora!' : 'Your subscription expires tomorrow, renew now!')
                     : (language === 'DE' ? `Dein Abo läuft in ${expiryBanner.daysLeft} Tagen ab.` : language === 'FR' ? `Votre abonnement expire dans ${expiryBanner.daysLeft} jours.` : language === 'IT' ? `Il tuo abbonamento scade tra ${expiryBanner.daysLeft} giorni.` : `Your subscription expires in ${expiryBanner.daysLeft} days.`)
                 }
               </p>
@@ -10699,10 +10699,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 {[
                                   { n: parsedInterviewResult.stats.questions, l: language === 'EN' ? 'Questions' : language === 'FR' ? 'Questions' : language === 'IT' ? 'Domande' : 'Fragen' },
                                   { n: parsedInterviewResult.stats.topics, l: language === 'EN' ? 'Key topics' : language === 'FR' ? 'Thèmes clés' : language === 'IT' ? 'Temi chiave' : 'Kernthemen' },
-                                  { n: parsedInterviewResult.stats.match != null ? `${parsedInterviewResult.stats.match}%` : '—', l: language === 'EN' ? 'Match' : language === 'IT' ? 'Affinità' : language === 'FR' ? 'Affinité' : 'Match', accent: true },
+                                  { n: parsedInterviewResult.stats.match != null ? `${parsedInterviewResult.stats.match}%` : '–', l: language === 'EN' ? 'Match' : language === 'IT' ? 'Affinità' : language === 'FR' ? 'Affinité' : 'Match', accent: true },
                                 ].map((s, i) => (
                                   <div key={i} className="bg-white dark:bg-[#1A1A18] py-3.5 text-center">
-                                    <div className={`text-xl font-semibold leading-none ${s.accent ? 'text-[#2a7a4a] dark:text-[#6FCF97]' : 'text-[#004225] dark:text-[#FAFAF8]'}`}>{s.n ?? '—'}</div>
+                                    <div className={`text-xl font-semibold leading-none ${s.accent ? 'text-[#2a7a4a] dark:text-[#6FCF97]' : 'text-[#004225] dark:text-[#FAFAF8]'}`}>{s.n ?? '–'}</div>
                                     <div className="text-[10px] text-[#8a9e8d] dark:text-[#9A9A94] mt-1 uppercase tracking-wide">{s.l}</div>
                                   </div>
                                 ))}
