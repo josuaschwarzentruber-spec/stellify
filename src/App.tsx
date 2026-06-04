@@ -5882,14 +5882,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               else if (onLegal) navigate('dashboard');
               else window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="text-xl sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0 inline-flex items-center gap-2"
+            className="text-lg sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0 inline-flex items-center gap-1.5 sm:gap-2 min-w-0"
           >
             <svg width="20" height="20" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] shrink-0" aria-hidden="true">
               <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
             </svg>
             <span>Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
           </button>
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 rounded-full p-1">
             {user ? (
               <>
@@ -5999,18 +5999,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         {/* Spacer that lets nav breathe at wider screens */}
         <div className="flex-1 hidden xl:block"></div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* Theme Toggle */}
           <button
             onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[#5C5C58] dark:text-[#9A9A94] transition-all"
+            className="p-2.5 sm:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 text-[#5C5C58] dark:text-[#9A9A94] transition-all"
             title={theme === 'light' ? 'Dark Mode' : 'Light Mode'}
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
-          <button 
+          <button
             onClick={() => setIsStellaOpen(true)}
-            className="p-2 hover:bg-black/5 rounded-full transition-colors text-[#004225]"
+            className="p-2.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors text-[#004225]"
             title={t.nav_stella_chat}
           >
             <Sparkles size={20} />
@@ -6019,13 +6019,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             onClick={() => setIsSearchOpen(true)}
             aria-label={t.search_placeholder}
             title={t.search_placeholder}
-            className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]"
+            className="hidden sm:inline-flex p-2.5 sm:p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]"
           >
             <Search size={20} />
           </button>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
+            className="lg:hidden p-2.5 sm:p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -6052,7 +6052,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <>
               <button
                 onClick={() => { setAuthTab('login'); setIsAuthModalOpen(true); }}
-                className="hidden sm:inline-flex text-[13px] font-medium text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] rounded-full transition-all px-4 py-1.5"
+                className="hidden sm:inline-flex text-[13px] font-medium text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/[0.04] dark:hover:bg-white/[0.04] rounded-full transition-all px-4 py-2.5"
               >
                 {t.nav_login}
               </button>
@@ -6061,11 +6061,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileHover={{ y: -1 }}
                 whileTap={{ y: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 22 }}
-                className="relative bg-[#004225] text-white text-sm font-bold px-5 py-2.5 hover:bg-[#00331d] hover:shadow-lg transition-colors flex items-center gap-2 shadow-md shadow-[#004225]/30 uppercase tracking-wider group"
+                className="relative bg-[#004225] text-white text-xs sm:text-sm font-bold px-3 sm:px-5 py-2 sm:py-2.5 hover:bg-[#00331d] hover:shadow-lg transition-colors flex items-center gap-1.5 sm:gap-2 shadow-md shadow-[#004225]/30 uppercase tracking-wider group whitespace-nowrap shrink-0"
               >
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00A854] rounded-full animate-ping opacity-75" />
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-[#00A854] rounded-full" />
-                {t.nav_register}
+                <span className="hidden sm:inline">{t.nav_register}</span>
+                <span className="sm:hidden">{language === 'FR' ? 'Démarrer' : language === 'IT' ? 'Inizia' : language === 'EN' ? 'Start' : 'Start'}</span>
                 <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
               </motion.button>
             </>
@@ -6080,7 +6081,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#1A1A18] border-b border-black/8 dark:border-white/8 z-40 p-4 sm:p-6 space-y-5 shadow-xl"
+            className="lg:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#1A1A18] border-b border-black/8 dark:border-white/8 z-40 p-4 sm:p-6 space-y-5 shadow-xl"
           >
             <div className="flex flex-col gap-2">
               {user ? (
