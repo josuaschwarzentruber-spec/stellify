@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Stellify – Dein KI-Karriere-Copilot für die Schweiz</title>
+    <title>Stellify, Dein KI-Karriere-Copilot für die Schweiz</title>
     <!-- THEME INIT: Muss VOR dem React-Bundle laufen um FOUC zu verhindern -->
     <script>
       (function() {
@@ -17,9 +17,9 @@
         } catch(e) {}
       })();
     </script>
-    <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner – auf Deutsch, Französisch und Italienisch.">
+    <meta name="description" content="Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. CV-Optimierung, Interview-Coach, Gehaltsrechner, auf Deutsch, Französisch und Italienisch.">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Stellify – Dein KI-Karriere-Copilot">
+    <meta property="og:title" content="Stellify, Dein KI-Karriere-Copilot">
     <meta property="og:description" content="CV-Optimierung, Interview-Coach
       und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
     <meta property="og:type" content="website">
@@ -30,9 +30,9 @@
     <meta property="og:image:type" content="image/svg+xml">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Stellify – Swiss Career Excellence">
+    <meta property="og:image:alt" content="Stellify, Swiss Career Excellence">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Stellify – Dein KI-Karriere-Copilot">
+    <meta name="twitter:title" content="Stellify, Dein KI-Karriere-Copilot">
     <meta name="twitter:description" content="CV-Optimierung, Interview-Coach und Gehaltsrechner für den Schweizer Arbeitsmarkt.">
     <meta name="twitter:image" content="https://stellify.ch/og-image.svg">
     <!-- Favicon — matches Splash icon (dark forest tile, green star, subtle green border) -->
@@ -328,8 +328,10 @@
         const cores = navigator.hardwareConcurrency || 4;
         const mem = navigator.deviceMemory || 4;
         const conn = navigator.connection && navigator.connection.effectiveType;
-        if (cores <= 2) return true;
-        if (mem <= 2) return true;
+        const saveData = navigator.connection && navigator.connection.saveData;
+        if (cores <= 4) return true;            // ≤4 cores → typical corporate laptop
+        if (mem <= 4) return true;              // ≤4 GB RAM
+        if (saveData) return true;              // user opted into data-saver
         if (conn === 'slow-2g' || conn === '2g' || conn === '3g') return true;
         return false;
       })();
@@ -349,9 +351,9 @@
       let state      = 'intro';
       let stateFrame = 0;
       let stopped    = false;
-      const INTRO_F   = 90;
-      const OUTRO_F   = 55;
-      const MINIMUM_MS = 4000;
+      const INTRO_F   = isLowPower ? 50 : 90;
+      const OUTRO_F   = isLowPower ? 30 : 55;
+      const MINIMUM_MS = isLowPower ? 1800 : 4000;
       const startTime  = Date.now();
       let   readyComplete = false;
       let   readyCalled   = false;
