@@ -1,0 +1,745 @@
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import {
+  Check, ChevronLeft, ChevronRight, Plus, Save, Trash2,
+  FolderOpen, Lock, Palette, FileText, Eye, X,
+} from 'lucide-react';
+import { db } from '../firebase';
+import {
+  collection, addDoc, getDocs, query, where, orderBy, limit,
+  deleteDoc, doc, updateDoc,
+} from 'firebase/firestore';
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Design system — six original, code-defined application designs.
+   A design is pure data; ApplicationDocument renders it. The same renderer
+   will drive the PDF/DOCX export in phase 2, so design === export layout.
+   ────────────────────────────────────────────────────────────────────────── */
+
+export type DesignConfig = {
+  id: string;
+  /** display font pairing */
+  font: 'serif' | 'sans' | 'mix';
+  /** accent colour (headings, rules, blocks) */
+  accent: string;
+  /** soft tint derived from accent for backgrounds */
+  layout: 'classic' | 'sidebar' | 'minimal' | 'elegant' | 'block' | 'executive';
+  custom?: boolean;
+  name?: string;
+};
+
+const BUILT_IN_DESIGNS: DesignConfig[] = [
+  { id: 'klassisch',  font: 'serif', accent: '#1A1A18', layout: 'classic' },
+  { id: 'modern',     font: 'sans',  accent: '#004225', layout: 'sidebar' },
+  { id: 'minimal',    font: 'sans',  accent: '#5C5C58', layout: 'minimal' },
+  { id: 'elegant',    font: 'mix',   accent: '#8A6D3B', layout: 'elegant' },
+  { id: 'kreativ',    font: 'sans',  accent: '#0E7490', layout: 'block' },
+  { id: 'management', font: 'mix',   accent: '#1E2A38', layout: 'executive' },
+];
+
+const ACCENT_PRESETS = ['#004225', '#1E2A38', '#8A6D3B', '#0E7490', '#7C2D4E', '#1A1A18'];
+
+export type ApplicationForm = {
+  firstName: string; lastName: string; address: string; phone: string; email: string;
+  currentRole: string; targetCompany: string; targetPosition: string; jobDescription: string;
+  experience: string; education: string; skills: string; motivation: string; tone: string;
+};
+
+const EMPTY_FORM: ApplicationForm = {
+  firstName: '', lastName: '', address: '', phone: '', email: '',
+  currentRole: '', targetCompany: '', targetPosition: '', jobDescription: '',
+  experience: '', education: '', skills: '', motivation: '', tone: '',
+};
+
+/* ── i18n ────────────────────────────────────────────────────────────────── */
+
+const STR: Record<string, Record<string, string>> = {
+  DE: {
+    step_design: 'Design', step_data: 'Daten', step_preview: 'Vorschau',
+    pick_design: 'Wähle dein Design', pick_design_sub: 'Sechs originale Layouts, entworfen für den Schweizer Arbeitsmarkt. Oder gestalte dein eigenes.',
+    own_design: 'Eigenes Design', own_design_new: 'Neues Design erstellen',
+    d_klassisch: 'Klassisch', d_modern: 'Modern', d_minimal: 'Minimalistisch', d_elegant: 'Elegant', d_kreativ: 'Kreativ', d_management: 'Management',
+    builder_title: 'Eigenes Design', builder_name: 'Name des Designs', builder_name_ph: 'z.B. Mein Stil',
+    builder_accent: 'Akzentfarbe', builder_font: 'Schrift', builder_layout: 'Layout-Stil',
+    font_serif: 'Serif', font_sans: 'Sans-Serif', font_mix: 'Kombiniert',
+    layout_classic: 'Klassisch zentriert', layout_sidebar: 'Seitenleiste', layout_minimal: 'Minimal', layout_elegant: 'Elegant', layout_block: 'Farbblock', layout_executive: 'Executive',
+    save_design: 'Design speichern', cancel: 'Abbrechen', delete: 'Löschen',
+    sec_person: 'Persönliche Angaben', sec_job: 'Zielstelle', sec_profile: 'Dein Profil',
+    f_firstName: 'Vorname', f_lastName: 'Nachname', f_address: 'Adresse', f_phone: 'Telefon', f_email: 'E-Mail',
+    f_currentRole: 'Beruf / aktuelle Rolle', f_targetCompany: 'Zielfirma', f_targetPosition: 'Stelle',
+    f_jobDescription: 'Stellenbeschreibung', f_experience: 'Berufserfahrung', f_education: 'Ausbildung',
+    f_skills: 'Fähigkeiten', f_motivation: 'Motivation', f_tone: 'Gewünschte Tonalität',
+    tone_prof: 'Professionell', tone_conf: 'Selbstbewusst', tone_warm: 'Freundlich', tone_direct: 'Direkt',
+    ph_jobDescription: 'Stellenbeschreibung einfügen oder die wichtigsten Anforderungen beschreiben…',
+    ph_experience: 'Stationen, Aufgaben, Erfolge…', ph_education: 'Abschlüsse, Weiterbildungen, Zertifikate…',
+    ph_skills: 'Fachlich und persönlich, z.B. Projektleitung, Deutsch/Französisch, CRM…',
+    ph_motivation: 'Warum diese Stelle? Warum diese Firma?…',
+    back: 'Zurück', next: 'Weiter', to_preview: 'Zur Vorschau',
+    preview_title: 'Deine Bewerbung', preview_sub: 'Live-Vorschau im gewählten Design. KI-Text und Export folgen im nächsten Schritt.',
+    save_application: 'Bewerbung speichern', saved: 'Gespeichert', saving: 'Speichern…',
+    load_saved: 'Gespeicherte Bewerbungen', load: 'Öffnen', no_saved: 'Noch keine gespeicherten Bewerbungen.',
+    subject: 'Bewerbung als', attachment_note: 'Beilagen: Lebenslauf, Zeugnisse',
+    greeting: 'Sehr geehrte Damen und Herren', closing: 'Freundliche Grüsse',
+    motivation_placeholder: 'Dein Bewerbungstext erscheint hier. Fülle das Formular aus, dein Motivations-Text bildet den Kern des Anschreibens. Im nächsten Schritt verfeinert die KI daraus ein vollständiges, professionelles Anschreiben.',
+    profile_title: 'Profil', skills_title: 'Fähigkeiten', exp_title: 'Erfahrung', edu_title: 'Ausbildung',
+    locked_title: 'Pro-Tool', locked_text: 'Der Bewerbungs-Generator ist Teil des Pro-Plans.', locked_cta: 'Pläne ansehen',
+    required_hint: 'Vorname, Nachname, Zielfirma und Stelle ausfüllen, um fortzufahren.',
+  },
+  FR: {
+    step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
+    pick_design: 'Choisis ton design', pick_design_sub: 'Six mises en page originales, conçues pour le marché suisse. Ou crée la tienne.',
+    own_design: 'Design personnel', own_design_new: 'Créer un nouveau design',
+    d_klassisch: 'Classique', d_modern: 'Moderne', d_minimal: 'Minimaliste', d_elegant: 'Élégant', d_kreativ: 'Créatif', d_management: 'Management',
+    builder_title: 'Design personnel', builder_name: 'Nom du design', builder_name_ph: 'p.ex. Mon style',
+    builder_accent: 'Couleur d\'accent', builder_font: 'Police', builder_layout: 'Style de mise en page',
+    font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combiné',
+    layout_classic: 'Classique centré', layout_sidebar: 'Barre latérale', layout_minimal: 'Minimal', layout_elegant: 'Élégant', layout_block: 'Bloc de couleur', layout_executive: 'Executive',
+    save_design: 'Enregistrer le design', cancel: 'Annuler', delete: 'Supprimer',
+    sec_person: 'Données personnelles', sec_job: 'Poste visé', sec_profile: 'Ton profil',
+    f_firstName: 'Prénom', f_lastName: 'Nom', f_address: 'Adresse', f_phone: 'Téléphone', f_email: 'E-mail',
+    f_currentRole: 'Profession / rôle actuel', f_targetCompany: 'Entreprise visée', f_targetPosition: 'Poste',
+    f_jobDescription: 'Description du poste', f_experience: 'Expérience professionnelle', f_education: 'Formation',
+    f_skills: 'Compétences', f_motivation: 'Motivation', f_tone: 'Tonalité souhaitée',
+    tone_prof: 'Professionnel', tone_conf: 'Confiant', tone_warm: 'Chaleureux', tone_direct: 'Direct',
+    ph_jobDescription: 'Colle la description du poste ou décris les exigences principales…',
+    ph_experience: 'Étapes, responsabilités, succès…', ph_education: 'Diplômes, formations continues, certificats…',
+    ph_skills: 'Techniques et personnelles, p.ex. gestion de projet, allemand/français, CRM…',
+    ph_motivation: 'Pourquoi ce poste ? Pourquoi cette entreprise ?…',
+    back: 'Retour', next: 'Continuer', to_preview: 'Voir l\'aperçu',
+    preview_title: 'Ta candidature', preview_sub: 'Aperçu en direct dans le design choisi. Texte IA et export suivent à la prochaine étape.',
+    save_application: 'Enregistrer la candidature', saved: 'Enregistré', saving: 'Enregistrement…',
+    load_saved: 'Candidatures enregistrées', load: 'Ouvrir', no_saved: 'Aucune candidature enregistrée.',
+    subject: 'Candidature au poste de', attachment_note: 'Annexes : CV, certificats',
+    greeting: 'Madame, Monsieur', closing: 'Meilleures salutations',
+    motivation_placeholder: 'Ton texte de candidature apparaîtra ici. Remplis le formulaire, ton texte de motivation forme le cœur de la lettre. À l\'étape suivante, l\'IA en fera une lettre complète et professionnelle.',
+    profile_title: 'Profil', skills_title: 'Compétences', exp_title: 'Expérience', edu_title: 'Formation',
+    locked_title: 'Outil Pro', locked_text: 'Le générateur de candidature fait partie du plan Pro.', locked_cta: 'Voir les plans',
+    required_hint: 'Remplis prénom, nom, entreprise et poste pour continuer.',
+  },
+  IT: {
+    step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
+    pick_design: 'Scegli il tuo design', pick_design_sub: 'Sei layout originali, pensati per il mercato svizzero. Oppure crea il tuo.',
+    own_design: 'Design personale', own_design_new: 'Crea un nuovo design',
+    d_klassisch: 'Classico', d_modern: 'Moderno', d_minimal: 'Minimalista', d_elegant: 'Elegante', d_kreativ: 'Creativo', d_management: 'Management',
+    builder_title: 'Design personale', builder_name: 'Nome del design', builder_name_ph: 'es. Il mio stile',
+    builder_accent: 'Colore accento', builder_font: 'Carattere', builder_layout: 'Stile layout',
+    font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combinato',
+    layout_classic: 'Classico centrato', layout_sidebar: 'Barra laterale', layout_minimal: 'Minimal', layout_elegant: 'Elegante', layout_block: 'Blocco colore', layout_executive: 'Executive',
+    save_design: 'Salva design', cancel: 'Annulla', delete: 'Elimina',
+    sec_person: 'Dati personali', sec_job: 'Posizione desiderata', sec_profile: 'Il tuo profilo',
+    f_firstName: 'Nome', f_lastName: 'Cognome', f_address: 'Indirizzo', f_phone: 'Telefono', f_email: 'E-mail',
+    f_currentRole: 'Professione / ruolo attuale', f_targetCompany: 'Azienda', f_targetPosition: 'Posizione',
+    f_jobDescription: 'Descrizione della posizione', f_experience: 'Esperienza professionale', f_education: 'Formazione',
+    f_skills: 'Competenze', f_motivation: 'Motivazione', f_tone: 'Tonalità desiderata',
+    tone_prof: 'Professionale', tone_conf: 'Sicuro', tone_warm: 'Cordiale', tone_direct: 'Diretto',
+    ph_jobDescription: 'Incolla la descrizione della posizione o descrivi i requisiti principali…',
+    ph_experience: 'Tappe, responsabilità, successi…', ph_education: 'Diplomi, perfezionamenti, certificati…',
+    ph_skills: 'Tecniche e personali, es. gestione progetti, tedesco/francese, CRM…',
+    ph_motivation: 'Perché questa posizione? Perché questa azienda?…',
+    back: 'Indietro', next: 'Avanti', to_preview: 'Vai all\'anteprima',
+    preview_title: 'La tua candidatura', preview_sub: 'Anteprima live nel design scelto. Testo IA ed export seguono al prossimo passo.',
+    save_application: 'Salva candidatura', saved: 'Salvato', saving: 'Salvataggio…',
+    load_saved: 'Candidature salvate', load: 'Apri', no_saved: 'Nessuna candidatura salvata.',
+    subject: 'Candidatura come', attachment_note: 'Allegati: CV, certificati',
+    greeting: 'Gentili Signore e Signori', closing: 'Cordiali saluti',
+    motivation_placeholder: 'Il tuo testo di candidatura apparirà qui. Compila il modulo: il testo di motivazione è il cuore della lettera. Al prossimo passo l\'IA lo trasformerà in una lettera completa e professionale.',
+    profile_title: 'Profilo', skills_title: 'Competenze', exp_title: 'Esperienza', edu_title: 'Formazione',
+    locked_title: 'Strumento Pro', locked_text: 'Il generatore di candidature fa parte del piano Pro.', locked_cta: 'Vedi i piani',
+    required_hint: 'Compila nome, cognome, azienda e posizione per continuare.',
+  },
+  EN: {
+    step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
+    pick_design: 'Pick your design', pick_design_sub: 'Six original layouts, built for the Swiss job market. Or create your own.',
+    own_design: 'Custom design', own_design_new: 'Create a new design',
+    d_klassisch: 'Classic', d_modern: 'Modern', d_minimal: 'Minimalist', d_elegant: 'Elegant', d_kreativ: 'Creative', d_management: 'Management',
+    builder_title: 'Custom design', builder_name: 'Design name', builder_name_ph: 'e.g. My style',
+    builder_accent: 'Accent colour', builder_font: 'Font', builder_layout: 'Layout style',
+    font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combined',
+    layout_classic: 'Classic centred', layout_sidebar: 'Sidebar', layout_minimal: 'Minimal', layout_elegant: 'Elegant', layout_block: 'Colour block', layout_executive: 'Executive',
+    save_design: 'Save design', cancel: 'Cancel', delete: 'Delete',
+    sec_person: 'Personal details', sec_job: 'Target position', sec_profile: 'Your profile',
+    f_firstName: 'First name', f_lastName: 'Last name', f_address: 'Address', f_phone: 'Phone', f_email: 'Email',
+    f_currentRole: 'Profession / current role', f_targetCompany: 'Target company', f_targetPosition: 'Position',
+    f_jobDescription: 'Job description', f_experience: 'Work experience', f_education: 'Education',
+    f_skills: 'Skills', f_motivation: 'Motivation', f_tone: 'Preferred tone',
+    tone_prof: 'Professional', tone_conf: 'Confident', tone_warm: 'Friendly', tone_direct: 'Direct',
+    ph_jobDescription: 'Paste the job description or describe the key requirements…',
+    ph_experience: 'Roles, responsibilities, achievements…', ph_education: 'Degrees, further training, certificates…',
+    ph_skills: 'Technical and personal, e.g. project management, German/French, CRM…',
+    ph_motivation: 'Why this role? Why this company?…',
+    back: 'Back', next: 'Next', to_preview: 'See preview',
+    preview_title: 'Your application', preview_sub: 'Live preview in your chosen design. AI text and export follow in the next step.',
+    save_application: 'Save application', saved: 'Saved', saving: 'Saving…',
+    load_saved: 'Saved applications', load: 'Open', no_saved: 'No saved applications yet.',
+    subject: 'Application for the position of', attachment_note: 'Enclosures: CV, references',
+    greeting: 'Dear Sir or Madam', closing: 'Kind regards',
+    motivation_placeholder: 'Your application text will appear here. Fill in the form — your motivation text forms the core of the letter. In the next step, the AI turns it into a complete, professional cover letter.',
+    profile_title: 'Profile', skills_title: 'Skills', exp_title: 'Experience', edu_title: 'Education',
+    locked_title: 'Pro Tool', locked_text: 'The application generator is part of the Pro plan.', locked_cta: 'See plans',
+    required_hint: 'Fill in first name, last name, company and position to continue.',
+  },
+};
+
+/* ── Document renderer ───────────────────────────────────────────────────────
+   One renderer for every design. Pure HTML/CSS so the same markup can be
+   printed to PDF in phase 2. Dimensions are A4-proportional (1:1.414). */
+
+export const ApplicationDocument = ({ design, form, s, generatedText }: {
+  design: DesignConfig; form: ApplicationForm; s: Record<string, string>; generatedText?: string | null;
+}) => {
+  const serif = "Georgia, 'Times New Roman', serif";
+  const sans = "'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif";
+  const headFont = design.font === 'sans' ? sans : serif;
+  const bodyFont = design.font === 'serif' ? serif : sans;
+  const a = design.accent;
+  const fullName = [form.firstName, form.lastName].filter(Boolean).join(' ') || '—';
+  const contactBits = [form.address, form.phone, form.email].filter(Boolean);
+  const bodyText = generatedText || form.motivation || s.motivation_placeholder;
+  const today = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const Body = () => (
+    <div style={{ fontFamily: bodyFont, fontSize: 10.5, lineHeight: 1.75, color: '#26261F' }}>
+      <p style={{ marginBottom: 10, color: '#6B6B66' }}>{today}</p>
+      <p style={{ fontWeight: 700, marginBottom: 14, color: a, fontSize: 11 }}>
+        {s.subject} {form.targetPosition || '…'}{form.targetCompany ? ` · ${form.targetCompany}` : ''}
+      </p>
+      <p style={{ marginBottom: 10 }}>{s.greeting}</p>
+      <p style={{ whiteSpace: 'pre-wrap', marginBottom: 14, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
+        {bodyText}
+      </p>
+      <p style={{ marginBottom: 4 }}>{s.closing}</p>
+      <p style={{ fontWeight: 600 }}>{fullName}</p>
+      <p style={{ marginTop: 14, fontSize: 8.5, color: '#9A9A94' }}>{s.attachment_note}</p>
+    </div>
+  );
+
+  const SideMeta = () => (
+    <div style={{ fontFamily: bodyFont, fontSize: 8.5, lineHeight: 1.7 }}>
+      {form.currentRole && (<div style={{ marginBottom: 12 }}><p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: 7.5, marginBottom: 3 }}>{s.profile_title}</p><p>{form.currentRole}</p></div>)}
+      {form.skills && (<div style={{ marginBottom: 12 }}><p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: 7.5, marginBottom: 3 }}>{s.skills_title}</p><p style={{ whiteSpace: 'pre-wrap' }}>{form.skills}</p></div>)}
+      {form.education && (<div><p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: 7.5, marginBottom: 3 }}>{s.edu_title}</p><p style={{ whiteSpace: 'pre-wrap' }}>{form.education}</p></div>)}
+    </div>
+  );
+
+  /* Layout variants — each visually distinct, all original work */
+  if (design.layout === 'sidebar') {
+    return (
+      <div style={{ display: 'flex', minHeight: '100%', background: '#fff' }}>
+        <div style={{ width: '32%', background: a, color: '#fff', padding: '28px 18px' }}>
+          <p style={{ fontFamily: headFont, fontSize: 17, fontWeight: 700, lineHeight: 1.2, marginBottom: 4 }}>{fullName}</p>
+          {form.currentRole && <p style={{ fontSize: 8.5, opacity: 0.75, marginBottom: 16 }}>{form.currentRole}</p>}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,.25)', paddingTop: 12, fontSize: 8.5, lineHeight: 1.8, opacity: 0.92 }}>
+            {contactBits.map((b, i) => <p key={i}>{b}</p>)}
+          </div>
+          <div style={{ marginTop: 20, opacity: 0.92 }}><SideMeta /></div>
+        </div>
+        <div style={{ flex: 1, padding: '28px 24px' }}><Body /></div>
+      </div>
+    );
+  }
+
+  if (design.layout === 'block') {
+    return (
+      <div style={{ background: '#fff', minHeight: '100%' }}>
+        <div style={{ background: a, color: '#fff', padding: '26px 28px 20px' }}>
+          <p style={{ fontFamily: headFont, fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{fullName}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6, fontSize: 8.5, opacity: 0.85 }}>
+            {contactBits.map((b, i) => <span key={i}>{b}</span>)}
+          </div>
+        </div>
+        <div style={{ height: 5, background: `linear-gradient(90deg, ${a} 0%, ${a}55 60%, transparent 100%)` }} />
+        <div style={{ padding: '24px 28px' }}><Body /></div>
+      </div>
+    );
+  }
+
+  if (design.layout === 'executive') {
+    return (
+      <div style={{ background: '#fff', minHeight: '100%' }}>
+        <div style={{ borderBottom: `3px solid ${a}`, padding: '26px 28px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
+          <div>
+            <p style={{ fontFamily: serif, fontSize: 20, fontWeight: 600, color: a }}>{fullName}</p>
+            {form.currentRole && <p style={{ fontFamily: sans, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: 2, color: '#6B6B66', marginTop: 2 }}>{form.currentRole}</p>}
+          </div>
+          <div style={{ fontFamily: sans, fontSize: 8, textAlign: 'right', color: '#6B6B66', lineHeight: 1.7 }}>
+            {contactBits.map((b, i) => <p key={i}>{b}</p>)}
+          </div>
+        </div>
+        <div style={{ padding: '22px 28px' }}><Body /></div>
+      </div>
+    );
+  }
+
+  if (design.layout === 'elegant') {
+    return (
+      <div style={{ background: '#fff', minHeight: '100%', padding: '30px 34px' }}>
+        <div style={{ textAlign: 'center', marginBottom: 6 }}>
+          <p style={{ fontFamily: serif, fontSize: 21, fontStyle: 'italic', color: '#1A1A18' }}>{fullName}</p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, fontSize: 8, color: '#6B6B66', marginTop: 4, fontFamily: sans }}>
+            {contactBits.map((b, i) => <span key={i}>{b}</span>)}
+          </div>
+        </div>
+        <div style={{ width: 60, margin: '10px auto 4px', borderTop: `1px solid ${a}` }} />
+        <div style={{ width: 36, margin: '0 auto 22px', borderTop: `1px solid ${a}` }} />
+        <Body />
+      </div>
+    );
+  }
+
+  if (design.layout === 'minimal') {
+    return (
+      <div style={{ background: '#fff', minHeight: '100%', padding: '34px 36px' }}>
+        <p style={{ fontFamily: sans, fontSize: 13, fontWeight: 300, textTransform: 'uppercase', letterSpacing: 5, color: '#1A1A18', marginBottom: 2 }}>{fullName}</p>
+        <p style={{ fontFamily: sans, fontSize: 8, color: '#9A9A94', marginBottom: 28 }}>{contactBits.join('  ·  ')}</p>
+        <Body />
+      </div>
+    );
+  }
+
+  /* classic (default) */
+  return (
+    <div style={{ background: '#fff', minHeight: '100%', padding: '30px 32px' }}>
+      <div style={{ textAlign: 'center', borderBottom: `1px solid ${a}33`, paddingBottom: 14, marginBottom: 20 }}>
+        <p style={{ fontFamily: serif, fontSize: 20, fontWeight: 600, color: '#1A1A18' }}>{fullName}</p>
+        <p style={{ fontFamily: serif, fontSize: 8.5, color: '#6B6B66', marginTop: 3 }}>{contactBits.join(' · ')}</p>
+      </div>
+      <Body />
+    </div>
+  );
+};
+
+/* ── Mini preview used on the design cards ──────────────────────────────── */
+const DesignThumb = ({ design }: { design: DesignConfig }) => {
+  const a = design.accent;
+  const bar = (w: string, o = 0.18) => <div style={{ height: 3, width: w, background: '#1A1A18', opacity: o, borderRadius: 1 }} />;
+  return (
+    <div className="w-full aspect-[3/4] bg-white border border-black/8 overflow-hidden pointer-events-none select-none" aria-hidden="true">
+      {design.layout === 'sidebar' && (
+        <div className="flex h-full">
+          <div style={{ width: '32%', background: a }} />
+          <div className="flex-1 p-2 space-y-1.5 pt-3">{bar('70%', 0.5)}{bar('90%')}{bar('85%')}{bar('88%')}{bar('60%')}</div>
+        </div>
+      )}
+      {design.layout === 'block' && (
+        <div className="h-full">
+          <div style={{ height: '26%', background: a }} />
+          <div className="p-2 space-y-1.5 pt-2.5">{bar('92%')}{bar('85%')}{bar('88%')}{bar('55%')}</div>
+        </div>
+      )}
+      {design.layout === 'executive' && (
+        <div className="h-full p-2">
+          <div className="flex justify-between items-end pb-1.5" style={{ borderBottom: `2px solid ${a}` }}>
+            {bar('45%', 0.55)}{bar('20%')}
+          </div>
+          <div className="space-y-1.5 pt-2">{bar('90%')}{bar('86%')}{bar('88%')}{bar('58%')}</div>
+        </div>
+      )}
+      {design.layout === 'elegant' && (
+        <div className="h-full p-2 flex flex-col items-center pt-3">
+          {bar('40%', 0.5)}
+          <div style={{ width: '30%', borderTop: `1px solid ${a}`, marginTop: 5 }} />
+          <div style={{ width: '18%', borderTop: `1px solid ${a}`, marginTop: 2, marginBottom: 7 }} />
+          <div className="w-full space-y-1.5 px-1">{bar('100%')}{bar('92%')}{bar('96%')}{bar('60%')}</div>
+        </div>
+      )}
+      {design.layout === 'minimal' && (
+        <div className="h-full p-2.5 pt-4 space-y-1.5">
+          <div style={{ height: 3, width: '50%', background: '#1A1A18', opacity: 0.6, letterSpacing: 2 }} />
+          <div style={{ height: 12 }} />
+          {bar('95%')}{bar('88%')}{bar('92%')}{bar('55%')}
+        </div>
+      )}
+      {design.layout === 'classic' && (
+        <div className="h-full p-2 flex flex-col items-center pt-3">
+          {bar('45%', 0.55)}
+          <div style={{ width: '85%', borderTop: `1px solid ${a}66`, margin: '6px 0 7px' }} />
+          <div className="w-full space-y-1.5 px-1">{bar('100%')}{bar('90%')}{bar('94%')}{bar('58%')}</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── Main component ──────────────────────────────────────────────────────── */
+
+const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: {
+  language: string;
+  user: { id: string; email?: string } | null;
+  locked: boolean;
+  onUpgrade: () => void;
+  showToast: (msg: string, type?: string) => void;
+}) => {
+  const s = STR[language] || STR.DE;
+  const [step, setStep] = useState<0 | 1 | 2>(0);
+  const [design, setDesign] = useState<DesignConfig>(BUILT_IN_DESIGNS[0]);
+  const [form, setForm] = useState<ApplicationForm>(EMPTY_FORM);
+  const [customDesigns, setCustomDesigns] = useState<(DesignConfig & { docId: string })[]>([]);
+  const [savedApps, setSavedApps] = useState<any[]>([]);
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [builder, setBuilder] = useState({ name: '', accent: ACCENT_PRESETS[0], font: 'sans' as DesignConfig['font'], layout: 'classic' as DesignConfig['layout'] });
+  const [isSaving, setIsSaving] = useState(false);
+  const [loadedDocId, setLoadedDocId] = useState<string | null>(null);
+
+  const designName = (d: DesignConfig) => d.custom ? (d.name || s.own_design) : (s as any)[`d_${d.id}`] || d.id;
+  const canProceed = form.firstName && form.lastName && form.targetCompany && form.targetPosition;
+
+  /* Load custom designs + saved applications */
+  useEffect(() => {
+    if (!user) return;
+    getDocs(query(collection(db, 'application_designs'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(12)))
+      .then(snap => setCustomDesigns(snap.docs.map(d => ({ ...(d.data().config as DesignConfig), custom: true, name: d.data().name, id: `custom-${d.id}`, docId: d.id }))))
+      .catch(() => {});
+    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), orderBy('updated_at', 'desc'), limit(8)))
+      .then(snap => setSavedApps(snap.docs.map(d => ({ docId: d.id, ...d.data() }))))
+      .catch(() => {});
+  }, [user]);
+
+  const saveCustomDesign = async () => {
+    if (!user || !builder.name.trim()) return;
+    const config: DesignConfig = { id: 'custom', font: builder.font, accent: builder.accent, layout: builder.layout, custom: true, name: builder.name.trim() };
+    try {
+      const ref = await addDoc(collection(db, 'application_designs'), {
+        user_id: user.id, name: builder.name.trim(), config, created_at: new Date().toISOString(),
+      });
+      const withId = { ...config, id: `custom-${ref.id}`, docId: ref.id };
+      setCustomDesigns(prev => [withId, ...prev]);
+      setDesign(withId);
+      setShowBuilder(false);
+      showToast(s.saved, 'success');
+    } catch (e: any) { showToast(e?.message || 'Error', 'error'); }
+  };
+
+  const deleteCustomDesign = async (docId: string) => {
+    try {
+      await deleteDoc(doc(db, 'application_designs', docId));
+      setCustomDesigns(prev => prev.filter(d => d.docId !== docId));
+      if ((design as any).docId === docId) setDesign(BUILT_IN_DESIGNS[0]);
+    } catch { /* ignore */ }
+  };
+
+  const saveApplication = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    const payload = {
+      user_id: user.id,
+      title: `${form.targetPosition || '—'} · ${form.targetCompany || '—'}`,
+      design,
+      form,
+      updated_at: new Date().toISOString(),
+    };
+    try {
+      if (loadedDocId) {
+        await updateDoc(doc(db, 'generated_applications', loadedDocId), payload);
+        setSavedApps(prev => prev.map(a => a.docId === loadedDocId ? { ...a, ...payload } : a));
+      } else {
+        const ref = await addDoc(collection(db, 'generated_applications'), { ...payload, created_at: new Date().toISOString() });
+        setLoadedDocId(ref.id);
+        setSavedApps(prev => [{ docId: ref.id, ...payload }, ...prev]);
+      }
+      showToast(s.saved, 'success');
+    } catch (e: any) { showToast(e?.message || 'Error', 'error'); }
+    finally { setIsSaving(false); }
+  };
+
+  const loadApplication = (app: any) => {
+    setForm({ ...EMPTY_FORM, ...app.form });
+    if (app.design) setDesign(app.design);
+    setLoadedDocId(app.docId);
+    setStep(2);
+  };
+
+  const deleteApplication = async (docId: string) => {
+    try {
+      await deleteDoc(doc(db, 'generated_applications', docId));
+      setSavedApps(prev => prev.filter(a => a.docId !== docId));
+      if (loadedDocId === docId) setLoadedDocId(null);
+    } catch { /* ignore */ }
+  };
+
+  const set = (key: keyof ApplicationForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm(prev => ({ ...prev, [key]: e.target.value }));
+
+  const inputCls = "w-full px-3.5 py-2.5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all placeholder:text-[#9A9A94]/60";
+  const labelCls = "text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]";
+
+  if (locked) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-10 text-center">
+        <div className="w-12 h-12 bg-[#004225]/10 flex items-center justify-center text-[#004225] mb-4 rounded-full"><Lock size={24} /></div>
+        <h3 className="text-lg font-serif mb-2 text-[#1A1A18] dark:text-[#FAFAF8]">{s.locked_title}</h3>
+        <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xs mb-5">{s.locked_text}</p>
+        <button onClick={onUpgrade} className="px-6 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all">{s.locked_cta}</button>
+      </div>
+    );
+  }
+
+  const steps = [s.step_design, s.step_data, s.step_preview];
+
+  return (
+    <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#FDFCFB] dark:bg-[#1A1A18]">
+      {/* Stepper */}
+      <div className="sticky top-0 z-10 bg-[#FDFCFB]/95 dark:bg-[#1A1A18]/95 backdrop-blur-sm border-b border-black/5 dark:border-white/5 px-4 sm:px-8 py-3.5 flex items-center gap-2">
+        {steps.map((label, i) => (
+          <div key={label} className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={() => { if (i < step || (i === 2 && canProceed) || i <= step) setStep(i as 0 | 1 | 2); }}
+              className={`flex items-center gap-2 px-2.5 py-1.5 transition-all ${i === step ? 'text-[#004225] dark:text-[#00A854]' : i < step ? 'text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-70' : 'text-[#9A9A94] cursor-default'}`}
+            >
+              <span className={`w-5 h-5 shrink-0 flex items-center justify-center text-[10px] font-bold rounded-full ${i === step ? 'bg-[#004225] dark:bg-[#00A854] text-white' : i < step ? 'bg-[#004225]/15 dark:bg-[#00A854]/20 text-[#004225] dark:text-[#00A854]' : 'bg-black/8 dark:bg-white/10'}`}>
+                {i < step ? <Check size={11} /> : i + 1}
+              </span>
+              <span className="text-[11px] font-bold uppercase tracking-widest hidden sm:inline truncate">{label}</span>
+            </button>
+            {i < 2 && <div className="w-6 sm:w-10 h-px bg-black/10 dark:bg-white/10 shrink-0" />}
+          </div>
+        ))}
+      </div>
+
+      <div className="p-4 sm:p-8">
+        <AnimatePresence mode="wait">
+          {/* ── STEP 1: DESIGN ───────────────────────────────────────────── */}
+          {step === 0 && (
+            <motion.div key="design" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+              <h3 className="font-serif text-2xl text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{s.pick_design}</h3>
+              <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light mb-6">{s.pick_design_sub}</p>
+
+              {savedApps.length > 0 && (
+                <div className="mb-7">
+                  <p className={`${labelCls} mb-2 flex items-center gap-1.5`}><FolderOpen size={11} />{s.load_saved}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {savedApps.map(app => (
+                      <div key={app.docId} className="group flex items-center gap-1 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 pl-3 pr-1 py-1.5">
+                        <button onClick={() => loadApplication(app)} className="text-xs text-[#1A1A18] dark:text-[#FAFAF8] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors max-w-[200px] truncate">
+                          {app.title}
+                        </button>
+                        <button onClick={() => deleteApplication(app.docId)} aria-label={s.delete} className="p-1 text-[#9A9A94] opacity-0 group-hover:opacity-100 hover:text-red-600 transition-all"><Trash2 size={12} /></button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                {[...BUILT_IN_DESIGNS, ...customDesigns].map(d => (
+                  <button
+                    key={d.id}
+                    onClick={() => setDesign(d)}
+                    className={`group relative text-left p-2.5 border transition-all ${design.id === d.id ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/4 dark:bg-[#00A854]/8 shadow-md' : 'border-black/8 dark:border-white/8 hover:border-[#004225]/40 bg-white dark:bg-[#2A2A26]'}`}
+                  >
+                    <DesignThumb design={d} />
+                    <div className="flex items-center justify-between mt-2.5 px-0.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A1A18] dark:text-[#FAFAF8] truncate">{designName(d)}</span>
+                      {design.id === d.id && <Check size={13} className="text-[#004225] dark:text-[#00A854] shrink-0" />}
+                    </div>
+                    {d.custom && (d as any).docId && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => { e.stopPropagation(); deleteCustomDesign((d as any).docId); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); deleteCustomDesign((d as any).docId); } }}
+                        aria-label={s.delete}
+                        className="absolute top-1.5 right-1.5 p-1.5 bg-white/90 dark:bg-black/60 text-[#9A9A94] hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                      ><Trash2 size={11} /></span>
+                    )}
+                  </button>
+                ))}
+
+                {/* + custom design */}
+                <button
+                  onClick={() => setShowBuilder(true)}
+                  className="flex flex-col items-center justify-center gap-2 border border-dashed border-black/15 dark:border-white/15 hover:border-[#004225] dark:hover:border-[#00A854] text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-all aspect-auto min-h-[140px] bg-white/50 dark:bg-white/[0.02]"
+                >
+                  <span className="w-9 h-9 rounded-full bg-black/5 dark:bg-white/8 flex items-center justify-center"><Plus size={16} /></span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{s.own_design}</span>
+                </button>
+              </div>
+
+              <div className="flex justify-end mt-8">
+                <button onClick={() => setStep(1)} className="inline-flex items-center gap-2 px-7 py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all">
+                  {s.next}<ChevronRight size={14} />
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 2: FORM ─────────────────────────────────────────────── */}
+          {step === 1 && (
+            <motion.div key="form" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="max-w-3xl">
+              <div className="space-y-8">
+                <section>
+                  <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_person}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_firstName} *</label><input className={inputCls} value={form.firstName} onChange={set('firstName')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_lastName} *</label><input className={inputCls} value={form.lastName} onChange={set('lastName')} /></div>
+                    <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_address}</label><input className={inputCls} value={form.address} onChange={set('address')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_phone}</label><input className={inputCls} type="tel" value={form.phone} onChange={set('phone')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_email}</label><input className={inputCls} type="email" value={form.email} onChange={set('email')} /></div>
+                    <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_currentRole}</label><input className={inputCls} value={form.currentRole} onChange={set('currentRole')} /></div>
+                  </div>
+                </section>
+
+                <section>
+                  <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_job}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_targetCompany} *</label><input className={inputCls} value={form.targetCompany} onChange={set('targetCompany')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_targetPosition} *</label><input className={inputCls} value={form.targetPosition} onChange={set('targetPosition')} /></div>
+                    <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_jobDescription}</label><textarea className={`${inputCls} min-h-[90px]`} placeholder={s.ph_jobDescription} value={form.jobDescription} onChange={set('jobDescription')} /></div>
+                  </div>
+                </section>
+
+                <section>
+                  <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_profile}</p>
+                  <div className="grid grid-cols-1 gap-4">
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_experience}</label><textarea className={`${inputCls} min-h-[80px]`} placeholder={s.ph_experience} value={form.experience} onChange={set('experience')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_education}</label><textarea className={`${inputCls} min-h-[70px]`} placeholder={s.ph_education} value={form.education} onChange={set('education')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_skills}</label><textarea className={`${inputCls} min-h-[70px]`} placeholder={s.ph_skills} value={form.skills} onChange={set('skills')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_motivation}</label><textarea className={`${inputCls} min-h-[100px]`} placeholder={s.ph_motivation} value={form.motivation} onChange={set('motivation')} /></div>
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>{s.f_tone}</label>
+                      <select className={inputCls} value={form.tone} onChange={set('tone')}>
+                        <option value="">—</option>
+                        <option value="professional">{s.tone_prof}</option>
+                        <option value="confident">{s.tone_conf}</option>
+                        <option value="friendly">{s.tone_warm}</option>
+                        <option value="direct">{s.tone_direct}</option>
+                      </select>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              {!canProceed && <p className="mt-5 text-[10px] text-[#9A9A94] italic">{s.required_hint}</p>}
+
+              <div className="flex justify-between mt-8">
+                <button onClick={() => setStep(0)} className="inline-flex items-center gap-2 px-5 py-3 text-[11px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                  <ChevronLeft size={14} />{s.back}
+                </button>
+                <button
+                  onClick={() => canProceed && setStep(2)}
+                  disabled={!canProceed}
+                  className={`inline-flex items-center gap-2 px-7 py-3 text-[11px] font-bold uppercase tracking-widest transition-all ${canProceed ? 'bg-[#004225] text-white hover:bg-[#00331d]' : 'bg-black/10 dark:bg-white/10 text-[#9A9A94] cursor-not-allowed'}`}
+                >
+                  <Eye size={14} />{s.to_preview}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── STEP 3: PREVIEW ──────────────────────────────────────────── */}
+          {step === 2 && (
+            <motion.div key="preview" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+              <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
+                <div>
+                  <h3 className="font-serif text-2xl text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{s.preview_title}</h3>
+                  <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light">{s.preview_sub}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                    <ChevronLeft size={12} />{s.back}
+                  </button>
+                  <button
+                    onClick={saveApplication}
+                    disabled={isSaving}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-60"
+                  >
+                    <Save size={12} />{isSaving ? s.saving : s.save_application}
+                  </button>
+                </div>
+              </div>
+
+              {/* A4 document preview */}
+              <div className="mx-auto max-w-[560px] shadow-2xl shadow-black/15 dark:shadow-black/50 border border-black/10 dark:border-white/10">
+                <div className="aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white">
+                  <ApplicationDocument design={design} form={form} s={s} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* ── Custom design builder ──────────────────────────────────────────── */}
+      <AnimatePresence>
+        {showBuilder && (
+          <div className="fixed inset-0 z-[400] flex items-end sm:items-center justify-center sm:p-4 bg-black/45 backdrop-blur-sm" onClick={() => setShowBuilder(false)}>
+            <motion.div
+              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 30 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-white dark:bg-[#1A1A18] w-full sm:max-w-2xl max-h-[92vh] overflow-y-auto custom-scrollbar shadow-2xl border border-black/10 dark:border-white/10"
+            >
+              <div className="p-5 border-b border-black/8 dark:border-white/8 flex items-center justify-between sticky top-0 bg-white dark:bg-[#1A1A18]">
+                <div className="flex items-center gap-2.5">
+                  <Palette size={16} className="text-[#004225] dark:text-[#00A854]" />
+                  <h4 className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8]">{s.own_design_new}</h4>
+                </div>
+                <button onClick={() => setShowBuilder(false)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full text-[#9A9A94]"><X size={16} /></button>
+              </div>
+
+              <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>{s.builder_name}</label>
+                    <input className={inputCls} placeholder={s.builder_name_ph} value={builder.name} onChange={e => setBuilder(b => ({ ...b, name: e.target.value }))} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>{s.builder_accent}</label>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {ACCENT_PRESETS.map(c => (
+                        <button key={c} onClick={() => setBuilder(b => ({ ...b, accent: c }))} aria-label={c}
+                          className={`w-8 h-8 rounded-full border-2 transition-all ${builder.accent === c ? 'border-[#1A1A18] dark:border-white scale-110' : 'border-transparent hover:scale-105'}`}
+                          style={{ background: c }} />
+                      ))}
+                      <input type="color" value={builder.accent} onChange={e => setBuilder(b => ({ ...b, accent: e.target.value }))}
+                        className="w-8 h-8 rounded-full border border-black/15 cursor-pointer bg-transparent" aria-label="Custom colour" />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>{s.builder_font}</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(['serif', 'sans', 'mix'] as const).map(f => (
+                        <button key={f} onClick={() => setBuilder(b => ({ ...b, font: f }))}
+                          className={`px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider border transition-all ${builder.font === f ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/5 text-[#004225] dark:text-[#00A854]' : 'border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:border-[#004225]/40'}`}>
+                          {(s as any)[`font_${f}`]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className={labelCls}>{s.builder_layout}</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['classic', 'sidebar', 'minimal', 'elegant', 'block', 'executive'] as const).map(l => (
+                        <button key={l} onClick={() => setBuilder(b => ({ ...b, layout: l }))}
+                          className={`px-2 py-2.5 text-[10px] font-bold uppercase tracking-wider border transition-all ${builder.layout === l ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/5 text-[#004225] dark:text-[#00A854]' : 'border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:border-[#004225]/40'}`}>
+                          {(s as any)[`layout_${l}`]}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live builder preview */}
+                <div>
+                  <p className={`${labelCls} mb-2`}>{s.step_preview}</p>
+                  <div className="border border-black/10 dark:border-white/10 shadow-lg">
+                    <DesignThumb design={{ id: 'builder-preview', font: builder.font, accent: builder.accent, layout: builder.layout }} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 border-t border-black/8 dark:border-white/8 flex justify-end gap-2">
+                <button onClick={() => setShowBuilder(false)} className="px-5 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all">{s.cancel}</button>
+                <button
+                  onClick={saveCustomDesign}
+                  disabled={!builder.name.trim()}
+                  className={`px-6 py-2.5 text-[10px] font-bold uppercase tracking-widest transition-all ${builder.name.trim() ? 'bg-[#004225] text-white hover:bg-[#00331d]' : 'bg-black/10 dark:bg-white/10 text-[#9A9A94] cursor-not-allowed'}`}
+                >{s.save_design}</button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default ApplicationGenerator;

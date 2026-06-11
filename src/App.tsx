@@ -55,6 +55,7 @@ import sampleJobs from './data/sampleJobs.json';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import FounderPortrait from './components/FounderPortrait';
+const ApplicationGenerator = lazy(() => import('./components/ApplicationGenerator'));
 
 // --- LAZY-LOADED HEAVY COMPONENTS ---
 const PromoVideoModal = lazy(() => import('./components/PromoVideoModal'));
@@ -4074,6 +4075,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           input_canton_placeholder: 'z.B. ZH',
           tutorial: 'Beispiel: Software Engineer im Banking (Zürich) mit 5 Jahren Erfahrung. Marktwert ca. CHF 125k - 145k inkl. Bonus.'
         },
+        'bewerbungs-gen': { title: 'Bewerbungs-Generator', desc: 'Design wählen, Daten eingeben, fertige Bewerbung als Dokument.', input_label: '', input_placeholder: '' },
         'cv-gen': { 
           title: 'Bewerbungen', 
           desc: 'Motivationsschreiben & Lebenslauf in 60 Sekunden, live generiert.', 
@@ -4646,6 +4648,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_data: {
         'cv-optimizer': { title: 'Optimiseur de CV', desc: 'Analyse votre CV selon les standards suisses et optimise la formulation.', input_label: 'Quelle section optimiser ?', input_placeholder: 'ex: Expérience professionnelle...' },
         'salary-calc': { title: 'Calculateur de salaire IA CH', desc: 'Secteur, expérience, canton : l\'IA analyse les salaires du marché.', input_job: 'Titre du poste', input_job_placeholder: 'ex: Ingénieur Logiciel', input_industry: 'Secteur', input_industry_placeholder: 'ex: Banque', input_exp: 'Années d\'expérience', input_exp_placeholder: 'ex: 5', input_canton: 'Canton', input_canton_placeholder: 'ex: GE' },
+        'bewerbungs-gen': { title: 'Générateur de candidature', desc: 'Choisis un design, saisis tes données, obtiens un document fini.', input_label: '', input_placeholder: '' },
         'cv-gen': { title: 'Candidatures', desc: 'Lettre de motivation & CV en 60 secondes, générés en direct.', input_label: 'Annonce d\'emploi (optionnel)', input_placeholder: 'Copiez l\'annonce ici...' },
         'ats-sim': { title: 'Simulation ATS', desc: 'Vérifie si votre CV passe les logiciels de recrutement.', input_label: 'Annonce d\'emploi (optionnel)', input_placeholder: 'Copiez l\'annonce...' },
         'zeugnis': { title: 'Décodeur de certificat Premium', desc: 'Décode le code secret des certificats de travail suisses. Identifie les messages négatifs cachés et évalue votre position sur le marché.', input_label: 'Texte du certificat', input_placeholder: 'Copiez le texte ici...' },
@@ -5130,6 +5133,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_data: {
         'cv-optimizer': { title: 'Ottimizzatore CV', desc: 'Analizza il tuo CV secondo gli standard svizzeri e ottimizza la formulazione.', input_label: 'Quale sezione ottimizzare?', input_placeholder: 'es. Esperienza professionale...' },
         'salary-calc': { title: 'Calcolatore stipendio AI CH', desc: 'Settore, esperienza, cantone: l\'IA analizza i salari di mercato.', input_job: 'Titolo del lavoro', input_job_placeholder: 'es: Ingegnere del Software', input_industry: 'Settore', input_industry_placeholder: 'es: Banche', input_exp: 'Anni di esperienza', input_exp_placeholder: 'es: 5', input_canton: 'Cantone', input_canton_placeholder: 'es: TI' },
+        'bewerbungs-gen': { title: 'Generatore di candidatura', desc: 'Scegli un design, inserisci i dati, ottieni un documento finito.', input_label: '', input_placeholder: '' },
         'cv-gen': { title: 'Candidature', desc: 'Lettera di motivazione & CV in 60 secondi, generati dal vivo.', input_label: 'Annuncio di lavoro (opzionale)', input_placeholder: 'Copia l\'annuncio qui...' },
         'ats-sim': { title: 'Simulazione ATS', desc: 'Verifica se il tuo CV passa attraverso i software dei recruiter.', input_label: 'Annuncio di lavoro (opzionale)', input_placeholder: 'Copia l\'annuncio...' },
         'zeugnis': { title: 'Decodificatore certificati Premium', desc: 'Decodifica il codice segreto dei certificati di lavoro svizzeri. Identifica messaggi negativi nascosti e valuta la tua posizione sul mercato.', input_label: 'Testo del certificato', input_placeholder: 'Copia il testo qui...' },
@@ -5614,6 +5618,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_data: {
         'cv-optimizer': { title: 'CV Optimizer', desc: 'Analyzes your CV for Swiss standards & optimizes wording.', input_label: 'Which section to optimize?', input_placeholder: 'e.g. Work experience...' },
         'salary-calc': { title: 'AI Salary Calc CH', desc: 'Industry, experience, canton: AI analyzes market wages & gives you a basis for negotiation.', input_job: 'Job Title', input_job_placeholder: 'e.g. Software Engineer', input_industry: 'Industry', input_industry_placeholder: 'e.g. Banking', input_exp: 'Years of Experience', input_exp_placeholder: 'e.g. 5', input_canton: 'Canton', input_canton_placeholder: 'e.g. ZH' },
+        'bewerbungs-gen': { title: 'Application Builder', desc: 'Pick a design, enter your details, get a finished document.', input_label: '', input_placeholder: '' },
         'cv-gen': { title: 'Applications', desc: 'Cover letter & CV in 60 seconds, generated live.', input_label: 'Job Ad (optional)', input_placeholder: 'Paste the job ad here...' },
         'ats-sim': { title: 'ATS Simulation', desc: 'Checks if your CV passes through recruiter software. With score & tips.', input_label: 'Job Ad (optional)', input_placeholder: 'Paste the job ad...' },
         'zeugnis': { title: 'Premium Certificate Decoder', desc: 'Decodes the secret code of Swiss work certificates. Identifies hidden negative messages and evaluates your market position.', input_label: 'Certificate Text', input_placeholder: 'Paste the text here...' },
@@ -5747,7 +5752,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { key: 'industry', label: t.tools_data['salary-calc'].input_industry, type: 'text', placeholder: t.tools_data['salary-calc'].input_industry_placeholder },
         { key: 'experience', label: t.tools_data['salary-calc'].input_exp, type: 'number', placeholder: t.tools_data['salary-calc'].input_exp_placeholder },
         { key: 'canton', label: t.tools_data['salary-calc'].input_canton, type: 'text', placeholder: t.tools_data['salary-calc'].input_canton_placeholder }
-      ] 
+      ]
+    },
+    {
+      id: 'bewerbungs-gen',
+      title: t.tools_data['bewerbungs-gen'].title,
+      desc: t.tools_data['bewerbungs-gen'].desc,
+      icon: <FileText size={20} />,
+      badge: 'Studio',
+      type: 'pro',
+      inputs: []
     },
     {
       id: 'cv-gen',
@@ -9178,6 +9192,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
+                {/* Bewerbungs-Generator: full-custom flow overlays the generic two-panel UI */}
+                {activeTool.id === 'bewerbungs-gen' && (
+                  <div className="absolute inset-0 z-40 flex flex-col bg-[#FDFCFB] dark:bg-[#1A1A18]">
+                    <Suspense fallback={<div className="flex-1 flex items-center justify-center"><div className="w-6 h-6 border-2 border-[#004225] border-t-transparent rounded-full animate-spin" /></div>}>
+                      <ApplicationGenerator
+                        language={language}
+                        user={user}
+                        locked={isToolLocked}
+                        onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
+                        showToast={showToast}
+                      />
+                    </Suspense>
+                  </div>
+                )}
                 {/* Inputs */}
                 <div className={`w-full lg:w-[340px] lg:shrink-0 p-4 sm:p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/5 transition-colors relative overflow-y-auto max-h-[45vh] lg:max-h-none`}>
                   {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
