@@ -811,9 +811,12 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
 // ── AI Quota / Rate-Limit Enforcement ────────────────────────────────────────
 // Free users get 3 lifetime tries — then upgrade is required.
 // Pro/Unlimited get generous monthly allowances with per-minute throttling.
+// Plan limits — must stay in sync with what we tell users on the Pricing
+// page, in Settings ("Dein Plan im Überblick") and on the dashboard tile.
+// Adjusting any of these requires updating those copy strings too.
 const QUOTA = {
   client:    { lifetime: 3 },
-  pro:       { perMin: 15, perDay: 150, perMonth: 800 },
+  pro:       { perMin: 15, perDay: 10,  perMonth: 150 },
   unlimited: { perMin: 30, perDay: 600, perMonth: 5000 },
 } as const;
 
