@@ -2555,9 +2555,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     
     // Limits must match server QUOTA (api/index.ts) and the pricing copy.
     const isToolLimitReached = (!isPro && toolUses >= 3)
-      || (user?.role === 'pro' && !isUnlimited && toolUses >= 150)
-      || (user?.role === 'unlimited' && toolUses >= 5000);
-    const isDailyLimitReached = user?.role === 'pro' && !isUnlimited && dailyToolUses >= 10;
+      || (user?.role === 'pro' && !isUnlimited && toolUses >= 200)
+      || (user?.role === 'unlimited' && toolUses >= 2000);
+    const isDailyLimitReached = (user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20)
+      || (user?.role === 'unlimited' && dailyToolUses >= 200);
 
     if (isToolLimitReached || isDailyLimitReached) {
       if (isDailyLimitReached) {
@@ -3663,8 +3664,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Häufige Fragen",
       stella_placeholder: "Frag Stella etwas...",
       stella_secure_data: "SSL-verschlüsselt · Sicher übertragen",
-      hero_title: "Von Bewerbung bis Interview: dein KI-Karriere-Coach",
-      hero_desc: "Stellify analysiert deinen Lebenslauf, optimiert deine Bewerbungsunterlagen und trainiert dich gezielt für das Vorstellungsgespräch, präzise, diskret und auf den Schweizer Markt zugeschnitten.",
+      hero_title: "Die Bewerbungs-KI für die Schweiz",
+      hero_desc: "In 5 Minuten zu einer professionellen Schweizer Bewerbung: Anschreiben, Lebenslauf, Interview-Vorbereitung. Plus 20 weitere Karriere-Tools inklusive — präzise, diskret, auf den Schweizer Arbeitsmarkt zugeschnitten.",
       cta_free: "Kostenlos starten",
       upload_cv: "Lebenslauf hochladen",
       update_cv: "Lebenslauf aktualisieren",
@@ -3703,7 +3704,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Der Standard für ambitionierte Bewerber.",
       pricing_ultimate_desc: "Maximale Power für deine Karriere.",
       faq_title: "Häufig gestellte Fragen",
-      footer_desc: "Stellify ist die führende KI-Plattform für Karriere-Optimierung in der Schweiz. Präzise, diskret und erfolgreich.",
+      footer_desc: "Stellify ist die Bewerbungs-KI für die Schweiz. Professionelle Bewerbungen in 5 Minuten, plus 20 weitere Karriere-Tools.",
       footer_legal: "Rechtliches",
       footer_contact: "Kontakt",
       auth_login: "Anmelden",
@@ -3773,7 +3774,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Einstellungen",
       nav_logout: "Abmelden",
       nav_login: "Anmelden",
-      tool_limit_pro: "Du hast deine 150 Nutzungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Ultimate für noch grösseren Spielraum (5'000/Monat).",
+      tool_limit_pro: "Du hast deine 200 Nutzungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Ultimate für 2'000/Monat plus exklusive Premium-Features.",
       tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Unlimited-Abo. ✨",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
@@ -3804,8 +3805,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits werden automatisch zurückgesetzt — täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen — Upgrade jederzeit möglich.",
       plan_free_f1: "21 Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
-      plan_pro_f1: "Alle 21 Tools freigeschaltet", plan_pro_f2: "150 KI-Anfragen pro Monat", plan_pro_f3: "10 Tool-Nutzungen pro Tag", plan_pro_f4: "Prioritärer Support", plan_pro_f5: "Erweiterte Bewerbungs-Designs",
-      plan_unlim_f1: "Alles aus Pro", plan_unlim_f2: "Bis zu 5000 KI-Anfragen pro Monat", plan_unlim_f3: "600 Anfragen pro Tag", plan_unlim_f4: "Deep Analysis Modus", plan_unlim_f5: "24/7 VIP-Support",
+      plan_pro_f1: "200 KI-Anfragen pro Monat", plan_pro_f2: "20 Nutzungen pro Tag", plan_pro_f3: "Alle 21 Tools (Bewerbungs-Generator + 20 weitere)", plan_pro_f4: "25 gespeicherte Bewerbungen", plan_pro_f5: "Prioritärer Support (24h)",
+      plan_unlim_f1: "2'000 KI-Anfragen pro Monat, 200 pro Tag", plan_unlim_f2: "Deep Analysis Modus (KI-Tiefenanalyse)", plan_unlim_f3: "Premium-Bewerbungs-Designs (exklusiv)", plan_unlim_f4: "Unbegrenzte gespeicherte Bewerbungen + KI-Live-Suche", plan_unlim_f5: "Priority-Server-Zugang + 24/7 VIP-Support",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Tageslimit",
@@ -3894,8 +3895,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Keine Massenbewerbungen oder Automatisierung gegen unsere AGB",
       tr_limits_title: "Konkrete KI-Limits pro Plan",
       tr_lim_free_label: "Gratis", tr_lim_free_v: "3 KI-Anfragen lebenslang · 3 Stella-Chat-Nachrichten",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "150 KI-Anfragen pro Monat · max. 10 pro Tag · alle 21 Tools",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "Bis zu 5'000 KI-Anfragen pro Monat · 600 pro Tag · Deep Analysis",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 KI-Anfragen pro Monat · max. 20 pro Tag · alle 21 Karriere-Tools",
+      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "2'000 KI-Anfragen pro Monat · 200 pro Tag · Deep Analysis + Premium-Designs",
       tr_reset_info: "Pro- und Ultimate-Limits werden monatlich am 1. zurückgesetzt, Tageslimit täglich um 0 Uhr (Europe/Zurich).",
       tr_fair_use: "Stellify nutzt einen Fair-Use-Schutz von max. 15 (Pro) bzw. 30 (Ultimate) Anfragen pro Minute, um Missbrauch zu verhindern.",
       quick_tools: "Quick Tools",
@@ -3953,7 +3954,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Oder",
       stat_members: "Mitglieder",
       hero_intro: "Dein persönlicher",
-      hero_accent: "KI-Karriere-Coach",
+      hero_accent: "Bewerbungs-KI",
       badge_new: "NEU",
       tools_section_badge: "21 KI-Tools",
       tools_section_title: "Alles, was du für deine Karriere brauchst",
@@ -4070,8 +4071,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Datenschutz aus der Schweiz", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
       pricing_free_f: ["3× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
-      pricing_pro_f: ["150 KI-Anfragen pro Monat", "10 Nutzungen pro Tag", "Alle 21 Tools (Zeugnis-Decoder, Interview-Coach, …)", "Prioritärer Support"],
-      pricing_ultimate_f: ["Bis zu 5'000 KI-Anfragen pro Monat", "600 Anfragen pro Tag — kein praktisches Limit", "Alle Pro-Features + Deep Analysis Modus", "24/7 VIP-Support"],
+      pricing_pro_f: ["200 KI-Bewerbungen / Anfragen pro Monat", "20 Nutzungen pro Tag", "Alle 21 Karriere-Tools inklusive", "25 gespeicherte Bewerbungen", "Prioritärer Support"],
+      pricing_ultimate_f: ["2'000 KI-Bewerbungen / Anfragen pro Monat", "200 pro Tag — für intensive Bewerbungsphasen", "Deep Analysis Modus + Premium-Designs (exklusiv)", "KI-Live-Suche + unbegrenzt gespeicherte Bewerbungen", "Priority-Server + 24/7 VIP-Support"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Ultimate wählen",
@@ -4282,8 +4283,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Questions fréquentes",
       stella_placeholder: "Demandez quelque chose à Stella...",
       stella_secure_data: "Traitement sécurisé des données suisses",
-      hero_title: "De la candidature à l'entretien : votre coach carrière IA",
-      hero_desc: "Stellify analyse votre CV, optimise vos candidatures et vous prépare aux entretiens, précisément, discrètement, pour le marché suisse.",
+      hero_title: "L'IA de candidature pour la Suisse",
+      hero_desc: "Une candidature suisse professionnelle en 5 minutes : lettre de motivation, CV, préparation à l'entretien. Plus 20 outils carrière inclus — précis, discret, adapté au marché du travail suisse.",
       cta_free: "Tester gratuitement",
       upload_cv: "Télécharger ton CV",
       update_cv: "Mettre à jour CV (Lebenslauf)",
@@ -4322,7 +4323,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Le standard pour les candidats ambitieux.",
       pricing_ultimate_desc: "Puissance maximale pour votre carrière.",
       faq_title: "Foire aux questions",
-      footer_desc: "Stellify est la plateforme IA leader pour l'optimisation de carrière en Suisse. Précise, discrète et réussie.",
+      footer_desc: "Stellify est l'IA de candidature pour la Suisse. Candidatures professionnelles en 5 minutes, plus 20 outils carrière.",
       footer_legal: "Mentions légales",
       footer_contact: "Contact",
       auth_login: "Se connecter",
@@ -4423,8 +4424,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limites réinitialisées automatiquement — chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie — upgrade possible à tout moment.",
       plan_free_f1: "21 outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
-      plan_pro_f1: "Les 21 outils débloqués", plan_pro_f2: "150 requêtes IA par mois", plan_pro_f3: "10 utilisations par jour", plan_pro_f4: "Support prioritaire", plan_pro_f5: "Designs de candidature avancés",
-      plan_unlim_f1: "Tout le contenu Pro", plan_unlim_f2: "Jusqu\'à 5000 requêtes IA par mois", plan_unlim_f3: "600 requêtes par jour", plan_unlim_f4: "Mode Deep Analysis", plan_unlim_f5: "Support VIP 24/7",
+      plan_pro_f1: "200 requêtes IA par mois", plan_pro_f2: "20 utilisations par jour", plan_pro_f3: "Les 21 outils (Générateur + 20 autres)", plan_pro_f4: "25 candidatures sauvegardées", plan_pro_f5: "Support prioritaire (24h)",
+      plan_unlim_f1: "2'000 requêtes IA par mois, 200 par jour", plan_unlim_f2: "Mode Deep Analysis (analyse IA approfondie)", plan_unlim_f3: "Designs de candidature Premium (exclusifs)", plan_unlim_f4: "Candidatures sauvegardées illimitées + Recherche IA en direct", plan_unlim_f5: "Accès serveur prioritaire + Support VIP 24/7",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite quotidienne",
@@ -4513,7 +4514,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Pas de candidatures de masse ni d'automatisation contre nos CGV",
       tr_limits_title: "Limites IA concrètes par plan",
       tr_lim_free_label: "Gratuit", tr_lim_free_v: "3 requêtes IA à vie · 3 messages Stella Chat",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "150 requêtes IA par mois · max. 10 par jour · les 21 outils",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 requêtes IA par mois · max. 20 par jour · les 21 outils carrière",
       tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "Jusqu'à 5'000 requêtes IA par mois · 600 par jour · Deep Analysis",
       tr_reset_info: "Les limites Pro et Ultimate sont réinitialisées le 1er du mois, la limite journalière à minuit (Europe/Zurich).",
       tr_fair_use: "Stellify applique une protection 'fair use' de max. 15 (Pro) ou 30 (Ultimate) requêtes par minute pour éviter les abus.",
@@ -4572,7 +4573,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Ou",
       stat_members: "Membres",
       hero_intro: "Votre",
-      hero_accent: "coach carrière IA",
+      hero_accent: "IA de candidature",
       badge_new: "NOUVEAU",
       tools_section_badge: "21 Outils IA",
       tools_section_title: "Tout ce dont vous avez besoin pour votre carrière",
@@ -4689,8 +4690,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
       ],
       pricing_free_f: ["3× candidatures ou utilisations d'outil", "3× demandes Stella Chat", "Calculateur de salaire IA (Base)", "Normes suisses"],
-      pricing_pro_f: ["150 requêtes IA par mois", "10 utilisations par jour", "Les 21 outils (Décodeur, Coach d'entretien, …)", "Support prioritaire"],
-      pricing_ultimate_f: ["Jusqu\'à 5'000 requêtes IA par mois", "600 requêtes par jour — sans limite pratique", "Toutes les fonctions Pro + Coach IA personnel", "Support VIP 24/7"],
+      pricing_pro_f: ["200 candidatures IA / requêtes par mois", "20 utilisations par jour", "Les 21 outils carrière inclus", "25 candidatures sauvegardées", "Support prioritaire"],
+      pricing_ultimate_f: ["2'000 candidatures IA / requêtes par mois", "200 par jour — pour les phases intensives", "Mode Deep Analysis + Designs Premium (exclusifs)", "Recherche IA en direct + candidatures illimitées", "Accès serveur prioritaire + Support VIP 24/7"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Ultimate",
@@ -4795,8 +4796,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Domande frequenti",
       stella_placeholder: "Chiedi qualcosa a Stella...",
       stella_secure_data: "Elaborazione sicura dei dati svizzeri",
-      hero_title: "Dal CV al colloquio: il tuo coach carriera con IA",
-      hero_desc: "Stellify analizza il tuo CV, ottimizza le tue candidature e ti prepara ai colloqui, con precisione, discrezione e focus sul mercato svizzero.",
+      hero_title: "L'IA per le candidature in Svizzera",
+      hero_desc: "Una candidatura svizzera professionale in 5 minuti: lettera di motivazione, CV, preparazione al colloquio. Più 20 strumenti carriera inclusi — preciso, discreto, calibrato sul mercato del lavoro svizzero.",
       cta_free: "Prova gratuitamente",
       upload_cv: "Carica il tuo CV",
       update_cv: "Aggiorna CV (Lebenslauf)",
@@ -4835,7 +4836,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Lo standard per i candidati ambiziosi.",
       pricing_ultimate_desc: "Massima potenza per la tua carriera.",
       faq_title: "Domande frequenti",
-      footer_desc: "Stellify è la piattaforma AI leader per l'ottimizzazione della carriera in Svizzera. Precisa, discreta e di successo.",
+      footer_desc: "Stellify è l'IA per le candidature in Svizzera. Candidature professionali in 5 minuti, più 20 strumenti carriera.",
       footer_legal: "Note legali",
       footer_contact: "Contatto",
       auth_login: "Accedi",
@@ -4936,8 +4937,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limiti reimpostati automaticamente — ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita — upgrade possibile in qualsiasi momento.",
       plan_free_f1: "21 strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
-      plan_pro_f1: "Tutti i 21 strumenti sbloccati", plan_pro_f2: "150 richieste IA al mese", plan_pro_f3: "10 utilizzi al giorno", plan_pro_f4: "Supporto prioritario", plan_pro_f5: "Design candidatura avanzati",
-      plan_unlim_f1: "Tutto Pro", plan_unlim_f2: "Fino a 5000 richieste IA al mese", plan_unlim_f3: "600 richieste al giorno", plan_unlim_f4: "Modalità Deep Analysis", plan_unlim_f5: "Supporto VIP 24/7",
+      plan_pro_f1: "200 richieste IA al mese", plan_pro_f2: "20 utilizzi al giorno", plan_pro_f3: "Tutti i 21 strumenti (Generatore + altri 20)", plan_pro_f4: "25 candidature salvate", plan_pro_f5: "Supporto prioritario (24h)",
+      plan_unlim_f1: "2'000 richieste IA al mese, 200 al giorno", plan_unlim_f2: "Modalità Deep Analysis (analisi IA approfondita)", plan_unlim_f3: "Design candidatura Premium (esclusivi)", plan_unlim_f4: "Candidature salvate illimitate + Ricerca IA dal vivo", plan_unlim_f5: "Accesso server prioritario + Supporto VIP 24/7",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite giornaliero",
@@ -5026,8 +5027,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Nessuna candidatura di massa o automazione contro le nostre condizioni",
       tr_limits_title: "Limiti IA concreti per piano",
       tr_lim_free_label: "Gratuito", tr_lim_free_v: "3 richieste IA a vita · 3 messaggi Stella Chat",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "150 richieste IA al mese · max. 10 al giorno · tutti i 21 strumenti",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "Fino a 5'000 richieste IA al mese · 600 al giorno · Deep Analysis",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 richieste IA al mese · max. 20 al giorno · tutti i 21 strumenti carriera",
+      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "2'000 richieste IA al mese · 200 al giorno · Deep Analysis + Design Premium",
       tr_reset_info: "I limiti Pro e Ultimate vengono reimpostati il 1° del mese, il limite giornaliero a mezzanotte (Europe/Zurich).",
       tr_fair_use: "Stellify applica una protezione 'fair use' di max. 15 (Pro) o 30 (Ultimate) richieste al minuto per evitare abusi.",
       quick_tools: "Strumenti rapidi",
@@ -5085,7 +5086,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Oppure",
       stat_members: "Membri",
       hero_intro: "Il tuo",
-      hero_accent: "coach carriera IA",
+      hero_accent: "IA per candidature",
       badge_new: "NUOVO",
       tools_section_badge: "21 Strumenti AI",
       tools_section_title: "Tutto ciò di cui hai bisogno per la tua carriera",
@@ -5202,8 +5203,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
       ],
       pricing_free_f: ["3× candidature o utilizzi strumenti", "3× messaggi Stella Chat", "Calcolatore di stipendio AI (Base)", "Standard svizzeri"],
-      pricing_pro_f: ["150 richieste IA al mese", "10 utilizzi al giorno", "Tutti i 21 strumenti (Decodificatore, Coach colloqui, …)", "Supporto prioritario"],
-      pricing_ultimate_f: ["Fino a 5'000 richieste IA al mese", "600 richieste al giorno — senza limite pratico", "Tutte le funzioni Pro + Coach AI personale", "Supporto VIP 24/7"],
+      pricing_pro_f: ["200 candidature IA / richieste al mese", "20 utilizzi al giorno", "Tutti i 21 strumenti carriera inclusi", "25 candidature salvate", "Supporto prioritario"],
+      pricing_ultimate_f: ["2'000 candidature IA / richieste al mese", "200 al giorno — per fasi intensive", "Modalità Deep Analysis + Design Premium (esclusivi)", "Ricerca IA dal vivo + candidature illimitate", "Accesso server prioritario + Supporto VIP 24/7"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Ultimate",
@@ -5308,8 +5309,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Common Questions",
       stella_placeholder: "Ask Stella something...",
       stella_secure_data: "Secure Swiss Data Processing",
-      hero_title: "Ace Every Interview. Land Your Dream Job in Switzerland.",
-      hero_desc: "Stellify prepares you for every stage of the Swiss application process, from CV analysis to interview coaching. AI-powered, precise, and tailored to the Swiss job market.",
+      hero_title: "The Application AI for Switzerland",
+      hero_desc: "A professional Swiss application in 5 minutes: cover letter, CV, interview prep. Plus 20 more career tools included — precise, discreet, tuned to the Swiss job market.",
       cta_free: "Test for free",
       upload_cv: "Upload CV (Resume)",
       update_cv: "Update CV (Resume)",
@@ -5348,7 +5349,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "The standard for ambitious candidates.",
       pricing_ultimate_desc: "Maximum power for your career.",
       faq_title: "Frequently Asked Questions",
-      footer_desc: "Stellify is the leading AI platform for career optimization in Switzerland. Precise, discreet, and successful.",
+      footer_desc: "Stellify is the application AI for Switzerland. Professional applications in 5 minutes, plus 20 more career tools.",
       footer_legal: "Legal",
       footer_contact: "Contact",
       auth_login: "Login",
@@ -5449,8 +5450,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits reset automatically — daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits — upgrade anytime.",
       plan_free_f1: "21 tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
-      plan_pro_f1: "All 21 tools unlocked", plan_pro_f2: "150 AI requests per month", plan_pro_f3: "10 uses per day", plan_pro_f4: "Priority support", plan_pro_f5: "Advanced application designs",
-      plan_unlim_f1: "Everything in Pro", plan_unlim_f2: "Up to 5,000 AI requests per month", plan_unlim_f3: "600 requests per day", plan_unlim_f4: "Deep Analysis mode", plan_unlim_f5: "VIP support 24/7",
+      plan_pro_f1: "200 AI requests per month", plan_pro_f2: "20 uses per day", plan_pro_f3: "All 21 tools (Builder + 20 more)", plan_pro_f4: "25 saved applications", plan_pro_f5: "Priority support (24h)",
+      plan_unlim_f1: "2,000 AI requests per month, 200 per day", plan_unlim_f2: "Deep Analysis mode (in-depth AI analysis)", plan_unlim_f3: "Premium application designs (exclusive)", plan_unlim_f4: "Unlimited saved applications + Live AI search", plan_unlim_f5: "Priority server access + VIP support 24/7",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Daily Limit",
@@ -5539,8 +5540,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "No mass applications or automation against our terms",
       tr_limits_title: "Concrete AI limits by plan",
       tr_lim_free_label: "Free", tr_lim_free_v: "3 lifetime AI requests · 3 Stella chat messages",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "150 AI requests per month · max. 10 per day · all 21 tools",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "Up to 5,000 AI requests per month · 600 per day · Deep Analysis",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 AI requests per month · max. 20 per day · all 21 career tools",
+      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "2,000 AI requests per month · 200 per day · Deep Analysis + Premium designs",
       tr_reset_info: "Pro and Ultimate limits reset on the 1st of each month, the daily limit at midnight (Europe/Zurich).",
       tr_fair_use: "Stellify applies a fair-use limit of max. 15 (Pro) or 30 (Ultimate) requests per minute to prevent abuse.",
       quick_tools: "Quick Tools",
@@ -5598,7 +5599,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Or",
       stat_members: "Members",
       hero_intro: "Your Personal",
-      hero_accent: "AI Career Coach",
+      hero_accent: "Application AI",
       badge_new: "NEW",
       tools_section_badge: "21 AI Tools",
       tools_section_title: "Everything you need for your career",
@@ -5715,8 +5716,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
       ],
       pricing_free_f: ["3× applications or tool uses", "3× Stella Chat messages", "AI Salary Calculator (Base)", "Swiss Standards"],
-      pricing_pro_f: ["150 AI requests per month", "10 uses per day", "All 21 tools (Certificate Decoder, Interview Coach, …)", "Priority Support"],
-      pricing_ultimate_f: ["Up to 5,000 AI requests per month", "600 requests per day — no practical limit", "All Pro features + Deep Analysis Mode", "24/7 VIP Support"],
+      pricing_pro_f: ["200 AI applications / requests per month", "20 uses per day", "All 21 career tools included", "25 saved applications", "Priority Support"],
+      pricing_ultimate_f: ["2,000 AI applications / requests per month", "200 per day — for intensive phases", "Deep Analysis Mode + Premium designs (exclusive)", "Live AI search + unlimited saved applications", "Priority server access + 24/7 VIP Support"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Ultimate",
@@ -6033,8 +6034,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const isPro = user?.role === 'pro' || isUnlimited;
   const toolUses = user?.toolUses || 0;
   const dailyToolUses = user?.dailyToolUses || 0;
-  const isToolLimitReached = (!isPro && toolUses >= 3) || (user?.role === 'pro' && !isUnlimited && toolUses >= 50);
-  const isDailyLimitReached = user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20;
+  const isToolLimitReached = (!isPro && toolUses >= 3)
+    || (user?.role === 'pro' && !isUnlimited && toolUses >= 200)
+    || (user?.role === 'unlimited' && toolUses >= 2000);
+  const isDailyLimitReached = (user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20)
+    || (user?.role === 'unlimited' && dailyToolUses >= 200);
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
@@ -6343,12 +6347,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
                                     <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 150</span>
+                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 200</span>
                                   </div>
                                   <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div 
                                       className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(((user.toolUses || 0) / 150) * 100, 100)}%` }}
+                                      style={{ width: `${Math.min(((user.toolUses || 0) / 200) * 100, 100)}%` }}
                                     />
                                   </div>
                                   <div className="flex justify-end">
@@ -6360,12 +6364,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
                                     <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_daily_usage}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.dailyToolUses || 0} / 10</span>
+                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.dailyToolUses || 0} / 20</span>
                                   </div>
                                   <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div 
                                       className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 10) * 100))}%` }}
+                                      style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%` }}
                                     />
                                   </div>
                                   <div className="flex justify-end">
@@ -11027,14 +11031,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 150 {t.settings_generations}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 200 {t.settings_generations}</p>
                                 </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 150) * 100)}%</span>
+                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 200) * 100)}%</span>
                               </div>
                               <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(((user.toolUses || 0) / 150) * 100, 100)}%` }}
+                                  style={{ width: `${Math.min(((user.toolUses || 0) / 200) * 100, 100)}%` }}
                                 />
                               </div>
                             </div>
@@ -11044,14 +11048,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.dashboard_daily_usage}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 10 {t.settings_actions_today}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {t.settings_actions_today}</p>
                                 </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 10) * 100))}%</span>
+                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%</span>
                               </div>
                               <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 10) * 100))}%` }}
+                                  style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%` }}
                                 />
                               </div>
                             </div>

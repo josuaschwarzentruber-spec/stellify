@@ -27,15 +27,17 @@ export type DesignConfig = {
   layout: 'classic' | 'sidebar' | 'minimal' | 'elegant' | 'block' | 'executive';
   custom?: boolean;
   name?: string;
+  /** Ultimate-only design — locked for Free + Pro */
+  premium?: boolean;
 };
 
 const BUILT_IN_DESIGNS: DesignConfig[] = [
   { id: 'klassisch',  font: 'serif', accent: '#1A1A18', layout: 'classic' },
   { id: 'modern',     font: 'sans',  accent: '#004225', layout: 'sidebar' },
   { id: 'minimal',    font: 'sans',  accent: '#5C5C58', layout: 'minimal' },
-  { id: 'elegant',    font: 'mix',   accent: '#8A6D3B', layout: 'elegant' },
+  { id: 'elegant',    font: 'mix',   accent: '#8A6D3B', layout: 'elegant', premium: true },
   { id: 'kreativ',    font: 'sans',  accent: '#0E7490', layout: 'block' },
-  { id: 'management', font: 'mix',   accent: '#1E2A38', layout: 'executive' },
+  { id: 'management', font: 'mix',   accent: '#1E2A38', layout: 'executive', premium: true },
 ];
 
 const ACCENT_PRESETS = ['#004225', '#1E2A38', '#8A6D3B', '#0E7490', '#7C2D4E', '#1A1A18'];
@@ -98,7 +100,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
     export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…',
     interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
-    quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/150 diesen Monat', quota_pro_day: '{used}/10 heute',
+    quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/200 diesen Monat', quota_pro_day: '{used}/20 heute',
     quota_free_done: 'Gratis-Versuche aufgebraucht', quota_pro_month_done: 'Monatslimit erreicht', quota_pro_day_done: 'Tageslimit erreicht',
   },
   FR: {
@@ -137,7 +139,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
     export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…',
     interview_hint: '10 questions possibles avec suggestions de réponses',
-    quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/150 ce mois', quota_pro_day: '{used}/10 aujourd\'hui',
+    quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/200 ce mois', quota_pro_day: '{used}/20 aujourd\'hui',
     quota_free_done: 'Essais gratuits épuisés', quota_pro_month_done: 'Limite mensuelle atteinte', quota_pro_day_done: 'Limite journalière atteinte',
   },
   IT: {
@@ -176,7 +178,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
     export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…',
     interview_hint: '10 possibili domande con suggerimenti di risposta',
-    quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/150 questo mese', quota_pro_day: '{used}/10 oggi',
+    quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/200 questo mese', quota_pro_day: '{used}/20 oggi',
     quota_free_done: 'Tentativi gratuiti esauriti', quota_pro_month_done: 'Limite mensile raggiunto', quota_pro_day_done: 'Limite giornaliero raggiunto',
   },
   EN: {
@@ -215,7 +217,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
     export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…',
     interview_hint: '10 possible questions with suggested answers',
-    quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/150 this month', quota_pro_day: '{used}/10 today',
+    quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/200 this month', quota_pro_day: '{used}/20 today',
     quota_free_done: 'Free attempts used up', quota_pro_month_done: 'Monthly limit reached', quota_pro_day_done: 'Daily limit reached',
   },
 };
@@ -438,8 +440,8 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
       const done = used >= 3;
       return { label: s.quota_free.replace('{used}', String(used)), done, doneLabel: s.quota_free_done };
     }
-    if (usage.dailyToolUses >= 10) return { label: s.quota_pro_day.replace('{used}', String(usage.dailyToolUses)), done: true, doneLabel: s.quota_pro_day_done };
-    if (usage.toolUses >= 150) return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: true, doneLabel: s.quota_pro_month_done };
+    if (usage.dailyToolUses >= 20) return { label: s.quota_pro_day.replace('{used}', String(usage.dailyToolUses)), done: true, doneLabel: s.quota_pro_day_done };
+    if (usage.toolUses >= 200) return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: true, doneLabel: s.quota_pro_month_done };
     return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: false, doneLabel: '' };
   })();
   const quotaBlocked = !!quotaInfo?.done;
@@ -700,15 +702,28 @@ ${bodyText}
               )}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
-                {[...BUILT_IN_DESIGNS, ...customDesigns].map(d => (
+                {[...BUILT_IN_DESIGNS, ...customDesigns].map(d => {
+                  const isLocked = !!d.premium && !usage?.isUnlimited;
+                  return (
                   <button
                     key={d.id}
-                    onClick={() => setDesign(d)}
+                    onClick={() => { if (isLocked) { onUpgrade(); return; } setDesign(d); }}
+                    title={isLocked ? s.locked_text : undefined}
                     className={`group relative text-left p-2.5 border transition-all ${design.id === d.id ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/4 dark:bg-[#00A854]/8 shadow-md' : 'border-black/8 dark:border-white/8 hover:border-[#004225]/40 bg-white dark:bg-[#2A2A26]'}`}
                   >
-                    <DesignThumb design={d} />
-                    <div className="flex items-center justify-between mt-2.5 px-0.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A1A18] dark:text-[#FAFAF8] truncate">{designName(d)}</span>
+                    <div className={isLocked ? 'relative' : ''}>
+                      <DesignThumb design={d} />
+                      {isLocked && (
+                        <div className="absolute inset-0 bg-white/60 dark:bg-black/50 backdrop-blur-[1px] flex items-center justify-center">
+                          <span className="w-7 h-7 rounded-full bg-[#004225] text-white flex items-center justify-center shadow-md"><Lock size={13} /></span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-2.5 px-0.5 gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A1A18] dark:text-[#FAFAF8] truncate flex items-center gap-1.5">
+                        {designName(d)}
+                        {d.premium && <span className="text-[8px] font-bold uppercase tracking-widest px-1 py-0.5 bg-[#004225] text-white">Ultimate</span>}
+                      </span>
                       {design.id === d.id && <Check size={13} className="text-[#004225] dark:text-[#00A854] shrink-0" />}
                     </div>
                     {d.custom && (d as any).docId && (
@@ -722,7 +737,8 @@ ${bodyText}
                       ><Trash2 size={11} /></span>
                     )}
                   </button>
-                ))}
+                  );
+                })}
 
                 {/* + custom design */}
                 <button
