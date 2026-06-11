@@ -6666,7 +6666,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="space-y-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
                           <select
@@ -8304,11 +8304,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     {[
-                      ['01', 'Lebenslauf'],
-                      ['02', 'Interview'],
-                      ['03', 'Offer'],
+                      ['01', language === 'FR' ? 'CV' : language === 'IT' ? 'CV' : language === 'EN' ? 'CV' : 'Lebenslauf'],
+                      ['02', language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview'],
+                      ['03', language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot'],
                     ].map(([num, label]) => (
                       <div key={num} className="border border-white/10 bg-black/10 px-3 py-4">
                         <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{num}</div>
