@@ -9202,6 +9202,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         locked={isToolLocked}
                         onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
                         showToast={showToast}
+                        authFetch={authFetch}
                       />
                     </Suspense>
                   </div>
