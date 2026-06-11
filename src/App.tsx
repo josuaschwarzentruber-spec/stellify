@@ -54,6 +54,7 @@ import sampleJobs from './data/sampleJobs.json';
 
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import FounderPortrait from './components/FounderPortrait';
 
 // --- LAZY-LOADED HEAVY COMPONENTS ---
 const PromoVideoModal = lazy(() => import('./components/PromoVideoModal'));
@@ -8400,18 +8401,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
             </div>
 
-            {/* Right — founder quote + CTA */}
+            {/* Right — founder portrait + quote + CTA */}
             <div className="lg:col-span-7">
-              <div className="border-l-2 border-[#004225]/25 dark:border-[#00A854]/40 pl-8 lg:pl-10 mb-10">
-                <blockquote className="font-serif italic text-2xl md:text-3xl lg:text-4xl text-[#1A1A18] dark:text-[#FAFAF8] leading-snug mb-6">
-                  «{language === 'FR' ? "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse."
-                    : language === 'IT' ? 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.'
-                    : language === 'EN' ? "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market."
-                    : 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.'}»
-                </blockquote>
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6B6B66] dark:text-[#9A9A94]">
-                  {language === 'FR' ? 'Le fondateur' : language === 'IT' ? 'Il fondatore' : language === 'EN' ? 'The Founder' : 'Der Gründer'}
-                </p>
+              <div className="flex flex-col sm:flex-row gap-10 sm:gap-12 items-start mb-10">
+                <FounderPortrait language={language} />
+                <div className="border-l-2 border-[#004225]/25 dark:border-[#00A854]/40 pl-8 lg:pl-10 flex-1 min-w-0">
+                  <blockquote className="font-serif italic text-2xl md:text-3xl text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">
+                    «{language === 'FR' ? "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse."
+                      : language === 'IT' ? 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.'
+                      : language === 'EN' ? "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market."
+                      : 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.'}»
+                  </blockquote>
+                </div>
               </div>
 
               <button
