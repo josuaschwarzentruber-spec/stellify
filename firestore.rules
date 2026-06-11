@@ -55,6 +55,22 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── Application Designs (Bewerbungs-Generator custom designs) ───────────
+    match /application_designs/{designId} {
+      allow read, update, delete: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+    }
+
+    // ── Generated Applications (Bewerbungs-Generator documents) ─────────────
+    match /generated_applications/{docId} {
+      allow read, update, delete: if request.auth != null
+        && resource.data.user_id == request.auth.uid;
+      allow create: if request.auth != null
+        && request.resource.data.user_id == request.auth.uid;
+    }
+
     // Deny everything else
     match /{document=**} {
       allow read, write: if false;
