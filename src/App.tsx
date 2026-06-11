@@ -53,6 +53,7 @@ import { searchData, SearchItem } from './data/searchData';
 import sampleJobs from './data/sampleJobs.json';
 
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // --- LAZY-LOADED HEAVY COMPONENTS ---
 const PromoVideoModal = lazy(() => import('./components/PromoVideoModal'));
@@ -809,13 +810,39 @@ function StellifyApp() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const viewParam = params.get('view');
-    if (viewParam === 'pricing') {
+    const paymentSuccess = params.get('payment') === 'success' || !!params.get('session_id');
+    const onPricingPath = window.location.pathname.replace(/\/+$/, '') === '/pricing';
+    if (viewParam === 'pricing' || paymentSuccess || onPricingPath) {
       setActiveView('pricing');
-      window.history.replaceState({}, '', window.location.pathname);
+      window.history.replaceState({ view: 'pricing' }, '', '/pricing');
+      // Scroll to the pricing section once it's mounted AND the splash overlay
+      // is gone (it sets body overflow:hidden which swallows scroll attempts).
+      // Retries cover the splash duration after a full reload, e.g. when the
+      // user comes back from Stripe via the browser back button.
+      let attempts = 0;
+      const tryScroll = () => {
+        attempts++;
+        const splashing = document.body.classList.contains('stellify-splashing');
+        const el = document.getElementById('pricing');
+        if (!splashing && el) {
+          el.scrollIntoView({ behavior: 'auto' });
+          const r = el.getBoundingClientRect();
+          if (r.top > -300 && r.top < 500) return; // in view → done
+        }
+        if (attempts < 40) setTimeout(tryScroll, 250);
+      };
+      setTimeout(tryScroll, 250);
     }
-    if (params.get('payment') === 'success' || params.get('session_id')) {
-      setActiveView('pricing');
-      window.history.replaceState({}, '', window.location.pathname);
+    if (paymentSuccess) {
+      setTimeout(() => {
+        showToast(
+          language === 'FR' ? 'Paiement réussi ! Ton abonnement est actif.'
+          : language === 'IT' ? 'Pagamento riuscito! Il tuo abbonamento è attivo.'
+          : language === 'EN' ? 'Payment successful! Your subscription is active.'
+          : 'Zahlung erfolgreich! Dein Abo ist aktiv.',
+          'success'
+        );
+      }, 600);
     }
   }, []);
 
@@ -852,7 +879,11 @@ function StellifyApp() {
       if (view) {
         setActiveView(view);
         setActiveTool(null);
-        if (view !== 'pricing') window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (view === 'pricing') {
+          setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'auto' }), 100);
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       } else {
         setActiveView('dashboard');
         setActiveTool(null);
@@ -2459,8 +2490,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           userId: user.id,
           planId: plan,
           billingCycle,
-          successUrl: window.location.origin + '?session_id={CHECKOUT_SESSION_ID}',
-          cancelUrl: window.location.origin + '?view=pricing'
+          successUrl: window.location.origin + '/pricing?payment=success&session_id={CHECKOUT_SESSION_ID}',
+          cancelUrl: window.location.origin + '/pricing'
         })
       });
 
@@ -9822,7 +9853,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <Sparkles size={14} className="text-[#004225] shrink-0" />
                                 <div>
                                   <p className="text-[9px] font-bold uppercase tracking-widest text-[#004225]">
-                                    {activeTool.id === 'cv-premium' ? 'Swiss Premium CV Standard' : activeTool.id === 'career-roadmap' ? 'Swiss Career Strategy' : activeTool.id === 'zeugnis' ? 'Arbeitszeugnis · Schweizer Code' : activeTool.id === 'cv-gen' ? 'Bewerbungsschreiben · Swiss Format' : activeTool.id === 'cv-optimizer' ? 'CV Precision Optimizer' : 'LinkedIn Application Package'}
+                                    {activeTool.id === 'cv-premium' ? 'Swiss Premium CV Standard'
+                                      : activeTool.id === 'career-roadmap' ? 'Swiss Career Strategy'
+                                      : activeTool.id === 'zeugnis' ? (language === 'FR' ? 'Certificat de travail · Code suisse' : language === 'IT' ? 'Certificato di lavoro · Codice svizzero' : language === 'EN' ? 'Reference Letter · Swiss Code' : 'Arbeitszeugnis · Schweizer Code')
+                                      : activeTool.id === 'cv-gen' ? (language === 'FR' ? 'Lettre de motivation · Format suisse' : language === 'IT' ? 'Lettera di motivazione · Formato svizzero' : language === 'EN' ? 'Cover Letter · Swiss Format' : 'Bewerbungsschreiben · Swiss Format')
+                                      : activeTool.id === 'cv-optimizer' ? 'CV Precision Optimizer'
+                                      : 'LinkedIn Application Package'}
                                   </p>
                                   <p className="text-[8px] text-[#004225]/60 font-light mt-0.5">
                                     {language === 'EN' ? 'Generated for the Swiss job market · Please review before use' : language === 'FR' ? 'Généré pour le marché suisse · À vérifier avant utilisation' : language === 'IT' ? 'Generato per il mercato svizzero · Verificare prima dell\'uso' : 'Für Schweizer Markt generiert · Bitte vor Verwendung prüfen'}
@@ -9842,6 +9878,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {/* Rendered markdown with premium styling */}
                             <div className="[&>*:first-child]:mt-0">
                               <Markdown
+                                remarkPlugins={[remarkGfm]}
                                 components={{
                                   h1: ({children}) => (
                                     <div className="flex items-center gap-2 mt-7 mb-4 pb-2 border-b-2 border-[#004225]/15">
@@ -9859,12 +9896,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                     <h4 className="text-[11px] font-bold uppercase tracking-wide text-[#4A4A45] dark:text-[#CACAC4] mt-4 mb-2">{children}</h4>
                                   ),
                                   p: ({children}) => (
-                                    <p className="text-[13px] leading-[1.8] text-[#1A1A18] dark:text-[#EBEBEB] font-light mb-3">{children}</p>
+                                    <p className="text-[14px] leading-[1.8] text-[#1A1A18] dark:text-[#EBEBEB] font-light mb-3">{children}</p>
                                   ),
                                   li: ({children}) => (
                                     <li className="flex items-start gap-2 mb-2 list-none">
-                                      <span className="mt-1.5 w-1.5 h-1.5 bg-[#004225] rounded-full shrink-0" />
-                                      <span className="text-[12px] leading-relaxed text-[#1A1A18] dark:text-[#EBEBEB] font-light">{children}</span>
+                                      <span className="mt-[7px] w-1.5 h-1.5 bg-[#004225] dark:bg-[#6FCF97] rounded-full shrink-0" />
+                                      <span className="text-[13px] leading-relaxed text-[#1A1A18] dark:text-[#EBEBEB] font-light">{children}</span>
                                     </li>
                                   ),
                                   ul: ({children}) => <ul className="my-3 pl-0 space-y-1">{children}</ul>,
@@ -9873,11 +9910,34 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                   hr: () => <hr className="border-0 border-t border-[#004225]/10 my-6" />,
                                   blockquote: ({children}) => (
                                     <div className="border-l-4 border-[#004225] pl-4 py-1 my-4 bg-[#004225]/4 dark:bg-[#004225]/10">
-                                      <div className="text-[12px] font-light italic text-[#1A1A18] dark:text-[#EBEBEB] leading-relaxed">{children}</div>
+                                      <div className="text-[13px] font-light italic text-[#1A1A18] dark:text-[#EBEBEB] leading-relaxed">{children}</div>
                                     </div>
                                   ),
                                   code: ({children}) => (
-                                    <code className="bg-[#004225]/8 dark:bg-[#004225]/20 text-[#004225] dark:text-[#6FCF97] px-1.5 py-0.5 text-[11px] font-mono rounded-sm">{children}</code>
+                                    <code className="bg-[#004225]/8 dark:bg-[#004225]/20 text-[#004225] dark:text-[#6FCF97] px-1.5 py-0.5 text-[12px] font-mono rounded-sm">{children}</code>
+                                  ),
+                                  table: ({children}) => (
+                                    <div className="my-5 overflow-x-auto -mx-1 px-1">
+                                      <table className="w-full border-collapse text-[13px]">{children}</table>
+                                    </div>
+                                  ),
+                                  thead: ({children}) => (
+                                    <thead className="bg-[#004225] text-white dark:bg-[#00331d]">{children}</thead>
+                                  ),
+                                  th: ({children}) => (
+                                    <th className="px-3.5 py-2.5 text-left text-[10px] font-bold uppercase tracking-widest whitespace-nowrap first:pl-4 last:pr-4">{children}</th>
+                                  ),
+                                  tbody: ({children}) => (
+                                    <tbody className="divide-y divide-black/5 dark:divide-white/8">{children}</tbody>
+                                  ),
+                                  tr: ({children}) => (
+                                    <tr className="even:bg-[#004225]/[0.03] dark:even:bg-white/[0.02] hover:bg-[#004225]/[0.06] dark:hover:bg-white/[0.04] transition-colors">{children}</tr>
+                                  ),
+                                  td: ({children}) => (
+                                    <td className="px-3.5 py-2.5 text-[13px] font-light text-[#1A1A18] dark:text-[#EBEBEB] align-top first:pl-4 last:pr-4">{children}</td>
+                                  ),
+                                  a: ({children, href}) => (
+                                    <a href={href} target="_blank" rel="noopener noreferrer" className="text-[#004225] dark:text-[#6FCF97] font-medium underline decoration-[#004225]/25 dark:decoration-[#6FCF97]/25 underline-offset-2 hover:decoration-[#004225] dark:hover:decoration-[#6FCF97] transition-colors">{children}</a>
                                   ),
                                 }}
                               >{toolResult}</Markdown>
