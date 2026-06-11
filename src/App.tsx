@@ -6547,7 +6547,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       animate={{ opacity: 1, y: 0 }}
                       className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
                     >
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
                           <input
@@ -6569,7 +6569,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
                           <select
@@ -6646,7 +6646,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       animate={{ opacity: 1, y: 0 }}
                       className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
                     >
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
                           <input
