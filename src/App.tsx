@@ -4220,7 +4220,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_title: "De la candidature à l'entretien : votre coach carrière IA",
       hero_desc: "Stellify analyse votre CV, optimise vos candidatures et vous prépare aux entretiens, précisément, discrètement, pour le marché suisse.",
       cta_free: "Tester gratuitement",
-      upload_cv: "Télécharger CV (Lebenslauf)",
+      upload_cv: "Télécharger ton CV",
       update_cv: "Mettre à jour CV (Lebenslauf)",
       cv_info: "Un CV (Curriculum Vitae) est votre parcours professionnel. C'est le document le plus important de votre candidature.",
       dashboard: "Tableau de bord",
@@ -4704,7 +4704,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_title: "Dal CV al colloquio: il tuo coach carriera con IA",
       hero_desc: "Stellify analizza il tuo CV, ottimizza le tue candidature e ti prepara ai colloqui, con precisione, discrezione e focus sul mercato svizzero.",
       cta_free: "Prova gratuitamente",
-      upload_cv: "Carica CV (Lebenslauf)",
+      upload_cv: "Carica il tuo CV",
       update_cv: "Aggiorna CV (Lebenslauf)",
       cv_info: "Un CV (Curriculum Vitae) è la tua storia professionale. È il documento più importante della tua candidatura.",
       dashboard: "Dashboard",
@@ -5897,37 +5897,37 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </svg>
             <span>Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
           </button>
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden xl:flex items-center gap-2">
             <div className="flex items-center gap-1 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 rounded-full p-1">
             {user ? (
               <>
                 <button
                   onClick={() => navigate('dashboard')}
-                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'dashboard' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'dashboard' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.dashboard}
                 </button>
                 <button
                   onClick={() => navigate('tools')}
-                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.tools}
                 </button>
                 <button
                   onClick={() => navigate('jobs')}
-                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'jobs' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'jobs' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.search_type_job}
                 </button>
                 <button
                   onClick={() => navigate('pricing')}
-                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'pricing' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'pricing' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.pricing}
                 </button>
                 <button
                   onClick={() => navigate('about')}
-                  className={`px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full transition-all ${activeView === 'about' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'about' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
                 </button>
@@ -5937,7 +5937,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {(() => {
                   const onLegal = activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about';
                   const goToAnchor = (id: string) => {
-                    const linkClass = "px-3 lg:px-4 py-1.5 text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all";
+                    const linkClass = "px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all whitespace-nowrap";
                     return linkClass;
                   };
                   const handleAnchor = (id: string) => (e: React.MouseEvent) => {
@@ -5951,7 +5951,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   };
                   return <>
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
-                    <a href="#success" onClick={handleAnchor('success')} className={goToAnchor('success')}>{t.success_stories}</a>
+                    <a href="#success" onClick={handleAnchor('success')} className={`${goToAnchor('success')} hidden xl:inline-flex`}>{t.success_stories}</a>
                     <a href="#how" onClick={handleAnchor('how')} className={goToAnchor('how')}>{t.how_it_works}</a>
                     <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                     <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
@@ -6033,7 +6033,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </button>
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="lg:hidden p-2.5 sm:p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
+            className="xl:hidden p-2.5 sm:p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
           >
             {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -6089,7 +6089,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="lg:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#1A1A18] border-b border-black/8 dark:border-white/8 z-40 p-4 sm:p-6 space-y-5 shadow-xl"
+            className="xl:hidden fixed inset-x-0 top-16 bg-white dark:bg-[#1A1A18] border-b border-black/8 dark:border-white/8 z-40 p-4 sm:p-6 space-y-5 shadow-xl"
           >
             <div className="flex flex-col gap-2">
               {user ? (
