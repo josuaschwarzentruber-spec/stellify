@@ -9206,6 +9206,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
                         showToast={showToast}
                         authFetch={authFetch}
+                        recordUsage={async ({ input, result }) => {
+                          if (!user) return;
+                          // Same bookkeeping as handleProcessTool: history + visible counters
+                          await addDoc(collection(db, 'tool_results'), {
+                            user_id: user.id,
+                            tool_id: 'bewerbungs-gen',
+                            tool_title: t.tools_data['bewerbungs-gen'].title,
+                            input,
+                            result,
+                            created_at: new Date().toISOString(),
+                          }).catch(console.error);
+                          const isUnl = user.role === 'unlimited' || user.role === 'admin';
+                          if (!isUnl) {
+                            await updateDoc(doc(db, 'users', user.id), {
+                              tool_uses: (user.toolUses || 0) + 1,
+                              daily_tool_uses: (user.dailyToolUses || 0) + 1,
+                            }).catch(console.error);
+                          }
+                        }}
                       />
                     </Suspense>
                   </div>

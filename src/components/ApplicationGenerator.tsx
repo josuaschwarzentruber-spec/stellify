@@ -394,13 +394,14 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, authFetch }: {
+const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, authFetch, recordUsage }: {
   language: string;
   user: { id: string; email?: string } | null;
   locked: boolean;
   onUpgrade: () => void;
   showToast: (msg: string, type?: string) => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
+  recordUsage?: (entry: { input: string; result: string }) => Promise<void>;
 }) => {
   const s = STR[language] || STR.DE;
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -460,6 +461,11 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
         skills: Array.isArray(parsed.skills) ? parsed.skills.map(String) : [],
         interview: Array.isArray(parsed.interview) ? parsed.interview.filter((x: any) => x?.q).map((x: any) => ({ q: String(x.q), a: String(x.a || '') })) : [],
       });
+      // Mirror the standard tool bookkeeping: history entry + visible usage counters
+      recordUsage?.({
+        input: `${form.targetPosition} · ${form.targetCompany}`,
+        result: String(parsed.coverLetter || ''),
+      }).catch(() => {});
     } catch (e: any) {
       console.error('[BEWERBUNGS-GEN]', e);
       showToast(s.gen_error, 'error');
