@@ -98,6 +98,8 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
     export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…',
     interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
+    quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/50 diesen Monat', quota_pro_day: '{used}/20 heute',
+    quota_free_done: 'Gratis-Versuche aufgebraucht', quota_pro_month_done: 'Monatslimit erreicht', quota_pro_day_done: 'Tageslimit erreicht',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -135,6 +137,8 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
     export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…',
     interview_hint: '10 questions possibles avec suggestions de réponses',
+    quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/50 ce mois', quota_pro_day: '{used}/20 aujourd\'hui',
+    quota_free_done: 'Essais gratuits épuisés', quota_pro_month_done: 'Limite mensuelle atteinte', quota_pro_day_done: 'Limite journalière atteinte',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -172,6 +176,8 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
     export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…',
     interview_hint: '10 possibili domande con suggerimenti di risposta',
+    quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/50 questo mese', quota_pro_day: '{used}/20 oggi',
+    quota_free_done: 'Tentativi gratuiti esauriti', quota_pro_month_done: 'Limite mensile raggiunto', quota_pro_day_done: 'Limite giornaliero raggiunto',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -209,6 +215,8 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
     export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…',
     interview_hint: '10 possible questions with suggested answers',
+    quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/50 this month', quota_pro_day: '{used}/20 today',
+    quota_free_done: 'Free attempts used up', quota_pro_month_done: 'Monthly limit reached', quota_pro_day_done: 'Daily limit reached',
   },
 };
 
@@ -394,7 +402,7 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, authFetch, recordUsage }: {
+const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, authFetch, recordUsage, usage }: {
   language: string;
   user: { id: string; email?: string } | null;
   locked: boolean;
@@ -402,6 +410,7 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
   showToast: (msg: string, type?: string) => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
   recordUsage?: (entry: { input: string; result: string }) => Promise<void>;
+  usage?: { toolUses: number; dailyToolUses: number; isPro: boolean; isUnlimited: boolean };
 }) => {
   const s = STR[language] || STR.DE;
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -421,7 +430,22 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
 
   const toneLabel = (v: string) => v === 'confident' ? (s as any).tone_conf : v === 'friendly' ? (s as any).tone_warm : v === 'direct' ? (s as any).tone_direct : (s as any).tone_prof;
 
+  /* Mirror handleProcessTool gating: same thresholds, same messages. */
+  const quotaInfo = (() => {
+    if (!usage || usage.isUnlimited) return null;
+    if (!usage.isPro) {
+      const used = Math.min(usage.toolUses, 3);
+      const done = used >= 3;
+      return { label: s.quota_free.replace('{used}', String(used)), done, doneLabel: s.quota_free_done };
+    }
+    if (usage.dailyToolUses >= 20) return { label: s.quota_pro_day.replace('{used}', String(usage.dailyToolUses)), done: true, doneLabel: s.quota_pro_day_done };
+    if (usage.toolUses >= 50) return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: true, doneLabel: s.quota_pro_month_done };
+    return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: false, doneLabel: '' };
+  })();
+  const quotaBlocked = !!quotaInfo?.done;
+
   const generate = async () => {
+    if (quotaBlocked) { onUpgrade(); return; }
     setIsGenerating(true);
     try {
       const prompt = `Erstelle eine vollständige Bewerbung basierend auf diesen Angaben.
@@ -800,14 +824,31 @@ ${bodyText}
                   >
                     <Save size={12} />{isSaving ? s.saving : s.save_application}
                   </button>
-                  <button
-                    onClick={generate}
-                    disabled={isGenerating}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-60"
-                  >
-                    {isGenerating ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
-                    {isGenerating ? s.generating : gen ? s.regenerate : s.generate}
-                  </button>
+                  {quotaInfo && (
+                    <span
+                      title={quotaInfo.label}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-widest border ${quotaInfo.done ? 'border-red-500/40 bg-red-500/8 text-red-700 dark:text-red-300' : 'border-[#004225]/20 dark:border-[#00A854]/30 bg-[#004225]/5 dark:bg-[#00A854]/8 text-[#004225] dark:text-[#00A854]'}`}
+                    >
+                      {quotaInfo.done ? quotaInfo.doneLabel : quotaInfo.label}
+                    </span>
+                  )}
+                  {quotaBlocked ? (
+                    <button
+                      onClick={onUpgrade}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
+                    >
+                      <Sparkles size={12} />{s.locked_cta}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={generate}
+                      disabled={isGenerating}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-60"
+                    >
+                      {isGenerating ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                      {isGenerating ? s.generating : gen ? s.regenerate : s.generate}
+                    </button>
+                  )}
                 </div>
               </div>
 
