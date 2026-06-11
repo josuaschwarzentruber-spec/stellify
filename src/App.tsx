@@ -5673,6 +5673,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
   const tools = [
     {
+      id: 'bewerbungs-gen',
+      title: t.tools_data['bewerbungs-gen'].title,
+      desc: t.tools_data['bewerbungs-gen'].desc,
+      icon: <FileText size={20} />,
+      badge: 'Studio',
+      type: 'pro',
+      inputs: []
+    },
+    {
       id: 'interview',
       title: t.tools_data['interview'].title,
       desc: t.tools_data['interview'].desc,
@@ -5753,15 +5762,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { key: 'experience', label: t.tools_data['salary-calc'].input_exp, type: 'number', placeholder: t.tools_data['salary-calc'].input_exp_placeholder },
         { key: 'canton', label: t.tools_data['salary-calc'].input_canton, type: 'text', placeholder: t.tools_data['salary-calc'].input_canton_placeholder }
       ]
-    },
-    {
-      id: 'bewerbungs-gen',
-      title: t.tools_data['bewerbungs-gen'].title,
-      desc: t.tools_data['bewerbungs-gen'].desc,
-      icon: <FileText size={20} />,
-      badge: 'Studio',
-      type: 'pro',
-      inputs: []
     },
     {
       id: 'cv-gen',
@@ -6921,7 +6921,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </button>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 md:gap-4">
-                    {tools.slice(0, 6).map((tool, qi) => (
+                    {[
+                      ...tools.filter(tl => tl.id === 'bewerbungs-gen'),
+                      ...tools.filter(tl => tl.id !== 'bewerbungs-gen').slice(0, 5),
+                    ].map((tool, qi) => (
                       <motion.div
                         key={tool.id}
                         initial={{ opacity: 0, y: 12 }}
