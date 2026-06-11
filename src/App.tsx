@@ -3794,6 +3794,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_plan: "Dein Plan",
       dashboard_usage_limit: "{used} von {total} Nutzungen",
       dashboard_usage_unlimited: "Unbegrenzte Nutzung",
+      plan_overview_title: "Dein Plan im Überblick",
+      plan_what_included: "In deinem Plan enthalten",
+      plan_what_upgrade: "Mit Upgrade bekommst du",
+      plan_upgrade_cta: "Plan upgraden",
+      plan_reset_info: "Limits werden automatisch zurückgesetzt — täglich um 0 Uhr, monatlich am 1.",
+      plan_resets_lifetime: "Limits bleiben bestehen — Upgrade jederzeit möglich.",
+      plan_free_f1: "21 Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
+      plan_pro_f1: "Alle 21 Tools freigeschaltet", plan_pro_f2: "50 KI-Anfragen pro Monat", plan_pro_f3: "20 Tool-Nutzungen pro Tag", plan_pro_f4: "Prioritärer Support", plan_pro_f5: "Erweiterte Bewerbungs-Designs",
+      plan_unlim_f1: "Alles aus Pro", plan_unlim_f2: "Unbegrenzte KI-Anfragen", plan_unlim_f3: "Keine Tageslimits", plan_unlim_f4: "Deep Analysis Modus", plan_unlim_f5: "24/7 VIP-Support",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Tageslimit",
@@ -4385,6 +4394,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_plan: "Votre Plan",
       dashboard_usage_limit: "{used} sur {total} utilisations",
       dashboard_usage_unlimited: "Utilisation illimitée",
+      plan_overview_title: "Aperçu de ton plan",
+      plan_what_included: "Inclus dans ton plan",
+      plan_what_upgrade: "Avec un upgrade, tu obtiens",
+      plan_upgrade_cta: "Améliorer mon plan",
+      plan_reset_info: "Limites réinitialisées automatiquement — chaque jour à 0h, chaque mois le 1er.",
+      plan_resets_lifetime: "Limites à vie — upgrade possible à tout moment.",
+      plan_free_f1: "21 outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
+      plan_pro_f1: "Les 21 outils débloqués", plan_pro_f2: "50 requêtes IA par mois", plan_pro_f3: "20 utilisations par jour", plan_pro_f4: "Support prioritaire", plan_pro_f5: "Designs de candidature avancés",
+      plan_unlim_f1: "Tout le contenu Pro", plan_unlim_f2: "Requêtes IA illimitées", plan_unlim_f3: "Aucune limite journalière", plan_unlim_f4: "Mode Deep Analysis", plan_unlim_f5: "Support VIP 24/7",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite quotidienne",
@@ -4870,6 +4888,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_plan: "Il tuo Piano",
       dashboard_usage_limit: "{used} di {total} utilizzi",
       dashboard_usage_unlimited: "Utilizzo illimitato",
+      plan_overview_title: "Il tuo piano in sintesi",
+      plan_what_included: "Incluso nel tuo piano",
+      plan_what_upgrade: "Con un upgrade ottieni",
+      plan_upgrade_cta: "Aggiorna piano",
+      plan_reset_info: "Limiti reimpostati automaticamente — ogni giorno alle 0:00, ogni mese il 1°.",
+      plan_resets_lifetime: "Limiti a vita — upgrade possibile in qualsiasi momento.",
+      plan_free_f1: "21 strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
+      plan_pro_f1: "Tutti i 21 strumenti sbloccati", plan_pro_f2: "50 richieste IA al mese", plan_pro_f3: "20 utilizzi al giorno", plan_pro_f4: "Supporto prioritario", plan_pro_f5: "Design candidatura avanzati",
+      plan_unlim_f1: "Tutto Pro", plan_unlim_f2: "Richieste IA illimitate", plan_unlim_f3: "Nessun limite giornaliero", plan_unlim_f4: "Modalità Deep Analysis", plan_unlim_f5: "Supporto VIP 24/7",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite giornaliero",
@@ -5355,6 +5382,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_plan: "Your Plan",
       dashboard_usage_limit: "{used} of {total} uses",
       dashboard_usage_unlimited: "Unlimited usage",
+      plan_overview_title: "Your plan at a glance",
+      plan_what_included: "Included in your plan",
+      plan_what_upgrade: "Upgrade and unlock",
+      plan_upgrade_cta: "Upgrade plan",
+      plan_reset_info: "Limits reset automatically — daily at midnight, monthly on the 1st.",
+      plan_resets_lifetime: "Lifetime limits — upgrade anytime.",
+      plan_free_f1: "21 tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
+      plan_pro_f1: "All 21 tools unlocked", plan_pro_f2: "50 AI requests per month", plan_pro_f3: "20 uses per day", plan_pro_f4: "Priority support", plan_pro_f5: "Advanced application designs",
+      plan_unlim_f1: "Everything in Pro", plan_unlim_f2: "Unlimited AI requests", plan_unlim_f3: "No daily limits", plan_unlim_f4: "Deep Analysis mode", plan_unlim_f5: "VIP support 24/7",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Daily Limit",
@@ -10777,6 +10813,62 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {t.settings_change_plan}
                     </button>
                   </div>
+
+                  {/* Plan overview — visible to every plan, lists what's
+                      included and (for Free/Pro) what an upgrade unlocks. */}
+                  {(() => {
+                    const isUnlim = user?.role === 'unlimited' || user?.role === 'admin';
+                    const isProPlan = user?.role === 'pro';
+                    const planFeatures: string[] = isUnlim
+                      ? [t.plan_unlim_f1, t.plan_unlim_f2, t.plan_unlim_f3, t.plan_unlim_f4, t.plan_unlim_f5]
+                      : isProPlan
+                      ? [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f4, t.plan_pro_f5]
+                      : [t.plan_free_f1, t.plan_free_f2, t.plan_free_f3, t.plan_free_f4, t.plan_free_f5];
+                    const upgradeFeatures: string[] | null = isUnlim ? null
+                      : isProPlan ? [t.plan_unlim_f2, t.plan_unlim_f3, t.plan_unlim_f4, t.plan_unlim_f5]
+                      : [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f5];
+                    return (
+                      <div className="p-5 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-5">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+                          <Star size={12} />
+                          <span>{t.plan_overview_title}</span>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-2.5">{t.plan_what_included}</p>
+                          <ul className="space-y-1.5">
+                            {planFeatures.map((f, i) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light">
+                                <CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
+                                <span>{f}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        {upgradeFeatures && (
+                          <div className="pt-4 border-t border-black/5 dark:border-white/5">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-2.5">{t.plan_what_upgrade}</p>
+                            <ul className="space-y-1.5 mb-4">
+                              {upgradeFeatures.map((f, i) => (
+                                <li key={i} className="flex items-start gap-2 text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">
+                                  <Sparkles size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                            <button
+                              onClick={() => { setIsSettingsOpen(false); navigate('pricing'); }}
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
+                            >
+                              <Sparkles size={12} />{t.plan_upgrade_cta}
+                            </button>
+                          </div>
+                        )}
+                        <p className="text-[10px] text-[#9A9A94] dark:text-[#6B6B66] italic leading-relaxed pt-1 border-t border-black/5 dark:border-white/5">
+                          {isProPlan ? t.plan_reset_info : isUnlim ? t.dashboard_usage_unlimited : t.plan_resets_lifetime}
+                        </p>
+                      </div>
+                    );
+                  })()}
 
                   {/* Detailed Usage in Settings */}
                   {(user?.role === 'pro' || user?.role === 'client') && (
