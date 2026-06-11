@@ -5678,7 +5678,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       desc: t.tools_data['bewerbungs-gen'].desc,
       icon: <FileText size={20} />,
       badge: 'Studio',
-      type: 'pro',
+      type: 'gratis',
       inputs: []
     },
     {
