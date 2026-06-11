@@ -592,7 +592,7 @@ const CVDropzone = ({ onFileAccepted, isUploading, t, variant = 'dark', onClickO
               {isDragActive ? (t.drop_file_here || 'Datei hier ablegen …') : (t.upload_cv || 'Lebenslauf hochladen')}
             </p>
             <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] mt-0.5">
-              PDF oder Word · Kostenlos & sicher analysieren lassen
+              {t.cv_upload_hint || 'PDF oder Word · Kostenlos & sicher analysieren lassen'}
             </p>
           </div>
           <div className="ml-auto text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/20 px-2 py-1 flex-shrink-0">
@@ -3889,6 +3889,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Oder",
       stat_members: "Mitglieder",
       hero_intro: "Dein persönlicher",
+      hero_accent: "KI-Karriere-Coach",
       badge_new: "NEU",
       tools_section_badge: "21 KI-Tools",
       tools_section_title: "Alles, was du für deine Karriere brauchst",
@@ -3897,6 +3898,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       testimonial_verified: "Verifiziert",
       cv_banner_title: "Lade deinen Lebenslauf hoch für personalisierte KI-Analysen",
       cv_banner_desc: "PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen Lebenslauf abgestimmt",
+      cv_upload_hint: "PDF oder Word · Kostenlos & sicher analysieren lassen",
       cv_banner_btn: "Lebenslauf hochladen",
       cv_stat_upload: "Hochladen",
       testimonials: [
@@ -4477,6 +4479,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Ou",
       stat_members: "Membres",
       hero_intro: "Votre",
+      hero_accent: "coach carrière IA",
       badge_new: "NOUVEAU",
       tools_section_badge: "21 Outils IA",
       tools_section_title: "Tout ce dont vous avez besoin pour votre carrière",
@@ -4485,6 +4488,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       testimonial_verified: "Vérifié",
       cv_banner_title: "Téléchargez votre CV pour des analyses IA personnalisées",
       cv_banner_desc: "PDF ou Word · Gratuit · Les 21 outils adaptés à votre CV",
+      cv_upload_hint: "PDF ou Word · Analyse gratuite et sécurisée",
       cv_banner_btn: "Télécharger le CV",
       cv_stat_upload: "Télécharger",
       testimonials: [
@@ -4959,6 +4963,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Oppure",
       stat_members: "Membri",
       hero_intro: "Il tuo",
+      hero_accent: "coach carriera IA",
       badge_new: "NUOVO",
       tools_section_badge: "21 Strumenti AI",
       tools_section_title: "Tutto ciò di cui hai bisogno per la tua carriera",
@@ -4967,6 +4972,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       testimonial_verified: "Verificato",
       cv_banner_title: "Carica il tuo CV per analisi AI personalizzate",
       cv_banner_desc: "PDF o Word · Gratuito · Tutti i 21 strumenti adattati al tuo CV",
+      cv_upload_hint: "PDF o Word · Analisi gratuita e sicura",
       cv_banner_btn: "Carica CV",
       cv_stat_upload: "Carica",
       testimonials: [
@@ -5441,6 +5447,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Or",
       stat_members: "Members",
       hero_intro: "Your Personal",
+      hero_accent: "AI Career Coach",
       badge_new: "NEW",
       tools_section_badge: "21 AI Tools",
       tools_section_title: "Everything you need for your career",
@@ -5449,6 +5456,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       testimonial_verified: "Verified",
       cv_banner_title: "Upload your CV for personalised AI analyses",
       cv_banner_desc: "PDF or Word · Free · All 21 tools tailored to your CV",
+      cv_upload_hint: "PDF or Word · Free & secure analysis",
       cv_banner_btn: "Upload CV",
       cv_stat_upload: "Upload",
       testimonials: [
@@ -7252,7 +7260,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
             <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl xl:text-7xl font-serif leading-[1.05] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] text-balance">
               {t.hero_intro} <br />
-              <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_title.split(' ').pop()}</span>
+              <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_accent || t.hero_title.split(' ').pop()}</span>
             </h1>
             <p className="text-base sm:text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
               {t.hero_desc}
@@ -7308,34 +7316,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
-                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[9px] font-bold uppercase tracking-widest"
+                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[11px] sm:text-[9px] font-bold uppercase tracking-widest"
               >
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
                   className="flex items-center gap-1.5 text-[#004225] dark:text-[#00A854]"
                 >
-                  <span className="w-4 h-4 bg-[#004225] dark:bg-[#00A854] text-white text-[8px] flex items-center justify-center rounded-full font-bold">1</span>
-                  Gratis anmelden
+                  <span className="w-5 h-5 sm:w-4 sm:h-4 bg-[#004225] dark:bg-[#00A854] text-white text-[10px] sm:text-[8px] flex items-center justify-center rounded-full font-bold">1</span>
+                  {language === 'FR' ? 'Inscription gratuite' : language === 'IT' ? 'Registrati gratis' : language === 'EN' ? 'Sign up free' : 'Gratis anmelden'}
                 </motion.span>
                 <motion.span variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }}>
-                  <ArrowRight size={9} className="text-[#9A9A94]" />
+                  <ArrowRight size={11} className="text-[#9A9A94] sm:hidden" />
+                  <ArrowRight size={9} className="text-[#9A9A94] hidden sm:inline" />
                 </motion.span>
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
                   className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]"
                 >
-                  <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">2</span>
-                  Plan wählen
+                  <span className="w-5 h-5 sm:w-4 sm:h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[10px] sm:text-[8px] flex items-center justify-center rounded-full font-bold">2</span>
+                  {language === 'FR' ? 'Choisir un plan' : language === 'IT' ? 'Scegli un piano' : language === 'EN' ? 'Pick a plan' : 'Plan wählen'}
                 </motion.span>
                 <motion.span variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }}>
-                  <ArrowRight size={9} className="text-[#9A9A94]" />
+                  <ArrowRight size={11} className="text-[#9A9A94] sm:hidden" />
+                  <ArrowRight size={9} className="text-[#9A9A94] hidden sm:inline" />
                 </motion.span>
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
                   className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]"
                 >
-                  <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">3</span>
-                  Karriere starten
+                  <span className="w-5 h-5 sm:w-4 sm:h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[10px] sm:text-[8px] flex items-center justify-center rounded-full font-bold">3</span>
+                  {language === 'FR' ? 'Lancer ta carrière' : language === 'IT' ? 'Lancia la carriera' : language === 'EN' ? 'Launch career' : 'Karriere starten'}
                 </motion.span>
               </motion.div>
 
@@ -7349,7 +7359,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </button>
                 <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
                 <a href="#pricing" className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
-                  Ab CHF 19.90/Mo, Pläne ansehen →
+                  {language === 'FR' ? 'Dès CHF 19.90/mois, voir les plans →' : language === 'IT' ? 'Da CHF 19.90/mese, vedi i piani →' : language === 'EN' ? 'From CHF 19.90/mo, see plans →' : 'Ab CHF 19.90/Mo, Pläne ansehen →'}
                 </a>
               </div>
             </div>

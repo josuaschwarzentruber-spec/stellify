@@ -16,3 +16,7 @@ npm-debug.log*
 # Editor
 .DS_Store
 .vscode/
+
+# Local audit/test scripts (temp tooling)
+snap.mjs
+/tmp-audit/
