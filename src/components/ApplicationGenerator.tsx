@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Check, ChevronLeft, ChevronRight, Plus, Save, Trash2,
-  FolderOpen, Lock, Palette, FileText, Eye, X,
+  FolderOpen, Lock, Palette, Eye, X, Sparkles, Download,
+  Pencil, RefreshCw, MessageSquare, ListChecks, UserSquare,
 } from 'lucide-react';
 import { db } from '../firebase';
 import {
@@ -51,6 +52,13 @@ const EMPTY_FORM: ApplicationForm = {
   experience: '', education: '', skills: '', motivation: '', tone: '',
 };
 
+export type GeneratedContent = {
+  coverLetter: string;
+  cvSummary: string;
+  skills: string[];
+  interview: { q: string; a: string }[];
+};
+
 /* ── i18n ────────────────────────────────────────────────────────────────── */
 
 const STR: Record<string, Record<string, string>> = {
@@ -75,7 +83,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_skills: 'Fachlich und persönlich, z.B. Projektleitung, Deutsch/Französisch, CRM…',
     ph_motivation: 'Warum diese Stelle? Warum diese Firma?…',
     back: 'Zurück', next: 'Weiter', to_preview: 'Zur Vorschau',
-    preview_title: 'Deine Bewerbung', preview_sub: 'Live-Vorschau im gewählten Design. KI-Text und Export folgen im nächsten Schritt.',
+    preview_title: 'Deine Bewerbung', preview_sub: 'Live-Vorschau im gewählten Design. Generiere den Text mit KI und exportiere als PDF oder Word.',
     save_application: 'Bewerbung speichern', saved: 'Gespeichert', saving: 'Speichern…',
     load_saved: 'Gespeicherte Bewerbungen', load: 'Öffnen', no_saved: 'Noch keine gespeicherten Bewerbungen.',
     subject: 'Bewerbung als', attachment_note: 'Beilagen: Lebenslauf, Zeugnisse',
@@ -84,6 +92,12 @@ const STR: Record<string, Record<string, string>> = {
     profile_title: 'Profil', skills_title: 'Fähigkeiten', exp_title: 'Erfahrung', edu_title: 'Ausbildung',
     locked_title: 'Pro-Tool', locked_text: 'Der Bewerbungs-Generator ist Teil des Pro-Plans.', locked_cta: 'Pläne ansehen',
     required_hint: 'Vorname, Nachname, Zielfirma und Stelle ausfüllen, um fortzufahren.',
+    generate: 'Mit KI generieren', regenerate: 'Neu generieren', generating: 'KI schreibt deine Bewerbung…',
+    gen_error: 'Generierung fehlgeschlagen. Bitte versuche es erneut.',
+    edit_letter: 'Text bearbeiten', done_editing: 'Fertig',
+    extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
+    export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…',
+    interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -106,7 +120,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_skills: 'Techniques et personnelles, p.ex. gestion de projet, allemand/français, CRM…',
     ph_motivation: 'Pourquoi ce poste ? Pourquoi cette entreprise ?…',
     back: 'Retour', next: 'Continuer', to_preview: 'Voir l\'aperçu',
-    preview_title: 'Ta candidature', preview_sub: 'Aperçu en direct dans le design choisi. Texte IA et export suivent à la prochaine étape.',
+    preview_title: 'Ta candidature', preview_sub: 'Aperçu en direct dans le design choisi. Génère le texte avec l\'IA et exporte en PDF ou Word.',
     save_application: 'Enregistrer la candidature', saved: 'Enregistré', saving: 'Enregistrement…',
     load_saved: 'Candidatures enregistrées', load: 'Ouvrir', no_saved: 'Aucune candidature enregistrée.',
     subject: 'Candidature au poste de', attachment_note: 'Annexes : CV, certificats',
@@ -115,6 +129,12 @@ const STR: Record<string, Record<string, string>> = {
     profile_title: 'Profil', skills_title: 'Compétences', exp_title: 'Expérience', edu_title: 'Formation',
     locked_title: 'Outil Pro', locked_text: 'Le générateur de candidature fait partie du plan Pro.', locked_cta: 'Voir les plans',
     required_hint: 'Remplis prénom, nom, entreprise et poste pour continuer.',
+    generate: 'Générer avec l\'IA', regenerate: 'Régénérer', generating: 'L\'IA rédige ta candidature…',
+    gen_error: 'Échec de la génération. Réessaie.',
+    edit_letter: 'Modifier le texte', done_editing: 'Terminé',
+    extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
+    export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…',
+    interview_hint: '10 questions possibles avec suggestions de réponses',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -137,7 +157,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_skills: 'Tecniche e personali, es. gestione progetti, tedesco/francese, CRM…',
     ph_motivation: 'Perché questa posizione? Perché questa azienda?…',
     back: 'Indietro', next: 'Avanti', to_preview: 'Vai all\'anteprima',
-    preview_title: 'La tua candidatura', preview_sub: 'Anteprima live nel design scelto. Testo IA ed export seguono al prossimo passo.',
+    preview_title: 'La tua candidatura', preview_sub: 'Anteprima live nel design scelto. Genera il testo con l\'IA ed esporta in PDF o Word.',
     save_application: 'Salva candidatura', saved: 'Salvato', saving: 'Salvataggio…',
     load_saved: 'Candidature salvate', load: 'Apri', no_saved: 'Nessuna candidatura salvata.',
     subject: 'Candidatura come', attachment_note: 'Allegati: CV, certificati',
@@ -146,6 +166,12 @@ const STR: Record<string, Record<string, string>> = {
     profile_title: 'Profilo', skills_title: 'Competenze', exp_title: 'Esperienza', edu_title: 'Formazione',
     locked_title: 'Strumento Pro', locked_text: 'Il generatore di candidature fa parte del piano Pro.', locked_cta: 'Vedi i piani',
     required_hint: 'Compila nome, cognome, azienda e posizione per continuare.',
+    generate: 'Genera con l\'IA', regenerate: 'Rigenera', generating: 'L\'IA scrive la tua candidatura…',
+    gen_error: 'Generazione non riuscita. Riprova.',
+    edit_letter: 'Modifica il testo', done_editing: 'Fatto',
+    extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
+    export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…',
+    interview_hint: '10 possibili domande con suggerimenti di risposta',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -168,7 +194,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_skills: 'Technical and personal, e.g. project management, German/French, CRM…',
     ph_motivation: 'Why this role? Why this company?…',
     back: 'Back', next: 'Next', to_preview: 'See preview',
-    preview_title: 'Your application', preview_sub: 'Live preview in your chosen design. AI text and export follow in the next step.',
+    preview_title: 'Your application', preview_sub: 'Live preview in your chosen design. Generate the text with AI and export as PDF or Word.',
     save_application: 'Save application', saved: 'Saved', saving: 'Saving…',
     load_saved: 'Saved applications', load: 'Open', no_saved: 'No saved applications yet.',
     subject: 'Application for the position of', attachment_note: 'Enclosures: CV, references',
@@ -177,6 +203,12 @@ const STR: Record<string, Record<string, string>> = {
     profile_title: 'Profile', skills_title: 'Skills', exp_title: 'Experience', edu_title: 'Education',
     locked_title: 'Pro Tool', locked_text: 'The application generator is part of the Pro plan.', locked_cta: 'See plans',
     required_hint: 'Fill in first name, last name, company and position to continue.',
+    generate: 'Generate with AI', regenerate: 'Regenerate', generating: 'The AI is writing your application…',
+    gen_error: 'Generation failed. Please try again.',
+    edit_letter: 'Edit text', done_editing: 'Done',
+    extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
+    export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…',
+    interview_hint: '10 possible questions with suggested answers',
   },
 };
 
@@ -362,12 +394,13 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: {
+const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, authFetch }: {
   language: string;
   user: { id: string; email?: string } | null;
   locked: boolean;
   onUpgrade: () => void;
   showToast: (msg: string, type?: string) => void;
+  authFetch: (url: string, options?: RequestInit) => Promise<Response>;
 }) => {
   const s = STR[language] || STR.DE;
   const [step, setStep] = useState<0 | 1 | 2>(0);
@@ -379,6 +412,121 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: 
   const [builder, setBuilder] = useState({ name: '', accent: ACCENT_PRESETS[0], font: 'sans' as DesignConfig['font'], layout: 'classic' as DesignConfig['layout'] });
   const [isSaving, setIsSaving] = useState(false);
   const [loadedDocId, setLoadedDocId] = useState<string | null>(null);
+  const [gen, setGen] = useState<GeneratedContent | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [editingLetter, setEditingLetter] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  const toneLabel = (v: string) => v === 'confident' ? (s as any).tone_conf : v === 'friendly' ? (s as any).tone_warm : v === 'direct' ? (s as any).tone_direct : (s as any).tone_prof;
+
+  const generate = async () => {
+    setIsGenerating(true);
+    try {
+      const prompt = `Erstelle eine vollständige Bewerbung basierend auf diesen Angaben.
+
+BEWERBER: ${form.firstName} ${form.lastName}${form.currentRole ? `, aktuell: ${form.currentRole}` : ''}
+ZIELFIRMA: ${form.targetCompany}
+STELLE: ${form.targetPosition}
+${form.jobDescription ? `STELLENBESCHREIBUNG: ${form.jobDescription.substring(0, 1500)}` : ''}
+${form.experience ? `BERUFSERFAHRUNG: ${form.experience.substring(0, 1200)}` : ''}
+${form.education ? `AUSBILDUNG: ${form.education.substring(0, 600)}` : ''}
+${form.skills ? `FÄHIGKEITEN: ${form.skills.substring(0, 600)}` : ''}
+${form.motivation ? `MOTIVATION: ${form.motivation.substring(0, 800)}` : ''}
+TONALITÄT: ${toneLabel(form.tone)}
+
+AUFGABE — antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
+{
+  "coverLetter": "Vollständiges Bewerbungsanschreiben, 250-350 Wörter, ohne Anrede und ohne Grussformel (werden separat ergänzt), Absätze mit \\n\\n getrennt",
+  "cvSummary": "Optimiertes Kurzprofil für den Lebenslauf, 3-4 Sätze",
+  "skills": ["6-8 passende Skills als kurze Stichworte"],
+  "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
+}
+Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
+
+      const res = await authFetch('/api/process-tool', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, language }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      const match = (data.text || '').match(/\{[\s\S]*\}/);
+      if (!match) throw new Error('no json');
+      const parsed = JSON.parse(match[0]);
+      setGen({
+        coverLetter: String(parsed.coverLetter || ''),
+        cvSummary: String(parsed.cvSummary || ''),
+        skills: Array.isArray(parsed.skills) ? parsed.skills.map(String) : [],
+        interview: Array.isArray(parsed.interview) ? parsed.interview.filter((x: any) => x?.q).map((x: any) => ({ q: String(x.q), a: String(x.a || '') })) : [],
+      });
+    } catch (e: any) {
+      console.error('[BEWERBUNGS-GEN]', e);
+      showToast(s.gen_error, 'error');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  /* Export: capture the offscreen A4-width render of ApplicationDocument so
+     the chosen design IS the exported layout (multi-page if needed). */
+  const exportPdf = async () => {
+    if (!exportRef.current) return;
+    setIsExporting(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'), import('jspdf'),
+      ]);
+      const canvas = await html2canvas(exportRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+      const pageW = 210, pageH = 297;
+      const imgH = (canvas.height * pageW) / canvas.width;
+      let rendered = 0, page = 0;
+      while (rendered < imgH) {
+        if (page > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, -rendered, pageW, imgH);
+        rendered += pageH; page++;
+        if (page > 6) break; // safety
+      }
+      pdf.save(`bewerbung-${(form.targetCompany || 'stellify').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`);
+    } catch (e: any) {
+      console.error('[EXPORT PDF]', e);
+      showToast(e?.message || 'Export error', 'error');
+    } finally { setIsExporting(false); }
+  };
+
+  const exportWord = () => {
+    /* Word renders HTML: same letter, design approximated (accent colour,
+       font pairing, simplified layout — sidebar becomes a table). */
+    const a = design.accent;
+    const serif = "Georgia, 'Times New Roman', serif";
+    const sans = "Helvetica, Arial, sans-serif";
+    const bodyFont = design.font === 'serif' ? serif : sans;
+    const headFont = design.font === 'sans' ? sans : serif;
+    const fullName = `${form.firstName} ${form.lastName}`.trim();
+    const contact = [form.address, form.phone, form.email].filter(Boolean).join(' · ');
+    const bodyText = (gen?.coverLetter || form.motivation || '').split('\n').map(p => `<p>${p.replace(/</g, '&lt;')}</p>`).join('');
+    const today = new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+    const headerHtml = design.layout === 'sidebar' || design.layout === 'block'
+      ? `<table width="100%" cellpadding="0" cellspacing="0" style="background:${a};color:#fff"><tr><td style="padding:18pt 22pt"><div style="font-family:${headFont};font-size:18pt;font-weight:bold">${fullName}</div><div style="font-size:8pt;margin-top:4pt;opacity:.85">${contact}</div></td></tr></table>`
+      : `<div style="text-align:${design.layout === 'minimal' || design.layout === 'executive' ? 'left' : 'center'};border-bottom:${design.layout === 'executive' ? `3pt solid ${a}` : `0.5pt solid ${a}`};padding-bottom:10pt;margin-bottom:6pt"><div style="font-family:${headFont};font-size:16pt;${design.layout === 'elegant' ? 'font-style:italic;' : ''}color:#1A1A18">${fullName}</div><div style="font-size:8pt;color:#6B6B66;margin-top:3pt">${contact}</div></div>`;
+    const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><style>@page{size:A4;margin:2cm 2.2cm}body{font-family:${bodyFont};font-size:10.5pt;line-height:1.65;color:#26261F}p{margin:0 0 8pt 0}</style></head><body>
+${headerHtml}
+<p style="color:#6B6B66;margin-top:14pt">${today}</p>
+<p style="font-weight:bold;color:${a};margin-top:10pt">${s.subject} ${form.targetPosition}${form.targetCompany ? ` · ${form.targetCompany}` : ''}</p>
+<p style="margin-top:10pt">${s.greeting}</p>
+${bodyText}
+<p style="margin-top:10pt">${s.closing}</p>
+<p style="font-weight:bold">${fullName}</p>
+<p style="font-size:8pt;color:#9A9A94;margin-top:12pt">${s.attachment_note}</p>
+</body></html>`;
+    const aEl = document.createElement('a');
+    aEl.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    aEl.download = `bewerbung-${(form.targetCompany || 'stellify').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.doc`;
+    document.body.appendChild(aEl);
+    aEl.click();
+    document.body.removeChild(aEl);
+  };
 
   const designName = (d: DesignConfig) => d.custom ? (d.name || s.own_design) : (s as any)[`d_${d.id}`] || d.id;
   const canProceed = form.firstName && form.lastName && form.targetCompany && form.targetPosition;
@@ -425,6 +573,7 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: 
       title: `${form.targetPosition || '—'} · ${form.targetCompany || '—'}`,
       design,
       form,
+      generated: gen,
       updated_at: new Date().toISOString(),
     };
     try {
@@ -444,6 +593,7 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: 
   const loadApplication = (app: any) => {
     setForm({ ...EMPTY_FORM, ...app.form });
     if (app.design) setDesign(app.design);
+    setGen(app.generated || null);
     setLoadedDocId(app.docId);
     setStep(2);
   };
@@ -625,7 +775,7 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: 
             </motion.div>
           )}
 
-          {/* ── STEP 3: PREVIEW ──────────────────────────────────────────── */}
+          {/* ── STEP 3: PREVIEW + GENERATE + EXPORT ─────────────────────── */}
           {step === 2 && (
             <motion.div key="preview" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
               <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
@@ -633,24 +783,127 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast }: 
                   <h3 className="font-serif text-2xl text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{s.preview_title}</h3>
                   <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light">{s.preview_sub}</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <button onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                     <ChevronLeft size={12} />{s.back}
                   </button>
                   <button
                     onClick={saveApplication}
                     disabled={isSaving}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-60"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#004225] dark:border-[#00A854] text-[#004225] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/5 transition-all disabled:opacity-60"
                   >
                     <Save size={12} />{isSaving ? s.saving : s.save_application}
+                  </button>
+                  <button
+                    onClick={generate}
+                    disabled={isGenerating}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-60"
+                  >
+                    {isGenerating ? <RefreshCw size={12} className="animate-spin" /> : <Sparkles size={12} />}
+                    {isGenerating ? s.generating : gen ? s.regenerate : s.generate}
                   </button>
                 </div>
               </div>
 
-              {/* A4 document preview */}
-              <div className="mx-auto max-w-[560px] shadow-2xl shadow-black/15 dark:shadow-black/50 border border-black/10 dark:border-white/10">
-                <div className="aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white">
-                  <ApplicationDocument design={design} form={form} s={s} />
+              <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-8 items-start">
+                <div>
+                  {/* A4 document preview */}
+                  <div className="mx-auto max-w-[560px] shadow-2xl shadow-black/15 dark:shadow-black/50 border border-black/10 dark:border-white/10 relative">
+                    {isGenerating && (
+                      <div className="absolute inset-0 z-10 bg-white/70 dark:bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3">
+                        <div className="w-7 h-7 border-2 border-[#004225] border-t-transparent rounded-full animate-spin" />
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">{s.generating}</p>
+                      </div>
+                    )}
+                    <div className="aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white">
+                      <ApplicationDocument design={design} form={form} s={s} generatedText={gen?.coverLetter || null} />
+                    </div>
+                  </div>
+
+                  {/* Export + edit row */}
+                  <div className="mx-auto max-w-[560px] mt-4 flex items-center justify-between gap-2 flex-wrap">
+                    <button
+                      onClick={() => setEditingLetter(v => !v)}
+                      disabled={!gen?.coverLetter}
+                      className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${gen?.coverLetter ? 'border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5' : 'border-black/5 text-[#C5C5C0] cursor-not-allowed'}`}
+                    >
+                      <Pencil size={12} />{editingLetter ? s.done_editing : s.edit_letter}
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={exportPdf}
+                        disabled={isExporting}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all disabled:opacity-60"
+                      >
+                        <Download size={12} />{isExporting ? s.exporting : s.export_pdf}
+                      </button>
+                      <button
+                        onClick={exportWord}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#004225] dark:border-[#00A854] text-[#004225] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/5 transition-all"
+                      >
+                        <Download size={12} />{s.export_word}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Inline letter editor */}
+                  <AnimatePresence>
+                    {editingLetter && gen && (
+                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mx-auto max-w-[560px] overflow-hidden">
+                        <textarea
+                          value={gen.coverLetter}
+                          onChange={e => setGen(g => g ? { ...g, coverLetter: e.target.value } : g)}
+                          className="mt-3 w-full min-h-[220px] px-4 py-3 bg-white dark:bg-[#2A2A26] border border-[#004225]/30 dark:border-[#00A854]/30 text-sm leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                        />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Extras: CV summary, skills, interview prep */}
+                {gen && (
+                  <div className="space-y-4">
+                    {gen.cvSummary && (
+                      <div className="border border-black/8 dark:border-white/8 bg-white dark:bg-[#2A2A26] p-4">
+                        <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-2"><UserSquare size={12} />{s.extras_summary}</p>
+                        <p className="text-xs leading-relaxed text-[#1A1A18] dark:text-[#EBEBEB] font-light">{gen.cvSummary}</p>
+                      </div>
+                    )}
+                    {gen.skills.length > 0 && (
+                      <div className="border border-black/8 dark:border-white/8 bg-white dark:bg-[#2A2A26] p-4">
+                        <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-2.5"><ListChecks size={12} />{s.extras_skills}</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {gen.skills.map((sk, i) => (
+                            <span key={i} className="px-2.5 py-1 bg-[#004225]/6 dark:bg-[#00A854]/10 text-[#004225] dark:text-[#00A854] text-[10px] font-medium">{sk}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {gen.interview.length > 0 && (
+                      <div className="border border-black/8 dark:border-white/8 bg-white dark:bg-[#2A2A26] p-4">
+                        <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-1"><MessageSquare size={12} />{s.extras_interview}</p>
+                        <p className="text-[9px] text-[#9A9A94] mb-3">{s.interview_hint}</p>
+                        <div className="space-y-1.5 max-h-[420px] overflow-y-auto custom-scrollbar pr-1">
+                          {gen.interview.map((qa, i) => (
+                            <details key={i} className="group border-b border-black/5 dark:border-white/5 pb-1.5">
+                              <summary className="cursor-pointer list-none flex items-start gap-2 py-1">
+                                <span className="shrink-0 w-4 h-4 mt-0.5 bg-[#004225]/10 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854] text-[8px] font-bold flex items-center justify-center rounded-full">{i + 1}</span>
+                                <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug group-open:text-[#004225] dark:group-open:text-[#00A854] transition-colors">{qa.q}</span>
+                              </summary>
+                              <p className="text-[10.5px] leading-relaxed text-[#5C5C58] dark:text-[#B5B5AF] font-light pl-6 pb-1">{qa.a}</p>
+                            </details>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Offscreen A4-width render used for the PDF export */}
+              <div aria-hidden="true" className="fixed -left-[12000px] top-0 pointer-events-none">
+                <div ref={exportRef} style={{ width: 794, minHeight: 1123, background: '#fff' }}>
+                  <ApplicationDocument design={design} form={form} s={s} generatedText={gen?.coverLetter || null} />
                 </div>
               </div>
             </motion.div>
