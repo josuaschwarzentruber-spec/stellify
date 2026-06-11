@@ -2553,8 +2553,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     const dailyToolUses = user?.dailyToolUses || 0;
     const searchUses = user?.searchUses || 0;
     
-    const isToolLimitReached = (!isPro && toolUses >= 3) || (user?.role === 'pro' && !isUnlimited && toolUses >= 50);
-    const isDailyLimitReached = user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20;
+    // Limits must match server QUOTA (api/index.ts) and the pricing copy.
+    const isToolLimitReached = (!isPro && toolUses >= 3)
+      || (user?.role === 'pro' && !isUnlimited && toolUses >= 150)
+      || (user?.role === 'unlimited' && toolUses >= 5000);
+    const isDailyLimitReached = user?.role === 'pro' && !isUnlimited && dailyToolUses >= 10;
 
     if (isToolLimitReached || isDailyLimitReached) {
       if (isDailyLimitReached) {
@@ -3770,7 +3773,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Einstellungen",
       nav_logout: "Abmelden",
       nav_login: "Anmelden",
-      tool_limit_pro: "Du hast deine Nutzungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Ultimate für sofortigen, unbegrenzten Zugriff! 🚀",
+      tool_limit_pro: "Du hast deine 150 Nutzungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Ultimate für noch grösseren Spielraum (5'000/Monat).",
       tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Unlimited-Abo. ✨",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
@@ -3801,8 +3804,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits werden automatisch zurückgesetzt — täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen — Upgrade jederzeit möglich.",
       plan_free_f1: "21 Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
-      plan_pro_f1: "Alle 21 Tools freigeschaltet", plan_pro_f2: "50 KI-Anfragen pro Monat", plan_pro_f3: "20 Tool-Nutzungen pro Tag", plan_pro_f4: "Prioritärer Support", plan_pro_f5: "Erweiterte Bewerbungs-Designs",
-      plan_unlim_f1: "Alles aus Pro", plan_unlim_f2: "Unbegrenzte KI-Anfragen", plan_unlim_f3: "Keine Tageslimits", plan_unlim_f4: "Deep Analysis Modus", plan_unlim_f5: "24/7 VIP-Support",
+      plan_pro_f1: "Alle 21 Tools freigeschaltet", plan_pro_f2: "150 KI-Anfragen pro Monat", plan_pro_f3: "10 Tool-Nutzungen pro Tag", plan_pro_f4: "Prioritärer Support", plan_pro_f5: "Erweiterte Bewerbungs-Designs",
+      plan_unlim_f1: "Alles aus Pro", plan_unlim_f2: "Bis zu 5000 KI-Anfragen pro Monat", plan_unlim_f3: "600 Anfragen pro Tag", plan_unlim_f4: "Deep Analysis Modus", plan_unlim_f5: "24/7 VIP-Support",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Tageslimit",
@@ -3876,6 +3879,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_overdue: "überfällig",
       tracker_reminder_short: "Nachfassen",
       tracker_export_csv: "CSV-Export",
+      transparency_badge: "Transparenz",
+      transparency_title: "Was geht — und was nicht",
+      transparency_sub: "Damit du genau weisst woran du bist. Alle Limits beziehen sich auf KI-Anfragen (Tools + Chat).",
+      tr_can_title: "Das kannst du", tr_cannot_title: "Das geht nicht",
+      tr_can_1: "Alle 21 Tools auf jedem Plan ausprobieren",
+      tr_can_2: "Bewerbungen erstellen, speichern und als PDF oder Word exportieren",
+      tr_can_3: "Auf Deutsch, Französisch, Italienisch und Englisch arbeiten",
+      tr_can_4: "Schweizer Lohnbänder, Standards und Arbeitsmarkt-Kontext nutzen",
+      tr_can_5: "Jederzeit Plan wechseln, kündigen oder pausieren — keine Bindung",
+      tr_cannot_1: "Stellify ersetzt keinen Anwalt oder Steuerberater — KI-Inhalte immer prüfen",
+      tr_cannot_2: "Keine Garantie auf Stellenangebote — wir sind ein Werkzeug, kein Vermittler",
+      tr_cannot_3: "Keine Verarbeitung sensibler Daten (z.B. Gesundheits-, Religions-, Sozialhilfe-Daten)",
+      tr_cannot_4: "Keine Massenbewerbungen oder Automatisierung gegen unsere AGB",
+      tr_limits_title: "Konkrete KI-Limits pro Plan",
+      tr_lim_free_label: "Gratis", tr_lim_free_v: "3 KI-Anfragen lebenslang · 3 Stella-Chat-Nachrichten",
+      tr_lim_pro_label: "Pro · CHF 19.90/Monat", tr_lim_pro_v: "150 KI-Anfragen pro Monat · max. 10 pro Tag · alle 21 Tools",
+      tr_lim_unlim_label: "Ultimate · CHF 39.90/Monat", tr_lim_unlim_v: "Bis zu 5'000 KI-Anfragen pro Monat · 600 pro Tag · Deep Analysis",
+      tr_reset_info: "Pro- und Ultimate-Limits werden monatlich am 1. zurückgesetzt, Tageslimit täglich um 0 Uhr (Europe/Zurich).",
+      tr_fair_use: "Stellify nutzt einen Fair-Use-Schutz von max. 15 (Pro) bzw. 30 (Ultimate) Anfragen pro Minute, um Missbrauch zu verhindern.",
       quick_tools: "Quick Tools",
       all_tools: "Alle Tools",
       recent_docs: "Deine letzten Dokumente",
@@ -4048,8 +4070,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Datenschutz aus der Schweiz", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
       pricing_free_f: ["3× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
-      pricing_pro_f: ["50× Bewerbungen / Nutzungen pro Monat", "20× Aktionen pro Tag", "Zeugnis-Decoder (Pro)", "Interview-Coach"],
-      pricing_ultimate_f: ["Unlimitierte Bewerbungen ♾️", "Alle Pro-Features + Exklusive Tools", "Deep Analysis Modus (KI)", "24/7 VIP-Support"],
+      pricing_pro_f: ["150 KI-Anfragen pro Monat", "10 Nutzungen pro Tag", "Alle 21 Tools (Zeugnis-Decoder, Interview-Coach, …)", "Prioritärer Support"],
+      pricing_ultimate_f: ["Bis zu 5'000 KI-Anfragen pro Monat", "600 Anfragen pro Tag — kein praktisches Limit", "Alle Pro-Features + Deep Analysis Modus", "24/7 VIP-Support"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Ultimate wählen",
@@ -4401,8 +4423,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limites réinitialisées automatiquement — chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie — upgrade possible à tout moment.",
       plan_free_f1: "21 outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
-      plan_pro_f1: "Les 21 outils débloqués", plan_pro_f2: "50 requêtes IA par mois", plan_pro_f3: "20 utilisations par jour", plan_pro_f4: "Support prioritaire", plan_pro_f5: "Designs de candidature avancés",
-      plan_unlim_f1: "Tout le contenu Pro", plan_unlim_f2: "Requêtes IA illimitées", plan_unlim_f3: "Aucune limite journalière", plan_unlim_f4: "Mode Deep Analysis", plan_unlim_f5: "Support VIP 24/7",
+      plan_pro_f1: "Les 21 outils débloqués", plan_pro_f2: "150 requêtes IA par mois", plan_pro_f3: "10 utilisations par jour", plan_pro_f4: "Support prioritaire", plan_pro_f5: "Designs de candidature avancés",
+      plan_unlim_f1: "Tout le contenu Pro", plan_unlim_f2: "Jusqu\'à 5000 requêtes IA par mois", plan_unlim_f3: "600 requêtes par jour", plan_unlim_f4: "Mode Deep Analysis", plan_unlim_f5: "Support VIP 24/7",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite quotidienne",
@@ -4476,6 +4498,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_overdue: "en retard",
       tracker_reminder_short: "Relance",
       tracker_export_csv: "Export CSV",
+      transparency_badge: "Transparence",
+      transparency_title: "Ce qui est possible — et ce qui ne l'est pas",
+      transparency_sub: "Pour que tu saches exactement à quoi t'attendre. Toutes les limites concernent les requêtes IA (outils + chat).",
+      tr_can_title: "Ce que tu peux faire", tr_cannot_title: "Ce qui n'est pas possible",
+      tr_can_1: "Essayer les 21 outils sur n'importe quel plan",
+      tr_can_2: "Créer des candidatures, les sauvegarder et exporter en PDF ou Word",
+      tr_can_3: "Travailler en allemand, français, italien et anglais",
+      tr_can_4: "Utiliser les fourchettes salariales, normes et contexte du marché suisse",
+      tr_can_5: "Changer de plan, résilier ou suspendre à tout moment — sans engagement",
+      tr_cannot_1: "Stellify ne remplace pas un avocat ou un fiscaliste — vérifie toujours le contenu IA",
+      tr_cannot_2: "Aucune garantie d'offre d'emploi — nous sommes un outil, pas un intermédiaire",
+      tr_cannot_3: "Pas de traitement de données sensibles (santé, religion, aide sociale, …)",
+      tr_cannot_4: "Pas de candidatures de masse ni d'automatisation contre nos CGV",
+      tr_limits_title: "Limites IA concrètes par plan",
+      tr_lim_free_label: "Gratuit", tr_lim_free_v: "3 requêtes IA à vie · 3 messages Stella Chat",
+      tr_lim_pro_label: "Pro · CHF 19.90/mois", tr_lim_pro_v: "150 requêtes IA par mois · max. 10 par jour · les 21 outils",
+      tr_lim_unlim_label: "Ultimate · CHF 39.90/mois", tr_lim_unlim_v: "Jusqu'à 5'000 requêtes IA par mois · 600 par jour · Deep Analysis",
+      tr_reset_info: "Les limites Pro et Ultimate sont réinitialisées le 1er du mois, la limite journalière à minuit (Europe/Zurich).",
+      tr_fair_use: "Stellify applique une protection 'fair use' de max. 15 (Pro) ou 30 (Ultimate) requêtes par minute pour éviter les abus.",
       quick_tools: "Outils rapides",
       all_tools: "Tous les outils",
       recent_docs: "Vos derniers documents",
@@ -4648,8 +4689,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
       ],
       pricing_free_f: ["3× candidatures ou utilisations d'outil", "3× demandes Stella Chat", "Calculateur de salaire IA (Base)", "Normes suisses"],
-      pricing_pro_f: ["50× candidatures / utilisations par mois", "20× actions par jour", "Décodeur de certificats (Pro)", "Coach d'entretien"],
-      pricing_ultimate_f: ["Candidatures illimitées ♾️", "Toutes les fonctions Pro", "Coach IA personnel", "Support VIP 24/7"],
+      pricing_pro_f: ["150 requêtes IA par mois", "10 utilisations par jour", "Les 21 outils (Décodeur, Coach d'entretien, …)", "Support prioritaire"],
+      pricing_ultimate_f: ["Jusqu\'à 5'000 requêtes IA par mois", "600 requêtes par jour — sans limite pratique", "Toutes les fonctions Pro + Coach IA personnel", "Support VIP 24/7"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Ultimate",
@@ -4895,8 +4936,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limiti reimpostati automaticamente — ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita — upgrade possibile in qualsiasi momento.",
       plan_free_f1: "21 strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
-      plan_pro_f1: "Tutti i 21 strumenti sbloccati", plan_pro_f2: "50 richieste IA al mese", plan_pro_f3: "20 utilizzi al giorno", plan_pro_f4: "Supporto prioritario", plan_pro_f5: "Design candidatura avanzati",
-      plan_unlim_f1: "Tutto Pro", plan_unlim_f2: "Richieste IA illimitate", plan_unlim_f3: "Nessun limite giornaliero", plan_unlim_f4: "Modalità Deep Analysis", plan_unlim_f5: "Supporto VIP 24/7",
+      plan_pro_f1: "Tutti i 21 strumenti sbloccati", plan_pro_f2: "150 richieste IA al mese", plan_pro_f3: "10 utilizzi al giorno", plan_pro_f4: "Supporto prioritario", plan_pro_f5: "Design candidatura avanzati",
+      plan_unlim_f1: "Tutto Pro", plan_unlim_f2: "Fino a 5000 richieste IA al mese", plan_unlim_f3: "600 richieste al giorno", plan_unlim_f4: "Modalità Deep Analysis", plan_unlim_f5: "Supporto VIP 24/7",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite giornaliero",
@@ -4970,6 +5011,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_overdue: "scaduto",
       tracker_reminder_short: "Ricontatta",
       tracker_export_csv: "Esporta CSV",
+      transparency_badge: "Trasparenza",
+      transparency_title: "Cosa è possibile — e cosa no",
+      transparency_sub: "Per sapere esattamente cosa aspettarsi. Tutti i limiti riguardano le richieste IA (strumenti + chat).",
+      tr_can_title: "Cosa puoi fare", tr_cannot_title: "Cosa non è possibile",
+      tr_can_1: "Provare tutti i 21 strumenti su qualsiasi piano",
+      tr_can_2: "Creare candidature, salvarle ed esportarle in PDF o Word",
+      tr_can_3: "Lavorare in tedesco, francese, italiano e inglese",
+      tr_can_4: "Usare fasce salariali, standard e contesto del mercato svizzero",
+      tr_can_5: "Cambiare piano, disdire o sospendere in qualsiasi momento — nessun vincolo",
+      tr_cannot_1: "Stellify non sostituisce avvocato o commercialista — verifica sempre i contenuti IA",
+      tr_cannot_2: "Nessuna garanzia di offerte di lavoro — siamo uno strumento, non un intermediario",
+      tr_cannot_3: "Nessun trattamento di dati sensibili (salute, religione, assistenza sociale)",
+      tr_cannot_4: "Nessuna candidatura di massa o automazione contro le nostre condizioni",
+      tr_limits_title: "Limiti IA concreti per piano",
+      tr_lim_free_label: "Gratuito", tr_lim_free_v: "3 richieste IA a vita · 3 messaggi Stella Chat",
+      tr_lim_pro_label: "Pro · CHF 19.90/mese", tr_lim_pro_v: "150 richieste IA al mese · max. 10 al giorno · tutti i 21 strumenti",
+      tr_lim_unlim_label: "Ultimate · CHF 39.90/mese", tr_lim_unlim_v: "Fino a 5'000 richieste IA al mese · 600 al giorno · Deep Analysis",
+      tr_reset_info: "I limiti Pro e Ultimate vengono reimpostati il 1° del mese, il limite giornaliero a mezzanotte (Europe/Zurich).",
+      tr_fair_use: "Stellify applica una protezione 'fair use' di max. 15 (Pro) o 30 (Ultimate) richieste al minuto per evitare abusi.",
       quick_tools: "Strumenti rapidi",
       all_tools: "Tutti gli strumenti",
       recent_docs: "I tuoi ultimi documenti",
@@ -5142,8 +5202,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
       ],
       pricing_free_f: ["3× candidature o utilizzi strumenti", "3× messaggi Stella Chat", "Calcolatore di stipendio AI (Base)", "Standard svizzeri"],
-      pricing_pro_f: ["50× candidature / mese", "Decodificatore di certificati (Pro)", "Coach per colloqui", "Supporto prioritario"],
-      pricing_ultimate_f: ["Candidature illimitate", "Tutte le funzioni Pro", "Coach AI personale", "Supporto VIP 24/7"],
+      pricing_pro_f: ["150 richieste IA al mese", "10 utilizzi al giorno", "Tutti i 21 strumenti (Decodificatore, Coach colloqui, …)", "Supporto prioritario"],
+      pricing_ultimate_f: ["Fino a 5'000 richieste IA al mese", "600 richieste al giorno — senza limite pratico", "Tutte le funzioni Pro + Coach AI personale", "Supporto VIP 24/7"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Ultimate",
@@ -5389,8 +5449,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits reset automatically — daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits — upgrade anytime.",
       plan_free_f1: "21 tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
-      plan_pro_f1: "All 21 tools unlocked", plan_pro_f2: "50 AI requests per month", plan_pro_f3: "20 uses per day", plan_pro_f4: "Priority support", plan_pro_f5: "Advanced application designs",
-      plan_unlim_f1: "Everything in Pro", plan_unlim_f2: "Unlimited AI requests", plan_unlim_f3: "No daily limits", plan_unlim_f4: "Deep Analysis mode", plan_unlim_f5: "VIP support 24/7",
+      plan_pro_f1: "All 21 tools unlocked", plan_pro_f2: "150 AI requests per month", plan_pro_f3: "10 uses per day", plan_pro_f4: "Priority support", plan_pro_f5: "Advanced application designs",
+      plan_unlim_f1: "Everything in Pro", plan_unlim_f2: "Up to 5,000 AI requests per month", plan_unlim_f3: "600 requests per day", plan_unlim_f4: "Deep Analysis mode", plan_unlim_f5: "VIP support 24/7",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Daily Limit",
@@ -5464,6 +5524,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_overdue: "overdue",
       tracker_reminder_short: "Follow-up",
       tracker_export_csv: "Export CSV",
+      transparency_badge: "Transparency",
+      transparency_title: "What you can do — and what you can't",
+      transparency_sub: "So you know exactly where you stand. All limits cover AI requests (tools + chat).",
+      tr_can_title: "What you can do", tr_cannot_title: "What's not possible",
+      tr_can_1: "Try all 21 tools on every plan",
+      tr_can_2: "Create applications, save them and export as PDF or Word",
+      tr_can_3: "Work in German, French, Italian and English",
+      tr_can_4: "Use Swiss salary ranges, standards and labour-market context",
+      tr_can_5: "Switch plans, cancel or pause anytime — no lock-in",
+      tr_cannot_1: "Stellify doesn't replace a lawyer or tax advisor — always check AI output",
+      tr_cannot_2: "No guarantee of job offers — we're a tool, not an agency",
+      tr_cannot_3: "No processing of sensitive data (health, religion, social-benefit data)",
+      tr_cannot_4: "No mass applications or automation against our terms",
+      tr_limits_title: "Concrete AI limits by plan",
+      tr_lim_free_label: "Free", tr_lim_free_v: "3 lifetime AI requests · 3 Stella chat messages",
+      tr_lim_pro_label: "Pro · CHF 19.90/month", tr_lim_pro_v: "150 AI requests per month · max. 10 per day · all 21 tools",
+      tr_lim_unlim_label: "Ultimate · CHF 39.90/month", tr_lim_unlim_v: "Up to 5,000 AI requests per month · 600 per day · Deep Analysis",
+      tr_reset_info: "Pro and Ultimate limits reset on the 1st of each month, the daily limit at midnight (Europe/Zurich).",
+      tr_fair_use: "Stellify applies a fair-use limit of max. 15 (Pro) or 30 (Ultimate) requests per minute to prevent abuse.",
       quick_tools: "Quick Tools",
       all_tools: "All Tools",
       recent_docs: "Your Recent Documents",
@@ -5636,8 +5715,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
       ],
       pricing_free_f: ["3× applications or tool uses", "3× Stella Chat messages", "AI Salary Calculator (Base)", "Swiss Standards"],
-      pricing_pro_f: ["50× applications / month", "Certificate Decoder (Pro)", "Interview Coach", "Priority Support"],
-      pricing_ultimate_f: ["Unlimited applications", "All Pro features + Exclusive Tools", "Deep Analysis Mode (AI)", "24/7 VIP Support"],
+      pricing_pro_f: ["150 AI requests per month", "10 uses per day", "All 21 tools (Certificate Decoder, Interview Coach, …)", "Priority Support"],
+      pricing_ultimate_f: ["Up to 5,000 AI requests per month", "600 requests per day — no practical limit", "All Pro features + Deep Analysis Mode", "24/7 VIP Support"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Ultimate",
@@ -6264,12 +6343,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
                                     <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 50</span>
+                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 150</span>
                                   </div>
                                   <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div 
                                       className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(((user.toolUses || 0) / 50) * 100, 100)}%` }}
+                                      style={{ width: `${Math.min(((user.toolUses || 0) / 150) * 100, 100)}%` }}
                                     />
                                   </div>
                                   <div className="flex justify-end">
@@ -6281,12 +6360,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
                                     <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_daily_usage}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.dailyToolUses || 0} / 20</span>
+                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.dailyToolUses || 0} / 10</span>
                                   </div>
                                   <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div 
                                       className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%` }}
+                                      style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 10) * 100))}%` }}
                                     />
                                   </div>
                                   <div className="flex justify-end">
@@ -8475,6 +8554,68 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {language === 'FR' ? 'Lire notre histoire' : language === 'IT' ? 'Leggi la nostra storia' : language === 'EN' ? 'Read our story' : 'Unsere Geschichte lesen'}
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- TRANSPARENCY / WHAT'S POSSIBLE & NOT --- */}
+      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
+              {t.transparency_badge}
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4">{t.transparency_title}</h2>
+            <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl mx-auto leading-relaxed">{t.transparency_sub}</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-12">
+            <div className="p-7 bg-white dark:bg-[#1A1A18] border border-[#004225]/15 dark:border-[#00A854]/20">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-5">
+                <CheckCircle2 size={13} /><span>{t.tr_can_title}</span>
+              </div>
+              <ul className="space-y-3">
+                {[t.tr_can_1, t.tr_can_2, t.tr_can_3, t.tr_can_4, t.tr_can_5].map((line: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed">
+                    <span className="mt-1.5 w-1.5 h-1.5 bg-[#004225] dark:bg-[#00A854] rounded-full shrink-0" />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="p-7 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10">
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-5">
+                <Info size={13} /><span>{t.tr_cannot_title}</span>
+              </div>
+              <ul className="space-y-3">
+                {[t.tr_cannot_1, t.tr_cannot_2, t.tr_cannot_3, t.tr_cannot_4].map((line: string, i: number) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+                    <span className="mt-1.5 w-1.5 h-1.5 bg-[#9A9A94] rounded-full shrink-0" />
+                    <span>{line}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/10">
+            <div className="p-5 border-b border-black/5 dark:border-white/5">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">{t.tr_limits_title}</p>
+            </div>
+            {[
+              { label: t.tr_lim_free_label, value: t.tr_lim_free_v },
+              { label: t.tr_lim_pro_label, value: t.tr_lim_pro_v },
+              { label: t.tr_lim_unlim_label, value: t.tr_lim_unlim_v },
+            ].map((row, i) => (
+              <div key={i} className="grid grid-cols-1 sm:grid-cols-[210px_1fr] gap-2 sm:gap-6 px-5 py-4 border-b last:border-b-0 border-black/5 dark:border-white/5">
+                <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8]">{row.label}</p>
+                <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{row.value}</p>
+              </div>
+            ))}
+            <div className="px-5 py-4 bg-[#FDFCFB] dark:bg-[#2A2A26] space-y-1.5">
+              <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">{t.tr_reset_info}</p>
+              <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">{t.tr_fair_use}</p>
             </div>
           </div>
         </div>
@@ -10886,14 +11027,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {t.settings_generations}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 150 {t.settings_generations}</p>
                                 </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 50) * 100)}%</span>
+                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 150) * 100)}%</span>
                               </div>
                               <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(((user.toolUses || 0) / 50) * 100, 100)}%` }}
+                                  style={{ width: `${Math.min(((user.toolUses || 0) / 150) * 100, 100)}%` }}
                                 />
                               </div>
                             </div>
@@ -10903,14 +11044,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.dashboard_daily_usage}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {t.settings_actions_today}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 10 {t.settings_actions_today}</p>
                                 </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%</span>
+                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 10) * 100))}%</span>
                               </div>
                               <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%` }}
+                                  style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 10) * 100))}%` }}
                                 />
                               </div>
                             </div>
