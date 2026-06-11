@@ -7308,34 +7308,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
-                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[9px] font-bold uppercase tracking-widest"
+                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[11px] sm:text-[9px] font-bold uppercase tracking-widest"
               >
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
                   className="flex items-center gap-1.5 text-[#004225] dark:text-[#00A854]"
                 >
-                  <span className="w-4 h-4 bg-[#004225] dark:bg-[#00A854] text-white text-[8px] flex items-center justify-center rounded-full font-bold">1</span>
-                  Gratis anmelden
+                  <span className="w-5 h-5 sm:w-4 sm:h-4 bg-[#004225] dark:bg-[#00A854] text-white text-[10px] sm:text-[8px] flex items-center justify-center rounded-full font-bold">1</span>
+                  {language === 'FR' ? 'Inscription gratuite' : language === 'IT' ? 'Registrati gratis' : language === 'EN' ? 'Sign up free' : 'Gratis anmelden'}
                 </motion.span>
                 <motion.span variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }}>
-                  <ArrowRight size={9} className="text-[#9A9A94]" />
+                  <ArrowRight size={11} className="text-[#9A9A94] sm:hidden" />
+                  <ArrowRight size={9} className="text-[#9A9A94] hidden sm:inline" />
                 </motion.span>
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
                   className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]"
                 >
-                  <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">2</span>
-                  Plan wählen
+                  <span className="w-5 h-5 sm:w-4 sm:h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[10px] sm:text-[8px] flex items-center justify-center rounded-full font-bold">2</span>
+                  {language === 'FR' ? 'Choisir un plan' : language === 'IT' ? 'Scegli un piano' : language === 'EN' ? 'Pick a plan' : 'Plan wählen'}
                 </motion.span>
                 <motion.span variants={{ hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.3 } } }}>
-                  <ArrowRight size={9} className="text-[#9A9A94]" />
+                  <ArrowRight size={11} className="text-[#9A9A94] sm:hidden" />
+                  <ArrowRight size={9} className="text-[#9A9A94] hidden sm:inline" />
                 </motion.span>
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
                   className="flex items-center gap-1.5 text-[#5C5C58] dark:text-[#9A9A94]"
                 >
-                  <span className="w-4 h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[8px] flex items-center justify-center rounded-full font-bold">3</span>
-                  Karriere starten
+                  <span className="w-5 h-5 sm:w-4 sm:h-4 bg-black/10 dark:bg-white/10 text-[#4A4A45] dark:text-[#FAFAF8] text-[10px] sm:text-[8px] flex items-center justify-center rounded-full font-bold">3</span>
+                  {language === 'FR' ? 'Lancer ta carrière' : language === 'IT' ? 'Lancia la carriera' : language === 'EN' ? 'Launch career' : 'Karriere starten'}
                 </motion.span>
               </motion.div>
 
