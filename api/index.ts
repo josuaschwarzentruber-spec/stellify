@@ -812,12 +812,13 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
 // Free users get 3 lifetime tries — then upgrade is required.
 // Pro/Unlimited get generous monthly allowances with per-minute throttling.
 // Plan limits — must stay in sync with what we tell users on the Pricing
-// page, in Settings ("Dein Plan im Überblick") and on the dashboard tile.
-// Adjusting any of these requires updating those copy strings too.
+// page, in Settings ("Dein Plan im Überblick"), the transparency section
+// on the landing page and the dashboard tile. Adjusting any of these
+// requires updating those copy strings too.
 const QUOTA = {
   client:    { lifetime: 3 },
-  pro:       { perMin: 15, perDay: 10,  perMonth: 150 },
-  unlimited: { perMin: 30, perDay: 600, perMonth: 5000 },
+  pro:       { perMin: 15, perDay: 20,  perMonth: 200 },
+  unlimited: { perMin: 30, perDay: 200, perMonth: 2000 },
 } as const;
 
 const GLOBAL_DAILY_CALL_CAP = 3000; // safety net against runaway costs (~$45/day worst case)
