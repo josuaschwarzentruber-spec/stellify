@@ -1003,7 +1003,15 @@ app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req
     IT: `Sei Stellify – un consulente di carriera d'élite con 20 anni di esperienza nel mercato del lavoro svizzero (Zurigo, Ginevra, Basilea, Lugano, Berna). Conosci le strutture dei maggiori datori di lavoro svizzeri (Nestlé, Novartis, UBS, Roche, ABB, Zurich Insurance, Lonza) e il settore PMI. LINGUA: Italiano svizzero, preciso e professionale. Tono: diretto, concreto, al livello di un direttore HR svizzero. QUALITÀ: Le tue risposte sono concrete, attuabili e del massimo livello. Niente generalità né frasi vuote.`,
     EN: `You are Stellify – an elite career advisor with 20 years of experience in the Swiss job market (Zurich, Geneva, Basel, Zug, Berne). You know the structures of Switzerland's largest employers (Nestlé, Novartis, UBS, Roche, ABB, Zurich Insurance, Swiss Re, Glencore, Richemont) and the SME sector. LANGUAGE: Professional British/Swiss English. Tone: precise, direct, professional – like a Swiss HR Director. QUALITY: Your answers are concrete, actionable and of the highest standard. No generic advice or empty phrases.`,
   };
-  const systemInstruction = langInstructions[language] || langInstructions.DE;
+  // Many tool briefings are written in German regardless of UI language.
+  // This suffix makes sure the OUTPUT (incl. all headings) is in the user's language.
+  const langEnforce: Record<string, string> = {
+    DE: '',
+    FR: ` IMPORTANT: La consigne ci-dessous peut être rédigée en allemand — ta réponse ENTIÈRE (y compris TOUS les titres de section) doit être en français. Traduis les titres de section allemands en français.`,
+    IT: ` IMPORTANTE: Il briefing qui sotto può essere in tedesco — la tua INTERA risposta (compresi TUTTI i titoli di sezione) deve essere in italiano. Traduci i titoli di sezione tedeschi in italiano.`,
+    EN: ` IMPORTANT: The briefing below may be written in German — your ENTIRE answer (including ALL section headings) must be in English. Translate any German section headings into English.`,
+  };
+  const systemInstruction = (langInstructions[language] || langInstructions.DE) + (langEnforce[language] || '');
 
   try {
     // Mit Google-Suche → Gemini ist Pflicht (DeepSeek hat kein Grounding)

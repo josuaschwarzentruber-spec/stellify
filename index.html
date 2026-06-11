@@ -321,6 +321,16 @@
 
     <script>
     (function () {
+      /* ── Return visit detection ───────────────────────
+         The cinematic splash plays once per session. Coming back
+         (e.g. from Stripe checkout or via the back button) shows
+         only a brief fade so the app feels instant. */
+      let isReturnVisit = false;
+      try {
+        isReturnVisit = sessionStorage.getItem('stellify_splash_seen') === '1';
+        sessionStorage.setItem('stellify_splash_seen', '1');
+      } catch (e) {}
+
       /* ── Reduced Motion + Low-power Detection ────────── */
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       const isLowPower = (() => {
@@ -351,9 +361,9 @@
       let state      = 'intro';
       let stateFrame = 0;
       let stopped    = false;
-      const INTRO_F   = isLowPower ? 50 : 90;
-      const OUTRO_F   = isLowPower ? 30 : 55;
-      const MINIMUM_MS = isLowPower ? 1800 : 4000;
+      const INTRO_F   = isReturnVisit ? 12 : (isLowPower ? 50 : 90);
+      const OUTRO_F   = isReturnVisit ? 14 : (isLowPower ? 30 : 55);
+      const MINIMUM_MS = isReturnVisit ? 250 : (isLowPower ? 1800 : 4000);
       const startTime  = Date.now();
       let   readyComplete = false;
       let   readyCalled   = false;
@@ -649,7 +659,7 @@
           }
           if (!shootScheduled && stateFrame === Math.floor(INTRO_F * .55)) {
             shootScheduled = true;
-            if (!reducedMotion && !isLowPower) spawnShoot();
+            if (!reducedMotion && !isLowPower && !isReturnVisit) spawnShoot();
           }
           if (stateFrame >= INTRO_F) { state = 'running'; stateFrame = 0; }
         }
@@ -659,7 +669,7 @@
           const progress = readyComplete ? 1 : Math.min(0.92, elapsed / MINIMUM_MS);
           progFill.style.width = (progress * 100) + '%';
           // Wiederkehrende Shooting Stars im Hintergrund (skip auf low-power)
-          if (!reducedMotion && !isLowPower && !shoot && Math.random() < .012 && elapsed > 1500 && elapsed < 3700) {
+          if (!reducedMotion && !isLowPower && !isReturnVisit && !shoot && Math.random() < .012 && elapsed > 1500 && elapsed < 3700) {
             spawnShoot();
           }
           if (readyComplete) { state = 'outro'; stateFrame = 0; }
