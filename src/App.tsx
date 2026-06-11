@@ -9206,6 +9206,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
                         showToast={showToast}
                         authFetch={authFetch}
+                        usage={{
+                          toolUses: user?.toolUses || 0,
+                          dailyToolUses: user?.dailyToolUses || 0,
+                          isPro: user?.role === 'pro' || user?.role === 'unlimited' || user?.role === 'admin',
+                          isUnlimited: user?.role === 'unlimited' || user?.role === 'admin',
+                        }}
                         recordUsage={async ({ input, result }) => {
                           if (!user) return;
                           // Same bookkeeping as handleProcessTool: history + visible counters
