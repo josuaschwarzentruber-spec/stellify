@@ -157,7 +157,7 @@ class ErrorBoundary extends React.Component<any, any> {
               </a>
             </div>
             <a
-              href="mailto:support.stellify@gmail.com?subject=Stellify%20Error"
+              href="mailto:support@stellify.ch?subject=Stellify%20Error"
               className="block text-xs text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mt-4"
             >
               {supportLabel} →
@@ -3566,10 +3566,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   </style>
 </head>
 <body>
-  <div class="doc-header">Stellify &nbsp;|&nbsp; Schweizer Karriere-Co-Pilot</div>
+  <div class="doc-header">Stellify &nbsp;|&nbsp; ${language === 'FR' ? 'Co-Pilote carrière suisse' : language === 'IT' ? 'Co-Pilota carriera svizzero' : language === 'EN' ? 'Swiss Career Co-Pilot' : 'Schweizer Karriere-Co-Pilot'}</div>
   <h1>${activeTool.title}</h1>
   <div class="content">${mdToHtml(toolResult)}</div>
-  <div class="doc-footer">Erstellt mit Stellify am ${new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' })} &nbsp;·&nbsp; stellify.ch</div>
+  <div class="doc-footer">${language === 'FR' ? 'Créé avec Stellify le' : language === 'IT' ? 'Creato con Stellify il' : language === 'EN' ? 'Created with Stellify on' : 'Erstellt mit Stellify am'} ${new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' })} &nbsp;·&nbsp; stellify.ch</div>
 </body>
 </html>`;
 
@@ -7856,7 +7856,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="min-w-0">
                     <p className="text-red-300 text-sm font-semibold">Zahlung konnte nicht verarbeitet werden</p>
                     <p className="text-red-400/80 text-xs mt-1 break-words">{subscriptionError}</p>
-                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support.stellify@gmail.com&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
+                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@stellify.ch&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support@stellify.ch</a></p>
                   </div>
                 </div>
                 <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
@@ -8220,7 +8220,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <ShieldCheck size={16} />
                     <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Swiss Grade</span>
                   </div>
-                  <p className="text-sm text-white/70 font-light">Gebaut für Schweizer Standards, nicht für generische Vorlagen.</p>
+                  <p className="text-sm text-white/70 font-light">{language === 'FR' ? 'Conçu pour les standards suisses, pas pour des modèles génériques.' : language === 'IT' ? 'Costruito per gli standard svizzeri, non per modelli generici.' : language === 'EN' ? 'Built for Swiss standards, not generic templates.' : 'Gebaut für Schweizer Standards, nicht für generische Vorlagen.'}</p>
                 </div>
                 <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
                   <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
@@ -8234,7 +8234,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <Sparkles size={16} />
                     <span className="text-[10px] font-bold uppercase tracking-[0.25em]">AI Copilot</span>
                   </div>
-                  <p className="text-sm text-white/70 font-light">Vom Lebenslauf (CV) bis zum Interview begleitet dich jede Antwort mit Kontext.</p>
+                  <p className="text-sm text-white/70 font-light">{language === 'FR' ? 'Du CV à l\'entretien, chaque réponse arrive avec le bon contexte.' : language === 'IT' ? 'Dal CV al colloquio, ogni risposta arriva con il giusto contesto.' : language === 'EN' ? 'From CV to interview, every answer comes with the right context.' : 'Vom Lebenslauf (CV) bis zum Interview begleitet dich jede Antwort mit Kontext.'}</p>
                 </div>
               </div>
 
@@ -8246,17 +8246,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </p>
                     <p className="text-sm text-white/70 font-light leading-relaxed">
                       {language === 'FR'
-                        ? <>Si tu as une idée solide pour un spot, une campagne ou une conversion story, envoie-la à{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        ? <>Si tu as une idée solide pour un spot, une campagne ou une conversion story, envoie-la à{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
                         : language === 'IT'
-                        ? <>Se hai un'idea concreta per uno spot, una campagna o una storia di conversione, inviala a{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        ? <>Se hai un'idea concreta per uno spot, una campagna o una storia di conversione, inviala a{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
                         : language === 'EN'
-                        ? <>If you have a solid idea for an ad spot, campaign or conversion story, send it to{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
-                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot oder eine Kampagne hast, sende sie an{' '}<a href="mailto:support.stellify@gmail.com" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support.stellify@gmail.com</a>.</>
+                        ? <>If you have a solid idea for an ad spot, campaign or conversion story, send it to{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
+                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot oder eine Kampagne hast, sende sie an{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
                       }
                     </p>
                   </div>
                   <a
-                    href={`mailto:support.stellify@gmail.com?subject=${
+                    href={`mailto:support@stellify.ch?subject=${
                       language === 'FR' ? 'Id%C3%A9e%20marketing%20pour%20Stellify'
                       : language === 'IT' ? 'Idea%20di%20marketing%20per%20Stellify'
                       : language === 'EN' ? 'Marketing%20Idea%20for%20Stellify'
@@ -8417,7 +8417,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
           <div className="text-center mt-12">
             <p className="text-sm text-[#9A9A94] font-light">
-              {t.faq_contact} <a href="mailto:support.stellify@gmail.com" className="text-[#004225] font-medium border-b border-[#004225]/20">support.stellify@gmail.com</a>
+              {t.faq_contact} <a href="mailto:support@stellify.ch" className="text-[#004225] font-medium border-b border-[#004225]/20">support@stellify.ch</a>
             </p>
           </div>
         </div>
@@ -8562,10 +8562,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <li><button onClick={() => navigate('about')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
                 <li><a href="#success" className="hover:text-white transition-colors">{t.success_stories}</a></li>
                 <li><a href="#pricing" className="hover:text-white transition-colors">{t.pricing}</a></li>
-                <li><a href={`mailto:support.stellify@gmail.com?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
+                <li><a href={`mailto:support@stellify.ch?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
                   {language === 'DE' ? 'Kooperationen' : language === 'FR' ? 'Partenariats' : language === 'IT' ? 'Collaborazioni' : 'Partnerships'}
                 </a></li>
-                <li><a href="mailto:support.stellify@gmail.com" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
+                <li><a href="mailto:support@stellify.ch" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
               </ul>
             </div>
             <div>
