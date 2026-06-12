@@ -331,7 +331,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3× Tool-Nutzungen','3× Stella Chat-Anfragen','KI-Gehaltsrechner (Basisversion)','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 199.–/Jahr)', ['50× Tool-Nutzungen/Monat','20× Aktionen/Tag','Zeugnis-Decoder, Interview-Coach, alle Pro-Tools','Prioritärer Support']],['Ultimate-Plan (CHF 39.90/Mo. · CHF 399.–/Jahr)', ['Unbegrenzte Nutzungen ♾️','Alle Pro-Features + exklusive Ultimate-Tools','Deep Analysis Modus','24/7 VIP-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3 KI-Anfragen lebenslang','3 Stella-Chat-Nachrichten','Zugang zu allen 21 Karriere-Tools','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 14.90/Mo. bei Jahresabo)', ['200 KI-Anfragen pro Monat','Maximal 20 KI-Anfragen pro Tag','Alle 21 Karriere-Tools freigeschaltet','Bis zu 25 gespeicherte Bewerbungen','Prioritärer Support']],['Ultimate-Plan (CHF 49.90/Mo. · CHF 39.90/Mo. bei Jahresabo)', ['2 000 KI-Anfragen pro Monat','Maximal 200 KI-Anfragen pro Tag','Exklusive Premium-Bewerbungs-Designs','Deep Analysis Modus + KI-Live-Suche','Priority-Server-Zugang','24/7 VIP-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -347,6 +347,17 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="7. Nutzungsbeschränkungen"><ul className="list-disc pl-5 space-y-2"><li>Keine illegale Nutzung oder Täuschung Dritter</li><li>Kein Scraping / Bots</li><li>Keine Weitergabe von Zugangsdaten</li><li>Nutzer ist für die Richtigkeit von KI-Inhalten selbst verantwortlich</li></ul></Section>
+              <Section title="7a. Nutzungs-Kontingente (verbindlich)">
+                <p>Alle kostenpflichtigen Pläne stellen festgelegte Kontingente für KI-Anfragen bereit, die serverseitig durchgesetzt werden. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Der Ultimate-Plan ist ausdrücklich kein unbeschränkter Plan</strong>, sondern ein Premium-Plan mit höheren, jedoch klar definierten Limits.</p>
+                <p className="mt-2">Zum Zeitpunkt der aktuellen Fassung gelten:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Gratis-Plan:</strong> 3 KI-Anfragen lebenslang, 3 Stella-Chat-Nachrichten</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro-Plan:</strong> 200 KI-Anfragen pro Monat, max. 20 pro Tag, max. 15 pro Minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Ultimate-Plan:</strong> 2 000 KI-Anfragen pro Monat, max. 200 pro Tag, max. 30 pro Minute</li>
+                </ul>
+                <p className="mt-2">Monatliche Kontingente werden am 1. des Monats (Europe/Zurich) zurückgesetzt, Tageskontingente täglich um 00:00 Uhr. Die Minuten-Limits dienen ausschliesslich dem Schutz vor Missbrauch und automatisierter Massennutzung.</p>
+                <p className="mt-2">Eine <em>Erhöhung</em> der Kontingente ist jederzeit möglich und gilt automatisch zugunsten des Nutzers. Eine <em>Senkung</em> würde nur für nach der Änderung neu abgeschlossene Abonnements wirksam und vorab mit 30 Tagen Frist angekündigt.</p>
+              </Section>
               <Section title="8. Geistiges Eigentum"><p>Alle Rechte an Plattform, Code, Design und Marken liegen beim Betreiber. KI-generierte Inhalte dürfen vom Nutzer für eigene Bewerbungsunterlagen verwendet werden.</p></Section>
               <Section title="9. Haftungsbeschränkung"><p>Stellify haftet nur für vorsätzliche oder grob fahrlässige Schäden. Gesamthaftung begrenzt auf den in den letzten 12 Monaten bezahlten Betrag.</p></Section>
               <Section title="10. Verfügbarkeit"><p>Keine Garantie auf unterbrechungsfreie Verfügbarkeit. Ausfälle von Firebase, Stripe oder Google AI liegen ausserhalb unseres Einflussbereichs.</p></Section>
@@ -361,7 +372,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3× utilisations d\'outil','3× requêtes Stella Chat','Calculateur de salaire IA (base)','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 199.–/an)', ['50× utilisations d\'outils/mois','20× actions/jour','Décodeur de certificat, Coach entretien, tous les outils Pro','Support prioritaire']],['Plan Ultimate (CHF 39.90/mois · CHF 399.–/an)', ['Utilisations illimitées ♾️','Toutes les fonctionnalités Pro + outils Ultimate exclusifs','Mode analyse approfondie','Support VIP 24/7']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3 requêtes IA à vie','3 messages Stella Chat','Accès aux 21 outils carrière','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 14.90/mois en annuel)', ['200 requêtes IA par mois','Maximum 20 requêtes IA par jour','Les 21 outils carrière débloqués','Jusqu\'à 25 candidatures sauvegardées','Support prioritaire']],['Plan Ultimate (CHF 49.90/mois · CHF 39.90/mois en annuel)', ['2 000 requêtes IA par mois','Maximum 200 requêtes IA par jour','Designs de candidature Premium exclusifs','Mode Deep Analysis + recherche IA en direct','Accès serveur prioritaire','Support VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -377,6 +388,17 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="7. Restrictions d'utilisation"><ul className="list-disc pl-5 space-y-2"><li>Pas d'utilisation illégale ni de tromperie de tiers</li><li>Pas de scraping / bots</li><li>Pas de partage d'identifiants</li><li>L'utilisateur est responsable de l'exactitude des contenus IA</li></ul></Section>
+              <Section title="7a. Quotas d'utilisation (engageants)">
+                <p>Tous les plans payants prévoient des quotas définis de requêtes IA, appliqués côté serveur. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Le plan Ultimate n'est expressément pas un plan illimité</strong>, mais un plan Premium avec des limites supérieures clairement définies.</p>
+                <p className="mt-2">À la date de la version actuelle, les limites sont :</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Gratuit :</strong> 3 requêtes IA à vie, 3 messages Stella Chat</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Pro :</strong> 200 requêtes IA par mois, max. 20 par jour, max. 15 par minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Ultimate :</strong> 2 000 requêtes IA par mois, max. 200 par jour, max. 30 par minute</li>
+                </ul>
+                <p className="mt-2">Les quotas mensuels sont réinitialisés le 1er du mois (Europe/Zurich), les quotas journaliers à 00h00. Les limites par minute servent exclusivement à prévenir les abus et l'utilisation automatisée de masse.</p>
+                <p className="mt-2">Une <em>augmentation</em> des quotas est possible à tout moment et s'applique automatiquement en faveur de l'utilisateur. Une <em>diminution</em> ne s'appliquerait qu'aux abonnements souscrits après la modification et serait annoncée 30 jours à l'avance.</p>
+              </Section>
               <Section title="8. Propriété intellectuelle"><p>Tous les droits sur la plateforme, le code, le design et les marques appartiennent à l'exploitant. Les contenus générés par IA peuvent être utilisés par l'utilisateur pour ses dossiers de candidature.</p></Section>
               <Section title="9. Limitation de responsabilité"><p>Stellify n'est responsable que des dommages causés intentionnellement ou par négligence grave. Responsabilité totale limitée aux montants payés au cours des 12 derniers mois.</p></Section>
               <Section title="10. Disponibilité"><p>Aucune garantie de disponibilité ininterrompue. Les pannes de Firebase, Stripe ou Google AI échappent à notre contrôle.</p></Section>
@@ -391,7 +413,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3× utilizzi strumento','3× richieste Stella Chat','Calcolatore stipendio IA (base)','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 199.–/anno)', ['50× utilizzi strumenti/mese','20× azioni/giorno','Decodificatore certificato, Coach colloquio, tutti gli strumenti Pro','Supporto prioritario']],['Piano Ultimate (CHF 39.90/mese · CHF 399.–/anno)', ['Utilizzi illimitati ♾️','Tutte le funzionalità Pro + strumenti Ultimate esclusivi','Modalità analisi approfondita','Supporto VIP 24/7']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3 richieste IA a vita','3 messaggi Stella Chat','Accesso a tutti i 21 strumenti carriera','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 14.90/mese con piano annuale)', ['200 richieste IA al mese','Massimo 20 richieste IA al giorno','Tutti i 21 strumenti carriera sbloccati','Fino a 25 candidature salvate','Supporto prioritario']],['Piano Ultimate (CHF 49.90/mese · CHF 39.90/mese con piano annuale)', ['2 000 richieste IA al mese','Massimo 200 richieste IA al giorno','Design candidatura Premium esclusivi','Modalità Deep Analysis + ricerca IA dal vivo','Accesso server prioritario','Supporto VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -407,6 +429,17 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="7. Restrizioni d'uso"><ul className="list-disc pl-5 space-y-2"><li>Nessun utilizzo illegale né inganno di terzi</li><li>Nessun scraping / bot</li><li>Nessuna condivisione di credenziali</li><li>L'utente è responsabile dell'accuratezza dei contenuti IA</li></ul></Section>
+              <Section title="7a. Limiti di utilizzo (vincolanti)">
+                <p>Tutti i piani a pagamento prevedono limiti definiti per le richieste IA, applicati lato server. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Il piano Ultimate non è espressamente un piano illimitato</strong>, ma un piano Premium con limiti più elevati ma chiaramente definiti.</p>
+                <p className="mt-2">Alla data della versione attuale valgono:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Gratuito:</strong> 3 richieste IA a vita, 3 messaggi Stella Chat</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Pro:</strong> 200 richieste IA al mese, max. 20 al giorno, max. 15 al minuto</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Ultimate:</strong> 2 000 richieste IA al mese, max. 200 al giorno, max. 30 al minuto</li>
+                </ul>
+                <p className="mt-2">I limiti mensili vengono reimpostati il 1° del mese (Europe/Zurich), i limiti giornalieri alle 00:00. I limiti al minuto servono esclusivamente a prevenire abusi e utilizzo automatizzato di massa.</p>
+                <p className="mt-2">Un <em>aumento</em> dei limiti è possibile in qualsiasi momento e si applica automaticamente a favore dell'utente. Una <em>riduzione</em> si applicherebbe solo agli abbonamenti sottoscritti dopo la modifica e verrebbe annunciata con 30 giorni di preavviso.</p>
+              </Section>
               <Section title="8. Proprietà intellettuale"><p>Tutti i diritti sulla piattaforma, il codice, il design e i marchi appartengono al gestore. I contenuti generati dall'IA possono essere utilizzati dall'utente per i propri documenti di candidatura.</p></Section>
               <Section title="9. Limitazione di responsabilità"><p>Stellify risponde solo per danni causati intenzionalmente o per colpa grave. Responsabilità totale limitata agli importi pagati negli ultimi 12 mesi.</p></Section>
               <Section title="10. Disponibilità"><p>Nessuna garanzia di disponibilità ininterrotta. I guasti di Firebase, Stripe o Google AI esulano dal nostro controllo.</p></Section>
@@ -421,7 +454,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3× tool uses','3× Stella Chat requests','AI Salary Calculator (basic)','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 199.–/yr)', ['50× tool uses/month','20× actions/day','Certificate Decoder, Interview Coach, all Pro tools','Priority support']],['Ultimate Plan (CHF 39.90/mo · CHF 399.–/yr)', ['Unlimited uses ♾️','All Pro features + exclusive Ultimate tools','Deep Analysis Mode','24/7 VIP Support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3 lifetime AI requests','3 Stella Chat messages','Access to all 21 career tools','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 14.90/mo on annual)', ['200 AI requests per month','Maximum 20 AI requests per day','All 21 career tools unlocked','Up to 25 saved applications','Priority support']],['Ultimate Plan (CHF 49.90/mo · CHF 39.90/mo on annual)', ['2,000 AI requests per month','Maximum 200 AI requests per day','Exclusive Premium application designs','Deep Analysis Mode + live AI search','Priority server access','24/7 VIP Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -437,6 +470,17 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="7. Usage Restrictions"><ul className="list-disc pl-5 space-y-2"><li>No illegal use or deception of third parties</li><li>No automated scraping or bots</li><li>No sharing of login credentials</li><li>Users are responsible for verifying the accuracy of AI-generated content</li></ul></Section>
+              <Section title="7a. Usage quotas (binding)">
+                <p>All paid plans provide defined AI request quotas that are enforced server-side. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">The Ultimate plan is expressly not an unlimited plan</strong>, but a Premium plan with higher yet clearly defined limits.</p>
+                <p className="mt-2">As of the current version the limits are:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Free Plan:</strong> 3 lifetime AI requests, 3 Stella Chat messages</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro Plan:</strong> 200 AI requests per month, max. 20 per day, max. 15 per minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Ultimate Plan:</strong> 2,000 AI requests per month, max. 200 per day, max. 30 per minute</li>
+                </ul>
+                <p className="mt-2">Monthly quotas reset on the 1st of each month (Europe/Zurich), daily quotas at 00:00. The per-minute limits serve solely to prevent abuse and automated mass use.</p>
+                <p className="mt-2">An <em>increase</em> of quotas is possible at any time and applies automatically in favour of the user. A <em>decrease</em> would only apply to subscriptions taken out after the change and would be announced 30 days in advance.</p>
+              </Section>
               <Section title="8. Intellectual Property"><p>All rights to the platform, code, design and trademarks belong to the operator. AI-generated content may be used by the user for their own job applications.</p></Section>
               <Section title="9. Limitation of Liability"><p>Stellify is only liable for damages caused by wilful misconduct or gross negligence. Total liability is capped at the amount paid by the user in the last 12 months.</p></Section>
               <Section title="10. Availability"><p>No guarantee of uninterrupted availability. Outages of Firebase, Stripe or Google AI are outside our control.</p></Section>
