@@ -566,10 +566,12 @@ ${bodyText}
   /* Load custom designs + saved applications */
   useEffect(() => {
     if (!user) return;
-    getDocs(query(collection(db, 'application_designs'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(12)))
+    // Practical caps that never bite a real user (no plan-imposed limit).
+    // Pagination can be added later if someone genuinely passes these.
+    getDocs(query(collection(db, 'application_designs'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(100)))
       .then(snap => setCustomDesigns(snap.docs.map(d => ({ ...(d.data().config as DesignConfig), custom: true, name: d.data().name, id: `custom-${d.id}`, docId: d.id }))))
       .catch(() => {});
-    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), orderBy('updated_at', 'desc'), limit(8)))
+    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), orderBy('updated_at', 'desc'), limit(200)))
       .then(snap => setSavedApps(snap.docs.map(d => ({ docId: d.id, ...d.data() }))))
       .catch(() => {});
   }, [user]);

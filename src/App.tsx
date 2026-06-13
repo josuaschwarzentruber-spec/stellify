@@ -387,8 +387,10 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
       style={style}
       {...attributes}
       {...listeners}
-      className={`p-4 bg-white border border-black/8 hover:border-[#004225]/30 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing overflow-hidden ${isDragging ? 'opacity-40' : ''}`}
+      className={`p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 hover:border-[#004225]/35 dark:hover:border-[#00A854]/35 hover:shadow-md transition-all group relative cursor-grab active:cursor-grabbing overflow-hidden rounded-sm ${isDragging ? 'opacity-40' : ''}`}
     >
+      {/* Accent rail on the left — subtle status hint */}
+      <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#004225] dark:bg-[#00A854] opacity-0 group-hover:opacity-100 transition-opacity" />
       <div
         className="absolute top-2 right-2 z-10 flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
         onPointerDown={(e) => e.stopPropagation()}
@@ -396,43 +398,47 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         <CardActionButton
           onClick={() => onEdit(app)}
           label={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
-          className="text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225]"
+          className="text-[#004225]/60 dark:text-[#00A854]/70 hover:bg-[#004225]/10 hover:text-[#004225] dark:hover:text-[#00A854]"
           icon={<Edit2 size={12} />}
         />
         <CardActionButton
           onClick={() => onArchive(app.id, !app.archived)}
           label={app.archived ? t.tracker_unarchive : t.tracker_archive}
-          className="text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18]"
+          className="text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]"
           icon={app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
         />
         <CardActionButton
           onClick={() => onDelete(app.id)}
           label={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
-          className="text-red-500 hover:bg-red-50"
+          className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
           icon={<Trash2 size={12} />}
         />
       </div>
-      <div className="space-y-2.5">
-        <h4 className="text-sm font-bold text-[#1A1A18] leading-tight break-words pr-20" title={app.company}>{app.company}</h4>
-        <p className="text-xs text-[#5C5C58] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
+      <div className="space-y-2">
+        <h4 className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight break-words pr-20" title={app.company}>{app.company}</h4>
+        <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
         {app.location && (
-          <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66]">
-            <MapPin size={11} />
+          <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94]">
+            <MapPin size={11} className="shrink-0" />
             <span className="truncate">{app.location}</span>
           </div>
         )}
-        {app.salary && (
-          <div className="flex items-center gap-1.5 text-[11px] text-[#004225] font-medium">
-            <span className="text-[10px] font-bold tracking-widest">CHF</span>
-            <span>{(() => {
-              const num = String(app.salary).replace(/[^\d.]/g, '');
-              if (!num) return app.salary;
-              const n = parseFloat(num);
-              if (isNaN(n)) return app.salary;
-              return n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
-            })()}</span>
-          </div>
-        )}
+        {app.salary && (() => {
+          const num = String(app.salary).replace(/[^\d.]/g, '');
+          if (!num) return null;
+          const n = parseFloat(num);
+          if (isNaN(n)) return null;
+          // Compact form: >=10k → "120k", smaller keeps full notation
+          const formatted = n >= 10000
+            ? `${Math.round(n / 1000).toLocaleString('de-CH')}k`
+            : n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
+          return (
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#004225] dark:text-[#00A854] bg-[#004225]/[0.06] dark:bg-[#00A854]/10 px-2 py-1 rounded-sm">
+              <span className="text-[9px] font-bold tracking-widest">CHF</span>
+              <span>{formatted}</span>
+            </div>
+          );
+        })()}
         {app.reminder_at && (() => {
           const today = new Date(); today.setHours(0, 0, 0, 0);
           const due = new Date(app.reminder_at);
@@ -451,13 +457,13 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
           );
         })()}
         {app.notes && (
-          <div className="flex items-center gap-1.5 text-[10px] text-[#9A9A94] italic">
+          <div className="flex items-center gap-1.5 text-[10px] text-[#9A9A94] dark:text-[#6B6B66] italic">
             <FileText size={10} />
             <span className="truncate">{t.tracker_notes_badge}</span>
           </div>
         )}
       </div>
-      <div className="mt-3 pt-3 border-t border-black/5 flex items-center justify-between gap-2" onPointerDown={(e) => e.stopPropagation()}>
+      <div className="mt-3 pt-3 border-t border-black/5 dark:border-white/5 flex items-center justify-between gap-2" onPointerDown={(e) => e.stopPropagation()}>
         <div className="relative flex-1 min-w-0">
           <label className="block text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">
             {language === 'FR' ? 'Statut' : language === 'IT' ? 'Stato' : language === 'EN' ? 'Status' : 'Status'}
@@ -489,21 +495,21 @@ function DroppableStatusColumn({ status, t, language, applications, activeId, on
   const { setNodeRef, isOver } = useDroppable({ id: status });
   const filtered = applications.filter((a: any) => a.status === status);
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 sm:min-w-[260px] lg:min-w-0 sm:flex-shrink-0 sm:snap-start sm:w-[260px] lg:w-auto">
       <div className="flex items-center justify-between px-1">
-        <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
           {status === 'Wishlist' ? t.tracker_wishlist :
            status === 'Applied' ? t.tracker_applied :
            status === 'Interview' ? t.tracker_interview :
            status === 'Offer' ? t.tracker_offer : t.tracker_rejected}
         </h3>
-        <span className="text-[10px] font-mono text-[#9A9A94] bg-black/5 px-2 py-0.5 rounded-full">
+        <span className="text-[10px] font-mono text-[#9A9A94] bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded-full">
           {filtered.length}
         </span>
       </div>
       <div
         ref={setNodeRef}
-        className={`space-y-3 min-h-[100px] transition-all ${isOver && activeId ? 'bg-[#004225]/5 border-2 border-dashed border-[#004225]/40 rounded-md p-1' : 'border-2 border-transparent'}`}
+        className={`space-y-3 min-h-[120px] transition-all rounded-md p-1.5 ${isOver && activeId ? 'bg-[#004225]/5 border-2 border-dashed border-[#004225]/40' : 'border-2 border-transparent bg-black/[0.015] dark:bg-white/[0.02]'}`}
       >
         {filtered.map((app: any) => (
           <DraggableAppCard
@@ -6307,9 +6313,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </>
               ) : (
                 <>
-                  <a href="#features" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.features}</a>
-                  <a href="#how" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.how_it_works}</a>
-                  <a href="#pricing" onClick={() => setIsMenuOpen(false)} className="px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{t.pricing}</a>
+                  {/* Anchor links work as scroll-targets ON the landing page; from
+                      any other view we route to the dashboard first, then scroll. */}
+                  {(() => {
+                    const onLanding = activeView === 'dashboard';
+                    const goAnchor = (id: string) => (e: React.MouseEvent) => {
+                      e.preventDefault();
+                      setIsMenuOpen(false);
+                      if (id === 'pricing') { navigate('pricing'); return; }
+                      if (!onLanding) {
+                        navigate('dashboard');
+                        setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 80);
+                      } else {
+                        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+                      }
+                    };
+                    const cls = "px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left";
+                    return <>
+                      <a href="#features" onClick={goAnchor('features')} className={cls}>{t.features}</a>
+                      <a href="#how" onClick={goAnchor('how')} className={cls}>{t.how_it_works}</a>
+                      <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={cls}>{t.pricing}</button>
+                    </>;
+                  })()}
                   <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className="px-4 py-3 text-base font-medium rounded-full text-left text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
               )}
@@ -6949,7 +6974,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       }}
                       onDragCancel={() => setDraggedAppId(null)}
                     >
-                      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                      <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:overflow-x-auto sm:snap-x sm:snap-mandatory sm:-mx-4 sm:px-4 sm:pb-2 lg:grid lg:grid-cols-5 lg:gap-4 lg:overflow-visible lg:mx-0 lg:px-0 [&>*]:sm:scroll-mt-4 tracker-scroll">
                         {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
                           <DroppableStatusColumn
                             key={status}
@@ -7560,9 +7585,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.nav_login}
                 </button>
                 <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
-                <a href="#pricing" className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
+                <button onClick={() => navigate('pricing')} className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
                   {language === 'FR' ? 'Dès CHF 19.90/mois, voir les plans →' : language === 'IT' ? 'Da CHF 19.90/mese, vedi i piani →' : language === 'EN' ? 'From CHF 19.90/mo, see plans →' : 'Ab CHF 19.90/Mo, Pläne ansehen →'}
-                </a>
+                </button>
               </div>
             </div>
 
@@ -8852,7 +8877,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <ul className="space-y-4 text-sm font-light">
                 <li><button onClick={() => navigate('about')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
                 <li><a href="#success" className="hover:text-white transition-colors">{t.success_stories}</a></li>
-                <li><a href="#pricing" className="hover:text-white transition-colors">{t.pricing}</a></li>
+                <li><button onClick={() => navigate('pricing')} className="hover:text-white transition-colors text-left">{t.pricing}</button></li>
                 <li><a href={`mailto:support@stellify.ch?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
                   {language === 'DE' ? 'Kooperationen' : language === 'FR' ? 'Partenariats' : language === 'IT' ? 'Collaborazioni' : 'Partnerships'}
                 </a></li>
