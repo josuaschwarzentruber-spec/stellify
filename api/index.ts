@@ -815,10 +815,13 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
 // page, in Settings ("Dein Plan im Überblick"), the transparency section
 // on the landing page and the dashboard tile. Adjusting any of these
 // requires updating those copy strings too.
+// One "generation" = one tool/AI request. Monthly is the headline limit;
+// perDay equals perMonth (no separate daily friction — matches the clean
+// "X Generierungen pro Monat" messaging), perMin is abuse protection only.
 const QUOTA = {
   client:    { lifetime: 3 },
-  pro:       { perMin: 15, perDay: 20,  perMonth: 200 },
-  unlimited: { perMin: 30, perDay: 200, perMonth: 2000 },
+  pro:       { perMin: 15, perDay: 50,  perMonth: 50 },
+  unlimited: { perMin: 30, perDay: 150, perMonth: 150 },
 } as const;
 
 const GLOBAL_DAILY_CALL_CAP = 3000; // safety net against runaway costs (~$45/day worst case)

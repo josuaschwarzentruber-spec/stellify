@@ -760,7 +760,10 @@ function StellifyApp() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
+  // Stella chat is hidden from the UI (kept in code, reversible). Set to true
+  // to re-enable the launcher entry points across the app.
+  const STELLA_CHAT_ENABLED = false;
   const [cvContext, setCvContext] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -1605,7 +1608,7 @@ function StellifyApp() {
       // Pages (Über uns, AGB, Datenschutz, Impressum, Preise) — always discoverable
       const pages = [
         { view: 'about',       keys: ['über uns','about','geschichte','story','team','founder','gründer'], title: language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns', content: language === 'FR' ? 'Notre histoire, le fondateur et le sens du nom Stellify.' : language === 'IT' ? 'La nostra storia, il fondatore e il significato del nome Stellify.' : language === 'EN' ? 'Our story, the founder and the meaning behind the name Stellify.' : 'Unsere Geschichte, der Gründer und die Bedeutung des Namens Stellify.' },
-        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Ultimate. Sans renouvellement automatique.' : language === 'IT' ? 'Piani Gratuito, Pro e Ultimate. Senza rinnovo automatico.' : language === 'EN' ? 'Free, Pro and Ultimate plans. No auto-renewal.' : 'Gratis-, Pro- und Ultimate-Plan. Ohne automatische Verlängerung.' },
+        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Karriere+. Sans renouvellement automatique.' : language === 'IT' ? 'Piani Gratuito, Pro e Karriere+. Senza rinnovo automatico.' : language === 'EN' ? 'Free, Pro and Karriere+ plans. No auto-renewal.' : 'Gratis-, Pro- und Karriere+-Plan. Ohne automatische Verlängerung.' },
         { view: 'datenschutz', keys: ['datenschutz','privacy','dsgvo','dsg','privacidad','vie privée'], title: language === 'FR' ? 'Politique de confidentialité' : language === 'IT' ? 'Informativa sulla privacy' : language === 'EN' ? 'Privacy Policy' : 'Datenschutz', content: language === 'FR' ? 'Comment nous traitons tes données personnelles selon LPD et RGPD.' : language === 'IT' ? 'Come trattiamo i tuoi dati personali secondo LPD e GDPR.' : language === 'EN' ? 'How we process your personal data under Swiss DPA and GDPR.' : 'Wie wir deine persönlichen Daten gemäss DSG und DSGVO bearbeiten.' },
         { view: 'agb',         keys: ['agb','terms','bedingungen','widerruf','kündigung'], title: language === 'FR' ? 'CGV' : language === 'IT' ? 'Termini' : language === 'EN' ? 'Terms' : 'AGB', content: language === 'FR' ? 'Conditions générales, paiement et droit de rétractation.' : language === 'IT' ? 'Condizioni generali, pagamento e diritto di recesso.' : language === 'EN' ? 'Terms, payment and right of withdrawal.' : 'Geschäftsbedingungen, Zahlung und Widerrufsrecht.' },
         { view: 'impressum',   keys: ['impressum','kontakt','contact','imprint','jtsp','zug','firma'], title: language === 'FR' ? 'Mentions légales' : language === 'IT' ? 'Informazioni legali' : language === 'EN' ? 'Imprint' : 'Impressum', content: language === 'FR' ? "Coordonnées de l'exploitant et juridiction." : language === 'IT' ? 'Dati del gestore e giurisdizione.' : language === 'EN' ? 'Operator details and jurisdiction.' : 'Betreiber-Angaben und Gerichtsstand.' },
@@ -2376,14 +2379,14 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         BEHAVIOR:
         - Be proactive: Offer the next logical step briefly.
         - Personalize: Use the context of the uploaded CV intensively.
-        - PREMIUM GUIDANCE: When a user asks about advanced features (e.g., unlimited CV analyses, advanced job matching, interview coaching, salary tools, unlimited messages), ALWAYS mention that these are available in the Pro or Ultimate plan on Stellify. Guide them clearly to the pricing/plans section. Example: "This feature is available in the Pro plan, you can upgrade directly in the Stellify pricing section." Adapt to the user's language.
+        - PREMIUM GUIDANCE: When a user asks about advanced features (e.g., unlimited CV analyses, advanced job matching, interview coaching, salary tools, unlimited messages), ALWAYS mention that these are available in the Pro or Karriere+ plan on Stellify. Guide them clearly to the pricing/plans section. Example: "This feature is available in the Pro plan, you can upgrade directly in the Stellify pricing section." Adapt to the user's language.
 
         LANGUAGE:
         - Respond in the user's selected language: ${language}.
         - If the language is German, use Swiss High German (no "ß", use "ss").
 
         USER TIER: ${user?.role === 'unlimited' ? 'Unlimited (Highest Priority/Elite)' : user?.role === 'pro' ? 'Pro (Premium)' : 'Gratis (Standard)'}.
-        ${!isPro ? '- FREE USER: This user is on the free plan. When relevant, briefly and elegantly mention the benefits of upgrading to Pro or Ultimate. Do not be pushy, mention it naturally when it adds value.' : ''}
+        ${!isPro ? '- FREE USER: This user is on the free plan. When relevant, briefly and elegantly mention the benefits of upgrading to Pro or Karriere+. Do not be pushy, mention it naturally when it adds value.' : ''}
 
         CONTEXT:
         ${cvContext ? `The candidate has uploaded a CV: ${cvContext}.` : 'The candidate has not yet uploaded a CV. Politely encourage them to do so to receive personalized tips.'}
@@ -2536,10 +2539,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (activeTool.type === 'ultimate' && !isUnlimited) {
       setToolResult(
         language === 'DE'
-          ? "Dieses exklusive Tool erfordert ein Ultimate-Abo für maximale Präzision und Tiefe. ✨"
-          : language === 'FR' ? "Cet outil exclusif nécessite un abonnement Ultimate pour une précision et une profondeur maximales. ✨"
-          : language === 'IT' ? "Questo strumento esclusivo richiede un abbonamento Ultimate per la massima precisione e profondità. ✨"
-          : "This exclusive tool requires an Ultimate subscription for maximum precision and depth. ✨"
+          ? "Dieses exklusive Tool erfordert ein Karriere+-Abo für maximale Präzision und Tiefe. ✨"
+          : language === 'FR' ? "Cet outil exclusif nécessite un abonnement Karriere+ pour une précision et une profondeur maximales. ✨"
+          : language === 'IT' ? "Questo strumento esclusivo richiede un abbonamento Karriere+ per la massima precisione e profondità. ✨"
+          : "This exclusive tool requires a Karriere+ subscription for maximum precision and depth. ✨"
       );
       setIsProcessingTool(false);
       return;
@@ -2554,11 +2557,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     const searchUses = user?.searchUses || 0;
     
     // Limits must match server QUOTA (api/index.ts) and the pricing copy.
+    // Generierungen pro Monat: Free 3 lifetime · Pro 50 · Karriere+ 150.
     const isToolLimitReached = (!isPro && toolUses >= 3)
-      || (user?.role === 'pro' && !isUnlimited && toolUses >= 200)
-      || (user?.role === 'unlimited' && toolUses >= 2000);
-    const isDailyLimitReached = (user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20)
-      || (user?.role === 'unlimited' && dailyToolUses >= 200);
+      || (user?.role === 'pro' && !isUnlimited && toolUses >= 50)
+      || (user?.role === 'unlimited' && toolUses >= 150);
+    const isDailyLimitReached = false;
 
     if (isToolLimitReached || isDailyLimitReached) {
       if (isDailyLimitReached) {
@@ -3620,9 +3623,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   };
 
   // --- RENDER HELPERS ---
-  const prices = billingCycle === 'yearly' 
-    ? { gratis: '0', pro: '14.90', ultimate: '39.90' }
-    : { gratis: '0', pro: '19.90', ultimate: '49.90' };
+  // Pricing model: monthly shows the per-month price; yearly shows the ANNUAL
+  // TOTAL as the headline (legally cleaner under Swiss PBV than a /mo figure
+  // you don't actually charge monthly). Stripe products must match these:
+  //   Pro: CHF 19.90/mo · CHF 190/yr   |   Karriere+: CHF 39.90/mo · CHF 349/yr
+  const planPricing = {
+    pro:      { monthly: '19.90', yearly: '190', yearlyPerMo: '15.85', save: '20%' },
+    ultimate: { monthly: '39.90', yearly: '349', yearlyPerMo: '29.10', save: '27%' },
+  };
+  const prices = billingCycle === 'yearly'
+    ? { gratis: '0', pro: planPricing.pro.yearly, ultimate: planPricing.ultimate.yearly }
+    : { gratis: '0', pro: planPricing.pro.monthly, ultimate: planPricing.ultimate.monthly };
 
   const translations: Record<string, any> = {
     DE: {
@@ -3664,8 +3675,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Häufige Fragen",
       stella_placeholder: "Frag Stella etwas...",
       stella_secure_data: "SSL-verschlüsselt · Sicher übertragen",
-      hero_title: "Die Bewerbungs-KI für die Schweiz",
-      hero_desc: "In 5 Minuten zu einer professionellen Schweizer Bewerbung: Anschreiben, Lebenslauf, Interview-Vorbereitung. Plus 20 weitere Karriere-Tools inklusive — präzise, diskret, auf den Schweizer Arbeitsmarkt zugeschnitten.",
+      hero_title: "Dein persönlicher KI-Karriereassistent",
+      hero_desc: "Erstelle professionelle Bewerbungen, optimiere deinen Lebenslauf und bereite dich erfolgreich auf Vorstellungsgespräche vor. Präzise, diskret und auf den Schweizer Arbeitsmarkt zugeschnitten.",
       cta_free: "Kostenlos starten",
       upload_cv: "Lebenslauf hochladen",
       update_cv: "Lebenslauf aktualisieren",
@@ -3763,9 +3774,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "Wie sicher sind meine Daten?",
       faq_1_a: "Deine Daten werden ausschliesslich auf Schweizer Servern verarbeitet und nach modernsten Standards verschlüsselt.",
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
-      faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung. Du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück, ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Ultimate, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
+      faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung. Du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück, ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Karriere+, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Der Gratis-Plan beinhaltet einmalig 3 KI-Anfragen sowie 3 Nachrichten im Stella-Chat, ideal um die Plattform unverbindlich kennenzulernen. Diese Versuche werden nicht zurückgesetzt. Der Pro-Plan stellt 200 KI-Anfragen pro Monat (maximal 20 pro Tag) zur Verfügung — alle 21 Karriere-Tools freigeschaltet. Der Ultimate-Plan erweitert das auf 2 000 KI-Anfragen pro Monat (maximal 200 pro Tag) und schaltet zusätzlich exklusive Premium-Designs, den Deep Analysis Modus, KI-Live-Suche und Priority-Server-Zugang frei. Die genauen Limits sind transparent auf der Pricing-Seite und in den AGB aufgeführt.",
+      faq_3_a: "Eine Generierung entspricht einer Tool-Nutzung — also einer erstellten Bewerbung, einem Motivationsschreiben, einer Lebenslaufanalyse, einer Stellenanalyse oder einem Interviewtraining. Der Gratis-Plan beinhaltet 3 Generierungen lebenslang, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 50 Generierungen pro Monat mit allen Kern-Funktionen. Karriere+ erweitert das auf 150 Generierungen pro Monat und schaltet zusätzlich ATS Premium-Analyse, erweiterten Interview Coach, Karriere- und Skill-Gap-Analyse, Premium-Vorlagen und priorisierte KI-Verarbeitung frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -3774,8 +3785,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Einstellungen",
       nav_logout: "Abmelden",
       nav_login: "Anmelden",
-      tool_limit_pro: "Du hast deine 200 Nutzungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Ultimate für 2'000/Monat plus exklusive Premium-Features.",
-      tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Ultimate-Abo. ✨",
+      tool_limit_pro: "Du hast deine 50 Generierungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Karriere+ für 150 Generierungen pro Monat plus Premium-Funktionen.",
+      tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Karriere+-Abo. ✨",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
       onboarding_cv_title: "Lade deinen Lebenslauf hoch",
@@ -3805,8 +3816,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits werden automatisch zurückgesetzt — täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen — Upgrade jederzeit möglich.",
       plan_free_f1: "21 Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
-      plan_pro_f1: "200 KI-Anfragen pro Monat", plan_pro_f2: "20 Nutzungen pro Tag", plan_pro_f3: "Alle 21 Tools (Bewerbungs-Generator + 20 weitere)", plan_pro_f4: "25 gespeicherte Bewerbungen", plan_pro_f5: "Prioritärer Support (24h)",
-      plan_unlim_f1: "2'000 KI-Anfragen pro Monat, 200 pro Tag", plan_unlim_f2: "Deep Analysis Modus (KI-Tiefenanalyse)", plan_unlim_f3: "Premium-Bewerbungs-Designs (exklusiv)", plan_unlim_f4: "Unbegrenzte gespeicherte Bewerbungen + KI-Live-Suche", plan_unlim_f5: "Priority-Server-Zugang + 24/7 VIP-Support",
+      plan_pro_f1: "50 Generierungen pro Monat", plan_pro_f2: "Bewerbung & Motivationsschreiben", plan_pro_f3: "Lebenslauf optimieren & Stellenanalyse", plan_pro_f4: "Interview Coach", plan_pro_f5: "Dokumentenspeicherung + prioritärer Support",
+      plan_unlim_f1: "150 Generierungen pro Monat", plan_unlim_f2: "ATS Premium-Analyse & Skill-Gap", plan_unlim_f3: "Erweiterter Interview Coach & Karriereanalyse", plan_unlim_f4: "Premium-Vorlagen & priorisierte KI-Verarbeitung", plan_unlim_f5: "Früher Zugang zu neuen Funktionen + VIP-Support",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Tageslimit",
@@ -3815,7 +3826,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_free_chat: "{used} / 3 Chat-Anfragen",
       dashboard_stat_free_tools: "{used} / 1 Tool-Nutzung",
       tool_daily_limit_pro: "Du hast dein Tageslimit erreicht. Morgen hast du wieder neue Versuche frei! 🚀",
-      tool_limit_search_pro: "Dein Limit für Live-Suchen (10/Monat) ist erreicht. Nächsten Monat hast du wieder neue Suchen frei. Upgrade auf Ultimate für 300 Live-Suchen pro Monat.",
+      tool_limit_search_pro: "Dein Limit für Live-Suchen (10/Monat) ist erreicht. Nächsten Monat hast du wieder neue Suchen frei. Upgrade auf Karriere+ für 300 Live-Suchen pro Monat.",
       tool_limit_search_fair_use: "Du hast das Fair-Use-Limit für Live-Suchen erreicht. Bitte versuche es morgen wieder oder kontaktiere den Support.",
       dashboard_stat_pro: "Pro",
       dashboard_pro: "Karriere-Profi",
@@ -3825,7 +3836,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_ready: "Bereit",
       dashboard_stat_missing: "Fehlt",
       dashboard_stat_chat: "Stella Chat",
-      dashboard_stat_unlimited: "Ultimate",
+      dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Premium Optimierung",
       tracker_title: "Bewerbungs-Tracker",
@@ -3895,10 +3906,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Keine Massenbewerbungen oder Automatisierung gegen unsere AGB",
       tr_limits_title: "Konkrete KI-Limits pro Plan",
       tr_lim_free_label: "Gratis", tr_lim_free_v: "3 KI-Anfragen lebenslang · 3 Stella-Chat-Nachrichten",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 KI-Anfragen pro Monat · max. 20 pro Tag · alle 21 Karriere-Tools",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "2'000 KI-Anfragen pro Monat · 200 pro Tag · Deep Analysis + Premium-Designs",
-      tr_reset_info: "Pro- und Ultimate-Limits werden monatlich am 1. zurückgesetzt, Tageslimit täglich um 0 Uhr (Europe/Zurich).",
-      tr_fair_use: "Stellify nutzt einen Fair-Use-Schutz von max. 15 (Pro) bzw. 30 (Ultimate) Anfragen pro Minute, um Missbrauch zu verhindern.",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 Generierungen pro Monat · alle Kern-Tools · Dokumentenspeicherung",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 Generierungen pro Monat · ATS Premium · erweiterter Interview Coach · Premium-Vorlagen",
+      tr_reset_info: "Die monatlichen Generierungs-Limits werden jeweils am 1. des Monats zurückgesetzt (Europe/Zurich).",
+      tr_fair_use: "Stellify nutzt einen Fair-Use-Schutz von max. 15 (Pro) bzw. 30 (Karriere+) Anfragen pro Minute, um Missbrauch zu verhindern.",
       quick_tools: "Quick Tools",
       all_tools: "Alle Tools",
       recent_docs: "Deine letzten Dokumente",
@@ -3954,7 +3965,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Oder",
       stat_members: "Mitglieder",
       hero_intro: "Dein persönlicher",
-      hero_accent: "Bewerbungs-KI",
+      hero_accent: "KI-Karriereassistent",
       badge_new: "NEU",
       tools_section_badge: "21 KI-Tools",
       tools_section_title: "Alles, was du für deine Karriere brauchst",
@@ -3985,9 +3996,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "So nutzt du dieses Tool",
       tool_scroll_example: "Runterscrollen für Profi-Beispiel",
       tool_pro_example: "Profi-Beispiel",
-      tool_unlimited_access: "Ultimate-Zugang",
-      tool_unlock_desc: "Schalte dieses Tool und alle Premium-Funktionen mit dem Ultimate-Plan frei.",
-      tool_discover_unlimited: "Jetzt Ultimate entdecken",
+      tool_unlimited_access: "Karriere+-Zugang",
+      tool_unlock_desc: "Schalte dieses Tool und alle Premium-Funktionen mit Karriere+ frei.",
+      tool_discover_unlimited: "Jetzt Karriere+ entdecken",
       tool_fill_fields: "Fülle die Felder links aus",
       auth_terms_by_signing: "Mit der Anmeldung akzeptierst du unsere",
       auth_terms_and: "und",
@@ -4070,13 +4081,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
         { title: "Datenschutz aus der Schweiz", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× Bewerbung oder Tool-Nutzung", "3× Stella Chat Anfragen", "KI-Gehaltsrechner (Basis)", "Schweizer Standards"],
-      pricing_pro_f: ["200 KI-Bewerbungen / Anfragen pro Monat", "20 Nutzungen pro Tag", "Alle 21 Karriere-Tools inklusive", "25 gespeicherte Bewerbungen", "Prioritärer Support"],
-      pricing_ultimate_f: ["2'000 KI-Bewerbungen / Anfragen pro Monat", "200 pro Tag — für intensive Bewerbungsphasen", "Deep Analysis Modus + Premium-Designs (exklusiv)", "KI-Live-Suche + bis zu 200 gespeicherte Bewerbungen", "Priority-Server + 24/7 VIP-Support"],
+      pricing_free_f: ["3 Generierungen (lebenslang)", "Bewerbung, Lebenslauf & Interview testen", "Alle Funktionen zum Ausprobieren", "Keine Kreditkarte nötig"],
+      pricing_pro_f: ["50 Generierungen pro Monat", "Bewerbung & Motivationsschreiben", "Lebenslauf optimieren & Stellenanalyse", "Interview Coach", "Dokumentenspeicherung"],
+      pricing_ultimate_f: ["Alles aus Pro, plus:", "150 Generierungen pro Monat", "ATS Premium-Analyse & Skill-Gap", "Erweiterter Interview Coach & Karriereanalyse", "Premium-Vorlagen & priorisierte KI", "Früher Zugang zu neuen Funktionen"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
-      pricing_cta_ultimate: "Ultimate wählen",
+      pricing_cta_ultimate: "Karriere+ wählen",
       pricing_recommended: "Empfohlen",
+      pricing_popular: "Beliebteste Wahl",
       value_title: "CHF 19.90: lohnt sich das?",
       value_items: [
         "Ein Karriereberater kostet CHF 200–400 / Sitzung",
@@ -4283,8 +4295,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Questions fréquentes",
       stella_placeholder: "Demandez quelque chose à Stella...",
       stella_secure_data: "Traitement sécurisé des données suisses",
-      hero_title: "L'IA de candidature pour la Suisse",
-      hero_desc: "Une candidature suisse professionnelle en 5 minutes : lettre de motivation, CV, préparation à l'entretien. Plus 20 outils carrière inclus — précis, discret, adapté au marché du travail suisse.",
+      hero_title: "Ton assistant carrière IA personnel",
+      hero_desc: "Crée des candidatures professionnelles, optimise ton CV et prépare-toi efficacement aux entretiens. Précis, discret et adapté au marché du travail suisse.",
       cta_free: "Tester gratuitement",
       upload_cv: "Télécharger ton CV",
       update_cv: "Mettre à jour CV (Lebenslauf)",
@@ -4382,9 +4394,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "Mes données sont-elles en sécurité ?",
       faq_1_a: "Vos données sont traitées exclusivement sur des serveurs suisses et cryptées selon les normes les plus modernes.",
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
-      faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer : vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement. Votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Ultimate, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
+      faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer : vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement. Votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Karriere+, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Le plan Gratuit comprend 3 requêtes IA à vie et 3 messages dans le chat Stella, idéal pour découvrir la plateforme sans engagement. Ces essais ne sont pas réinitialisés. Le plan Pro propose 200 requêtes IA par mois (max. 20 par jour) — les 21 outils carrière débloqués. Le plan Ultimate étend cela à 2 000 requêtes IA par mois (max. 200 par jour) et débloque en plus les designs Premium exclusifs, le mode Deep Analysis, la recherche IA en direct et l'accès serveur prioritaire. Les limites exactes sont indiquées en toute transparence sur la page Tarifs et dans nos CGV.",
+      faq_3_a: "Une génération correspond à une utilisation d'outil — une candidature, une lettre de motivation, une analyse de CV, une analyse d'offre ou un entraînement d'entretien. Le plan Gratuit comprend 3 générations à vie, idéal pour découvrir sans engagement. Le plan Pro offre 50 générations par mois avec toutes les fonctions essentielles. Karriere+ étend cela à 150 générations par mois et débloque en plus l'analyse ATS Premium, le coach d'entretien avancé, l'analyse de carrière et Skill-Gap, les modèles Premium et le traitement IA prioritaire. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -4393,8 +4405,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Paramètres",
       nav_logout: "Déconnexion",
       nav_login: "Connexion",
-      tool_limit_pro: "Vous avez utilisé vos 200 générations pour ce mois. De nouvelles seront disponibles le 1er du mois prochain. Passe à Ultimate pour 2 000/mois plus des fonctionnalités Premium exclusives.",
-      tool_limit_free: "Cet outil expert nécessite un abonnement Pro ou Ultimate. ✨",
+      tool_limit_pro: "Tu as utilisé tes 50 générations ce mois-ci. De nouvelles seront disponibles le 1er du mois prochain. Passe à Karriere+ pour 150 générations par mois plus des fonctions Premium.",
+      tool_limit_free: "Cet outil expert nécessite un abonnement Pro ou Karriere+. ✨",
       onboarding_welcome_title: "Bienvenue sur Stellify",
       onboarding_welcome_desc: "Votre copilote IA pour votre carrière en Suisse. Nous vous aidons à tirer le meilleur parti de votre potentiel.",
       onboarding_cv_title: "Téléchargez votre CV",
@@ -4424,8 +4436,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limites réinitialisées automatiquement — chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie — upgrade possible à tout moment.",
       plan_free_f1: "21 outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
-      plan_pro_f1: "200 requêtes IA par mois", plan_pro_f2: "20 utilisations par jour", plan_pro_f3: "Les 21 outils (Générateur + 20 autres)", plan_pro_f4: "25 candidatures sauvegardées", plan_pro_f5: "Support prioritaire (24h)",
-      plan_unlim_f1: "2'000 requêtes IA par mois, 200 par jour", plan_unlim_f2: "Mode Deep Analysis (analyse IA approfondie)", plan_unlim_f3: "Designs de candidature Premium (exclusifs)", plan_unlim_f4: "Jusqu'à 200 candidatures sauvegardées + Recherche IA en direct", plan_unlim_f5: "Accès serveur prioritaire + Support VIP 24/7",
+      plan_pro_f1: "50 générations par mois", plan_pro_f2: "Candidature & lettre de motivation", plan_pro_f3: "Optimisation du CV & analyse d'offre", plan_pro_f4: "Coach d'entretien", plan_pro_f5: "Stockage des documents + support prioritaire",
+      plan_unlim_f1: "150 générations par mois", plan_unlim_f2: "Analyse ATS Premium & Skill-Gap", plan_unlim_f3: "Coach d'entretien avancé & analyse carrière", plan_unlim_f4: "Modèles Premium & traitement IA prioritaire", plan_unlim_f5: "Accès anticipé aux nouveautés + support VIP",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite quotidienne",
@@ -4434,7 +4446,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_free_chat: "{used} / 3 questions Chat",
       dashboard_stat_free_tools: "{used} / 1 utilisation Outil",
       tool_daily_limit_pro: "Vous avez atteint votre limite quotidienne. Vous en aurez de nouvelles demain ! 🚀",
-      tool_limit_search_pro: "Votre limite de recherches en direct (10/mois) est atteinte. Vous en aurez de nouvelles le mois prochain. Passe à Ultimate pour 300 recherches en direct par mois.",
+      tool_limit_search_pro: "Votre limite de recherches en direct (10/mois) est atteinte. Vous en aurez de nouvelles le mois prochain. Passe à Karriere+ pour 300 recherches en direct par mois.",
       tool_limit_search_fair_use: "Vous avez atteint la limite d'utilisation équitable pour les recherches en direct. Veuillez réessayer demain ou contacter le support.",
       dashboard_pro: "Professionnel de carrière",
       dashboard_desc: "Votre copilote Stella est prête. Analysez de nouveaux postes, optimisez votre profil ou préparez-vous pour votre prochain entretien.",
@@ -4444,7 +4456,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_missing: "Manquant",
       dashboard_stat_chat: "Stella Chat",
       dashboard_stat_pro: "Pro",
-      dashboard_stat_unlimited: "Ultimate",
+      dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Gratuit",
       dashboard_cv_optimize: "Optimisation Premium",
       tracker_title: "Suivi des candidatures",
@@ -4514,10 +4526,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Pas de candidatures de masse ni d'automatisation contre nos CGV",
       tr_limits_title: "Limites IA concrètes par plan",
       tr_lim_free_label: "Gratuit", tr_lim_free_v: "3 requêtes IA à vie · 3 messages Stella Chat",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 requêtes IA par mois · max. 20 par jour · les 21 outils carrière",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "Jusqu'à 5'000 requêtes IA par mois · 600 par jour · Deep Analysis",
-      tr_reset_info: "Les limites Pro et Ultimate sont réinitialisées le 1er du mois, la limite journalière à minuit (Europe/Zurich).",
-      tr_fair_use: "Stellify applique une protection 'fair use' de max. 15 (Pro) ou 30 (Ultimate) requêtes par minute pour éviter les abus.",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 générations par mois · tous les outils essentiels · stockage des documents",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 générations par mois · ATS Premium · coach d'entretien avancé · modèles Premium",
+      tr_reset_info: "Les limites mensuelles de générations sont réinitialisées le 1er du mois (Europe/Zurich).",
+      tr_fair_use: "Stellify applique une protection 'fair use' de max. 15 (Pro) ou 30 (Karriere+) requêtes par minute pour éviter les abus.",
       quick_tools: "Outils rapides",
       all_tools: "Tous les outils",
       recent_docs: "Vos derniers documents",
@@ -4573,7 +4585,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Ou",
       stat_members: "Membres",
       hero_intro: "Votre",
-      hero_accent: "IA de candidature",
+      hero_accent: "assistant carrière IA",
       badge_new: "NOUVEAU",
       tools_section_badge: "21 Outils IA",
       tools_section_title: "Tout ce dont vous avez besoin pour votre carrière",
@@ -4604,9 +4616,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "Comment utiliser cet outil",
       tool_scroll_example: "Faites défiler pour l'exemple professionnel",
       tool_pro_example: "Exemple professionnel",
-      tool_unlimited_access: "Accès Ultimate",
-      tool_unlock_desc: "Débloque cet outil et toutes les fonctionnalités premium avec le plan Ultimate.",
-      tool_discover_unlimited: "Découvrir Ultimate maintenant",
+      tool_unlimited_access: "Accès Karriere+",
+      tool_unlock_desc: "Débloque cet outil et toutes les fonctions premium avec Karriere+.",
+      tool_discover_unlimited: "Découvrir Karriere+ maintenant",
       tool_fill_fields: "Remplissez les champs à gauche",
       auth_terms_by_signing: "En vous connectant, vous acceptez nos",
       auth_terms_and: "et",
@@ -4689,13 +4701,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× candidatures ou utilisations d'outil", "3× demandes Stella Chat", "Calculateur de salaire IA (Base)", "Normes suisses"],
-      pricing_pro_f: ["200 candidatures IA / requêtes par mois", "20 utilisations par jour", "Les 21 outils carrière inclus", "25 candidatures sauvegardées", "Support prioritaire"],
-      pricing_ultimate_f: ["2'000 candidatures IA / requêtes par mois", "200 par jour — pour les phases intensives", "Mode Deep Analysis + Designs Premium (exclusifs)", "Recherche IA en direct + jusqu'à 200 candidatures sauvegardées", "Accès serveur prioritaire + Support VIP 24/7"],
+      pricing_free_f: ["3 générations (à vie)", "Tester candidature, CV & entretien", "Toutes les fonctions pour essayer", "Sans carte de crédit"],
+      pricing_pro_f: ["50 générations par mois", "Candidature & lettre de motivation", "Optimisation du CV & analyse d'offre", "Coach d'entretien", "Stockage des documents"],
+      pricing_ultimate_f: ["Tout de Pro, plus :", "150 générations par mois", "Analyse ATS Premium & Skill-Gap", "Coach d'entretien avancé & analyse carrière", "Modèles Premium & IA prioritaire", "Accès anticipé aux nouveautés"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
-      pricing_cta_ultimate: "Choisir Ultimate",
+      pricing_cta_ultimate: "Choisir Karriere+",
       pricing_recommended: "Recommandé",
+      pricing_popular: "Choix le plus populaire",
       value_title: "CHF 19.90 : cela en vaut-il la peine ?",
       value_items: [
         "Un conseiller en carrière coûte CHF 200–400 / séance",
@@ -4796,8 +4809,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Domande frequenti",
       stella_placeholder: "Chiedi qualcosa a Stella...",
       stella_secure_data: "Elaborazione sicura dei dati svizzeri",
-      hero_title: "L'IA per le candidature in Svizzera",
-      hero_desc: "Una candidatura svizzera professionale in 5 minuti: lettera di motivazione, CV, preparazione al colloquio. Più 20 strumenti carriera inclusi — preciso, discreto, calibrato sul mercato del lavoro svizzero.",
+      hero_title: "Il tuo assistente di carriera IA personale",
+      hero_desc: "Crea candidature professionali, ottimizza il tuo CV e preparati con successo ai colloqui. Preciso, discreto e calibrato sul mercato del lavoro svizzero.",
       cta_free: "Prova gratuitamente",
       upload_cv: "Carica il tuo CV",
       update_cv: "Aggiorna CV (Lebenslauf)",
@@ -4895,9 +4908,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "Quanto sono sicuri i miei dati?",
       faq_1_a: "I tuoi dati sono elaborati esclusivamente su server svizzeri e crittografati secondo i più moderni standard.",
       faq_2_q: "Come funziona l'abbonamento Stellify?",
-      faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare: hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento. Il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Ultimate, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
+      faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare: hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento. Il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Karriere+, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Il piano Gratuito include 3 richieste IA a vita e 3 messaggi nella chat Stella, ideale per provare la piattaforma senza impegno. Questi tentativi non vengono ripristinati. Il piano Pro offre 200 richieste IA al mese (max. 20 al giorno) — tutti i 21 strumenti carriera sbloccati. Il piano Ultimate estende a 2 000 richieste IA al mese (max. 200 al giorno) e sblocca inoltre i design Premium esclusivi, la modalità Deep Analysis, la ricerca IA dal vivo e l'accesso server prioritario. I limiti esatti sono trasparenti sulla pagina Prezzi e nelle nostre Condizioni.",
+      faq_3_a: "Una generazione corrisponde a un utilizzo di strumento — una candidatura, una lettera di motivazione, un'analisi del CV, un'analisi dell'annuncio o un allenamento al colloquio. Il piano Gratuito include 3 generazioni a vita, ideale per provare senza impegno. Il piano Pro offre 50 generazioni al mese con tutte le funzioni essenziali. Karriere+ estende a 150 generazioni al mese e sblocca inoltre l'analisi ATS Premium, il coach colloqui avanzato, l'analisi di carriera e Skill-Gap, i modelli Premium e l'elaborazione IA prioritaria. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -4906,8 +4919,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Impostazioni",
       nav_logout: "Disconnetti",
       nav_login: "Accedi",
-      tool_limit_pro: "Hai utilizzato i tuoi 200 utilizzi per questo mese. Il 1° del prossimo mese avrai nuovi tentativi a disposizione. Passa a Ultimate per 2 000/mese più funzionalità Premium esclusive.",
-      tool_limit_free: "Questo strumento esperto richiede un abbonamento Pro o Ultimate. ✨",
+      tool_limit_pro: "Hai utilizzato le tue 50 generazioni per questo mese. Il 1° del prossimo mese avrai nuovi tentativi. Passa a Karriere+ per 150 generazioni al mese più funzioni Premium.",
+      tool_limit_free: "Questo strumento esperto richiede un abbonamento Pro o Karriere+. ✨",
       onboarding_welcome_title: "Benvenuti su Stellify",
       onboarding_welcome_desc: "Il tuo copilota AI per la tua carriera in Svizzera. Ti aiutiamo a sfruttare al meglio il tuo potenziale.",
       onboarding_cv_title: "Carica il tuo CV",
@@ -4937,8 +4950,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limiti reimpostati automaticamente — ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita — upgrade possibile in qualsiasi momento.",
       plan_free_f1: "21 strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
-      plan_pro_f1: "200 richieste IA al mese", plan_pro_f2: "20 utilizzi al giorno", plan_pro_f3: "Tutti i 21 strumenti (Generatore + altri 20)", plan_pro_f4: "25 candidature salvate", plan_pro_f5: "Supporto prioritario (24h)",
-      plan_unlim_f1: "2'000 richieste IA al mese, 200 al giorno", plan_unlim_f2: "Modalità Deep Analysis (analisi IA approfondita)", plan_unlim_f3: "Design candidatura Premium (esclusivi)", plan_unlim_f4: "Fino a 200 candidature salvate + Ricerca IA dal vivo", plan_unlim_f5: "Accesso server prioritario + Supporto VIP 24/7",
+      plan_pro_f1: "50 generazioni al mese", plan_pro_f2: "Candidatura & lettera di motivazione", plan_pro_f3: "Ottimizzazione CV & analisi annuncio", plan_pro_f4: "Coach per colloqui", plan_pro_f5: "Archiviazione documenti + supporto prioritario",
+      plan_unlim_f1: "150 generazioni al mese", plan_unlim_f2: "Analisi ATS Premium & Skill-Gap", plan_unlim_f3: "Coach colloqui avanzato & analisi carriera", plan_unlim_f4: "Modelli Premium & elaborazione IA prioritaria", plan_unlim_f5: "Accesso anticipato alle novità + supporto VIP",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Limite giornaliero",
@@ -4947,7 +4960,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_free_chat: "{used} / 3 domande Chat",
       dashboard_stat_free_tools: "{used} / 1 utilizzo Strumento",
       tool_daily_limit_pro: "Hai raggiunto il tuo limite giornaliero. Ne avrai di nuove domani! 🚀",
-      tool_limit_search_pro: "Il tuo limite di ricerche dal vivo (10/mese) è raggiunto. Il prossimo mese avrai nuove ricerche libere. Passa a Ultimate per 300 ricerche dal vivo al mese.",
+      tool_limit_search_pro: "Il tuo limite di ricerche dal vivo (10/mese) è raggiunto. Il prossimo mese avrai nuove ricerche libere. Passa a Karriere+ per 300 ricerche dal vivo al mese.",
       tool_limit_search_fair_use: "Hai raggiunto il limite di utilizzo corretto per le ricerche dal vivo. Riprova domani o contatta il supporto.",
       dashboard_pro: "Professionista della carriera",
       dashboard_desc: "Il tuo copilota Stella è pronto. Analizza nuove posizioni, ottimizza il tuo profilo o preparati per il tuo prossimo colloquio.",
@@ -4957,7 +4970,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_missing: "Mancante",
       dashboard_stat_chat: "Stella Chat",
       dashboard_stat_pro: "Pro",
-      dashboard_stat_unlimited: "Ultimate",
+      dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Ottimizzazione Premium",
       tracker_title: "Tracker candidature",
@@ -5027,10 +5040,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Nessuna candidatura di massa o automazione contro le nostre condizioni",
       tr_limits_title: "Limiti IA concreti per piano",
       tr_lim_free_label: "Gratuito", tr_lim_free_v: "3 richieste IA a vita · 3 messaggi Stella Chat",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 richieste IA al mese · max. 20 al giorno · tutti i 21 strumenti carriera",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "2'000 richieste IA al mese · 200 al giorno · Deep Analysis + Design Premium",
-      tr_reset_info: "I limiti Pro e Ultimate vengono reimpostati il 1° del mese, il limite giornaliero a mezzanotte (Europe/Zurich).",
-      tr_fair_use: "Stellify applica una protezione 'fair use' di max. 15 (Pro) o 30 (Ultimate) richieste al minuto per evitare abusi.",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 generazioni al mese · tutti gli strumenti essenziali · archiviazione documenti",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 generazioni al mese · ATS Premium · coach colloqui avanzato · modelli Premium",
+      tr_reset_info: "I limiti mensili di generazioni vengono reimpostati il 1° del mese (Europe/Zurich).",
+      tr_fair_use: "Stellify applica una protezione 'fair use' di max. 15 (Pro) o 30 (Karriere+) richieste al minuto per evitare abusi.",
       quick_tools: "Strumenti rapidi",
       all_tools: "Tutti gli strumenti",
       recent_docs: "I tuoi ultimi documenti",
@@ -5086,7 +5099,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Oppure",
       stat_members: "Membri",
       hero_intro: "Il tuo",
-      hero_accent: "IA per candidature",
+      hero_accent: "assistente di carriera IA",
       badge_new: "NUOVO",
       tools_section_badge: "21 Strumenti AI",
       tools_section_title: "Tutto ciò di cui hai bisogno per la tua carriera",
@@ -5117,9 +5130,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "Come usare questo strumento",
       tool_scroll_example: "Scorri verso il basso per l'esempio professionale",
       tool_pro_example: "Esempio professionale",
-      tool_unlimited_access: "Accesso Ultimate",
-      tool_unlock_desc: "Sblocca questo strumento e tutte le funzionalità premium con il piano Ultimate.",
-      tool_discover_unlimited: "Scopri Ultimate ora",
+      tool_unlimited_access: "Accesso Karriere+",
+      tool_unlock_desc: "Sblocca questo strumento e tutte le funzioni premium con Karriere+.",
+      tool_discover_unlimited: "Scopri Karriere+ ora",
       tool_fill_fields: "Compila i campi a sinistra",
       auth_terms_by_signing: "Accedendo, accetti i nostri",
       auth_terms_and: "e",
@@ -5202,13 +5215,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× candidature o utilizzi strumenti", "3× messaggi Stella Chat", "Calcolatore di stipendio AI (Base)", "Standard svizzeri"],
-      pricing_pro_f: ["200 candidature IA / richieste al mese", "20 utilizzi al giorno", "Tutti i 21 strumenti carriera inclusi", "25 candidature salvate", "Supporto prioritario"],
-      pricing_ultimate_f: ["2'000 candidature IA / richieste al mese", "200 al giorno — per fasi intensive", "Modalità Deep Analysis + Design Premium (esclusivi)", "Ricerca IA dal vivo + fino a 200 candidature salvate", "Accesso server prioritario + Supporto VIP 24/7"],
+      pricing_free_f: ["3 generazioni (a vita)", "Prova candidatura, CV e colloquio", "Tutte le funzioni da provare", "Nessuna carta di credito"],
+      pricing_pro_f: ["50 generazioni al mese", "Candidatura & lettera di motivazione", "Ottimizzazione CV & analisi annuncio", "Coach per colloqui", "Archiviazione documenti"],
+      pricing_ultimate_f: ["Tutto di Pro, più:", "150 generazioni al mese", "Analisi ATS Premium & Skill-Gap", "Coach colloqui avanzato & analisi carriera", "Modelli Premium & IA prioritaria", "Accesso anticipato alle novità"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
-      pricing_cta_ultimate: "Scegli Ultimate",
+      pricing_cta_ultimate: "Scegli Karriere+",
       pricing_recommended: "Consigliato",
+      pricing_popular: "Scelta più popolare",
       value_title: "CHF 19.90: ne vale la pena?",
       value_items: [
         "Un consulente di carriera costa CHF 200–400 / sessione",
@@ -5309,8 +5323,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_type_faq: "Common Questions",
       stella_placeholder: "Ask Stella something...",
       stella_secure_data: "Secure Swiss Data Processing",
-      hero_title: "The Application AI for Switzerland",
-      hero_desc: "A professional Swiss application in 5 minutes: cover letter, CV, interview prep. Plus 20 more career tools included — precise, discreet, tuned to the Swiss job market.",
+      hero_title: "Your personal AI career assistant",
+      hero_desc: "Create professional applications, optimise your CV and prepare successfully for interviews. Precise, discreet and tuned to the Swiss job market.",
       cta_free: "Test for free",
       upload_cv: "Upload CV (Resume)",
       update_cv: "Update CV (Resume)",
@@ -5408,9 +5422,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_1_q: "How secure is my data?",
       faq_1_a: "Your data is processed exclusively on Swiss servers and encrypted according to the latest standards.",
       faq_2_q: "How does the Stellify subscription work?",
-      faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required: you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again. Your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Ultimate, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
+      faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required: you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again. Your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Karriere+, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "The Free plan includes 3 lifetime AI requests and 3 messages in Stella Chat — perfect to try the platform with no commitment. These attempts do not reset. The Pro plan provides 200 AI requests per month (max. 20 per day) — all 21 career tools unlocked. The Ultimate plan extends this to 2,000 AI requests per month (max. 200 per day) and additionally unlocks exclusive Premium designs, Deep Analysis Mode, live AI search and priority server access. The exact limits are transparently shown on the Pricing page and in our Terms.",
+      faq_3_a: "One generation equals one tool use — a created application, a cover letter, a CV analysis, a job analysis or an interview training. The Free plan includes 3 lifetime generations, ideal to explore with no commitment. The Pro plan offers 50 generations per month with all core features. Karriere+ extends this to 150 generations per month and additionally unlocks ATS Premium analysis, the advanced Interview Coach, career and Skill-Gap analysis, Premium templates and prioritised AI processing. The exact limits are shown transparently on the Pricing page and in our Terms.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -5419,8 +5433,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Settings",
       nav_logout: "Logout",
       nav_login: "Login",
-      tool_limit_pro: "You have used up your generations for this month. You will get new ones on the 1st of next month. Upgrade to Ultimate for immediate, unlimited access! 🚀",
-      tool_limit_free: "This expert tool requires a Pro or Ultimate subscription. ✨",
+      tool_limit_pro: "You've used your 50 generations for this month. New ones arrive on the 1st of next month. Upgrade to Karriere+ for 150 generations per month plus Premium features.",
+      tool_limit_free: "This expert tool requires a Pro or Karriere+ subscription. ✨",
       onboarding_welcome_title: "Welcome to Stellify",
       onboarding_welcome_desc: "Your AI copilot for your Swiss career. We help you make the most of your potential.",
       onboarding_cv_title: "Upload your CV",
@@ -5450,8 +5464,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits reset automatically — daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits — upgrade anytime.",
       plan_free_f1: "21 tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
-      plan_pro_f1: "200 AI requests per month", plan_pro_f2: "20 uses per day", plan_pro_f3: "All 21 tools (Builder + 20 more)", plan_pro_f4: "25 saved applications", plan_pro_f5: "Priority support (24h)",
-      plan_unlim_f1: "2,000 AI requests per month, 200 per day", plan_unlim_f2: "Deep Analysis mode (in-depth AI analysis)", plan_unlim_f3: "Premium application designs (exclusive)", plan_unlim_f4: "Up to 200 saved applications + Live AI search", plan_unlim_f5: "Priority server access + VIP support 24/7",
+      plan_pro_f1: "50 generations per month", plan_pro_f2: "Application & cover letter", plan_pro_f3: "CV optimisation & job analysis", plan_pro_f4: "Interview Coach", plan_pro_f5: "Document storage + priority support",
+      plan_unlim_f1: "150 generations per month", plan_unlim_f2: "ATS Premium analysis & Skill-Gap", plan_unlim_f3: "Advanced Interview Coach & career analysis", plan_unlim_f4: "Premium templates & prioritised AI processing", plan_unlim_f5: "Early access to new features + VIP support",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella Chat",
       dashboard_daily_usage: "Daily Limit",
@@ -5460,7 +5474,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_free_chat: "{used} / 3 Chat requests",
       dashboard_stat_free_tools: "{used} / 1 Tool use",
       tool_daily_limit_pro: "You have reached your daily limit. You will have new attempts tomorrow! 🚀",
-      tool_limit_search_pro: "Your live search limit (10/month) has been reached. You will get new searches next month. Upgrade to Ultimate for unlimited search! 🚀",
+      tool_limit_search_pro: "Your live search limit (10/month) has been reached. You will get new searches next month. Upgrade to Karriere+ for 300 live searches per month.",
       tool_limit_search_fair_use: "You have reached the fair-use limit for live searches. Please try again tomorrow or contact support.",
       dashboard_pro: "Career Professional",
       dashboard_desc: "Your copilot Stella is ready. Analyze new jobs, optimize your profile, or prepare for your next interview.",
@@ -5470,7 +5484,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_stat_missing: "Missing",
       dashboard_stat_chat: "Stella Chat",
       dashboard_stat_pro: "Pro",
-      dashboard_stat_unlimited: "Ultimate",
+      dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Free",
       dashboard_cv_optimize: "Premium Optimization",
       tracker_title: "Application Tracker",
@@ -5540,10 +5554,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "No mass applications or automation against our terms",
       tr_limits_title: "Concrete AI limits by plan",
       tr_lim_free_label: "Free", tr_lim_free_v: "3 lifetime AI requests · 3 Stella chat messages",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "200 AI requests per month · max. 20 per day · all 21 career tools",
-      tr_lim_unlim_label: "Ultimate", tr_lim_unlim_v: "2,000 AI requests per month · 200 per day · Deep Analysis + Premium designs",
-      tr_reset_info: "Pro and Ultimate limits reset on the 1st of each month, the daily limit at midnight (Europe/Zurich).",
-      tr_fair_use: "Stellify applies a fair-use limit of max. 15 (Pro) or 30 (Ultimate) requests per minute to prevent abuse.",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 generations per month · all core tools · document storage",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 generations per month · ATS Premium · advanced Interview Coach · Premium templates",
+      tr_reset_info: "The monthly generation limits reset on the 1st of each month (Europe/Zurich).",
+      tr_fair_use: "Stellify applies a fair-use limit of max. 15 (Pro) or 30 (Karriere+) requests per minute to prevent abuse.",
       quick_tools: "Quick Tools",
       all_tools: "All Tools",
       recent_docs: "Your Recent Documents",
@@ -5599,7 +5613,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       or_divider: "Or",
       stat_members: "Members",
       hero_intro: "Your Personal",
-      hero_accent: "Application AI",
+      hero_accent: "AI career assistant",
       badge_new: "NEW",
       tools_section_badge: "21 AI Tools",
       tools_section_title: "Everything you need for your career",
@@ -5630,8 +5644,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "How to use this tool",
       tool_scroll_example: "Scroll down for professional example",
       tool_pro_example: "Professional Example",
-      tool_unlimited_access: "Ultimate Access",
-      tool_unlock_desc: "Unlock this tool and all premium features with the Ultimate plan.",
+      tool_unlimited_access: "Karriere+ Access",
+      tool_unlock_desc: "Unlock this tool and all premium features with Karriere+.",
       tool_discover_unlimited: "Discover Unlimited Now",
       tool_fill_fields: "Fill in the fields on the left",
       auth_terms_by_signing: "By signing in, you accept our",
@@ -5715,13 +5729,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Salary Transparency", desc: "Get precise salary forecasts based on Swiss market data for your specific region and industry.", icon: "Coins" },
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["3× applications or tool uses", "3× Stella Chat messages", "AI Salary Calculator (Base)", "Swiss Standards"],
-      pricing_pro_f: ["200 AI applications / requests per month", "20 uses per day", "All 21 career tools included", "25 saved applications", "Priority Support"],
-      pricing_ultimate_f: ["2,000 AI applications / requests per month", "200 per day — for intensive phases", "Deep Analysis Mode + Premium designs (exclusive)", "Live AI search + up to 200 saved applications", "Priority server access + 24/7 VIP Support"],
+      pricing_free_f: ["3 generations (lifetime)", "Try application, CV & interview", "All features to explore", "No credit card required"],
+      pricing_pro_f: ["50 generations per month", "Application & cover letter", "CV optimisation & job analysis", "Interview Coach", "Document storage"],
+      pricing_ultimate_f: ["Everything in Pro, plus:", "150 generations per month", "ATS Premium analysis & Skill-Gap", "Advanced Interview Coach & career analysis", "Premium templates & prioritised AI", "Early access to new features"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
-      pricing_cta_ultimate: "Choose Ultimate",
+      pricing_cta_ultimate: "Choose Karriere+",
       pricing_recommended: "Recommended",
+      pricing_popular: "Most Popular",
       value_title: "CHF 19.90: is it worth it?",
       value_items: [
         "A career counselor costs CHF 200–400 / session",
@@ -6035,10 +6050,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const toolUses = user?.toolUses || 0;
   const dailyToolUses = user?.dailyToolUses || 0;
   const isToolLimitReached = (!isPro && toolUses >= 3)
-    || (user?.role === 'pro' && !isUnlimited && toolUses >= 200)
-    || (user?.role === 'unlimited' && toolUses >= 2000);
-  const isDailyLimitReached = (user?.role === 'pro' && !isUnlimited && dailyToolUses >= 20)
-    || (user?.role === 'unlimited' && dailyToolUses >= 200);
+    || (user?.role === 'pro' && !isUnlimited && toolUses >= 50)
+    || (user?.role === 'unlimited' && toolUses >= 150);
+  const isDailyLimitReached = false;
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
@@ -6181,6 +6195,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
           </button>
+          {STELLA_CHAT_ENABLED && (
           <button
             onClick={() => setIsStellaOpen(true)}
             className="p-2.5 sm:p-2 hover:bg-black/5 rounded-full transition-colors text-[#004225]"
@@ -6188,6 +6203,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             <Sparkles size={20} />
           </button>
+          )}
           <button
             onClick={() => setIsSearchOpen(true)}
             aria-label={t.search_placeholder}
@@ -8121,39 +8137,31 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               >{user ? t.dashboard : t.pricing_cta_free}</button>
             </motion.div>
 
-            {/* PRO — Premium glass with gold accent */}
+            {/* PRO — Calm glass with green accent */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
-              whileHover={{ y: -6 }}
+              whileHover={{ y: -4 }}
               transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-              className="group relative p-10 bg-[#004225]/15 backdrop-blur-xl border border-[#00A854]/40 flex flex-col shadow-2xl shadow-[#004225]/40 overflow-hidden"
-              style={{ boxShadow: '0 0 0 1px rgba(0,168,84,0.2) inset, 0 30px 60px -20px rgba(0,66,37,0.6)' }}
+              className="group relative p-10 bg-white/[0.04] backdrop-blur-xl border border-[#00A854]/25 flex flex-col transition-all hover:bg-white/[0.06] hover:border-[#00A854]/40 overflow-hidden"
             >
-              {/* Subtle aurora glow on top */}
-              <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#00A854]/20 rounded-full blur-3xl pointer-events-none" />
-              <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#D4AF37]/[0.08] rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#00A854]/[0.08] rounded-full blur-3xl pointer-events-none" />
 
-              {/* Recommended badge with gold underline */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center gap-2 bg-gradient-to-r from-[#004225] to-[#00592F] text-white text-[10px] font-bold uppercase tracking-[0.3em] px-5 py-1.5 rounded-full border border-[#D4AF37]/30 shadow-lg shadow-[#004225]/30">
-                <span className="w-1 h-1 rounded-full bg-[#D4AF37]" />
-                {t.pricing_recommended}
-              </div>
               <div className="relative mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/70">Pro</span>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif text-white">CHF {prices.pro}</span>
-                  <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
+                  <span className="text-white/70 text-sm">/{billingCycle === 'yearly' ? (language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year') : (language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.')}</span>
                 </div>
                 {billingCycle === 'yearly' && (
                   <div className="mt-2 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
-                    <span className="text-white text-xs font-semibold">−25%</span>
-                    <span className="text-white/70 text-xs">· CHF 178.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</span>
+                    <span className="text-white text-xs font-semibold">−{planPricing.pro.save}</span>
+                    <span className="text-white/70 text-xs">· ≈ CHF {planPricing.pro.yearlyPerMo}/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                   </div>
                 )}
               </div>
               <ul className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_pro_f.map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-medium text-white">
+                  <li key={i} className="flex items-center gap-3 text-sm font-light text-white/80">
                     <CheckCircle2 size={14} className="text-[#6FCF97] shrink-0" />
                     {f}
                   </li>
@@ -8162,37 +8170,45 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <button
                 onClick={() => handleSubscription('pro')}
                 disabled={isSubscribing}
-                className="relative w-full py-4 bg-white text-[#004225] hover:bg-[#FAFAF8] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl"
+                className="relative w-full py-4 border border-[#00A854]/40 text-white hover:bg-[#00A854]/10 hover:border-[#00A854] transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px]"
               >
                 {isSubscribing ? '...' : t.pricing_cta_pro}
               </button>
             </motion.div>
 
-            {/* ULTIMATE — Glass with restrained gold accent */}
+            {/* KARRIERE+ — Featured / most popular plan */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
-              whileHover={{ y: -4 }}
+              whileHover={{ y: -6 }}
               transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-              className="group relative p-10 bg-white/[0.04] backdrop-blur-xl border border-white/10 flex flex-col transition-all hover:bg-white/[0.06] hover:border-[#D4AF37]/30 overflow-hidden"
+              className="group relative p-10 bg-[#004225]/20 backdrop-blur-xl border border-[#00A854]/50 flex flex-col overflow-hidden lg:scale-[1.04] lg:-my-2 z-10"
+              style={{ boxShadow: '0 0 0 1px rgba(0,168,84,0.25) inset, 0 30px 70px -20px rgba(0,66,37,0.7)' }}
             >
-              <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#D4AF37]/[0.05] rounded-full blur-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#00A854]/25 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#D4AF37]/[0.10] rounded-full blur-3xl pointer-events-none" />
+
+              {/* Most-popular badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center gap-2 bg-gradient-to-r from-[#004225] to-[#00592F] text-white text-[10px] font-bold uppercase tracking-[0.3em] px-5 py-1.5 rounded-full border border-[#D4AF37]/40 shadow-lg shadow-[#004225]/40 whitespace-nowrap">
+                <span className="w-1 h-1 rounded-full bg-[#D4AF37]" />
+                {t.pricing_popular}
+              </div>
               <div className="relative mb-8">
-                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#D4AF37]">Ultimate</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6FCF97]">Karriere+</span>
                 <div className="flex items-baseline gap-1 mt-4">
-                  <span className="text-4xl font-serif">CHF {prices.ultimate}</span>
-                  <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
+                  <span className="text-4xl font-serif text-white">CHF {prices.ultimate}</span>
+                  <span className="text-white/70 text-sm">/{billingCycle === 'yearly' ? (language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year') : (language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.')}</span>
                 </div>
                 {billingCycle === 'yearly' && (
-                  <div className="mt-2 inline-flex items-center gap-1.5 bg-white/10 px-3 py-1 rounded-full">
-                    <span className="text-white text-xs font-semibold">−20%</span>
-                    <span className="text-white/60 text-xs">· CHF 478.80/{language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year'}</span>
+                  <div className="mt-2 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
+                    <span className="text-white text-xs font-semibold">−{planPricing.ultimate.save}</span>
+                    <span className="text-white/70 text-xs">· ≈ CHF {planPricing.ultimate.yearlyPerMo}/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                   </div>
                 )}
               </div>
               <ul className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_ultimate_f.map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-light text-white/80">
-                    <CheckCircle2 size={14} className="text-[#D4AF37] shrink-0" />
+                  <li key={i} className="flex items-center gap-3 text-sm font-medium text-white">
+                    <CheckCircle2 size={14} className="text-[#6FCF97] shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -8200,7 +8216,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <button
                 onClick={() => handleSubscription('ultimate')}
                 disabled={isSubscribing}
-                className="relative w-full py-4 border border-[#D4AF37]/40 hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] text-[#D4AF37]"
+                className="relative w-full py-4 bg-white text-[#004225] hover:bg-[#FAFAF8] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl"
               >
                 {isSubscribing ? '...' : t.pricing_cta_ultimate}
               </button>
@@ -9340,6 +9356,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </AnimatePresence>
 
       {/* --- STELLA FAB --- */}
+      {STELLA_CHAT_ENABLED && (
       <button
         onClick={() => setIsStellaOpen(prev => !prev)}
         className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-14 h-14 bg-[#004225] text-white shadow-2xl flex items-center justify-center z-[100] group"
@@ -9349,6 +9366,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
         </svg>
       </button>
+      )}
 
       {/* --- TOOL MODAL --- */}
       <AnimatePresence>
@@ -10936,7 +10954,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.subscription}</h4>
                   <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 flex justify-between items-center">
                     <div>
-                      <p className="text-sm font-medium dark:text-[#FAFAF8]">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Ultimate' : 'Stellify Gratis'}</p>
+                      <p className="text-sm font-medium dark:text-[#FAFAF8]">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Karriere+' : 'Stellify Gratis'}</p>
                       {user?.subscriptionExpiresAt && (user?.role === 'pro' || user?.role === 'unlimited') ? (
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">
                           {language === 'DE' ? 'Gültig bis' : language === 'FR' ? 'Valide jusqu\'au' : language === 'IT' ? 'Valido fino al' : 'Valid until'}{' '}
