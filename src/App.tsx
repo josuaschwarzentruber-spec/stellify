@@ -7586,44 +7586,71 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             className="relative"
           >
-            <div className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 p-8 shadow-2xl relative z-10 transition-colors">
-              <div className="flex items-center gap-4 mb-8 pb-6 border-b border-black/5 dark:border-white/5">
-                <div className="w-12 h-12 bg-[#004225] flex items-center justify-center text-white">
-                  <svg width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">
+            {/* Application document preview — the core product in action */}
+            <div className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl relative z-10 transition-colors overflow-hidden">
+              {/* Branded header band */}
+              <div className="bg-[#004225] px-6 py-3.5 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <svg width="18" height="18" viewBox="0 0 32 32" aria-hidden="true" className="text-[#6FCF97]">
                     <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
                   </svg>
+                  <span className="text-white font-serif text-sm tracking-tight">Stell<span className="text-[#6FCF97]">ify</span></span>
+                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#6FCF97] border border-[#6FCF97]/30 px-1.5 py-0.5">
+                    {language === 'FR' ? 'Candidature' : language === 'IT' ? 'Candidatura' : language === 'EN' ? 'Application' : 'Bewerbung'}
+                  </span>
                 </div>
-                <div>
-                  <h3 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{t.stella_name}</h3>
-                  <p className="text-xs text-[#059669] flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#059669]" />
-                    {t.stella_online}
-                  </p>
-                </div>
+                <span className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#6FCF97]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#6FCF97] animate-pulse" />
+                  {language === 'FR' ? 'Généré' : language === 'IT' ? 'Generato' : language === 'EN' ? 'Generated' : 'Fertig'}
+                </span>
               </div>
-              <div className="space-y-4 mb-8">
-                <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
-                  Grüezi! Dein CV ist analysiert. Für das Interview bei der UBS solltest du auf die Frage "Warum UBS?" vorbereitet sein, ich zeige dir die optimale Antwort.
+
+              {/* Document body */}
+              <div className="px-7 py-6">
+                <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">Anna Müller</p>
+                <p className="text-[10px] text-[#9A9A94] mt-0.5">Bahnhofstrasse 12 · 8001 Zürich · anna.mueller@mail.ch</p>
+
+                <div className="my-5 h-px bg-black/8 dark:bg-white/8" />
+
+                <p className="text-[10px] text-[#9A9A94] mb-2.5">13. Juni 2026</p>
+                <p className="text-[12px] font-bold text-[#004225] dark:text-[#6FCF97] mb-3">
+                  {language === 'FR' ? 'Candidature : Marketing Manager · UBS'
+                    : language === 'IT' ? 'Candidatura: Marketing Manager · UBS'
+                    : language === 'EN' ? 'Application: Marketing Manager · UBS'
+                    : 'Bewerbung als Marketing Managerin · UBS'}
+                </p>
+                <p className="text-[12px] text-[#1A1A18] dark:text-[#EBEBEB] mb-3">
+                  {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
+                </p>
+                {/* Letter body — typeset text lines */}
+                <div className="space-y-1.5 mb-4">
+                  {['97%','100%','94%','99%','88%'].map((w, i) => (
+                    <div key={i} style={{ width: w }} className="h-[7px] rounded-sm bg-[#1A1A18]/[0.08] dark:bg-white/[0.08]" />
+                  ))}
                 </div>
-                <div className="bg-[#004225] text-white p-4 text-sm font-light leading-relaxed max-w-[85%] ml-auto">
-                  Super! Welche Fragen kommen noch? Und wie antworte ich am besten?
-                </div>
-                <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] p-4 text-sm font-light leading-relaxed max-w-[85%] text-[#1A1A18] dark:text-[#FAFAF8]">
-                  Starte den Interview-Coach: du erhältst 5 echte Fragen mit Musterantworten und deinem persönlichen Score.
-                </div>
+                <p className="text-[12px] text-[#1A1A18] dark:text-[#EBEBEB]">
+                  {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
+                </p>
+                <p className="font-serif text-[13px] text-[#1A1A18] dark:text-[#FAFAF8] mt-1">Anna Müller</p>
               </div>
-              <div className="flex gap-2">
-                <div className="flex-1 h-10 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 px-4 flex items-center text-xs text-[#9A9A94] dark:text-[#5C5C58]">
-                  {t.stella_input_ph}
-                </div>
-                <div className="w-10 h-10 bg-[#004225] flex items-center justify-center text-white">
-                  <Send size={16} />
+
+              {/* Export footer */}
+              <div className="border-t border-black/8 dark:border-white/8 px-6 py-3 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
+                <span className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] font-light">
+                  {language === 'FR' ? 'Créé en 5 minutes' : language === 'IT' ? 'Creato in 5 minuti' : language === 'EN' ? 'Created in 5 minutes' : 'In 5 Minuten erstellt'}
+                </span>
+                <div className="flex items-center gap-2">
+                  {['PDF', 'WORD'].map(fmt => (
+                    <span key={fmt} className="flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#6FCF97] border border-[#004225]/20 dark:border-[#6FCF97]/30 px-2 py-1">
+                      <Download size={9} />{fmt}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
