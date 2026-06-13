@@ -8455,7 +8455,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <ShieldCheck size={16} />
                     <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Swiss Grade</span>
                   </div>
-                  <p className="text-sm text-white/70 font-light">{language === 'FR' ? 'Conçu pour les standards suisses, pas pour des modèles génériques.' : language === 'IT' ? 'Costruito per gli standard svizzeri, non per modelli generici.' : language === 'EN' ? 'Built for Swiss standards, not generic templates.' : 'Gebaut für Schweizer Standards, nicht für generische Vorlagen.'}</p>
+                  <p className="text-sm text-white/70 font-light">{language === 'FR' ? 'Conçu pour les standards suisses, pas pour des modèles interchangeables.' : language === 'IT' ? 'Costruito per gli standard svizzeri, non per modelli intercambiabili.' : language === 'EN' ? 'Built for Swiss standards, not interchangeable templates.' : 'Gebaut für Schweizer Standards, nicht für beliebige Vorlagen.'}</p>
                 </div>
                 <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
                   <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
