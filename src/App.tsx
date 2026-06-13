@@ -6727,7 +6727,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   )}
 
                   {trackerStats.total > 0 && (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_total}</p>
                         <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
@@ -6742,25 +6742,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
                         <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.offerRate}% {t.stat_rate}</p>
-                      </div>
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_avg_salary}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none whitespace-nowrap">
-                          {trackerStats.avgSalary > 0
-                            ? (() => {
-                                const v = Math.round(trackerStats.avgSalary);
-                                // ≥ 10'000 → compact "120k" so the tile never overflows
-                                return v >= 10000
-                                  ? `CHF ${Math.round(v / 1000).toLocaleString('de-CH')}k`
-                                  : `CHF ${v.toLocaleString('de-CH')}`;
-                              })()
-                            : t.stat_no_data}
-                        </p>
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">
-                          {trackerStats.salaryCount > 0
-                            ? `${t.stat_based_on} ${trackerStats.salaryCount}`
-                            : ' '}
-                        </p>
                       </div>
                     </div>
                   )}
