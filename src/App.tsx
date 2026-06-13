@@ -9525,28 +9525,27 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </div>
                       <h3 className="text-lg font-serif mb-2">
                         {activeTool.type === 'ultimate'
-                          ? (language === 'FR' ? 'Outil Ultimate' : language === 'IT' ? 'Strumento Ultimate' : language === 'EN' ? 'Ultimate Tool' : 'Ultimate-Tool')
+                          ? (language === 'FR' ? 'Outil Karriere+' : language === 'IT' ? 'Strumento Karriere+' : language === 'EN' ? 'Karriere+ Tool' : 'Karriere+ Tool')
                           : (language === 'FR' ? 'Outil Pro' : language === 'IT' ? 'Strumento Pro' : language === 'EN' ? 'Pro Tool' : 'Pro-Tool')}
                       </h3>
                       <p className="text-[10px] text-[#5C5C58] font-light max-w-xs mb-4 leading-relaxed">
                         {activeTool.type === 'ultimate'
-                          ? (language === 'FR' ? 'Cet outil fait partie de notre plan Ultimate. Obtenez un accès complet à toutes les fonctionnalités Stellify.'
-                            : language === 'IT' ? 'Questo strumento fa parte del nostro piano Ultimate. Ottieni accesso completo a tutte le funzionalità di Stellify.'
-                            : language === 'EN' ? 'This tool is part of our Ultimate plan. Get full access to all Stellify features.'
-                            : 'Dieses Tool ist Teil unseres Ultimate-Pakets. Erhalte vollen Zugriff auf alle Stellify-Funktionen.')
-                          : (language === 'FR' ? 'Cet outil fait partie de notre plan Pro. Accédez à plus de 20 outils de carrière.'
-                            : language === 'IT' ? 'Questo strumento fa parte del nostro piano Pro. Accedi a oltre 20 strumenti di carriera.'
-                            : language === 'EN' ? 'This tool is part of our Pro plan. Get access to 20+ career tools.'
-                            : 'Dieses Tool ist Teil unseres Pro-Pakets. Erhalte Zugriff auf alle 20+ Karriere-Tools.')}
+                          ? (language === 'FR' ? 'Cet outil fait partie du plan Karriere+. Débloque les fonctions premium et l\'analyse approfondie.'
+                            : language === 'IT' ? 'Questo strumento fa parte del piano Karriere+. Sblocca le funzioni premium e l\'analisi approfondita.'
+                            : language === 'EN' ? 'This tool is part of the Karriere+ plan. Unlock premium features and deep analysis.'
+                            : 'Dieses Tool ist Teil von Karriere+. Schalte Premium-Funktionen und die Deep-Analyse frei.')
+                          : (language === 'FR' ? 'Cet outil fait partie du plan Pro. Accède à tous les outils de carrière.'
+                            : language === 'IT' ? 'Questo strumento fa parte del piano Pro. Accedi a tutti gli strumenti di carriera.'
+                            : language === 'EN' ? 'This tool is part of the Pro plan. Get access to all career tools.'
+                            : 'Dieses Tool ist Teil des Pro-Pakets. Erhalte Zugriff auf alle Karriere-Tools.')}
                       </p>
                       <div className="flex flex-col gap-2 w-full max-w-[200px]">
-                        <button 
+                        <button
                           onClick={() => {
                             setActiveTool(null);
                             setParsedSalaryResult(null);
                             setParsedInterviewResult(null);
-                            const pricingSection = document.getElementById('pricing');
-                            pricingSection?.scrollIntoView({ behavior: 'smooth' });
+                            navigate('pricing');
                           }}
                           className="w-full py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331D] transition-all"
                         >
@@ -10332,12 +10331,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           <p className="text-[10px] text-amber-800 leading-relaxed">
                             {t.tool_unlock_desc}
                           </p>
-                          <button 
-                            onClick={() => {
-                              setActiveTool(null);
-                              const pricingSection = document.getElementById('pricing');
-                              pricingSection?.scrollIntoView({ behavior: 'smooth' });
-                            }}
+                          <button
+                            onClick={() => { setActiveTool(null); navigate('pricing'); }}
                             className="w-full py-3 bg-amber-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-amber-700 transition-all"
                           >
                             {t.tool_discover_unlimited}
@@ -11047,11 +11042,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
                       )}
                     </div>
-                    <button 
-                      onClick={() => {
-                        setIsSettingsOpen(false);
-                        document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' });
-                      }}
+                    <button
+                      onClick={() => { setIsSettingsOpen(false); navigate('pricing'); }}
                       className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border border-[#004225]/20 px-3 py-1.5 hover:bg-[#004225] hover:text-white transition-all"
                     >
                       {t.settings_change_plan}
