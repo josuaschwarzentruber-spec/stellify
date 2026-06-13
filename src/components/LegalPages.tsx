@@ -331,7 +331,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3 KI-Anfragen lebenslang','3 Stella-Chat-Nachrichten','Zugang zu allen Karriere-Tools','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Bewerbung & Motivationsschreiben','Lebenslauf optimieren & Stellenanalyse','Interview Coach','Dokumentenspeicherung','Prioritärer Support']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','ATS Premium-Analyse & Skill-Gap-Analyse','Erweiterter Interview Coach & Karriereanalyse','Premium-Vorlagen & priorisierte KI','24/7 VIP-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3 Generierungen lebenslang','Zugang zu allen Karriere-Tools','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Bewerbung & Motivationsschreiben','Lebenslauf optimieren & Stellenanalyse','Interview Coach','Dokumentenspeicherung','Prioritärer Support']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','ATS Premium-Analyse & Skill-Gap-Analyse','Erweiterter Interview Coach & Karriereanalyse','Premium-Vorlagen & priorisierte KI','24/7 VIP-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -351,7 +351,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Alle kostenpflichtigen Pläne stellen festgelegte Kontingente für KI-Anfragen bereit, die serverseitig durchgesetzt werden. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ ist ausdrücklich kein unbeschränkter Plan</strong>, sondern ein Premium-Plan mit höheren, jedoch klar definierten Limits.</p>
                 <p className="mt-2">Zum Zeitpunkt der aktuellen Fassung gelten:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Gratis-Plan:</strong> 3 KI-Anfragen lebenslang, 3 Stella-Chat-Nachrichten</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Gratis-Plan:</strong> 3 Generierungen lebenslang (Tool-Nutzungen)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro-Plan:</strong> 50 Generierungen pro Monat, max. 15 pro Minute</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 Generierungen pro Monat, max. 30 pro Minute</li>
                 </ul>
@@ -384,7 +384,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3 requêtes IA à vie','3 messages Stella Chat','Accès à tous les outils carrière','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidature & lettre de motivation','Optimisation du CV & analyse d\'offre','Coach d\'entretien','Stockage des documents','Support prioritaire']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Analyse ATS Premium & Skill-Gap','Coach d\'entretien avancé & analyse carrière','Modèles Premium & IA prioritaire','Support VIP 24/7']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3 générations à vie','Accès à tous les outils carrière','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidature & lettre de motivation','Optimisation du CV & analyse d\'offre','Coach d\'entretien','Stockage des documents','Support prioritaire']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Analyse ATS Premium & Skill-Gap','Coach d\'entretien avancé & analyse carrière','Modèles Premium & IA prioritaire','Support VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -404,7 +404,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Tous les plans payants prévoient des quotas définis de requêtes IA, appliqués côté serveur. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ n'est expressément pas un plan illimité</strong>, mais un plan Premium avec des limites supérieures clairement définies.</p>
                 <p className="mt-2">À la date de la version actuelle, les limites sont :</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Gratuit :</strong> 3 requêtes IA à vie, 3 messages Stella Chat</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Gratuit :</strong> 3 générations à vie (utilisations d'outils)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Pro :</strong> 50 générations par mois, max. 15 par minute</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ :</strong> 150 générations par mois, max. 30 par minute</li>
                 </ul>
@@ -437,7 +437,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3 richieste IA a vita','3 messaggi Stella Chat','Accesso a tutti gli strumenti carriera','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidatura & lettera di motivazione','Ottimizzazione CV & analisi annuncio','Coach per colloqui','Archiviazione documenti','Supporto prioritario']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Analisi ATS Premium & Skill-Gap','Coach colloqui avanzato & analisi carriera','Modelli Premium & IA prioritaria','Supporto VIP 24/7']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3 generazioni a vita','Accesso a tutti gli strumenti carriera','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidatura & lettera di motivazione','Ottimizzazione CV & analisi annuncio','Coach per colloqui','Archiviazione documenti','Supporto prioritario']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Analisi ATS Premium & Skill-Gap','Coach colloqui avanzato & analisi carriera','Modelli Premium & IA prioritaria','Supporto VIP 24/7']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -457,7 +457,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Tutti i piani a pagamento prevedono limiti definiti per le richieste IA, applicati lato server. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ non è espressamente un piano illimitato</strong>, ma un piano Premium con limiti più elevati ma chiaramente definiti.</p>
                 <p className="mt-2">Alla data della versione attuale valgono:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Gratuito:</strong> 3 richieste IA a vita, 3 messaggi Stella Chat</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Gratuito:</strong> 3 generazioni a vita (utilizzi di strumenti)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Pro:</strong> 50 generazioni al mese, max. 15 al minuto</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 generazioni al mese, max. 30 al minuto</li>
                 </ul>
@@ -490,7 +490,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3 lifetime AI requests','3 Stella Chat messages','Access to all career tools','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Application & cover letter','CV optimisation & job analysis','Interview Coach','Document storage','Priority support']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','ATS Premium analysis & Skill-Gap','Advanced Interview Coach & career analysis','Premium templates & prioritised AI','24/7 VIP Support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3 lifetime generations','Access to all career tools','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Application & cover letter','CV optimisation & job analysis','Interview Coach','Document storage','Priority support']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','ATS Premium analysis & Skill-Gap','Advanced Interview Coach & career analysis','Premium templates & prioritised AI','24/7 VIP Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -510,7 +510,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>All paid plans provide defined AI request quotas that are enforced server-side. <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ is expressly not an unlimited plan</strong>, but a Premium plan with higher yet clearly defined limits.</p>
                 <p className="mt-2">As of the current version the limits are:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Free Plan:</strong> 3 lifetime AI requests, 3 Stella Chat messages</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Free Plan:</strong> 3 lifetime generations (tool uses)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro Plan:</strong> 50 generations per month, max. 15 per minute</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 generations per month, max. 30 per minute</li>
                 </ul>
