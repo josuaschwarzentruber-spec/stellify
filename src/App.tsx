@@ -766,7 +766,7 @@ function StellifyApp() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly');
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
   // Stella chat is hidden from the UI (kept in code, reversible). Set to true
   // to re-enable the launcher entry points across the app.
   const STELLA_CHAT_ENABLED = false;
