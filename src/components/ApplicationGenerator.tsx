@@ -100,7 +100,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
     export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…',
     interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
-    quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/200 diesen Monat', quota_pro_day: '{used}/20 heute',
+    quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/{cap} diesen Monat', quota_pro_day: '{used}/20 heute',
     quota_free_done: 'Gratis-Versuche aufgebraucht', quota_pro_month_done: 'Monatslimit erreicht', quota_pro_day_done: 'Tageslimit erreicht',
   },
   FR: {
@@ -139,7 +139,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
     export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…',
     interview_hint: '10 questions possibles avec suggestions de réponses',
-    quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/200 ce mois', quota_pro_day: '{used}/20 aujourd\'hui',
+    quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/{cap} ce mois', quota_pro_day: '{used}/20 aujourd\'hui',
     quota_free_done: 'Essais gratuits épuisés', quota_pro_month_done: 'Limite mensuelle atteinte', quota_pro_day_done: 'Limite journalière atteinte',
   },
   IT: {
@@ -178,7 +178,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
     export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…',
     interview_hint: '10 possibili domande con suggerimenti di risposta',
-    quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/200 questo mese', quota_pro_day: '{used}/20 oggi',
+    quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/{cap} questo mese', quota_pro_day: '{used}/20 oggi',
     quota_free_done: 'Tentativi gratuiti esauriti', quota_pro_month_done: 'Limite mensile raggiunto', quota_pro_day_done: 'Limite giornaliero raggiunto',
   },
   EN: {
@@ -217,7 +217,7 @@ const STR: Record<string, Record<string, string>> = {
     extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
     export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…',
     interview_hint: '10 possible questions with suggested answers',
-    quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/200 this month', quota_pro_day: '{used}/20 today',
+    quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/{cap} this month', quota_pro_day: '{used}/20 today',
     quota_free_done: 'Free attempts used up', quota_pro_month_done: 'Monthly limit reached', quota_pro_day_done: 'Daily limit reached',
   },
 };
@@ -433,16 +433,21 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
   const toneLabel = (v: string) => v === 'confident' ? (s as any).tone_conf : v === 'friendly' ? (s as any).tone_warm : v === 'direct' ? (s as any).tone_direct : (s as any).tone_prof;
 
   /* Mirror handleProcessTool gating: same thresholds, same messages. */
+  // Must mirror the server QUOTA in api/index.ts:
+  //   Free: 3 lifetime · Pro: 50/month · Karriere+ (role 'unlimited'): 150/month
+  // No daily cap any more — only the monthly limit + per-minute fair-use guard.
   const quotaInfo = (() => {
-    if (!usage || usage.isUnlimited) return null;
+    if (!usage) return null;
     if (!usage.isPro) {
       const used = Math.min(usage.toolUses, 3);
       const done = used >= 3;
       return { label: s.quota_free.replace('{used}', String(used)), done, doneLabel: s.quota_free_done };
     }
-    if (usage.dailyToolUses >= 20) return { label: s.quota_pro_day.replace('{used}', String(usage.dailyToolUses)), done: true, doneLabel: s.quota_pro_day_done };
-    if (usage.toolUses >= 200) return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: true, doneLabel: s.quota_pro_month_done };
-    return { label: s.quota_pro_month.replace('{used}', String(usage.toolUses)), done: false, doneLabel: '' };
+    const cap = usage.isUnlimited ? 150 : 50;
+    const used = usage.toolUses;
+    const done = used >= cap;
+    const label = s.quota_pro_month.replace('{used}', String(used)).replace('{cap}', String(cap));
+    return { label, done, doneLabel: s.quota_pro_month_done };
   })();
   const quotaBlocked = !!quotaInfo?.done;
 
