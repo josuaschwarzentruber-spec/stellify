@@ -3797,8 +3797,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
       onboarding_cv_title: "Lade deinen Lebenslauf hoch",
       onboarding_cv_desc: "Lade deinen Lebenslauf hoch, damit Stella dich und deine Erfahrungen besser versteht. So erhältst du personalisierte Tipps.",
-      onboarding_chat_title: "Frag Stella",
-      onboarding_chat_desc: "Nutze den Stella Chat für Karriereberatung, Interview-Vorbereitung oder um mehr über den Schweizer Arbeitsmarkt zu erfahren.",
+      onboarding_chat_title: "Stella im Hintergrund",
+      onboarding_chat_desc: "Stella ist die KI, die in jedem Tool im Hintergrund arbeitet — sie schreibt deine Bewerbung, optimiert deinen Lebenslauf und bereitet dich auf Vorstellungsgespräche vor. Du musst sie nicht erst fragen, sie ist immer da.",
       onboarding_tools_title: "Experten-Tools",
       onboarding_tools_desc: "Nutze unsere spezialisierten Tools für Gehaltschecks, Lebenslauf-Prüfung und Marktanalyse.",
       onboarding_next: "Weiter",
@@ -3821,11 +3821,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Plan upgraden",
       plan_reset_info: "Limits werden automatisch zurückgesetzt — täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen — Upgrade jederzeit möglich.",
-      plan_free_f1: "Alle Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
+      plan_free_f1: "Alle Tools zum Testen", plan_free_f2: "3 Generierungen lebenslang", plan_free_f3: "Bewerbung, Lebenslauf & Interview testen", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
       plan_pro_f1: "50 Generierungen pro Monat", plan_pro_f2: "Bewerbung & Motivationsschreiben", plan_pro_f3: "Lebenslauf optimieren & Stellenanalyse", plan_pro_f4: "Interview Coach", plan_pro_f5: "Dokumentenspeicherung + prioritärer Support",
       plan_unlim_f1: "150 Generierungen pro Monat", plan_unlim_f2: "ATS Premium-Analyse & Skill-Gap", plan_unlim_f3: "Erweiterter Interview Coach & Karriereanalyse", plan_unlim_f4: "Premium-Vorlagen & priorisierte KI-Verarbeitung", plan_unlim_f5: "Früher Zugang zu neuen Funktionen + VIP-Support",
       dashboard_usage_desc: "Tool-Nutzung",
-      dashboard_chat_usage: "Stella Chat",
+      dashboard_chat_usage: "Stella Anfragen",
       dashboard_daily_usage: "Tageslimit",
       dashboard_reset_monthly: "Reset am 1. des Monats",
       dashboard_reset_daily: "Reset morgen",
@@ -3836,12 +3836,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_fair_use: "Du hast das Fair-Use-Limit für Live-Suchen erreicht. Bitte versuche es morgen wieder oder kontaktiere den Support.",
       dashboard_stat_pro: "Pro",
       dashboard_pro: "Karriere-Profi",
-      dashboard_desc: "Dein Copilot Stella ist bereit. Analysiere neue Stellen, optimiere dein Profil oder bereite dich auf dein nächstes Interview vor.",
+      dashboard_desc: "Stella hat alles bereit. Erstelle eine neue Bewerbung, optimiere deinen Lebenslauf oder bereite dich auf dein nächstes Vorstellungsgespräch vor.",
       dashboard_stat_analyses: "Analysen",
       dashboard_stat_cv_status: "Lebenslauf",
       dashboard_stat_ready: "Bereit",
       dashboard_stat_missing: "Fehlt",
-      dashboard_stat_chat: "Stella Chat",
+      dashboard_stat_applications: "Bewerbungen",
       dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Gratis",
       dashboard_cv_optimize: "Premium Optimierung",
@@ -3911,7 +3911,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_3: "Keine Verarbeitung sensibler Daten (z.B. Gesundheits-, Religions-, Sozialhilfe-Daten)",
       tr_cannot_4: "Keine Massenbewerbungen oder Automatisierung gegen unsere AGB",
       tr_limits_title: "Konkrete KI-Limits pro Plan",
-      tr_lim_free_label: "Gratis", tr_lim_free_v: "3 KI-Anfragen lebenslang · 3 Stella-Chat-Nachrichten",
+      tr_lim_free_label: "Gratis", tr_lim_free_v: "3 Generierungen lebenslang · alle Tools zum Testen",
       tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 Generierungen pro Monat · alle Kern-Tools · Dokumentenspeicherung",
       tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 Generierungen pro Monat · ATS Premium · erweiterter Interview Coach · Premium-Vorlagen",
       tr_reset_info: "Die monatlichen Generierungs-Limits werden jeweils am 1. des Monats zurückgesetzt (Europe/Zurich).",
@@ -4420,8 +4420,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_welcome_desc: "Votre copilote IA pour votre carrière en Suisse. Nous vous aidons à tirer le meilleur parti de votre potentiel.",
       onboarding_cv_title: "Téléchargez votre CV",
       onboarding_cv_desc: "Téléchargez votre CV pour que Stella puisse mieux vous comprendre, vous et vos expériences. Vous recevrez ainsi des conseils personnalisés.",
-      onboarding_chat_title: "Demandez à Stella",
-      onboarding_chat_desc: "Utilisez le chat Stella pour des conseils de carrière, la préparation aux entretiens ou pour en savoir plus sur le marché du travail suisse.",
+      onboarding_chat_title: "Stella en arrière-plan",
+      onboarding_chat_desc: "Stella est l'IA qui travaille en arrière-plan de chaque outil — elle rédige tes candidatures, optimise ton CV et te prépare aux entretiens. Pas besoin de la solliciter, elle est toujours présente.",
       onboarding_tools_title: "Outils d'experts",
       onboarding_tools_desc: "Utilisez nos outils spécialisés pour les vérifications de salaire, l'optimisation ATS et l'analyse du marché.",
       onboarding_next: "Suivant",
@@ -4444,11 +4444,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Améliorer mon plan",
       plan_reset_info: "Limites réinitialisées automatiquement — chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie — upgrade possible à tout moment.",
-      plan_free_f1: "Tous les outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
+      plan_free_f1: "Tous les outils à essayer", plan_free_f2: "3 générations à vie", plan_free_f3: "Tester candidature, CV & entretien", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
       plan_pro_f1: "50 générations par mois", plan_pro_f2: "Candidature & lettre de motivation", plan_pro_f3: "Optimisation du CV & analyse d'offre", plan_pro_f4: "Coach d'entretien", plan_pro_f5: "Stockage des documents + support prioritaire",
       plan_unlim_f1: "150 générations par mois", plan_unlim_f2: "Analyse ATS Premium & Skill-Gap", plan_unlim_f3: "Coach d'entretien avancé & analyse carrière", plan_unlim_f4: "Modèles Premium & traitement IA prioritaire", plan_unlim_f5: "Accès anticipé aux nouveautés + support VIP",
       dashboard_usage_desc: "Utilisation des outils",
-      dashboard_chat_usage: "Stella Chat",
+      dashboard_chat_usage: "Requêtes Stella",
       dashboard_daily_usage: "Limite quotidienne",
       dashboard_reset_monthly: "Réinitialisation le 1er",
       dashboard_reset_daily: "Réinitialisation demain",
@@ -4458,12 +4458,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Votre limite de recherches en direct (10/mois) est atteinte. Vous en aurez de nouvelles le mois prochain. Passe à Karriere+ pour 300 recherches en direct par mois.",
       tool_limit_search_fair_use: "Vous avez atteint la limite d'utilisation équitable pour les recherches en direct. Veuillez réessayer demain ou contacter le support.",
       dashboard_pro: "Professionnel de carrière",
-      dashboard_desc: "Votre copilote Stella est prête. Analysez de nouveaux postes, optimisez votre profil ou préparez-vous pour votre prochain entretien.",
+      dashboard_desc: "Stella a tout préparé. Crée une nouvelle candidature, optimise ton CV ou prépare-toi pour ton prochain entretien.",
       dashboard_stat_analyses: "Analyses",
       dashboard_stat_cv_status: "Statut CV",
       dashboard_stat_ready: "Prêt",
       dashboard_stat_missing: "Manquant",
-      dashboard_stat_chat: "Stella Chat",
+      dashboard_stat_applications: "Candidatures",
       dashboard_stat_pro: "Pro",
       dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Gratuit",
@@ -4534,7 +4534,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_3: "Pas de traitement de données sensibles (santé, religion, aide sociale, …)",
       tr_cannot_4: "Pas de candidatures de masse ni d'automatisation contre nos CGV",
       tr_limits_title: "Limites IA concrètes par plan",
-      tr_lim_free_label: "Gratuit", tr_lim_free_v: "3 requêtes IA à vie · 3 messages Stella Chat",
+      tr_lim_free_label: "Gratuit", tr_lim_free_v: "3 générations à vie · tous les outils à essayer",
       tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 générations par mois · tous les outils essentiels · stockage des documents",
       tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 générations par mois · ATS Premium · coach d'entretien avancé · modèles Premium",
       tr_reset_info: "Les limites mensuelles de générations sont réinitialisées le 1er du mois (Europe/Zurich).",
@@ -4937,8 +4937,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_welcome_desc: "Il tuo copilota AI per la tua carriera in Svizzera. Ti aiutiamo a sfruttare al meglio il tuo potenziale.",
       onboarding_cv_title: "Carica il tuo CV",
       onboarding_cv_desc: "Carica il tuo curriculum in modo che Stella possa capire meglio te e le tue esperienze. Riceverai così consigli personalizzati.",
-      onboarding_chat_title: "Chiedi a Stella",
-      onboarding_chat_desc: "Usa la chat di Stella per consigli di carriera, preparazione ai colloqui o per saperne di più sul mercato del lavoro svizzero.",
+      onboarding_chat_title: "Stella in background",
+      onboarding_chat_desc: "Stella è l'IA che lavora in background in ogni strumento — scrive le tue candidature, ottimizza il tuo CV e ti prepara ai colloqui. Non devi chiederle nulla, è sempre presente.",
       onboarding_tools_title: "Strumenti esperti",
       onboarding_tools_desc: "Usa i nostri strumenti specializzati per controlli salariali, ottimizzazione ATS e analisi di mercato.",
       onboarding_next: "Avanti",
@@ -4961,11 +4961,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Aggiorna piano",
       plan_reset_info: "Limiti reimpostati automaticamente — ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita — upgrade possibile in qualsiasi momento.",
-      plan_free_f1: "Tutti gli strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
+      plan_free_f1: "Tutti gli strumenti da provare", plan_free_f2: "3 generazioni a vita", plan_free_f3: "Prova candidatura, CV e colloquio", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
       plan_pro_f1: "50 generazioni al mese", plan_pro_f2: "Candidatura & lettera di motivazione", plan_pro_f3: "Ottimizzazione CV & analisi annuncio", plan_pro_f4: "Coach per colloqui", plan_pro_f5: "Archiviazione documenti + supporto prioritario",
       plan_unlim_f1: "150 generazioni al mese", plan_unlim_f2: "Analisi ATS Premium & Skill-Gap", plan_unlim_f3: "Coach colloqui avanzato & analisi carriera", plan_unlim_f4: "Modelli Premium & elaborazione IA prioritaria", plan_unlim_f5: "Accesso anticipato alle novità + supporto VIP",
       dashboard_usage_desc: "Utilizzo strumenti",
-      dashboard_chat_usage: "Stella Chat",
+      dashboard_chat_usage: "Richieste Stella",
       dashboard_daily_usage: "Limite giornaliero",
       dashboard_reset_monthly: "Reset il 1° del mese",
       dashboard_reset_daily: "Reset domani",
@@ -4975,12 +4975,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Il tuo limite di ricerche dal vivo (10/mese) è raggiunto. Il prossimo mese avrai nuove ricerche libere. Passa a Karriere+ per 300 ricerche dal vivo al mese.",
       tool_limit_search_fair_use: "Hai raggiunto il limite di utilizzo corretto per le ricerche dal vivo. Riprova domani o contatta il supporto.",
       dashboard_pro: "Professionista della carriera",
-      dashboard_desc: "Il tuo copilota Stella è pronto. Analizza nuove posizioni, ottimizza il tuo profilo o preparati per il tuo prossimo colloquio.",
+      dashboard_desc: "Stella ha tutto pronto. Crea una nuova candidatura, ottimizza il tuo CV o preparati per il tuo prossimo colloquio.",
       dashboard_stat_analyses: "Analisi",
       dashboard_stat_cv_status: "Stato CV",
       dashboard_stat_ready: "Pronto",
       dashboard_stat_missing: "Mancante",
-      dashboard_stat_chat: "Stella Chat",
+      dashboard_stat_applications: "Candidature",
       dashboard_stat_pro: "Pro",
       dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Gratis",
@@ -5051,7 +5051,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_3: "Nessun trattamento di dati sensibili (salute, religione, assistenza sociale)",
       tr_cannot_4: "Nessuna candidatura di massa o automazione contro le nostre condizioni",
       tr_limits_title: "Limiti IA concreti per piano",
-      tr_lim_free_label: "Gratuito", tr_lim_free_v: "3 richieste IA a vita · 3 messaggi Stella Chat",
+      tr_lim_free_label: "Gratuito", tr_lim_free_v: "3 generazioni a vita · tutti gli strumenti da provare",
       tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 generazioni al mese · tutti gli strumenti essenziali · archiviazione documenti",
       tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 generazioni al mese · ATS Premium · coach colloqui avanzato · modelli Premium",
       tr_reset_info: "I limiti mensili di generazioni vengono reimpostati il 1° del mese (Europe/Zurich).",
@@ -5454,8 +5454,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_welcome_desc: "Your AI copilot for your Swiss career. We help you make the most of your potential.",
       onboarding_cv_title: "Upload your CV",
       onboarding_cv_desc: "Upload your resume so Stella can better understand you and your experiences. This way you get personalized tips.",
-      onboarding_chat_title: "Ask Stella",
-      onboarding_chat_desc: "Use Stella Chat for career advice, interview preparation or to learn more about the Swiss labor market.",
+      onboarding_chat_title: "Stella in the background",
+      onboarding_chat_desc: "Stella is the AI working in the background of every tool — she writes your applications, optimises your CV and prepares you for interviews. You don't have to ask her, she's always there.",
       onboarding_tools_title: "Expert Tools",
       onboarding_tools_desc: "Use our specialized tools for salary checks, ATS optimization and market analysis.",
       onboarding_next: "Next",
@@ -5478,11 +5478,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Upgrade plan",
       plan_reset_info: "Limits reset automatically — daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits — upgrade anytime.",
-      plan_free_f1: "All tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
+      plan_free_f1: "All tools to try", plan_free_f2: "3 lifetime generations", plan_free_f3: "Try application, CV & interview", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
       plan_pro_f1: "50 generations per month", plan_pro_f2: "Application & cover letter", plan_pro_f3: "CV optimisation & job analysis", plan_pro_f4: "Interview Coach", plan_pro_f5: "Document storage + priority support",
       plan_unlim_f1: "150 generations per month", plan_unlim_f2: "ATS Premium analysis & Skill-Gap", plan_unlim_f3: "Advanced Interview Coach & career analysis", plan_unlim_f4: "Premium templates & prioritised AI processing", plan_unlim_f5: "Early access to new features + VIP support",
       dashboard_usage_desc: "Tool Usage",
-      dashboard_chat_usage: "Stella Chat",
+      dashboard_chat_usage: "Stella requests",
       dashboard_daily_usage: "Daily Limit",
       dashboard_reset_monthly: "Resets on the 1st",
       dashboard_reset_daily: "Resets tomorrow",
@@ -5492,12 +5492,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Your live search limit (10/month) has been reached. You will get new searches next month. Upgrade to Karriere+ for 300 live searches per month.",
       tool_limit_search_fair_use: "You have reached the fair-use limit for live searches. Please try again tomorrow or contact support.",
       dashboard_pro: "Career Professional",
-      dashboard_desc: "Your copilot Stella is ready. Analyze new jobs, optimize your profile, or prepare for your next interview.",
+      dashboard_desc: "Stella has everything ready. Create a new application, optimise your CV, or prepare for your next interview.",
       dashboard_stat_analyses: "Analyses",
       dashboard_stat_cv_status: "CV (Resume)",
       dashboard_stat_ready: "Ready",
       dashboard_stat_missing: "Missing",
-      dashboard_stat_chat: "Stella Chat",
+      dashboard_stat_applications: "Applications",
       dashboard_stat_pro: "Pro",
       dashboard_stat_unlimited: "Karriere+",
       dashboard_stat_free: "Free",
@@ -5568,7 +5568,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_3: "No processing of sensitive data (health, religion, social-benefit data)",
       tr_cannot_4: "No mass applications or automation against our terms",
       tr_limits_title: "Concrete AI limits by plan",
-      tr_lim_free_label: "Free", tr_lim_free_v: "3 lifetime AI requests · 3 Stella chat messages",
+      tr_lim_free_label: "Free", tr_lim_free_v: "3 lifetime generations · all tools to try",
       tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 generations per month · all core tools · document storage",
       tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 generations per month · ATS Premium · advanced Interview Coach · Premium templates",
       tr_reset_info: "The monthly generation limits reset on the 1st of each month (Europe/Zurich).",
@@ -6361,7 +6361,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {[
                     { label: t.dashboard_stat_analyses, value: toolHistory.length, icon: <TrendingUp size={16} /> },
                     { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={16} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
-                    { label: t.dashboard_stat_chat, value: messages.length, icon: <Send size={16} /> },
+                    { label: t.dashboard_stat_applications, value: trackerStats?.total ?? 0, icon: <Send size={16} /> },
                     { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={16} /> }
                   ].map((stat, i) => (
                     <motion.div
@@ -6717,24 +6717,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_total}</p>
-                        <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
+                        <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.inProcess} {t.stat_in_process}</p>
                       </div>
                       <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_interviews}</p>
-                        <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.interview}</p>
+                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.interview}</p>
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.interviewRate}% {t.stat_rate}</p>
                       </div>
                       <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
-                        <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
+                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.offerRate}% {t.stat_rate}</p>
                       </div>
                       <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
                         <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_avg_salary}</p>
-                        <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none whitespace-nowrap">
+                        <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none whitespace-nowrap">
                           {trackerStats.avgSalary > 0
-                            ? `CHF ${Math.round(trackerStats.avgSalary).toLocaleString('de-CH')}`
+                            ? (() => {
+                                const v = Math.round(trackerStats.avgSalary);
+                                // ≥ 10'000 → compact "120k" so the tile never overflows
+                                return v >= 10000
+                                  ? `CHF ${Math.round(v / 1000).toLocaleString('de-CH')}k`
+                                  : `CHF ${v.toLocaleString('de-CH')}`;
+                              })()
                             : t.stat_no_data}
                         </p>
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">
