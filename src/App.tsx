@@ -7350,16 +7350,71 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             )}
 
             {activeView === 'jobs' && (
-              <div className="space-y-12">
+              <div className="space-y-10 max-w-4xl">
                 <header>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
+                    {language === 'FR' ? 'Bientôt disponible' : language === 'IT' ? 'Presto disponibile' : language === 'EN' ? 'Coming soon' : 'Folgt bald'}
+                  </div>
                   <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">
-                    {t.job_board_title}
+                    {language === 'FR' ? 'La bourse de l\'emploi arrive' : language === 'IT' ? 'La bacheca offerte sta arrivando' : language === 'EN' ? 'The job board is on its way' : 'Die Stellenbörse kommt bald'}
                   </h1>
-                  <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">
-                    {t.job_board_desc}
+                  <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl leading-relaxed">
+                    {language === 'FR'
+                      ? 'Bientôt, tu pourras postuler directement via Stellify : un clic t\'amène à l\'offre de l\'entreprise. Nous construisons un réseau d\'employeurs suisses, étape par étape.'
+                      : language === 'IT'
+                      ? 'Presto potrai candidarti direttamente tramite Stellify: un clic ti porta all\'offerta dell\'azienda. Stiamo costruendo una rete di datori di lavoro svizzeri, passo dopo passo.'
+                      : language === 'EN'
+                      ? 'Soon you\'ll apply directly through Stellify: one click takes you to the company\'s posting. We\'re building a network of Swiss employers, step by step.'
+                      : 'Bald kannst du dich direkt über Stellify bewerben: Ein Klick bringt dich zur Stelle des Unternehmens. Wir bauen Schritt für Schritt ein Netzwerk Schweizer Arbeitgeber auf.'}
                   </p>
                 </header>
-                <JobBoard />
+
+                {/* For companies — the B2B hook */}
+                <div className="p-7 sm:p-8 bg-[#004225] text-white relative overflow-hidden rounded-sm">
+                  <div className="absolute -top-20 -right-20 w-64 h-64 bg-[#00A854]/20 rounded-full blur-3xl pointer-events-none" />
+                  <div className="relative">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6FCF97] mb-3">
+                      {language === 'FR' ? 'Pour les entreprises' : language === 'IT' ? 'Per le aziende' : language === 'EN' ? 'For companies' : 'Für Unternehmen'}
+                    </p>
+                    <h2 className="text-2xl font-serif mb-3 leading-snug">
+                      {language === 'FR' ? 'Présentez vos postes à des candidats qualifiés' : language === 'IT' ? 'Mostra le tue posizioni a candidati qualificati' : language === 'EN' ? 'Put your roles in front of qualified candidates' : 'Zeige deine Stellen qualifizierten Kandidaten'}
+                    </h2>
+                    <p className="text-sm text-white/70 font-light leading-relaxed max-w-xl mb-6">
+                      {language === 'FR'
+                        ? 'Tes offres apparaissent directement là où les candidats préparent leur dossier avec l\'IA. Ils postulent chez toi en un clic. Écris-nous pour faire partie des premiers employeurs.'
+                        : language === 'IT'
+                        ? 'Le tue offerte appaiono dove i candidati preparano la candidatura con l\'IA. Si candidano da te con un clic. Scrivici per essere tra i primi datori di lavoro.'
+                        : language === 'EN'
+                        ? 'Your openings appear right where candidates craft their applications with AI. They apply to you in one click. Get in touch to be among the first employers.'
+                        : 'Deine Stellen erscheinen genau dort, wo Kandidaten ihre Bewerbung mit KI erstellen. Sie bewerben sich mit einem Klick bei dir. Melde dich, um zu den ersten Arbeitgebern zu gehören.'}
+                    </p>
+                    <a
+                      href={`mailto:support@stellify.ch?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise — publier des postes sur Stellify' : language === 'IT' ? 'Azienda — pubblicare posizioni su Stellify' : language === 'EN' ? 'Company — list roles on Stellify' : 'Unternehmen — Stellen auf Stellify ausschreiben')}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#004225] text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#FAFAF8] transition-all"
+                    >
+                      {language === 'FR' ? 'Nous contacter' : language === 'IT' ? 'Contattaci' : language === 'EN' ? 'Get in touch' : 'Kontakt aufnehmen'}
+                      <ArrowRight size={14} />
+                    </a>
+                  </div>
+                </div>
+
+                {/* While they wait — point job seekers to the tools that exist now */}
+                <div className="border border-black/8 dark:border-white/10 p-6 sm:p-7 rounded-sm">
+                  <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-medium mb-1">
+                    {language === 'FR' ? 'En attendant' : language === 'IT' ? 'Nel frattempo' : language === 'EN' ? 'In the meantime' : 'In der Zwischenzeit'}
+                  </p>
+                  <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light mb-5 max-w-xl leading-relaxed">
+                    {language === 'FR' ? 'Prépare des candidatures parfaites avec nos outils IA — prêt dès qu\'un poste t\'intéresse.' : language === 'IT' ? 'Prepara candidature perfette con i nostri strumenti IA — pronto appena trovi una posizione.' : language === 'EN' ? 'Get perfect applications ready with our AI tools — so you\'re set the moment a role catches your eye.' : 'Bereite mit unseren KI-Tools perfekte Bewerbungen vor — damit du bereit bist, sobald dich eine Stelle interessiert.'}
+                  </p>
+                  <button
+                    onClick={() => navigate('tools')}
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                  >
+                    {language === 'FR' ? 'Voir les outils' : language === 'IT' ? 'Vedi gli strumenti' : language === 'EN' ? 'Explore the tools' : 'Zu den Tools'}
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
               </div>
             )}
 
