@@ -3628,8 +3628,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   // you don't actually charge monthly). Stripe products must match these:
   //   Pro: CHF 19.90/mo · CHF 190/yr   |   Karriere+: CHF 39.90/mo · CHF 349/yr
   const planPricing = {
-    pro:      { monthly: '19.90', yearly: '190.00', yearlyPerMo: '15.85', save: '20%' },
-    ultimate: { monthly: '39.90', yearly: '349.00', yearlyPerMo: '29.10', save: '27%' },
+    // yearlyPerMo = yearly / 12, rounded (shown with a "≈" prefix):
+    //   190.00 / 12 = 15.83   ·   349.00 / 12 = 29.08
+    pro:      { monthly: '19.90', yearly: '190.00', yearlyPerMo: '15.83', save: '20%' },
+    ultimate: { monthly: '39.90', yearly: '349.00', yearlyPerMo: '29.08', save: '27%' },
   };
   const prices = billingCycle === 'yearly'
     ? { gratis: '0', pro: planPricing.pro.yearly, ultimate: planPricing.ultimate.yearly }
@@ -3715,7 +3717,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Der Standard für ambitionierte Bewerber.",
       pricing_ultimate_desc: "Maximale Power für deine Karriere.",
       faq_title: "Häufig gestellte Fragen",
-      footer_desc: "Stellify ist die Bewerbungs-KI für die Schweiz. Professionelle Bewerbungen in 5 Minuten, plus 20 weitere Karriere-Tools.",
+      footer_desc: "Stellify ist die Bewerbungs-KI für die Schweiz. Professionelle Bewerbungen in 5 Minuten, plus alle Tools für deine Karriere.",
       footer_legal: "Rechtliches",
       footer_contact: "Kontakt",
       auth_login: "Anmelden",
@@ -3815,7 +3817,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Plan upgraden",
       plan_reset_info: "Limits werden automatisch zurückgesetzt — täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen — Upgrade jederzeit möglich.",
-      plan_free_f1: "21 Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
+      plan_free_f1: "Alle Tools zum Testen", plan_free_f2: "3 KI-Tool-Anfragen (lebenslang)", plan_free_f3: "3 Stella-Chat-Nachrichten", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
       plan_pro_f1: "50 Generierungen pro Monat", plan_pro_f2: "Bewerbung & Motivationsschreiben", plan_pro_f3: "Lebenslauf optimieren & Stellenanalyse", plan_pro_f4: "Interview Coach", plan_pro_f5: "Dokumentenspeicherung + prioritärer Support",
       plan_unlim_f1: "150 Generierungen pro Monat", plan_unlim_f2: "ATS Premium-Analyse & Skill-Gap", plan_unlim_f3: "Erweiterter Interview Coach & Karriereanalyse", plan_unlim_f4: "Premium-Vorlagen & priorisierte KI-Verarbeitung", plan_unlim_f5: "Früher Zugang zu neuen Funktionen + VIP-Support",
       dashboard_usage_desc: "Tool-Nutzung",
@@ -3895,7 +3897,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       transparency_title: "Was geht — und was nicht",
       transparency_sub: "Damit du genau weisst woran du bist. Alle Limits beziehen sich auf KI-Anfragen (Tools + Chat).",
       tr_can_title: "Das kannst du", tr_cannot_title: "Das geht nicht",
-      tr_can_1: "Alle 21 Tools auf jedem Plan ausprobieren",
+      tr_can_1: "Alle Tools auf jedem Plan ausprobieren",
       tr_can_2: "Bewerbungen erstellen, speichern und als PDF oder Word exportieren",
       tr_can_3: "Auf Deutsch, Französisch, Italienisch und Englisch arbeiten",
       tr_can_4: "Schweizer Lohnbänder, Standards und Arbeitsmarkt-Kontext nutzen",
@@ -3967,13 +3969,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_intro: "Dein persönlicher",
       hero_accent: "KI-Karriereassistent",
       badge_new: "NEU",
-      tools_section_badge: "21 KI-Tools",
+      tools_section_badge: "KI-Karriere-Tools",
       tools_section_title: "Alles, was du für deine Karriere brauchst",
       tools_section_desc: "Von der Lebenslauf-Analyse bis zur Lohnverhandlung: Stellify begleitet dich durch jeden Schritt.",
-      tools_section_cta: "Alle 21 Tools ansehen →",
+      tools_section_cta: "Alle Tools ansehen →",
       testimonial_verified: "Verifiziert",
       cv_banner_title: "Lade deinen Lebenslauf hoch für personalisierte KI-Analysen",
-      cv_banner_desc: "PDF oder Word · Kostenlos · Alle 21 Tools werden auf deinen Lebenslauf abgestimmt",
+      cv_banner_desc: "PDF oder Word · Kostenlos · Alle Tools werden auf deinen Lebenslauf abgestimmt",
       cv_upload_hint: "PDF oder Word · Kostenlos & sicher analysieren lassen",
       cv_banner_btn: "Lebenslauf hochladen",
       cv_stat_upload: "Hochladen",
@@ -4435,7 +4437,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Améliorer mon plan",
       plan_reset_info: "Limites réinitialisées automatiquement — chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie — upgrade possible à tout moment.",
-      plan_free_f1: "21 outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
+      plan_free_f1: "Tous les outils à essayer", plan_free_f2: "3 requêtes IA (à vie)", plan_free_f3: "3 messages Stella Chat", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
       plan_pro_f1: "50 générations par mois", plan_pro_f2: "Candidature & lettre de motivation", plan_pro_f3: "Optimisation du CV & analyse d'offre", plan_pro_f4: "Coach d'entretien", plan_pro_f5: "Stockage des documents + support prioritaire",
       plan_unlim_f1: "150 générations par mois", plan_unlim_f2: "Analyse ATS Premium & Skill-Gap", plan_unlim_f3: "Coach d'entretien avancé & analyse carrière", plan_unlim_f4: "Modèles Premium & traitement IA prioritaire", plan_unlim_f5: "Accès anticipé aux nouveautés + support VIP",
       dashboard_usage_desc: "Utilisation des outils",
@@ -4515,7 +4517,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       transparency_title: "Ce qui est possible — et ce qui ne l'est pas",
       transparency_sub: "Pour que tu saches exactement à quoi t'attendre. Toutes les limites concernent les requêtes IA (outils + chat).",
       tr_can_title: "Ce que tu peux faire", tr_cannot_title: "Ce qui n'est pas possible",
-      tr_can_1: "Essayer les 21 outils sur n'importe quel plan",
+      tr_can_1: "Essayer tous les outils sur n'importe quel plan",
       tr_can_2: "Créer des candidatures, les sauvegarder et exporter en PDF ou Word",
       tr_can_3: "Travailler en allemand, français, italien et anglais",
       tr_can_4: "Utiliser les fourchettes salariales, normes et contexte du marché suisse",
@@ -4587,13 +4589,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_intro: "Votre",
       hero_accent: "assistant carrière IA",
       badge_new: "NOUVEAU",
-      tools_section_badge: "21 Outils IA",
+      tools_section_badge: "Outils IA carrière",
       tools_section_title: "Tout ce dont vous avez besoin pour votre carrière",
       tools_section_desc: "De l'analyse CV à la négociation salariale : Stellify vous guide à chaque étape.",
-      tools_section_cta: "Voir les 21 outils →",
+      tools_section_cta: "Voir tous les outils →",
       testimonial_verified: "Vérifié",
       cv_banner_title: "Téléchargez votre CV pour des analyses IA personnalisées",
-      cv_banner_desc: "PDF ou Word · Gratuit · Les 21 outils adaptés à votre CV",
+      cv_banner_desc: "PDF ou Word · Gratuit · Tous les outils adaptés à votre CV",
       cv_upload_hint: "PDF ou Word · Analyse gratuite et sécurisée",
       cv_banner_btn: "Télécharger le CV",
       cv_stat_upload: "Télécharger",
@@ -4949,7 +4951,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Aggiorna piano",
       plan_reset_info: "Limiti reimpostati automaticamente — ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita — upgrade possibile in qualsiasi momento.",
-      plan_free_f1: "21 strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
+      plan_free_f1: "Tutti gli strumenti da provare", plan_free_f2: "3 richieste IA (a vita)", plan_free_f3: "3 messaggi Stella Chat", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
       plan_pro_f1: "50 generazioni al mese", plan_pro_f2: "Candidatura & lettera di motivazione", plan_pro_f3: "Ottimizzazione CV & analisi annuncio", plan_pro_f4: "Coach per colloqui", plan_pro_f5: "Archiviazione documenti + supporto prioritario",
       plan_unlim_f1: "150 generazioni al mese", plan_unlim_f2: "Analisi ATS Premium & Skill-Gap", plan_unlim_f3: "Coach colloqui avanzato & analisi carriera", plan_unlim_f4: "Modelli Premium & elaborazione IA prioritaria", plan_unlim_f5: "Accesso anticipato alle novità + supporto VIP",
       dashboard_usage_desc: "Utilizzo strumenti",
@@ -5029,7 +5031,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       transparency_title: "Cosa è possibile — e cosa no",
       transparency_sub: "Per sapere esattamente cosa aspettarsi. Tutti i limiti riguardano le richieste IA (strumenti + chat).",
       tr_can_title: "Cosa puoi fare", tr_cannot_title: "Cosa non è possibile",
-      tr_can_1: "Provare tutti i 21 strumenti su qualsiasi piano",
+      tr_can_1: "Provare tutti gli strumenti su qualsiasi piano",
       tr_can_2: "Creare candidature, salvarle ed esportarle in PDF o Word",
       tr_can_3: "Lavorare in tedesco, francese, italiano e inglese",
       tr_can_4: "Usare fasce salariali, standard e contesto del mercato svizzero",
@@ -5101,13 +5103,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_intro: "Il tuo",
       hero_accent: "assistente di carriera IA",
       badge_new: "NUOVO",
-      tools_section_badge: "21 Strumenti AI",
+      tools_section_badge: "Strumenti IA carriera",
       tools_section_title: "Tutto ciò di cui hai bisogno per la tua carriera",
       tools_section_desc: "Dall'analisi del CV alla negoziazione salariale: Stellify ti guida in ogni fase.",
-      tools_section_cta: "Vedi tutti i 21 strumenti →",
+      tools_section_cta: "Vedi tutti gli strumenti →",
       testimonial_verified: "Verificato",
       cv_banner_title: "Carica il tuo CV per analisi AI personalizzate",
-      cv_banner_desc: "PDF o Word · Gratuito · Tutti i 21 strumenti adattati al tuo CV",
+      cv_banner_desc: "PDF o Word · Gratuito · Tutti gli strumenti adattati al tuo CV",
       cv_upload_hint: "PDF o Word · Analisi gratuita e sicura",
       cv_banner_btn: "Carica CV",
       cv_stat_upload: "Carica",
@@ -5363,7 +5365,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "The standard for ambitious candidates.",
       pricing_ultimate_desc: "Maximum power for your career.",
       faq_title: "Frequently Asked Questions",
-      footer_desc: "Stellify is the application AI for Switzerland. Professional applications in 5 minutes, plus 20 more career tools.",
+      footer_desc: "Stellify is the application AI for Switzerland. Professional applications in 5 minutes, plus a full suite of career tools.",
       footer_legal: "Legal",
       footer_contact: "Contact",
       auth_login: "Login",
@@ -5463,7 +5465,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Upgrade plan",
       plan_reset_info: "Limits reset automatically — daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits — upgrade anytime.",
-      plan_free_f1: "21 tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
+      plan_free_f1: "All tools to try", plan_free_f2: "3 AI tool requests (lifetime)", plan_free_f3: "3 Stella chat messages", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
       plan_pro_f1: "50 generations per month", plan_pro_f2: "Application & cover letter", plan_pro_f3: "CV optimisation & job analysis", plan_pro_f4: "Interview Coach", plan_pro_f5: "Document storage + priority support",
       plan_unlim_f1: "150 generations per month", plan_unlim_f2: "ATS Premium analysis & Skill-Gap", plan_unlim_f3: "Advanced Interview Coach & career analysis", plan_unlim_f4: "Premium templates & prioritised AI processing", plan_unlim_f5: "Early access to new features + VIP support",
       dashboard_usage_desc: "Tool Usage",
@@ -5543,7 +5545,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       transparency_title: "What you can do — and what you can't",
       transparency_sub: "So you know exactly where you stand. All limits cover AI requests (tools + chat).",
       tr_can_title: "What you can do", tr_cannot_title: "What's not possible",
-      tr_can_1: "Try all 21 tools on every plan",
+      tr_can_1: "Try every tool on any plan",
       tr_can_2: "Create applications, save them and export as PDF or Word",
       tr_can_3: "Work in German, French, Italian and English",
       tr_can_4: "Use Swiss salary ranges, standards and labour-market context",
@@ -5615,13 +5617,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       hero_intro: "Your Personal",
       hero_accent: "AI career assistant",
       badge_new: "NEW",
-      tools_section_badge: "21 AI Tools",
+      tools_section_badge: "AI Career Tools",
       tools_section_title: "Everything you need for your career",
       tools_section_desc: "From CV analysis to salary negotiation: Stellify guides you every step of the way.",
-      tools_section_cta: "View all 21 tools →",
+      tools_section_cta: "View all tools →",
       testimonial_verified: "Verified",
       cv_banner_title: "Upload your CV for personalised AI analyses",
-      cv_banner_desc: "PDF or Word · Free · All 21 tools tailored to your CV",
+      cv_banner_desc: "PDF or Word · Free · All tools tailored to your CV",
       cv_upload_hint: "PDF or Word · Free & secure analysis",
       cv_banner_btn: "Upload CV",
       cv_stat_upload: "Upload",
@@ -5802,7 +5804,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
   const t = translations[language] || translations.DE;
 
-  const tools = [
+  const allTools = [
     {
       id: 'bewerbungs-gen',
       title: t.tools_data['bewerbungs-gen'].title,
@@ -6036,6 +6038,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ]
     },
   ];
+
+  // Strategy-aligned toolset. Tools not named in the launch strategy are kept
+  // in code above (reversible) but hidden by filtering them out here.
+  const ENABLED_TOOL_IDS = new Set([
+    'bewerbungs-gen', 'cv-gen', 'cv-optimizer', 'cv-analysis', 'cv-premium',
+    'matching', 'interview', 'interview-live', 'salary-negotiation',
+    'ats-sim', 'career-roadmap', 'skill-gap', 'tracker',
+  ]);
+  const tools = allTools.filter(tl => ENABLED_TOOL_IDS.has(tl.id));
 
   const faqs = [
     { q: t.faq_1_q, a: t.faq_1_a },
@@ -8934,26 +8945,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <div className="space-y-2">
                   {(user.role === 'unlimited'
                     ? [
-                        { id: 'career-roadmap', icon: <Compass size={16} />, badge: 'Ultimate' },
-                        { id: 'cv-premium', icon: <Sparkles size={16} />, badge: 'Ultimate' },
-                        { id: 'matching', icon: <Search size={16} />, badge: 'Ultimate' },
+                        { id: 'career-roadmap', icon: <Compass size={16} />, badge: 'Karriere+' },
+                        { id: 'cv-premium', icon: <Sparkles size={16} />, badge: 'Karriere+' },
+                        { id: 'matching', icon: <Search size={16} />, badge: 'Karriere+' },
                       ]
                     : user.role === 'pro'
                     ? [
                         { id: 'cv-analysis', icon: <Search size={16} />, badge: 'Pro' },
-                        { id: 'salary-calc', icon: <Coins size={16} />, badge: 'Pro' },
+                        { id: 'matching', icon: <Search size={16} />, badge: 'Pro' },
                         { id: 'skill-gap', icon: <Target size={16} />, badge: 'Pro' },
                       ]
                     : user.cvContext
                     ? [
                         { id: 'cv-analysis', icon: <Search size={16} />, badge: 'Pro' },
                         { id: 'interview', icon: <Mic size={16} />, badge: 'Gratis' },
-                        { id: 'salary-calc', icon: <Coins size={16} />, badge: 'Pro' },
+                        { id: 'matching', icon: <Search size={16} />, badge: 'Pro' },
                       ]
                     : [
                         { id: 'cv-gen', icon: <Sparkles size={16} />, badge: 'Gratis' },
                         { id: 'interview', icon: <Mic size={16} />, badge: 'Gratis' },
-                        { id: 'salary-calc', icon: <Coins size={16} />, badge: 'Pro' },
+                        { id: 'matching', icon: <Search size={16} />, badge: 'Pro' },
                       ]
                   ).map((item) => {
                     const tool = tools.find(tl => tl.id === item.id);
@@ -9106,9 +9117,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <div className="grid grid-cols-2 gap-3">
                       {[
                         { id: 'cv-gen', title: t.tools_data['cv-gen'].title, icon: <Sparkles size={14} />, badge: 'Gratis' },
-                        { id: 'salary-calc', title: t.tools_data['salary-calc'].title, icon: <Coins size={14} />, badge: 'Pro' },
+                        { id: 'cv-optimizer', title: t.tools_data['cv-optimizer'].title, icon: <FileText size={14} />, badge: 'Pro' },
                         { id: 'interview', title: t.tools_data['interview'].title, icon: <Mic size={14} />, badge: 'Gratis' },
-                        { id: 'matching', title: t.tools_data['matching'].title, icon: <Search size={14} />, badge: 'Ultimate' }
+                        { id: 'matching', title: t.tools_data['matching'].title, icon: <Search size={14} />, badge: 'Karriere+' }
                       ].map(action => (
                         <button
                           key={action.id}
