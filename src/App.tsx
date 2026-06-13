@@ -3628,8 +3628,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   // you don't actually charge monthly). Stripe products must match these:
   //   Pro: CHF 19.90/mo · CHF 190/yr   |   Karriere+: CHF 39.90/mo · CHF 349/yr
   const planPricing = {
-    pro:      { monthly: '19.90', yearly: '190', yearlyPerMo: '15.85', save: '20%' },
-    ultimate: { monthly: '39.90', yearly: '349', yearlyPerMo: '29.10', save: '27%' },
+    pro:      { monthly: '19.90', yearly: '190.00', yearlyPerMo: '15.85', save: '20%' },
+    ultimate: { monthly: '39.90', yearly: '349.00', yearlyPerMo: '29.10', save: '27%' },
   };
   const prices = billingCycle === 'yearly'
     ? { gratis: '0', pro: planPricing.pro.yearly, ultimate: planPricing.ultimate.yearly }
@@ -8145,7 +8145,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="relative mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Gratis</span>
                 <div className="flex items-baseline gap-1 mt-4">
-                  <span className="text-4xl font-serif">CHF 0</span>
+                  <span className="text-4xl font-serif">CHF 0.00</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
                 <p className="text-xs text-white/70 mt-2 font-light">{t.pricing_gratis_desc}</p>
