@@ -1530,25 +1530,24 @@ function StellifyApp() {
     return () => window.removeEventListener('message', handleOAuthMessage);
   }, [user, cvContext, language]);
 
-  // Keyword-to-tool mapping for semantic tool discovery
+  // Keyword-to-tool mapping for semantic tool discovery.
+  // Only the strategy-enabled tools (see ENABLED_TOOL_IDS) — removed tools
+  // are not in the `tools` array, so any stale entries here would be inert,
+  // but keeping the map honest avoids confusion.
   const toolKeywordMap: Record<string, string[]> = {
+    'bewerbungs-gen': ['bewerbung', 'bewerbung erstellen', 'bewerbung schreiben', 'anschreiben', 'motivationsschreiben', 'application', 'cover letter', 'candidature', 'lettre de motivation', 'generator', 'dokument', 'pdf', 'word'],
+    'cv-gen': ['erstellen', 'generieren', 'schreiben', 'write', 'cv erstell', 'lebenslauf erstell', 'cv schreib', 'anschreiben'],
     'cv-analysis': ['cv', 'lebenslauf', 'analyse', 'scan', 'prüfen', 'analysieren', 'resume', 'analyse cv', 'check cv'],
-    'cv-optimizer': ['optimieren', 'optimize', 'verbessern', 'improve', 'abschnitt', 'section'],
-    'cv-gen': ['erstellen', 'generieren', 'schreiben', 'write', 'cv erstell', 'lebenslauf erstell', 'cv schreib'],
-    'cv-premium': ['premium', 'professionell', 'professional', 'design cv'],
+    'cv-optimizer': ['optimieren', 'optimize', 'verbessern', 'improve', 'abschnitt', 'section', 'lebenslauf optimieren'],
+    'cv-premium': ['premium', 'professionell', 'professional', 'design cv', 'rewrite'],
+    'matching': ['stellen', 'jobs', 'stelle', 'arbeit', 'matching', 'passend', 'stellenanalyse', 'stellenanzeige', 'offene stellen', 'job analyse', 'stellenangebot'],
     'interview': ['interview', 'vorstellungsgespräch', 'vorbereitung', 'training', 'coaching', 'gespräch', 'fragen'],
-    'salary-calc': ['lohn', 'gehalt', 'salary', 'verdienen', 'verhandeln', 'vergütung', 'worth', 'einkommen'],
-    'ats-sim': ['ats', 'bewerbungssystem', 'keywords', 'algorithmus', 'tracking system'],
-    'zeugnis': ['zeugnis', 'arbeitszeugnis', 'certificate', 'referenz', 'reference', 'zwischenzeugnis'],
-    'skill-gap': ['skills', 'fähigkeiten', 'gap', 'lücke', 'kompetenzen', 'qualifikationen', 'weiterbildung'],
-    'tracker': ['bewerbung', 'application', 'tracker', 'status', 'verfolgen', 'übersicht', 'bewerb'],
-    'career-roadmap': ['karriere', 'career', 'roadmap', 'plan', 'strategie', 'ziel', 'goal', 'zukunft'],
-    'matching': ['stellen', 'jobs', 'stelle', 'arbeit', 'matching', 'passend', 'suchen', 'suche', 'offene stellen', 'job suche', 'stellenangebot'],
-    'berufseinstieg': ['einstieg', 'erster job', 'berufsstart', 'neu', 'first job', 'einsteigen'],
-    'erfahrung-plus': ['50+', 'ü50', 'senior', 'erfahrung', 'älter', 'over 50'],
-    'wiedereinstieg': ['wiedereinstieg', 'comeback', 'rückkehr', 'pause', 'elternzeit', 'karenz'],
-    'linkedin-job': ['linkedin', 'netzwerk', 'network', 'verbindung', 'social'],
-    'karriere-checkup': ['checkup', 'fortschritt', 'status check', 'überblick', 'progress'],
+    'interview-live': ['live interview', 'live coach', 'simulation', 'echtes interview', 'interview üben', 'mock interview'],
+    'salary-negotiation': ['lohn', 'gehalt', 'salary', 'verhandeln', 'gehaltsverhandlung', 'gehaltsgespräch', 'negotiation', 'vergütung', 'lohnverhandlung'],
+    'ats-sim': ['ats', 'bewerbungssystem', 'keywords', 'algorithmus', 'tracking system', 'ats analyse'],
+    'skill-gap': ['skills', 'fähigkeiten', 'gap', 'lücke', 'kompetenzen', 'qualifikationen', 'weiterbildung', 'skill gap'],
+    'career-roadmap': ['karriere', 'career', 'roadmap', 'plan', 'strategie', 'ziel', 'goal', 'zukunft', 'karriereanalyse'],
+    'tracker': ['tracker', 'status', 'verfolgen', 'übersicht', 'bewerbungen verwalten', 'kanban'],
   };
 
   useEffect(() => {
