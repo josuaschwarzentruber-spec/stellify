@@ -360,6 +360,18 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="8. Geistiges Eigentum"><p>Alle Rechte an Plattform, Code, Design und Marken liegen beim Betreiber. KI-generierte Inhalte dürfen vom Nutzer für eigene Bewerbungsunterlagen verwendet werden.</p></Section>
               <Section title="9. Haftungsbeschränkung"><p>Stellify haftet nur für vorsätzliche oder grob fahrlässige Schäden. Gesamthaftung begrenzt auf den in den letzten 12 Monaten bezahlten Betrag.</p></Section>
+              <Section title="9a. KI-Inhalte und Eigenverantwortung">
+                <p>Stellify nutzt grosse Sprachmodelle (KI) von Drittanbietern (insbesondere Google Gemini und DeepSeek). Generierte Inhalte sind statistische Wahrscheinlichkeitsausgaben und können unvollständig, sachlich falsch, veraltet oder vollständig erfunden sein.</p>
+                <p className="mt-2">Der Nutzer hat alle von Stellify generierten Inhalte vor jeder Verwendung sorgfältig zu prüfen, insbesondere:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>Persönliche Angaben (Name, Anschrift, Geburtsdatum, Kontaktdaten)</li>
+                  <li>Berufliche Stationen, Zeiträume, Titel, Abschlüsse und Qualifikationen</li>
+                  <li>Aussagen zu Arbeitgebern, Branchen, Lohnbändern und Marktbedingungen</li>
+                  <li>Rechtliche, steuerliche, medizinische oder ähnlich beratungsintensive Aussagen</li>
+                </ul>
+                <p className="mt-2">Falsche oder erfundene Angaben in Bewerbungsunterlagen können <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">arbeitsrechtliche, vertragliche oder strafrechtliche Folgen</strong> haben (z.B. Anfechtung des Arbeitsvertrags, fristlose Kündigung, Urkundenfälschung, Betrug). Diese liegen ausschliesslich beim Nutzer.</p>
+                <p className="mt-2">Stellify haftet ausdrücklich nicht für Schäden, die durch ungeprüftes Verwenden KI-generierter Inhalte entstehen — insbesondere nicht für nicht erfolgreiche Bewerbungen, abgelehnte Stellen, Rückzug von Stellenangeboten, Vertragsverletzungen oder Reputationsschäden. Diese Klausel ergänzt §9 (Haftungsbeschränkung) und gilt vorrangig.</p>
+              </Section>
               <Section title="10. Verfügbarkeit"><p>Keine Garantie auf unterbrechungsfreie Verfügbarkeit. Ausfälle von Firebase, Stripe oder Google AI liegen ausserhalb unseres Einflussbereichs.</p></Section>
               <Section title="11. Änderungen"><p>Anpassungen mit 30 Tagen Frist. Wesentliche Änderungen per E-Mail. Fortgesetzte Nutzung gilt als Zustimmung.</p></Section>
               <Section title="12. Anwendbares Recht"><p>Ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>. Gerichtsstand: Zug, Schweiz.</p></Section>
@@ -401,6 +413,18 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="8. Propriété intellectuelle"><p>Tous les droits sur la plateforme, le code, le design et les marques appartiennent à l'exploitant. Les contenus générés par IA peuvent être utilisés par l'utilisateur pour ses dossiers de candidature.</p></Section>
               <Section title="9. Limitation de responsabilité"><p>Stellify n'est responsable que des dommages causés intentionnellement ou par négligence grave. Responsabilité totale limitée aux montants payés au cours des 12 derniers mois.</p></Section>
+              <Section title="9a. Contenus IA et responsabilité de l'utilisateur">
+                <p>Stellify utilise de grands modèles de langage (IA) de tiers (notamment Google Gemini et DeepSeek). Les contenus générés sont des sorties probabilistes statistiques et peuvent être incomplets, factuellement incorrects, obsolètes ou entièrement inventés.</p>
+                <p className="mt-2">L'utilisateur doit vérifier soigneusement tous les contenus générés par Stellify avant chaque utilisation, en particulier :</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>Données personnelles (nom, adresse, date de naissance, coordonnées)</li>
+                  <li>Étapes professionnelles, périodes, titres, diplômes et qualifications</li>
+                  <li>Affirmations sur des employeurs, secteurs, fourchettes salariales ou conditions de marché</li>
+                  <li>Affirmations juridiques, fiscales, médicales ou autres nécessitant un conseil professionnel</li>
+                </ul>
+                <p className="mt-2">Des informations fausses ou inventées dans des dossiers de candidature peuvent avoir des <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">conséquences en droit du travail, contractuelles ou pénales</strong> (p. ex. annulation du contrat de travail, licenciement immédiat, faux et usage de faux, escroquerie). Celles-ci incombent exclusivement à l'utilisateur.</p>
+                <p className="mt-2">Stellify n'est expressément pas responsable des dommages résultant de l'utilisation non vérifiée des contenus générés par l'IA — notamment pour des candidatures infructueuses, postes refusés, retraits d'offres d'emploi, violations contractuelles ou atteintes à la réputation. Cette clause complète §9 (Limitation de responsabilité) et prime sur celle-ci.</p>
+              </Section>
               <Section title="10. Disponibilité"><p>Aucune garantie de disponibilité ininterrompue. Les pannes de Firebase, Stripe ou Google AI échappent à notre contrôle.</p></Section>
               <Section title="11. Modifications"><p>Modifications avec un préavis de 30 jours. Changements importants communiqués par e-mail.</p></Section>
               <Section title="12. Droit applicable"><p>Le <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">droit suisse</strong> s'applique exclusivement. For juridique : Zoug, Suisse.</p></Section>
@@ -442,6 +466,18 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="8. Proprietà intellettuale"><p>Tutti i diritti sulla piattaforma, il codice, il design e i marchi appartengono al gestore. I contenuti generati dall'IA possono essere utilizzati dall'utente per i propri documenti di candidatura.</p></Section>
               <Section title="9. Limitazione di responsabilità"><p>Stellify risponde solo per danni causati intenzionalmente o per colpa grave. Responsabilità totale limitata agli importi pagati negli ultimi 12 mesi.</p></Section>
+              <Section title="9a. Contenuti IA e responsabilità dell'utente">
+                <p>Stellify utilizza grandi modelli linguistici (IA) di terze parti (in particolare Google Gemini e DeepSeek). I contenuti generati sono output probabilistici statistici e possono essere incompleti, fattualmente errati, obsoleti o interamente inventati.</p>
+                <p className="mt-2">L'utente deve verificare attentamente tutti i contenuti generati da Stellify prima di ogni utilizzo, in particolare:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>Dati personali (nome, indirizzo, data di nascita, contatti)</li>
+                  <li>Tappe professionali, periodi, titoli, diplomi e qualifiche</li>
+                  <li>Affermazioni su datori di lavoro, settori, fasce salariali o condizioni di mercato</li>
+                  <li>Affermazioni legali, fiscali, mediche o altre che richiedono consulenza professionale</li>
+                </ul>
+                <p className="mt-2">Informazioni false o inventate nei documenti di candidatura possono avere <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">conseguenze giuslavoristiche, contrattuali o penali</strong> (ad es. annullamento del contratto di lavoro, licenziamento immediato, falsificazione di documenti, truffa). Queste ricadono esclusivamente sull'utente.</p>
+                <p className="mt-2">Stellify non è espressamente responsabile dei danni derivanti dall'uso non verificato dei contenuti generati dall'IA — in particolare per candidature non riuscite, posizioni rifiutate, ritiri di offerte di lavoro, violazioni contrattuali o danni reputazionali. Questa clausola integra §9 (Limitazione di responsabilità) e ha precedenza.</p>
+              </Section>
               <Section title="10. Disponibilità"><p>Nessuna garanzia di disponibilità ininterrotta. I guasti di Firebase, Stripe o Google AI esulano dal nostro controllo.</p></Section>
               <Section title="11. Modifiche"><p>Modifiche con 30 giorni di preavviso. Cambiamenti sostanziali comunicati via e-mail.</p></Section>
               <Section title="12. Diritto applicabile"><p>Si applica esclusivamente il <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">diritto svizzero</strong>. Foro competente: Zugo, Svizzera.</p></Section>
@@ -483,6 +519,18 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="8. Intellectual Property"><p>All rights to the platform, code, design and trademarks belong to the operator. AI-generated content may be used by the user for their own job applications.</p></Section>
               <Section title="9. Limitation of Liability"><p>Stellify is only liable for damages caused by wilful misconduct or gross negligence. Total liability is capped at the amount paid by the user in the last 12 months.</p></Section>
+              <Section title="9a. AI Content and User Responsibility">
+                <p>Stellify uses third-party large language models (AI), notably Google Gemini and DeepSeek. Generated content consists of statistical probability outputs and may be incomplete, factually incorrect, outdated or entirely fabricated.</p>
+                <p className="mt-2">The user must carefully check all content generated by Stellify before each use, in particular:</p>
+                <ul className="list-disc pl-5 space-y-1 mt-2">
+                  <li>Personal details (name, address, date of birth, contact information)</li>
+                  <li>Career steps, periods, titles, degrees and qualifications</li>
+                  <li>Statements about employers, industries, salary ranges or market conditions</li>
+                  <li>Legal, tax, medical or other statements requiring professional advice</li>
+                </ul>
+                <p className="mt-2">Incorrect or fabricated information in application materials may have <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">employment-law, contractual or criminal consequences</strong> (e.g. rescission of the employment contract, immediate dismissal, document forgery, fraud). These rest exclusively with the user.</p>
+                <p className="mt-2">Stellify is expressly not liable for damages caused by unverified use of AI-generated content — in particular not for unsuccessful applications, rejected positions, withdrawn job offers, breaches of contract or reputational damage. This clause supplements §9 (Limitation of Liability) and takes precedence.</p>
+              </Section>
               <Section title="10. Availability"><p>No guarantee of uninterrupted availability. Outages of Firebase, Stripe or Google AI are outside our control.</p></Section>
               <Section title="11. Changes"><p>Changes to these Terms with 30 days' notice. Material changes communicated by email. Continued use constitutes acceptance.</p></Section>
               <Section title="12. Applicable Law"><p>Exclusively <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Swiss law</strong> applies. Place of jurisdiction: Zug, Switzerland.</p></Section>
