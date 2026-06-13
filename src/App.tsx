@@ -2564,21 +2564,13 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     
     // Limits must match server QUOTA (api/index.ts) and the pricing copy.
     // Generierungen pro Monat: Free 3 lifetime · Pro 50 · Karriere+ 150.
+    // No daily cap any more — monthly + per-minute fair-use only.
     const isToolLimitReached = (!isPro && toolUses >= 3)
       || (user?.role === 'pro' && !isUnlimited && toolUses >= 50)
       || (user?.role === 'unlimited' && toolUses >= 150);
-    const isDailyLimitReached = false;
 
-    if (isToolLimitReached || isDailyLimitReached) {
-      if (isDailyLimitReached) {
-        setToolResult(t.tool_daily_limit_pro);
-      } else {
-        setToolResult(
-          user?.role === 'pro'
-            ? t.tool_limit_pro
-            : t.tool_limit_free
-        );
-      }
+    if (isToolLimitReached) {
+      setToolResult(user?.role === 'pro' ? t.tool_limit_pro : t.tool_limit_free);
       setIsProcessingTool(false);
       return;
     }
@@ -6412,12 +6404,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
                                     <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 200</span>
+                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 50</span>
                                   </div>
                                   <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
                                     <div 
                                       className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(((user.toolUses || 0) / 200) * 100, 100)}%` }}
+                                      style={{ width: `${Math.min(((user.toolUses || 0) / 50) * 100, 100)}%` }}
                                     />
                                   </div>
                                   <div className="flex justify-end">
@@ -6425,22 +6417,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                   </div>
                                 </div>
 
-                                {/* Daily Usage */}
-                                <div className="space-y-1">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_daily_usage}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.dailyToolUses || 0} / 20</span>
-                                  </div>
-                                  <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%` }}
-                                    />
-                                  </div>
-                                  <div className="flex justify-end">
-                                    <span className="text-[7px] text-[#004225] font-bold uppercase tracking-tighter opacity-60">{t.dashboard_reset_daily}</span>
-                                  </div>
-                                </div>
                               </>
                             ) : (
                               /* Free User Usage — one canonical "Tool-Nutzung" counter
@@ -11100,31 +11076,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <div className="flex justify-between items-end">
                                 <div className="space-y-0.5">
                                   <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 200 {t.settings_generations}</p>
+                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {t.settings_generations}</p>
                                 </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 200) * 100)}%</span>
+                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 50) * 100)}%</span>
                               </div>
                               <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(((user.toolUses || 0) / 200) * 100, 100)}%` }}
-                                />
-                              </div>
-                            </div>
-
-                            {/* Daily Usage */}
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-end">
-                                <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.dashboard_daily_usage}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.dailyToolUses || 0} / 20 {t.settings_actions_today}</p>
-                                </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%</span>
-                              </div>
-                              <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(100, Math.round(((user.dailyToolUses || 0) / 20) * 100))}%` }}
+                                  style={{ width: `${Math.min(((user.toolUses || 0) / 50) * 100, 100)}%` }}
                                 />
                               </div>
                             </div>
@@ -11149,22 +11108,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               </div>
                             </div>
 
-                            {/* Stella Chat */}
-                            <div className="space-y-2 pt-4 border-t border-black/5">
-                              <div className="flex justify-between items-end">
-                                <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">Stella Chat</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.freeGenerationsUsed || 0} / 3 {t.settings_requests}</p>
-                                </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.freeGenerationsUsed || 0) / 3) * 100))}%</span>
-                              </div>
-                              <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(100, Math.round(((user.freeGenerationsUsed || 0) / 3) * 100))}%` }}
-                                />
-                              </div>
-                            </div>
                           </div>
                         )}
                       </div>
