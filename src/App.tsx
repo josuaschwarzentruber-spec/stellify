@@ -3628,10 +3628,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   // you don't actually charge monthly). Stripe products must match these:
   //   Pro: CHF 19.90/mo · CHF 190/yr   |   Karriere+: CHF 39.90/mo · CHF 349/yr
   const planPricing = {
-    // yearlyPerMo = yearly / 12, rounded (shown with a "≈" prefix):
-    //   190.00 / 12 = 15.83   ·   349.00 / 12 = 29.08
-    pro:      { monthly: '19.90', yearly: '190.00', yearlyPerMo: '15.83', save: '20%' },
-    ultimate: { monthly: '39.90', yearly: '349.00', yearlyPerMo: '29.08', save: '27%' },
+    // Round amounts shown without cents (Pro yearly 190, Karriere+ yearly 349);
+    // the small monthly prices (19.90 / 39.90) keep their rappen.
+    // Savings vs. monthly: 190 / (19.90×12) = 20.4% → 20%, 349 / (39.90×12) = 27.1% → 27%.
+    pro:      { monthly: '19.90', yearly: '190', save: '20%' },
+    ultimate: { monthly: '39.90', yearly: '349', save: '27%' },
   };
   const prices = billingCycle === 'yearly'
     ? { gratis: '0', pro: planPricing.pro.yearly, ultimate: planPricing.ultimate.yearly }
@@ -3713,6 +3714,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Monatlich",
       pricing_yearly: "Jährlich",
       pricing_save: "2 Monate gratis",
+      plan_free_subtitle: "Zum Kennenlernen — ohne Verpflichtung",
+      plan_pro_subtitle: "Für Studierende, Berufseinsteiger und Gelegenheitsbewerber",
+      plan_ultimate_subtitle: "Für aktive Stellensuchende und Karrierewechsler",
       pricing_gratis_desc: "Kostenlos loslegen, ohne Kreditkarte.",
       pricing_pro_desc: "Der Standard für ambitionierte Bewerber.",
       pricing_ultimate_desc: "Maximale Power für deine Karriere.",
@@ -4333,6 +4337,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Mensuel",
       pricing_yearly: "Annuel",
       pricing_save: "2 mois gratuits",
+      plan_free_subtitle: "Pour découvrir — sans engagement",
+      plan_pro_subtitle: "Pour étudiants, débutants et candidats occasionnels",
+      plan_ultimate_subtitle: "Pour les candidats actifs et reconversions de carrière",
       pricing_gratis_desc: "Commencez gratuitement, sans carte de crédit.",
       pricing_pro_desc: "Le standard pour les candidats ambitieux.",
       pricing_ultimate_desc: "Puissance maximale pour votre carrière.",
@@ -4847,6 +4854,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Mensile",
       pricing_yearly: "Annuale",
       pricing_save: "2 mesi gratis",
+      plan_free_subtitle: "Per conoscere la piattaforma — senza impegno",
+      plan_pro_subtitle: "Per studenti, neolaureati e candidati occasionali",
+      plan_ultimate_subtitle: "Per candidati attivi e cambi di carriera",
       pricing_gratis_desc: "Inizia gratuitamente, senza carta di credito.",
       pricing_pro_desc: "Lo standard per i candidati ambiziosi.",
       pricing_ultimate_desc: "Massima potenza per la tua carriera.",
@@ -5361,6 +5371,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_monthly: "Monthly",
       pricing_yearly: "Yearly",
       pricing_save: "2 months free",
+      plan_free_subtitle: "Try Stellify — no commitment",
+      plan_pro_subtitle: "For students, early-career and occasional applicants",
+      plan_ultimate_subtitle: "For active job seekers and career changers",
       pricing_gratis_desc: "Start for free, no credit card required.",
       pricing_pro_desc: "The standard for ambitious candidates.",
       pricing_ultimate_desc: "Maximum power for your career.",
@@ -8156,10 +8169,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="relative mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Gratis</span>
                 <div className="flex items-baseline gap-1 mt-4">
-                  <span className="text-4xl font-serif">CHF 0.00</span>
+                  <span className="text-4xl font-serif">CHF 0</span>
                   <span className="text-white/70 text-sm">/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                 </div>
-                <p className="text-xs text-white/70 mt-2 font-light">{t.pricing_gratis_desc}</p>
+                <p className="text-xs text-white/70 mt-2 font-light">{t.plan_free_subtitle}</p>
               </div>
               <ul className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_free_f.map((f: string, i: number) => (
@@ -8186,6 +8199,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               <div className="relative mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/70">Pro</span>
+                <p className="text-xs text-white/60 mt-2 font-light leading-relaxed">{t.plan_pro_subtitle}</p>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif text-white">CHF {prices.pro}</span>
                   <span className="text-white/70 text-sm">/{billingCycle === 'yearly' ? (language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year') : (language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.')}</span>
@@ -8193,7 +8207,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {billingCycle === 'yearly' && (
                   <div className="mt-2 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
                     <span className="text-white text-xs font-semibold">−{planPricing.pro.save}</span>
-                    <span className="text-white/70 text-xs">· ≈ CHF {planPricing.pro.yearlyPerMo}/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                   </div>
                 )}
               </div>
@@ -8232,6 +8245,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
               <div className="relative mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6FCF97]">Karriere+</span>
+                <p className="text-xs text-white/70 mt-2 font-light leading-relaxed">{t.plan_ultimate_subtitle}</p>
                 <div className="flex items-baseline gap-1 mt-4">
                   <span className="text-4xl font-serif text-white">CHF {prices.ultimate}</span>
                   <span className="text-white/70 text-sm">/{billingCycle === 'yearly' ? (language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year') : (language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.')}</span>
@@ -8239,7 +8253,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {billingCycle === 'yearly' && (
                   <div className="mt-2 inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full">
                     <span className="text-white text-xs font-semibold">−{planPricing.ultimate.save}</span>
-                    <span className="text-white/70 text-xs">· ≈ CHF {planPricing.ultimate.yearlyPerMo}/{language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.'}</span>
                   </div>
                 )}
               </div>
