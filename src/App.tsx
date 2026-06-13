@@ -6418,22 +6418,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 </div>
                               </>
                             ) : (
-                              /* Free User Usage */
+                              /* Free User Usage — one canonical "Tool-Nutzung" counter
+                                 (freeGenerationsUsed and toolUses are incremented in
+                                 lockstep; showing both was confusing on the live tile). */
                               <div className="space-y-4">
-                                {/* Chat Usage */}
-                                <div className="space-y-1">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_chat_usage}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.freeGenerationsUsed || 0} / 3</span>
-                                  </div>
-                                  <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(100, Math.round(((user.freeGenerationsUsed || 0) / 3) * 100))}%` }}
-                                    />
-                                  </div>
-                                </div>
-
                                 {/* Tool Usage */}
                                 <div className="space-y-1">
                                   <div className="flex justify-between items-center">
