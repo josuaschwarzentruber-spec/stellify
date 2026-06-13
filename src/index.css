@@ -49,3 +49,19 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 66, 37, 0.2);
 }
+
+/* Tracker kanban horizontal scroll — discreet bottom bar that doesn't compete
+   with the cards themselves. Only visible while the columns overflow. */
+.tracker-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.tracker-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tracker-scroll::-webkit-scrollbar-thumb {
+  background: rgba(0, 66, 37, 0.12);
+  border-radius: 3px;
+}
+.tracker-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 66, 37, 0.25);
+}
