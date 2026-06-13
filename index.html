@@ -360,9 +360,13 @@
       let state      = 'intro';
       let stateFrame = 0;
       let stopped    = false;
-      const INTRO_F   = isReturnVisit ? 12 : (isLowPower ? 50 : 90);
-      const OUTRO_F   = isReturnVisit ? 14 : (isLowPower ? 30 : 55);
-      const MINIMUM_MS = isReturnVisit ? 250 : (isLowPower ? 1800 : 4000);
+      // Splash timing
+      //  first visit          → cinematic full intro (~5s) for brand impact
+      //  low-power devices    → shorter so weak laptops/phones feel snappy
+      //  return visit (back from Stripe etc.) → near-instant 0.25s fade
+      const INTRO_F   = isReturnVisit ? 12 : (isLowPower ? 50 : 110);
+      const OUTRO_F   = isReturnVisit ? 14 : (isLowPower ? 30 : 60);
+      const MINIMUM_MS = isReturnVisit ? 250 : (isLowPower ? 2200 : 5000);
       const startTime  = Date.now();
       let   readyComplete = false;
       let   readyCalled   = false;
