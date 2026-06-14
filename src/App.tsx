@@ -50,7 +50,6 @@ import {
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { searchData, SearchItem } from './data/searchData';
-import sampleJobs from './data/sampleJobs.json';
 
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -979,18 +978,6 @@ function StellifyApp() {
   const [toolStep, setToolStep] = useState(0); // For multi-step tools like Interview Sim
   const [toolHistory, setToolHistory] = useState<any[]>([]);
   
-  const [selectedJob, setSelectedJob] = useState<any | null>(null);
-  const [isJobModalOpen, setIsJobModalOpen] = useState(false);
-  const [jobFilters, setJobFilters] = useState({ keyword: '', location: '', industry: '' });
-
-  const handleJobClick = (jobId: string) => {
-    const job = sampleJobs.find(j => j.id === jobId);
-    if (job) {
-      setSelectedJob(job);
-      setIsJobModalOpen(true);
-    }
-  };
-
   const getAuthToken = async (): Promise<string | null> => {
     try {
       const currentUser = auth.currentUser;
@@ -1005,257 +992,6 @@ function StellifyApp() {
       ...options,
       headers: { ...((options.headers as Record<string, string>) || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     });
-  };
-
-  // --- JOB BOARD COMPONENT ---
-  const JobBoard = () => {
-    const [liveJobs, setLiveJobs] = useState<any[] | null>(null);
-    const [isSearching, setIsSearching] = useState(false);
-    const [isLiveResult, setIsLiveResult] = useState(false);
-    const [liveSource, setLiveSource] = useState<'adzuna' | null>(null);
-    const [liveTotal, setLiveTotal] = useState<number | null>(null);
-
-    const localFiltered = (sampleJobs as any[]).filter(job => {
-      const kw = jobFilters.keyword.toLowerCase();
-      const loc = jobFilters.location.toLowerCase();
-      const ind = jobFilters.industry.toLowerCase();
-      const jobDesc = ((language === 'EN' && job.description_en) || (language === 'FR' && job.description_fr) || (language === 'IT' && job.description_it) || job.description || '').toLowerCase();
-      return (!kw || job.title.toLowerCase().includes(kw) || jobDesc.includes(kw) || job.ats_keywords?.some((k: string) => k.toLowerCase().includes(kw)))
-        && (!loc || job.location.toLowerCase().includes(loc))
-        && (!ind || job.category.toLowerCase().includes(ind));
-    });
-
-    const displayJobs = liveJobs !== null ? liveJobs : localFiltered;
-
-    const handleLiveSearch = async () => {
-      setIsSearching(true);
-      setIsLiveResult(false);
-      try {
-        const params = new URLSearchParams();
-        if (jobFilters.keyword) params.set('keyword', jobFilters.keyword);
-        if (jobFilters.location) params.set('location', jobFilters.location);
-        if (jobFilters.industry) params.set('category', jobFilters.industry);
-        const token = await getAuthToken();
-        const res = await fetch(`/api/jobs?${params}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-        const data = await res.json();
-        if (data.jobs && data.jobs.length > 0) {
-          setLiveJobs(data.jobs);
-          setIsLiveResult(true);
-          setLiveSource(data.source || null);
-          setLiveTotal(data.total || data.jobs.length);
-        } else {
-          setLiveJobs([]);
-        }
-      } catch {
-        setLiveJobs(null);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const handleReset = () => {
-      setLiveJobs(null);
-      setIsLiveResult(false);
-      setLiveSource(null);
-      setLiveTotal(null);
-      setJobFilters({ keyword: '', location: '', industry: '' });
-    };
-
-    const handleOpenJob = (url: string, job?: any) => {
-      if (url && url !== '#' && url.startsWith('http')) {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      } else if (job) {
-        const query = encodeURIComponent(`${job.title} ${job.company}`);
-        const loc = encodeURIComponent('Schweiz');
-        window.open(`https://ch.indeed.com/jobs?q=${query}&l=${loc}`, '_blank', 'noopener,noreferrer');
-      }
-    };
-
-    return (
-      <div className="space-y-8">
-        {/* Search bar */}
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_keyword}</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94]" size={14} />
-              <input
-                type="text"
-                placeholder={t.search_placeholder}
-                className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 pl-10 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
-                value={jobFilters.keyword}
-                onChange={(e) => { setJobFilters({ ...jobFilters, keyword: e.target.value }); setLiveJobs(null); }}
-                onKeyDown={(e) => e.key === 'Enter' && handleLiveSearch()}
-              />
-            </div>
-          </div>
-          <div className="w-full md:w-44 space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_location}</label>
-            <input
-              type="text"
-              placeholder={language === 'FR' ? 'p.ex. Zurich' : language === 'IT' ? 'es. Zurigo' : language === 'EN' ? 'e.g. Zurich' : 'z.B. Zürich'}
-              className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
-              value={jobFilters.location}
-              onChange={(e) => { setJobFilters({ ...jobFilters, location: e.target.value }); setLiveJobs(null); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleLiveSearch()}
-            />
-          </div>
-          <div className="w-full md:w-44 space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_industry}</label>
-            <select
-              className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
-              value={jobFilters.industry}
-              onChange={(e) => { setJobFilters({ ...jobFilters, industry: e.target.value }); setLiveJobs(null); }}
-            >
-              <option value="">{t.filter_all}</option>
-              <option value="IT">IT</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Finance">{language === 'FR' ? 'Finance' : language === 'IT' ? 'Finanza' : language === 'EN' ? 'Finance' : 'Finanzen'}</option>
-              <option value="Banking">{language === 'FR' ? 'Banque' : language === 'IT' ? 'Banca' : language === 'EN' ? 'Banking' : 'Banking'}</option>
-              <option value="Engineering">{language === 'FR' ? 'Ingénierie' : language === 'IT' ? 'Ingegneria' : language === 'EN' ? 'Engineering' : 'Ingenieurwesen'}</option>
-              <option value="HR">{language === 'FR' ? 'RH' : language === 'IT' ? 'HR' : language === 'EN' ? 'HR' : 'HR'}</option>
-              <option value="Healthcare">{language === 'FR' ? 'Santé' : language === 'IT' ? 'Sanità' : language === 'EN' ? 'Healthcare' : 'Gesundheitswesen'}</option>
-              <option value="Pharma">{language === 'FR' ? 'Pharma' : language === 'IT' ? 'Farmaceutica' : language === 'EN' ? 'Pharma' : 'Pharma'}</option>
-              <option value="Logistik">{language === 'FR' ? 'Logistique' : language === 'IT' ? 'Logistica' : language === 'EN' ? 'Logistics' : 'Logistik'}</option>
-              <option value="Consulting">{language === 'FR' ? 'Conseil' : language === 'IT' ? 'Consulenza' : language === 'EN' ? 'Consulting' : 'Beratung'}</option>
-              <option value="Legal">{language === 'FR' ? 'Droit' : language === 'IT' ? 'Diritto' : language === 'EN' ? 'Legal' : 'Recht'}</option>
-              <option value="Education">{language === 'FR' ? 'Éducation' : language === 'IT' ? 'Istruzione' : language === 'EN' ? 'Education' : 'Bildung'}</option>
-              <option value="RealEstate">{language === 'FR' ? 'Immobilier' : language === 'IT' ? 'Immobiliare' : language === 'EN' ? 'Real Estate' : 'Immobilien'}</option>
-              <option value="Retail">{language === 'FR' ? 'Commerce' : language === 'IT' ? 'Commercio' : language === 'EN' ? 'Retail' : 'Handel'}</option>
-              <option value="Hospitality">{language === 'FR' ? 'Hôtellerie' : language === 'IT' ? 'Ospitalità' : language === 'EN' ? 'Hospitality' : 'Gastgewerbe'}</option>
-              <option value="Media">{language === 'FR' ? 'Médias' : language === 'IT' ? 'Media' : language === 'EN' ? 'Media' : 'Medien'}</option>
-              <option value="Energy">{language === 'FR' ? 'Énergie' : language === 'IT' ? 'Energia' : language === 'EN' ? 'Energy' : 'Energie'}</option>
-              <option value="PublicSector">{language === 'FR' ? 'Secteur public' : language === 'IT' ? 'Settore pubblico' : language === 'EN' ? 'Public Sector' : 'Öffentlicher Sektor'}</option>
-              <option value="Transport">{language === 'FR' ? 'Transport' : language === 'IT' ? 'Trasporti' : language === 'EN' ? 'Transport' : 'Transport'}</option>
-              <option value="NonProfit">{language === 'FR' ? 'ONG / Non-profit' : language === 'IT' ? 'ONG / Non-profit' : language === 'EN' ? 'NGO / Non-Profit' : 'NGO / Non-Profit'}</option>
-            </select>
-          </div>
-          {/* Live Search button */}
-          <button
-            onClick={handleLiveSearch}
-            disabled={isSearching}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#003318] transition-colors disabled:opacity-60 whitespace-nowrap"
-          >
-            {isSearching ? (
-              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> {language === 'FR' ? 'Recherche...' : language === 'IT' ? 'Ricerca...' : language === 'EN' ? 'Searching...' : 'Suche...'}</>
-            ) : (
-              <><Search size={13} /> {language === 'FR' ? 'Recherche IA' : language === 'IT' ? 'Ricerca IA' : language === 'EN' ? 'AI Search' : 'KI-Suche'}</>
-            )}
-          </button>
-          {isLiveResult && (
-            <button onClick={handleReset} className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors whitespace-nowrap">
-              {language === 'FR' ? 'Réinitialiser' : language === 'IT' ? 'Reimposta' : language === 'EN' ? 'Reset' : 'Zurücksetzen'}
-            </button>
-          )}
-        </div>
-
-        {/* Live result badge */}
-        {isLiveResult && (
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
-              Live · {displayJobs.length} {language === 'FR' ? 'offres affichées' : language === 'IT' ? 'offerte mostrate' : language === 'EN' ? 'jobs shown' : 'Stellen angezeigt'}{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
-            </div>
-            {liveSource === 'adzuna' && (
-              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                via Adzuna API
-              </span>
-            )}
-          </div>
-        )}
-        {!isLiveResult && (
-          <p className="text-[11px] text-[#9A9A94] dark:text-[#5C5C58]">
-            {displayJobs.length} {language === 'FR' ? <>offres exemples · Cliquez sur <strong>Recherche IA</strong> pour des résultats en direct</> : language === 'IT' ? <>offerte esempio · Clicca su <strong>Ricerca IA</strong> per risultati live</> : language === 'EN' ? <>sample jobs · Click <strong>AI Search</strong> for live results</> : <>Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse</>}
-          </p>
-        )}
-
-        {/* Job cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <AnimatePresence mode="popLayout">
-            {displayJobs.map((job, i) => (
-              <motion.div
-                key={job.id || i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: i * 0.04 }}
-                whileHover={{ y: -3 }}
-                onClick={() => handleOpenJob(job.url, job)}
-                className="bg-white dark:bg-[#2A2A26] p-6 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="space-y-1 flex-1 pr-4">
-                    <h3 className="text-lg font-serif group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors dark:text-[#FAFAF8] leading-snug">{job.title}</h3>
-                    <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{job.company}</p>
-                  </div>
-                  <div className="px-2 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 text-[#004225] dark:text-[#00A854] text-[9px] font-bold uppercase tracking-widest shrink-0">
-                    {job.category}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-xs text-[#6B6B66] dark:text-[#9A9A94] mb-4 flex-wrap">
-                  <div className="flex items-center gap-1">
-                    <MapPin size={12} />
-                    {job.location}
-                  </div>
-                  {job.salary_min && (
-                    <div className="flex items-center gap-1 text-[#004225] dark:text-[#00A854] font-medium">
-                      CHF {Math.round(job.salary_min / 1000)}k{job.salary_max ? `–${Math.round(job.salary_max / 1000)}k` : '+'}
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">{(language === 'EN' && job.description_en) || (language === 'FR' && job.description_fr) || (language === 'IT' && job.description_it) || job.description}</p>
-                <div className="flex justify-between items-center">
-                  <div className="flex gap-2 flex-wrap">
-                    {job.ats_keywords?.slice(0, 3).map((kw: string) => (
-                      <span key={kw} className="text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 bg-black/5 dark:bg-white/5 text-[#9A9A94] dark:text-[#5C5C58]">{kw}</span>
-                    ))}
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    {t.tool_open} <ArrowRight size={12} />
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {displayJobs.length === 0 && !isSearching && (
-          <div className="py-24 text-center space-y-4">
-            <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto text-[#9A9A94]">
-              <Search size={32} />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-xl font-serif dark:text-[#FAFAF8]">{t.search_no_results}</h3>
-              <p className="text-sm text-[#9A9A94] font-light">{t.search_no_results_desc}</p>
-            </div>
-          </div>
-        )}
-
-        {/* External links */}
-        <div className="pt-4 border-t border-black/5 dark:border-white/5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">{language === 'FR' ? 'Rechercher d\'autres postes directement' : language === 'IT' ? 'Cerca altri posti direttamente' : language === 'EN' ? 'Search more jobs directly' : 'Weitere Stellen direkt suchen'}</p>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { label: 'Jobs.ch', url: 'https://www.jobs.ch/de/vakanzen/' },
-              { label: 'Indeed CH', url: 'https://ch.indeed.com/' },
-              { label: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs/search/?location=Switzerland' },
-              { label: 'Jobup.ch', url: 'https://www.jobup.ch/de/jobs/' },
-              { label: 'Yousty.ch', url: 'https://www.yousty.ch/de-CH/stellen' },
-            ].map(({ label, url }) => (
-              <a
-                key={label}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 border border-black/10 dark:border-white/10 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] hover:border-[#004225] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors flex items-center gap-1"
-              >
-                {label} <ArrowRight size={10} />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
   };
 
   // Search State
@@ -1897,18 +1633,36 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         updateDoc(doc(db, 'users', user.id), { cv_context: text }).catch(e => handleDbError(e, 'db', `users/${user.id}`)),
       ]);
 
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe deinen Lebenslauf "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
-      }]);
-      
-      if (!isStellaOpen) setIsStellaOpen(true);
+      if (STELLA_CHAT_ENABLED) {
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe deinen Lebenslauf "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
+        }]);
+        if (!isStellaOpen) setIsStellaOpen(true);
+      } else {
+        showToast(
+          language === 'FR' ? `CV "${file.name}" importé avec succès`
+            : language === 'IT' ? `CV "${file.name}" importato con successo`
+            : language === 'EN' ? `CV "${file.name}" imported successfully`
+            : `Lebenslauf "${file.name}" erfolgreich importiert`
+        );
+      }
     } catch (error) {
       console.error("PDF extraction error:", error);
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines Lebenslaufs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
-      }]);
+      if (STELLA_CHAT_ENABLED) {
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines Lebenslaufs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
+        }]);
+      } else {
+        showToast(
+          language === 'FR' ? `Impossible de lire "${file.name}". Essaie un autre fichier.`
+            : language === 'IT' ? `Impossibile leggere "${file.name}". Prova un altro file.`
+            : language === 'EN' ? `Couldn't read "${file.name}". Please try a different file.`
+            : `"${file.name}" konnte nicht gelesen werden. Bitte versuche eine andere Datei.`,
+          'error'
+        );
+      }
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -2760,50 +2514,6 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             }
             Antworte NUR mit dem JSON-Objekt.
           `;
-          break;
-        case 'job-search':
-          const keyword = (toolInput.keyword || '').toLowerCase();
-          const loc = (toolInput.location || '').toLowerCase();
-          const ind = (toolInput.industry || '').toLowerCase();
-          
-          const filteredJobs = (sampleJobs as any[]).filter(job => {
-            const matchesKeyword = !keyword || 
-              job.title.toLowerCase().includes(keyword) || 
-              job.description.toLowerCase().includes(keyword) ||
-              (job.ats_keywords && job.ats_keywords.some((k: string) => k.toLowerCase().includes(keyword)));
-            const matchesLocation = !loc || job.location.toLowerCase().includes(loc);
-            const matchesIndustry = !ind || job.category.toLowerCase().includes(ind);
-            return matchesKeyword && matchesLocation && matchesIndustry;
-          });
-
-          if (filteredJobs.length > 0) {
-            const jobList = filteredJobs.map(job => 
-              `### ${job.title}\n**Firma:** ${job.company}\n**Standort:** ${job.location}\n**Bereich:** ${job.category}\n\n${job.description}\n\n**Anforderungen:** ${job.requirements}\n\n---`
-            ).join('\n\n');
-            
-            prompt = `
-              Der Nutzer sucht nach Jobs in der Schweiz.
-              Hier sind die gefundenen Stellen aus unserer Datenbank:
-              
-              ${jobList}
-              
-              HANDLUNGSANWEISUNG:
-              1. Präsentiere diese Stellen dem Nutzer auf ansprechende Weise.
-              2. Analysiere kurz, welche dieser Stellen am besten zum Profil des Nutzers passt (CV: ${cvContext || 'Kein CV vorhanden'}).
-              3. Gib Tipps für die Bewerbung bei diesen spezifischen Firmen.
-              4. Falls weniger als 3 Stellen gefunden wurden, schlage vor, die Suchkriterien zu erweitern.
-            `;
-          } else {
-            prompt = `
-              Der Nutzer sucht nach Jobs in der Schweiz (Keyword: "${keyword}", Ort: "${loc}", Branche: "${ind}").
-              Leider wurden in unserer Datenbank keine exakten Treffer gefunden.
-              
-              HANDLUNGSANWEISUNG:
-              1. Informiere den Nutzer höflich, dass aktuell keine exakten Treffer in der Datenbank vorliegen.
-              2. Gib allgemeine Tipps für die Jobsuche in der Schweiz für diesen Bereich ("${ind}") und diesen Ort ("${loc}").
-              3. Nenne 3-4 grosse Arbeitgeber in dieser Region/Branche, bei denen der Nutzer direkt suchen könnte.
-            `;
-          }
           break;
         case 'ats-sim':
           prompt = `
@@ -3660,7 +3370,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "Keine Ergebnisse gefunden",
       search_no_results_desc: "Versuche es mit anderen Suchbegriffen oder Kategorien.",
       search_close: "ESC zum Schliessen",
-      search_stella: "ENTER für Stella-Beratung",
       job_board_title: "Job-Börse",
       job_board_desc: "Entdecke aktuelle Stellenangebote, die perfekt zu deinem Profil passen.",
       filter_all: "Alle Branchen",
@@ -3989,7 +3698,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "verbleibend",
       search_close_label: "Schliessen",
       search_open_selection: "Auswahl öffnen",
-      search_stella_advice: "Stella-Beratung",
       premium_analysis_desc: "Tiefgehende Prüfung nach Schweizer Standards",
       salary_median_label: "Geschätzter Medianlohn (Brutto/Jahr)",
       salary_important_notice: "Wichtiger Hinweis",
@@ -4283,7 +3991,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "Aucun résultat trouvé",
       search_no_results_desc: "Essayez d'autres termes de recherche ou catégories.",
       search_close: "ESC pour fermer",
-      search_stella: "ENTER pour le conseil Stella",
       job_board_title: "Bourse à l'emploi",
       job_board_desc: "Découvrez les offres d'emploi actuelles qui correspondent parfaitement à votre profil.",
       filter_all: "Tous les secteurs",
@@ -4612,7 +4319,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "restants",
       search_close_label: "Fermer",
       search_open_selection: "Ouvrir la sélection",
-      search_stella_advice: "Conseil Stella",
       premium_analysis_desc: "Examen approfondi selon les normes suisses",
       salary_median_label: "Salaire médian estimé (Brut/An)",
       salary_important_notice: "Remarque importante",
@@ -4800,7 +4506,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "Nessun risultato trovato",
       search_no_results_desc: "Prova altri termini di ricerca o categorie.",
       search_close: "ESC per chiudere",
-      search_stella: "ENTER per la consulenza Stella",
       job_board_title: "Bacheca del lavoro",
       job_board_desc: "Scopri le attuali offerte di lavoro che corrispondono perfettamente al tuo profilo.",
       filter_all: "Tutti i settori",
@@ -5129,7 +4834,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "rimanenti",
       search_close_label: "Chiudi",
       search_open_selection: "Apri selezione",
-      search_stella_advice: "Consulenza Stella",
       premium_analysis_desc: "Esame approfondito secondo gli standard svizzeri",
       salary_median_label: "Stipendio mediano stimato (Lordo/Anno)",
       salary_important_notice: "Nota importante",
@@ -5317,7 +5021,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "No results found",
       search_no_results_desc: "Try other search terms or categories.",
       search_close: "ESC to close",
-      search_stella: "ENTER for Stella advice",
       job_board_title: "Job Board",
       job_board_desc: "Discover current job openings that perfectly match your profile.",
       filter_all: "All Industries",
@@ -5646,7 +5349,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "remaining",
       search_close_label: "Close",
       search_open_selection: "Open Selection",
-      search_stella_advice: "Stella Advice",
       premium_analysis_desc: "Deep review according to Swiss standards",
       salary_median_label: "Estimated Median Salary (Gross/Year)",
       salary_important_notice: "Important Notice",
@@ -7718,52 +7420,157 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- MARKETING SECTIONS (hidden on legal pages) --- */}
       {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
-      {/* --- HOW IT WORKS --- */}
-      <section id="how" className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+      {/* --- TOOLS GRID --- */}
+      <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-              {t.how_badge}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
+            <div className="flex items-start gap-5">
+              <span className="text-5xl lg:text-6xl font-serif text-[#004225]/15 dark:text-[#00A854]/20 leading-none select-none">01</span>
+              <div>
+                <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-2">{t.tools_badge}</p>
+                <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
+              </div>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.how_it_works}</h2>
-            <p className="text-[#4A4A45] dark:text-[#9A9A94] font-light mt-4 max-w-2xl mx-auto">
-              {t.how_desc}
-            </p>
           </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-80px' }}
-            variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
-            className="grid md:grid-cols-3 gap-12"
-          >
-            {[
-              { step: '01', title: t.how_1_t, desc: t.how_1_d },
-              { step: '02', title: t.how_2_t, desc: t.how_2_d },
-              { step: '03', title: t.how_3_t, desc: t.how_3_d }
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                variants={{ hidden: { opacity: 0, y: 32 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] } } }}
-                whileHover={{ y: -4 }}
-                className="relative p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 group hover:border-[#004225]/30 dark:hover:border-[#004225]/40 hover:shadow-lg transition-all"
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tools.map((tool) => (
+              <motion.div 
+                key={tool.id}
+                whileHover={{ y: -5 }}
+                onClick={() => handleToolClick(tool.id)}
+                className="p-6 md:p-8 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#004225]/40 transition-all group cursor-pointer shadow-sm"
               >
-                <div className="text-5xl font-serif text-[#004225]/10 dark:text-[#004225]/20 mb-6 group-hover:text-[#004225]/30 dark:group-hover:text-[#004225]/40 transition-all">{item.step}</div>
-                <h3 className="text-xl font-medium mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h3>
-                <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{item.desc}</p>
+                <div className="flex justify-between items-start mb-6">
+                  <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
+                    <span className="relative z-0 flex items-center justify-center">{tool.icon}</span>
+                    {((tool.type === 'pro' && (!user?.role || user.role === 'client')) || 
+                      (tool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
+                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/10 flex items-center justify-center text-[#004225] dark:text-[#00A854] shadow-sm z-10">
+                        <Lock size={10} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
+                    {tool.type === 'ultimate' && (
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-100">Ultimate</span>
+                    )}
+                    {tool.type === 'pro' && (
+                      <span className="text-[8px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-1.5 py-0.5 border border-blue-100">Pro</span>
+                    )}
+                  </div>
+                </div>
+                <h3 className="text-lg md:text-xl font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
+                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-6 line-clamp-3">{tool.desc}</p>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleToolClick(tool.id);
+                  }}
+                  className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn"
+                >
+                  {isGeneratingApp && tool.id === 'cv-gen' ? (language === 'DE' ? 'Wird generiert...' : language === 'FR' ? 'En cours...' : language === 'IT' ? 'Generazione...' : 'Generating...') : t.tool_open}
+                  <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                </button>
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
+      {/* --- TRACKER SHOWCASE --- */}
+      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+              {language === 'FR' ? 'Inclus · Gratuit' : language === 'IT' ? 'Incluso · Gratis' : language === 'EN' ? 'Included · Free' : 'Inklusive · Gratis'}
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
+              {language === 'FR' ? 'Garde toutes tes candidatures sous contrôle.'
+                : language === 'IT' ? 'Tieni tutte le candidature sotto controllo.'
+                : language === 'EN' ? 'Every application, in one clear view.'
+                : 'Alle Bewerbungen im Blick. Immer.'}
+            </h2>
+            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-8 max-w-lg">
+              {language === 'FR'
+                ? 'Un Kanban simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes, ne rate plus jamais un suivi. Disponible dans chaque plan — y compris le plan Gratuit.'
+                : language === 'IT'
+                ? 'Una Kanban semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note, non perdere mai un follow-up. Disponibile in ogni piano — anche in quello Gratuito.'
+                : language === 'EN'
+                ? 'A simple Kanban: Applied, Interview, Offer. Drag cards, add notes, never miss a follow-up. Available on every plan — including Free.'
+                : 'Ein einfaches Kanban: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen, nie wieder ein Follow-up verpassen. In jedem Plan dabei — auch im Gratis-Plan.'}
+            </p>
+            <button
+              onClick={() => user ? navigate('dashboard') : setIsAuthModalOpen(true)}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+            >
+              {language === 'FR' ? 'Ouvrir le tracker' : language === 'IT' ? 'Apri il tracker' : language === 'EN' ? 'Open the tracker' : 'Tracker öffnen'}
+              <ArrowRight size={14} />
+            </button>
+          </div>
 
+          {/* Mini-Kanban Preview */}
+          <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 p-5 sm:p-6 shadow-sm">
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                {
+                  label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben',
+                  count: 4,
+                  color: '#9A9A94',
+                  cards: [
+                    { company: 'Roche', title: 'Data Analyst' },
+                    { company: 'PostFinance', title: language === 'FR' ? 'UX Designer' : 'UX Designer' },
+                  ]
+                },
+                {
+                  label: language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview',
+                  count: 2,
+                  color: '#D4A852',
+                  cards: [
+                    { company: 'Swisscom', title: language === 'FR' ? 'Product Manager' : language === 'IT' ? 'Product Manager' : 'Product Manager' },
+                  ]
+                },
+                {
+                  label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot',
+                  count: 1,
+                  color: '#004225',
+                  cards: [
+                    { company: 'Nestlé', title: 'Marketing Lead', salary: 'CHF 120k' },
+                  ]
+                },
+              ].map((col, i) => (
+                <div key={i} className="space-y-2">
+                  <div className="flex items-center justify-between mb-2 px-1">
+                    <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: col.color }}>{col.label}</span>
+                    <span className="text-[9px] font-bold text-[#9A9A94]">{col.count}</span>
+                  </div>
+                  {col.cards.map((card, j) => (
+                    <div key={j} className="bg-white dark:bg-[#1A1A18] border-l-2 p-2.5 shadow-sm" style={{ borderLeftColor: col.color }}>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate">{card.company}</p>
+                      <p className="text-xs font-medium text-[#1A1A18] dark:text-[#FAFAF8] truncate mt-0.5">{card.title}</p>
+                      {(card as any).salary && (
+                        <p className="text-[10px] text-[#004225] dark:text-[#00A854] font-bold mt-1">{(card as any).salary}</p>
+                      )}
+                    </div>
+                  ))}
+                  <div className="border border-dashed border-black/10 dark:border-white/10 h-8 flex items-center justify-center">
+                    <span className="text-[#9A9A94] text-base leading-none">+</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       {/* --- WHY STELLIFY SECTION --- */}
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
-              {t.comparison_badge}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="h-px w-12 bg-[#004225]/30 dark:bg-[#FAFAF8]/20" />
+              <span className="text-[10px] font-bold tracking-[0.4em] uppercase text-[#004225] dark:text-[#FAFAF8]">{t.comparison_badge}</span>
+              <div className="h-px w-12 bg-[#004225]/30 dark:bg-[#FAFAF8]/20" />
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.comparison_title}</h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light mt-4 max-w-2xl mx-auto">{t.comparison_subtitle}</p>
@@ -7828,251 +7635,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
-
-      {/* --- DATA SECURITY SECTION --- */}
-      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/10 dark:border-[#FAFAF8]/10 rounded-full text-[#004225] dark:text-[#FAFAF8] text-[10px] font-bold tracking-widest uppercase mb-4">
-                {t.security_badge}
-              </div>
-              <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-6 text-[#1A1A18] dark:text-[#FAFAF8]">{t.security_title}</h2>
-              <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light text-lg leading-relaxed mb-8">
-                {t.security_desc}
-              </p>
-              <div className="space-y-6">
-                {[
-                  { title: t.security_item_1_t, desc: t.security_item_1_d, icon: <Globe size={20} /> },
-                  { title: t.security_item_2_t, desc: t.security_item_2_d, icon: <Lock size={20} /> },
-                  { title: t.security_item_3_t, desc: t.security_item_3_d, icon: <Shield size={20} /> }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-4">
-                    <div className="w-10 h-10 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0">
-                      {item.icon}
-                    </div>
-                    <div>
-                      <h4 className="font-medium mb-1 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h4>
-                      <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              <div className="aspect-square bg-[#004225]/5 border border-[#004225]/10 flex items-center justify-center p-12">
-                <div className="w-full h-full border border-[#004225]/20 flex flex-col items-center justify-center space-y-6 bg-white dark:bg-[#1A1A18] shadow-2xl p-8">
-                  <Shield size={64} className="text-[#004225]" />
-                  <div className="text-center space-y-2">
-                    <p className="text-xl font-serif">Swiss Data Safe</p>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">Certified Security Standards</p>
-                  </div>
-                  <div className="w-full pt-6 border-t border-black/5 grid grid-cols-3 gap-4">
-                    <div className="text-center">
-                      <p className="text-lg font-serif">256</p>
-                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">Bit AES</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-serif">CH</p>
-                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">Hosting</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-serif">SSL</p>
-                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">Secure</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* Decorative dots */}
-              <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#004225]/10 -z-10" />
-              <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-[#004225]/10 -z-10" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- EXAMPLES SECTION --- */}
-      <section className="px-6 lg:px-12 py-24 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4">{t.examples_title}</h2>
-            <p className="text-[#5C5C58] font-light max-w-2xl mx-auto">{t.examples_desc}</p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-12">
-            {[
-              {
-                title: language === 'DE' ? 'Standard-Anschreiben' : language === 'FR' ? 'Lettre de motivation standard' : language === 'IT' ? 'Lettera di candidatura standard' : 'Standard Cover Letter',
-                before: language === 'DE' ? 'Ich interessiere mich für die Stelle als Projektleiter. Ich habe viel Erfahrung und bin motiviert.' : language === 'FR' ? 'Je suis intéressé par le poste de chef de projet. J\'ai beaucoup d\'expérience et je suis motivé.' : language === 'IT' ? 'Sono interessato alla posizione di project manager. Ho molta esperienza e sono motivato.' : 'I am interested in the project manager position. I have a lot of experience and I am motivated.',
-                after: language === 'DE' ? 'Mit meiner fundierten Expertise in der Leitung komplexer Infrastrukturprojekte im Raum Zürich bringe ich die nötige Präzision und das Schweizer Qualitätsbewusstsein mit, um Ihre ambitionierten Ziele bei der [Firma] nachhaltig zu unterstützen.' : language === 'FR' ? 'Avec mon expertise approfondie dans la direction de projets d\'infrastructure complexes dans la région de Zurich, j\'apporte la précision nécessaire et la conscience de la qualité suisse pour soutenir durablement vos objectifs ambitieux chez [Entreprise].' : language === 'IT' ? 'Con la mia profonda esperienza nella direzione di complessi progetti infrastrutturali nell\'area di Zurigo, porto la precisione necessaria e la consapevolezza della qualità svizzera per supportare in modo sostenibile i tuoi obiettivi ambiziosi presso [Azienda].' : 'With my deep expertise in leading complex infrastructure projects in the Zurich area, I bring the necessary precision and Swiss quality awareness to sustainably support your ambitious goals at [Company].',
-                tag: 'Precision'
-              },
-              {
-                title: language === 'DE' ? 'Lebenslauf-Highlight' : language === 'FR' ? 'Point fort du CV' : language === 'IT' ? 'Punto di forza del CV' : 'CV Highlight',
-                before: language === 'DE' ? 'Verantwortlich für das Team und die Budgetplanung.' : language === 'FR' ? 'Responsable de l\'équipe et de la planification budgétaire.' : language === 'IT' ? 'Responsabile del team e della pianificazione del budget.' : 'Responsible for the team and budget planning.',
-                after: language === 'DE' ? 'Strategische Führung eines interdisziplinären Teams von 12 Spezialisten; Optimierung der Budgeteffizienz um 15% durch Einführung eines Lean-Management-Prozesses nach Schweizer Standards.' : language === 'FR' ? 'Direction stratégique d\'une équipe interdisciplinaire de 12 spécialistes ; optimisation de l\'efficacité budgétaire de 15% grâce à l\'introduction d\'un processus de gestion lean selon les normes suisses.' : language === 'IT' ? 'Direzione strategica di un team interdisciplinare di 12 specialisti; ottimizzazione dell\'efficienza del budget del 15% attraverso l\'introduzione di un processo di gestione lean secondo gli standard svizzeri.' : 'Strategic leadership of an interdisciplinary team of 12 specialists; optimization of budget efficiency by 15% through the introduction of a lean management process according to Swiss standards.',
-                tag: 'Impact'
-              }
-            ].map((ex, i) => (
-              <div key={i} className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-medium">{ex.title}</h4>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] bg-[#004225]/5 px-2 py-1">{ex.tag}</span>
-                </div>
-                <div className="grid gap-4">
-                  <div className="p-6 bg-[#FDFCFB] border border-black/5 relative">
-                    <span className="absolute -top-2 -left-2 px-2 py-0.5 bg-red-500 text-white text-[8px] font-bold uppercase tracking-widest">Standard</span>
-                    <p className="text-sm text-[#9A9A94] italic">"{ex.before}"</p>
-                  </div>
-                  <div className="p-6 bg-[#004225]/5 border border-[#004225]/20 relative">
-                    <span className="absolute -top-2 -left-2 px-2 py-0.5 bg-[#004225] text-white text-[8px] font-bold uppercase tracking-widest">Stellify AI</span>
-                    <p className="text-sm text-[#004225] font-medium leading-relaxed">"{ex.after}"</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* --- SUCCESS STORIES SECTION --- */}
-      <section id="success" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.success_title}</h2>
-            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl mx-auto">{t.success_desc}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {(t.testimonials as { name: string; role: string; city: string; quote: string }[]).map((story, i) => (
-              <motion.div 
-                key={i}
-                whileHover={{ y: -5 }}
-                className="p-8 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-xl rounded-2xl space-y-6 relative overflow-hidden group"
-              >
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <Quote size={48} />
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <Avatar name={story.name} color={i === 0 ? 'bg-blue-500' : i === 1 ? 'bg-rose-500' : 'bg-amber-500'} src={[
-                      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200',
-                      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=200',
-                      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200'
-                    ][i]} />
-                    <div className="absolute -bottom-1 -right-1 bg-[#004225] text-white rounded-full p-0.5 border-2 border-white">
-                      <CheckCircle2 size={10} />
-                    </div>
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{story.name}</h4>
-                    <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{story.role}</p>
-                    <p className="text-[9px] text-[#004225] font-bold uppercase tracking-widest">{story.city}</p>
-                  </div>
-                </div>
-                <p className="text-sm text-[#5C5C58] font-light italic leading-relaxed relative z-10">"{story.quote}"</p>
-                <div className="flex items-center justify-between pt-4 border-t border-black/5">
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map(s => <Star key={s} size={12} className="text-[#004225]" fill="currentColor" />)}
-                  </div>
-                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-[#004225]/40">{t.testimonial_verified}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* --- TOOLS GRID --- */}
-      <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-16">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-                {t.tools_badge}
-              </div>
-              <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
-            </div>
-            <button
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hidden md:block text-sm font-medium text-[#004225] dark:text-[#00A854] border-b border-[#004225] dark:border-[#00A854] pb-1 hover:opacity-70 transition-opacity"
-            >{t.tools_view_all}</button>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tools.map((tool) => (
-              <motion.div 
-                key={tool.id}
-                whileHover={{ y: -5 }}
-                onClick={() => handleToolClick(tool.id)}
-                className="p-6 md:p-8 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#004225]/40 transition-all group cursor-pointer shadow-sm"
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
-                    <span className="relative z-0 flex items-center justify-center">{tool.icon}</span>
-                    {((tool.type === 'pro' && (!user?.role || user.role === 'client')) || 
-                      (tool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/10 flex items-center justify-center text-[#004225] dark:text-[#00A854] shadow-sm z-10">
-                        <Lock size={10} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
-                    {tool.type === 'ultimate' && (
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-100">Ultimate</span>
-                    )}
-                    {tool.type === 'pro' && (
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-1.5 py-0.5 border border-blue-100">Pro</span>
-                    )}
-                  </div>
-                </div>
-                <h3 className="text-lg md:text-xl font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
-                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-6 line-clamp-3">{tool.desc}</p>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToolClick(tool.id);
-                  }}
-                  className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn"
-                >
-                  {isGeneratingApp && tool.id === 'cv-gen' ? (language === 'DE' ? 'Wird generiert...' : language === 'FR' ? 'En cours...' : language === 'IT' ? 'Generazione...' : 'Generating...') : t.tool_open}
-                  <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* --- MARKET POTENTIAL --- */}
-      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-              {t.market_badge}
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.market_title}</h2>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { title: t.market_1_t, desc: t.market_1_d, icon: <TrendingUp size={22} /> },
-              { title: t.market_2_t, desc: t.market_2_d, icon: <Activity size={22} /> },
-              { title: t.market_3_t, desc: t.market_3_d, icon: <Cpu size={22} /> },
-              { title: t.market_4_t, desc: t.market_4_d, icon: <Shield size={22} /> }
-            ].map((item, i) => (
-              <div key={i} className="p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 transition-colors">
-                <div className="w-10 h-10 bg-[#004225]/8 dark:bg-[#004225]/20 flex items-center justify-center text-[#004225] dark:text-[#00A854] mb-6">
-                  {item.icon}
-                </div>
-                <h4 className="font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</h4>
-                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* --- PRICING SECTION --- */}
       <section id="pricing" className="px-6 lg:px-12 py-24 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
@@ -8336,270 +7898,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
-
-      {/* --- PROMO SPOT SECTION --- */}
-      <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white overflow-hidden relative">
-        <div className="absolute inset-0">
-          {/* 1. Base Mesh Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-[#004225] via-[#005a32] to-[#002e1a]" />
-          
-          {/* 2. Noise Texture */}
-          <div className="absolute inset-0 opacity-[0.04] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")' }} />
-          
-          {/* 3. Technical Grid Pattern */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none" 
-               style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-          
-          {/* 4. Animated Glows */}
-          <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 -left-20 w-[500px] h-[500px] bg-[#FDFCFB] rounded-full blur-[140px]" 
-          />
-          <motion.div 
-            animate={{ scale: [1.2, 1, 1.2], opacity: [0.05, 0.15, 0.05] }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-1/4 -right-20 w-[600px] h-[600px] bg-[#FDFCFB] rounded-full blur-[160px]" 
-          />
-
-          {/* 5. Scanline Effect */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <motion.div 
-              animate={{ translateY: ['-100%', '100%'] }}
-              transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-              className="w-full h-1/2 bg-gradient-to-b from-transparent via-white/5 to-transparent opacity-20"
-            />
-          </div>
-
-          {/* 6. Artistic Career Journey Sketch - Professional Blueprint Style */}
-          <div className="absolute inset-0 opacity-30 pointer-events-none overflow-hidden">
-            <svg width="100%" height="100%" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <filter id="sketchy-ultra" x="-20%" y="-20%" width="140%" height="140%">
-                  <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="4" result="noise" />
-                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" />
-                </filter>
-                <radialGradient id="fade-mask-pro" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
-                  <stop offset="0%" stopColor="white" stopOpacity="1" />
-                  <stop offset="60%" stopColor="white" stopOpacity="0.5" />
-                  <stop offset="100%" stopColor="white" stopOpacity="0" />
-                </radialGradient>
-                <mask id="sketch-mask-pro">
-                  <rect width="1000" height="1000" fill="url(#fade-mask-pro)" />
-                </mask>
-              </defs>
-              <g mask="url(#sketch-mask-pro)" filter="url(#sketchy-ultra)" stroke="white" fill="none" strokeLinecap="round">
-                {/* Main Career Trajectory - Elegant Curves */}
-                <g strokeWidth="3" opacity="0.7">
-                  <path d="M100,850 C250,800 350,850 500,700 S650,300 900,150" strokeDasharray="25,15" />
-                  <path d="M105,855 C255,805 355,855 505,705 S655,305 905,155" opacity="0.2" strokeWidth="1" />
-                </g>
-
-                {/* Nodes / Milestones - Geometric & Professional */}
-                <g strokeWidth="2.5">
-                  <circle cx="100" cy="850" r="16" />
-                  <circle cx="100" cy="850" r="6" fill="white" />
-                  
-                  <rect x="490" y="690" width="24" height="24" transform="rotate(45 500 700)" />
-                  <circle cx="650" cy="450" r="12" />
-                  
-                  <path d="M885,135 L915,150 L885,165 Z" fill="white" />
-                  <circle cx="900" cy="150" r="40" strokeDasharray="10,10" />
-                </g>
-
-                {/* Technical Callouts / Annotations */}
-                <g opacity="0.5" strokeWidth="1.2">
-                  <path d="M100,890 L500,890" strokeDasharray="3,6" />
-                  <path d="M100,885 L100,895 M500,885 L500,895" />
-                  
-                  <path d="M940,150 L940,450" strokeDasharray="3,6" />
-                  <path d="M935,150 L945,150 M935,450 L945,450" />
-                  
-                  {/* Abstract UI Elements Sketch */}
-                  <rect x="150" y="250" width="160" height="100" rx="8" strokeDasharray="12,6" />
-                  <line x1="170" y1="275" x2="270" y2="275" />
-                  <line x1="170" y1="295" x2="240" y2="295" />
-                  <circle cx="280" cy="320" r="14" />
-                  
-                  <rect x="720" y="620" width="120" height="140" rx="6" strokeDasharray="8,16" />
-                  <path d="M735,650 L825,650 M735,675 L825,675 M735,700 L795,700" opacity="0.4" />
-                </g>
-
-                {/* Floating Particles / Data Points */}
-                {[...Array(12)].map((_, i) => (
-                  <circle 
-                    key={`p-${i}`}
-                    cx={100 + Math.random() * 800} 
-                    cy={100 + Math.random() * 800} 
-                    r={2 + Math.random() * 3} 
-                    opacity={0.3 + Math.random() * 0.4}
-                    fill="white"
-                  />
-                ))}
-              </g>
-            </svg>
-          </div>
-
-          {PROMO_VIDEO_URL && (
-            <LazyVideo
-              src={PROMO_VIDEO_URL}
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover opacity-15 mix-blend-overlay"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#004225] via-[#004225]/95 to-transparent" />
-        </div>
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="grid lg:grid-cols-[1.15fr_0.85fr] gap-8 sm:gap-12 lg:gap-20 items-end"
-          >
-            <div className="space-y-8 text-left">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.35em] text-white/55 backdrop-blur-sm">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#6FCF97]" />
-                  {t.promo_spot}
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-[0.35em] text-white/30">
-                  {t.promo_presents}
-                </span>
-              </div>
-
-              <div className="space-y-6">
-                <h2 className="max-w-5xl text-5xl lg:text-7xl xl:text-[6.2rem] font-serif tracking-tight leading-[0.95] text-white text-balance">
-                  {t.promo_title}
-                </h2>
-                <p className="max-w-2xl text-lg lg:text-xl text-white/72 font-light leading-relaxed">
-                  {t.promo_desc}
-                </p>
-              </div>
-
-              <div className="grid sm:grid-cols-3 gap-3 max-w-3xl">
-                <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
-                    <ShieldCheck size={16} />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Swiss Grade</span>
-                  </div>
-                  <p className="text-sm text-white/70 font-light">{language === 'FR' ? 'Conçu pour les standards suisses, pas pour des modèles interchangeables.' : language === 'IT' ? 'Costruito per gli standard svizzeri, non per modelli intercambiabili.' : language === 'EN' ? 'Built for Swiss standards, not interchangeable templates.' : 'Gebaut für Schweizer Standards, nicht für beliebige Vorlagen.'}</p>
-                </div>
-                <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
-                    <Target size={16} />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.25em]">Career Edge</span>
-                  </div>
-                  <p className="text-sm text-white/70 font-light">{t.promo_precision} {t.promo_redefined}</p>
-                </div>
-                <div className="border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-[#A7F3D0] mb-2">
-                    <Sparkles size={16} />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.25em]">AI Copilot</span>
-                  </div>
-                  <p className="text-sm text-white/70 font-light">{language === 'FR' ? 'Du CV à l\'entretien, chaque réponse arrive avec le bon contexte.' : language === 'IT' ? 'Dal CV al colloquio, ogni risposta arriva con il giusto contesto.' : language === 'EN' ? 'From CV to interview, every answer comes with the right context.' : 'Vom Lebenslauf (CV) bis zum Interview begleitet dich jede Antwort mit Kontext.'}</p>
-                </div>
-              </div>
-
-              <div className="max-w-3xl border border-white/10 bg-black/10 px-5 py-5 backdrop-blur-sm">
-                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#A7F3D0]">
-                      {language === 'FR' ? 'Idées marketing' : language === 'IT' ? 'Idee di marketing' : language === 'EN' ? 'Marketing Ideas' : 'Marketing-Ideen'}
-                    </p>
-                    <p className="text-sm text-white/70 font-light leading-relaxed">
-                      {language === 'FR'
-                        ? <>Si tu as une idée solide pour un spot, une campagne ou une conversion story, envoie-la à{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
-                        : language === 'IT'
-                        ? <>Se hai un'idea concreta per uno spot, una campagna o una storia di conversione, inviala a{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
-                        : language === 'EN'
-                        ? <>If you have a solid idea for an ad spot, campaign or conversion story, send it to{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
-                        : <>Wenn du eine starke, seriöse Idee für einen Werbespot oder eine Kampagne hast, sende sie an{' '}<a href="mailto:support@stellify.ch" className="font-medium text-white underline decoration-white/20 underline-offset-4 hover:decoration-white">support@stellify.ch</a>.</>
-                      }
-                    </p>
-                  </div>
-                  <a
-                    href={`mailto:support@stellify.ch?subject=${
-                      language === 'FR' ? 'Id%C3%A9e%20marketing%20pour%20Stellify'
-                      : language === 'IT' ? 'Idea%20di%20marketing%20per%20Stellify'
-                      : language === 'EN' ? 'Marketing%20Idea%20for%20Stellify'
-                      : 'Marketing-Idee%20f%C3%BCr%20Stellify'
-                    }&body=${
-                      language === 'FR' ? 'Bonjour%20%C3%A9quipe%20Stellify%2C%0A%0AMon%20id%C3%A9e%20%3A%0A%0A'
-                      : language === 'IT' ? 'Ciao%20team%20Stellify%2C%0A%0ALa%20mia%20idea%3A%0A%0A'
-                      : language === 'EN' ? 'Hello%20Stellify%20Team%2C%0A%0AMy%20idea%3A%0A%0A'
-                      : 'Hallo%20Stellify-Team%2C%0A%0AMeine%20Idee%3A%0A%0A'
-                    }`}
-                    className="inline-flex shrink-0 items-center gap-2 border border-white/15 bg-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.22em] text-white transition-all hover:bg-white/12 hover:border-white/30"
-                  >
-                    {language === 'FR' ? 'Soumettre' : language === 'IT' ? 'Invia idea' : language === 'EN' ? 'Submit idea' : 'Idee einreichen'}
-                    <ArrowRight size={14} />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute -inset-5 bg-gradient-to-br from-white/10 via-transparent to-[#6FCF97]/10 blur-2xl" />
-              <button
-                onClick={() => PROMO_VIDEO_URL ? setIsPromoVideoOpen(true) : setIsPromoOpen(true)}
-                className="group relative w-full overflow-hidden border border-white/10 bg-white/[0.06] p-8 md:p-10 text-left backdrop-blur-md transition-all duration-500 hover:border-white/25 hover:bg-white/[0.09] hover:-translate-y-1"
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.12),transparent_38%),linear-gradient(135deg,rgba(255,255,255,0.05),transparent_55%)]" />
-                <div className="absolute right-6 top-6 h-20 w-20 rounded-full border border-white/10" />
-                <div className="absolute right-12 top-12 h-3 w-3 rounded-full bg-[#6FCF97]/30" />
-
-                <div className="relative z-10 space-y-8">
-                  <div className="flex items-start justify-between gap-6">
-                    <div className="space-y-3">
-                      <span className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">
-                        <span className="h-px w-8 bg-white/25" />
-                        Campaign Film
-                      </span>
-                      <h3 className="text-3xl md:text-4xl font-serif tracking-tight leading-tight text-white">
-                        {t.promo_precision} <span className="italic text-[#D1FAE5]">{t.promo_redefined}</span>
-                      </h3>
-                    </div>
-                    <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-white text-[#004225] shadow-2xl shadow-black/20 transition-transform duration-500 group-hover:scale-110">
-                      <Play size={28} fill="currentColor" className="ml-1" />
-                      <div className="absolute inset-0 rounded-full border border-white animate-ping opacity-20" />
-                      <div className="absolute -inset-3 rounded-full border border-white/15 transition-transform duration-700 group-hover:scale-110" />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                    {[
-                      ['01', language === 'FR' ? 'CV' : language === 'IT' ? 'CV' : language === 'EN' ? 'CV' : 'Lebenslauf'],
-                      ['02', language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview'],
-                      ['03', language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot'],
-                    ].map(([num, label]) => (
-                      <div key={num} className="border border-white/10 bg-black/10 px-3 py-4">
-                        <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-white/35">{num}</div>
-                        <div className="mt-2 text-sm font-medium uppercase tracking-[0.18em] text-white/80">{label}</div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-white/10 pt-6">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/45">{t.promo_play}</p>
-                      <p className="mt-2 text-sm text-white/70 font-light">{t.promo_journey}</p>
-                    </div>
-                    <div className="inline-flex items-center gap-2 text-sm font-medium text-white">
-                      <span className="text-white/70">Launch</span>
-                      <ArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
-                    </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
       <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
@@ -8659,75 +7957,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
-
-      {/* --- TRANSPARENCY / WHAT'S POSSIBLE & NOT --- */}
-      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-              {t.transparency_badge}
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4">{t.transparency_title}</h2>
-            <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl mx-auto leading-relaxed">{t.transparency_sub}</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
-            <div className="p-7 bg-white dark:bg-[#1A1A18] border border-[#004225]/15 dark:border-[#00A854]/20">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-5">
-                <CheckCircle2 size={13} /><span>{t.tr_can_title}</span>
-              </div>
-              <ul className="space-y-3">
-                {[t.tr_can_1, t.tr_can_2, t.tr_can_3, t.tr_can_4, t.tr_can_5].map((line: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 bg-[#004225] dark:bg-[#00A854] rounded-full shrink-0" />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-7 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-5">
-                <Info size={13} /><span>{t.tr_cannot_title}</span>
-              </div>
-              <ul className="space-y-3">
-                {[t.tr_cannot_1, t.tr_cannot_2, t.tr_cannot_3, t.tr_cannot_4].map((line: string, i: number) => (
-                  <li key={i} className="flex items-start gap-2.5 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 bg-[#9A9A94] rounded-full shrink-0" />
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/10">
-            <div className="p-5 border-b border-black/5 dark:border-white/5">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">{t.tr_limits_title}</p>
-            </div>
-            {[
-              { label: t.tr_lim_free_label, value: t.tr_lim_free_v },
-              { label: t.tr_lim_pro_label, value: t.tr_lim_pro_v },
-              { label: t.tr_lim_unlim_label, value: t.tr_lim_unlim_v },
-            ].map((row, i) => (
-              <div key={i} className="grid grid-cols-1 sm:grid-cols-[210px_1fr] gap-2 sm:gap-6 px-5 py-4 border-b last:border-b-0 border-black/5 dark:border-white/5">
-                <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8]">{row.label}</p>
-                <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{row.value}</p>
-              </div>
-            ))}
-            <div className="px-5 py-4 bg-[#FDFCFB] dark:bg-[#2A2A26] space-y-1.5">
-              <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">{t.tr_reset_info}</p>
-              <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] leading-relaxed">{t.tr_fair_use}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* --- FAQ SECTION --- */}
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 border border-[#004225]/10 rounded-full text-[#004225] text-[10px] font-bold tracking-widest uppercase mb-4">
-              {t.faq_badge}
+          <div className="text-left mb-16">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-9 h-9 rounded-full bg-[#004225] text-white flex items-center justify-center text-base font-serif">?</div>
+              <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854]">{t.faq_badge}</p>
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.faq_subtitle}</h2>
           </div>
@@ -8749,7 +7985,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
-
       {/* --- FINAL CTA --- */}
       <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white text-center relative overflow-hidden">
         <motion.div
@@ -9108,20 +8343,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           showToast(t.search_nav_profile);
                         } else if (result.type === 'tool') {
                           handleToolClick(result.id);
-                        } else if (result.type === 'job') {
-                          handleJobClick(result.id);
                         } else if (result.type === 'page') {
                           navigate(result.view);
                         } else if (result.link) {
                           window.location.hash = result.link;
                         }
                         setIsSearchOpen(false);
-                        setSearchQuery('');
-                      } else if (searchQuery.trim().length > 0) {
-                        // No results → ask Stella
-                        setIsStellaOpen(true);
-                        setIsSearchOpen(false);
-                        sendMessage(searchQuery);
                         setSearchQuery('');
                       }
                     } else if (e.key === 'Escape') {
@@ -9216,8 +8443,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                       showToast(t.search_nav_profile);
                                     } else if (result.type === 'tool') {
                                       handleToolClick(result.id);
-                                    } else if (result.type === 'job') {
-                                      handleJobClick(result.id);
                                     } else if (result.type === 'page') {
                                       navigate(result.view);
                                     } else if (result.link) {
@@ -9283,20 +8508,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border-t border-black/5 dark:border-white/5 flex justify-between items-center">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                  {t.search_results.replace('{count}', searchResults.length.toString())}
+                  {searchQuery.trim().length < 2
+                    ? ''
+                    : t.search_results.replace('{count}', searchResults.length.toString())}
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                     <span className="px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[8px]">ESC</span>
                     {t.search_close_label}
                   </div>
-                  <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${selectedSearchIndex >= 0 ? 'text-[#004225] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}>
-                    <span className={`px-1.5 py-0.5 rounded text-[8px] transition-colors ${selectedSearchIndex >= 0 ? 'bg-[#004225] text-white' : 'bg-black/5 dark:bg-white/10'}`}>ENTER</span>
-                    {selectedSearchIndex >= 0
-                      ? t.search_open_selection
-                      : t.search_stella_advice
-                    }
-                  </div>
+                  {selectedSearchIndex >= 0 && (
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
+                      <span className="px-1.5 py-0.5 rounded text-[8px] bg-[#004225] text-white">ENTER</span>
+                      {t.search_open_selection}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -9306,7 +8532,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- STELLA CHAT WINDOW --- */}
       <AnimatePresence>
-        {isStellaOpen && (
+        {isStellaOpen && STELLA_CHAT_ENABLED && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -9319,7 +8545,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {isStellaOpen && (
+        {isStellaOpen && STELLA_CHAT_ENABLED && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -10347,104 +9573,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                   )}
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* --- JOB DETAIL MODAL --- */}
-      <AnimatePresence>
-        {isJobModalOpen && selectedJob && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-[#1A1A18] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors"
-            >
-              <div className="p-6 border-b border-black/8 dark:border-white/8 flex items-center justify-between gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26]">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-11 h-11 shrink-0 bg-[#004225] text-white flex items-center justify-center shadow-md">
-                    <Briefcase size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate">{selectedJob.title}</h3>
-                    <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] font-bold uppercase tracking-widest mt-0.5">{selectedJob.company}</p>
-                  </div>
-                </div>
-                <button onClick={() => setIsJobModalOpen(false)} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.job_location}</p>
-                    <p className="text-sm font-medium flex items-center gap-2 dark:text-[#FAFAF8]">
-                      <MapPin size={14} className="text-[#004225] dark:text-[#FAFAF8]" />
-                      {selectedJob.location}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.job_category}</p>
-                    <p className="text-sm font-medium flex items-center gap-2 dark:text-[#FAFAF8]">
-                      <Compass size={14} className="text-[#004225] dark:text-[#FAFAF8]" />
-                      {selectedJob.category}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_description}</h4>
-                  <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed font-light">
-                    {(language === 'EN' && selectedJob.description_en) || (language === 'FR' && selectedJob.description_fr) || (language === 'IT' && selectedJob.description_it) || selectedJob.description}
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_requirements}</h4>
-                  <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed font-light">
-                    {selectedJob.requirements}
-                  </p>
-                </div>
-
-                {selectedJob.ats_keywords && (
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_keywords}</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedJob.ats_keywords.map((kw: string, i: number) => (
-                        <span key={i} className="px-2 py-1 bg-[#004225]/5 dark:bg-white/5 text-[#004225] dark:text-[#FAFAF8] text-[10px] font-medium rounded border border-[#004225]/10 dark:border-white/10">
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="p-6 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row justify-end gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26]">
-                <button 
-                  onClick={() => {
-                    setIsJobModalOpen(false);
-                    handleToolClick('ats-sim');
-                    setToolInput({ ...toolInput, jobAd: `${selectedJob.title} bei ${selectedJob.company}\n\n${selectedJob.description}\n\n${selectedJob.requirements}` });
-                  }}
-                  className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border border-[#004225] dark:border-[#FAFAF8] text-[#004225] dark:text-[#FAFAF8] hover:bg-[#004225] dark:hover:bg-[#FDFCFB] hover:text-white dark:hover:text-[#1A1A18] transition-all flex items-center justify-center gap-2"
-                >
-                  <Target size={14} />
-                  ATS Check
-                </button>
-                <button 
-                  onClick={() => {
-                    setIsJobModalOpen(false);
-                    handleToolClick('cv-gen');
-                    setToolInput({ ...toolInput, jobAd: `${selectedJob.title} bei ${selectedJob.company}\n\n${selectedJob.description}\n\n${selectedJob.requirements}` });
-                  }}
-                  className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
-                >
-                  <Sparkles size={14} />
-                  {t.apply_now}
-                </button>
               </div>
             </motion.div>
           </div>
