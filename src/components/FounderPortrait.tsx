@@ -27,7 +27,7 @@ const FounderPortrait = ({ language }: { language: string }) => {
           <>
             <img
               src="/founder.jpg"
-              alt="Josua Schwarzentruber"
+              alt={roleLabel}
               loading="lazy"
               onError={() => setPortraitOk(false)}
               className="absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-[cubic-bezier(.22,.61,.36,1)] group-hover/founder:opacity-0 group-hover/founder:scale-[1.04]"
@@ -48,13 +48,13 @@ const FounderPortrait = ({ language }: { language: string }) => {
         ) : (
           /* Placeholder until /founder.jpg is uploaded */
           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-[#004225] to-[#00331d]">
-            <span className="font-serif text-5xl text-white/90 tracking-tight">JS</span>
+            <span className="font-serif text-5xl text-white/90 tracking-tight">S</span>
           </div>
         )}
       </div>
       <figcaption className="mt-4">
-        <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">Josua Schwarzentruber</p>
-        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.3em] text-[#6B6B66] dark:text-[#9A9A94]">{roleLabel}</p>
+        <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{roleLabel}</p>
+        <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.3em] text-[#6B6B66] dark:text-[#9A9A94]">Stellify</p>
       </figcaption>
     </figure>
   );
