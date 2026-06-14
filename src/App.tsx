@@ -9291,7 +9291,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- STELLA CHAT WINDOW --- */}
       <AnimatePresence>
-        {isStellaOpen && (
+        {isStellaOpen && STELLA_CHAT_ENABLED && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -9304,7 +9304,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
       <AnimatePresence>
-        {isStellaOpen && (
+        {isStellaOpen && STELLA_CHAT_ENABLED && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
