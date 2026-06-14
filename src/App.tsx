@@ -50,7 +50,6 @@ import {
   collection, query, where, orderBy, limit, getDocs, onSnapshot, serverTimestamp,
 } from 'firebase/firestore';
 import { searchData, SearchItem } from './data/searchData';
-import sampleJobs from './data/sampleJobs.json';
 
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -979,18 +978,6 @@ function StellifyApp() {
   const [toolStep, setToolStep] = useState(0); // For multi-step tools like Interview Sim
   const [toolHistory, setToolHistory] = useState<any[]>([]);
   
-  const [selectedJob, setSelectedJob] = useState<any | null>(null);
-  const [isJobModalOpen, setIsJobModalOpen] = useState(false);
-  const [jobFilters, setJobFilters] = useState({ keyword: '', location: '', industry: '' });
-
-  const handleJobClick = (jobId: string) => {
-    const job = sampleJobs.find(j => j.id === jobId);
-    if (job) {
-      setSelectedJob(job);
-      setIsJobModalOpen(true);
-    }
-  };
-
   const getAuthToken = async (): Promise<string | null> => {
     try {
       const currentUser = auth.currentUser;
@@ -1005,257 +992,6 @@ function StellifyApp() {
       ...options,
       headers: { ...((options.headers as Record<string, string>) || {}), ...(token ? { Authorization: `Bearer ${token}` } : {}) },
     });
-  };
-
-  // --- JOB BOARD COMPONENT ---
-  const JobBoard = () => {
-    const [liveJobs, setLiveJobs] = useState<any[] | null>(null);
-    const [isSearching, setIsSearching] = useState(false);
-    const [isLiveResult, setIsLiveResult] = useState(false);
-    const [liveSource, setLiveSource] = useState<'adzuna' | null>(null);
-    const [liveTotal, setLiveTotal] = useState<number | null>(null);
-
-    const localFiltered = (sampleJobs as any[]).filter(job => {
-      const kw = jobFilters.keyword.toLowerCase();
-      const loc = jobFilters.location.toLowerCase();
-      const ind = jobFilters.industry.toLowerCase();
-      const jobDesc = ((language === 'EN' && job.description_en) || (language === 'FR' && job.description_fr) || (language === 'IT' && job.description_it) || job.description || '').toLowerCase();
-      return (!kw || job.title.toLowerCase().includes(kw) || jobDesc.includes(kw) || job.ats_keywords?.some((k: string) => k.toLowerCase().includes(kw)))
-        && (!loc || job.location.toLowerCase().includes(loc))
-        && (!ind || job.category.toLowerCase().includes(ind));
-    });
-
-    const displayJobs = liveJobs !== null ? liveJobs : localFiltered;
-
-    const handleLiveSearch = async () => {
-      setIsSearching(true);
-      setIsLiveResult(false);
-      try {
-        const params = new URLSearchParams();
-        if (jobFilters.keyword) params.set('keyword', jobFilters.keyword);
-        if (jobFilters.location) params.set('location', jobFilters.location);
-        if (jobFilters.industry) params.set('category', jobFilters.industry);
-        const token = await getAuthToken();
-        const res = await fetch(`/api/jobs?${params}`, { headers: token ? { Authorization: `Bearer ${token}` } : {} });
-        const data = await res.json();
-        if (data.jobs && data.jobs.length > 0) {
-          setLiveJobs(data.jobs);
-          setIsLiveResult(true);
-          setLiveSource(data.source || null);
-          setLiveTotal(data.total || data.jobs.length);
-        } else {
-          setLiveJobs([]);
-        }
-      } catch {
-        setLiveJobs(null);
-      } finally {
-        setIsSearching(false);
-      }
-    };
-
-    const handleReset = () => {
-      setLiveJobs(null);
-      setIsLiveResult(false);
-      setLiveSource(null);
-      setLiveTotal(null);
-      setJobFilters({ keyword: '', location: '', industry: '' });
-    };
-
-    const handleOpenJob = (url: string, job?: any) => {
-      if (url && url !== '#' && url.startsWith('http')) {
-        window.open(url, '_blank', 'noopener,noreferrer');
-      } else if (job) {
-        const query = encodeURIComponent(`${job.title} ${job.company}`);
-        const loc = encodeURIComponent('Schweiz');
-        window.open(`https://ch.indeed.com/jobs?q=${query}&l=${loc}`, '_blank', 'noopener,noreferrer');
-      }
-    };
-
-    return (
-      <div className="space-y-8">
-        {/* Search bar */}
-        <div className="flex flex-col md:flex-row gap-4 items-end">
-          <div className="flex-1 space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_keyword}</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94]" size={14} />
-              <input
-                type="text"
-                placeholder={t.search_placeholder}
-                className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 pl-10 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
-                value={jobFilters.keyword}
-                onChange={(e) => { setJobFilters({ ...jobFilters, keyword: e.target.value }); setLiveJobs(null); }}
-                onKeyDown={(e) => e.key === 'Enter' && handleLiveSearch()}
-              />
-            </div>
-          </div>
-          <div className="w-full md:w-44 space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_location}</label>
-            <input
-              type="text"
-              placeholder={language === 'FR' ? 'p.ex. Zurich' : language === 'IT' ? 'es. Zurigo' : language === 'EN' ? 'e.g. Zurich' : 'z.B. Zürich'}
-              className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
-              value={jobFilters.location}
-              onChange={(e) => { setJobFilters({ ...jobFilters, location: e.target.value }); setLiveJobs(null); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleLiveSearch()}
-            />
-          </div>
-          <div className="w-full md:w-44 space-y-2">
-            <label className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{t.filter_industry}</label>
-            <select
-              className="w-full bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-2.5 text-sm outline-none focus:border-[#004225]/20 transition-all dark:text-[#FAFAF8]"
-              value={jobFilters.industry}
-              onChange={(e) => { setJobFilters({ ...jobFilters, industry: e.target.value }); setLiveJobs(null); }}
-            >
-              <option value="">{t.filter_all}</option>
-              <option value="IT">IT</option>
-              <option value="Marketing">Marketing</option>
-              <option value="Finance">{language === 'FR' ? 'Finance' : language === 'IT' ? 'Finanza' : language === 'EN' ? 'Finance' : 'Finanzen'}</option>
-              <option value="Banking">{language === 'FR' ? 'Banque' : language === 'IT' ? 'Banca' : language === 'EN' ? 'Banking' : 'Banking'}</option>
-              <option value="Engineering">{language === 'FR' ? 'Ingénierie' : language === 'IT' ? 'Ingegneria' : language === 'EN' ? 'Engineering' : 'Ingenieurwesen'}</option>
-              <option value="HR">{language === 'FR' ? 'RH' : language === 'IT' ? 'HR' : language === 'EN' ? 'HR' : 'HR'}</option>
-              <option value="Healthcare">{language === 'FR' ? 'Santé' : language === 'IT' ? 'Sanità' : language === 'EN' ? 'Healthcare' : 'Gesundheitswesen'}</option>
-              <option value="Pharma">{language === 'FR' ? 'Pharma' : language === 'IT' ? 'Farmaceutica' : language === 'EN' ? 'Pharma' : 'Pharma'}</option>
-              <option value="Logistik">{language === 'FR' ? 'Logistique' : language === 'IT' ? 'Logistica' : language === 'EN' ? 'Logistics' : 'Logistik'}</option>
-              <option value="Consulting">{language === 'FR' ? 'Conseil' : language === 'IT' ? 'Consulenza' : language === 'EN' ? 'Consulting' : 'Beratung'}</option>
-              <option value="Legal">{language === 'FR' ? 'Droit' : language === 'IT' ? 'Diritto' : language === 'EN' ? 'Legal' : 'Recht'}</option>
-              <option value="Education">{language === 'FR' ? 'Éducation' : language === 'IT' ? 'Istruzione' : language === 'EN' ? 'Education' : 'Bildung'}</option>
-              <option value="RealEstate">{language === 'FR' ? 'Immobilier' : language === 'IT' ? 'Immobiliare' : language === 'EN' ? 'Real Estate' : 'Immobilien'}</option>
-              <option value="Retail">{language === 'FR' ? 'Commerce' : language === 'IT' ? 'Commercio' : language === 'EN' ? 'Retail' : 'Handel'}</option>
-              <option value="Hospitality">{language === 'FR' ? 'Hôtellerie' : language === 'IT' ? 'Ospitalità' : language === 'EN' ? 'Hospitality' : 'Gastgewerbe'}</option>
-              <option value="Media">{language === 'FR' ? 'Médias' : language === 'IT' ? 'Media' : language === 'EN' ? 'Media' : 'Medien'}</option>
-              <option value="Energy">{language === 'FR' ? 'Énergie' : language === 'IT' ? 'Energia' : language === 'EN' ? 'Energy' : 'Energie'}</option>
-              <option value="PublicSector">{language === 'FR' ? 'Secteur public' : language === 'IT' ? 'Settore pubblico' : language === 'EN' ? 'Public Sector' : 'Öffentlicher Sektor'}</option>
-              <option value="Transport">{language === 'FR' ? 'Transport' : language === 'IT' ? 'Trasporti' : language === 'EN' ? 'Transport' : 'Transport'}</option>
-              <option value="NonProfit">{language === 'FR' ? 'ONG / Non-profit' : language === 'IT' ? 'ONG / Non-profit' : language === 'EN' ? 'NGO / Non-Profit' : 'NGO / Non-Profit'}</option>
-            </select>
-          </div>
-          {/* Live Search button */}
-          <button
-            onClick={handleLiveSearch}
-            disabled={isSearching}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#003318] transition-colors disabled:opacity-60 whitespace-nowrap"
-          >
-            {isSearching ? (
-              <><div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" /> {language === 'FR' ? 'Recherche...' : language === 'IT' ? 'Ricerca...' : language === 'EN' ? 'Searching...' : 'Suche...'}</>
-            ) : (
-              <><Search size={13} /> {language === 'FR' ? 'Recherche IA' : language === 'IT' ? 'Ricerca IA' : language === 'EN' ? 'AI Search' : 'KI-Suche'}</>
-            )}
-          </button>
-          {isLiveResult && (
-            <button onClick={handleReset} className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors whitespace-nowrap">
-              {language === 'FR' ? 'Réinitialiser' : language === 'IT' ? 'Reimposta' : language === 'EN' ? 'Reset' : 'Zurücksetzen'}
-            </button>
-          )}
-        </div>
-
-        {/* Live result badge */}
-        {isLiveResult && (
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854] animate-pulse" />
-              Live · {displayJobs.length} {language === 'FR' ? 'offres affichées' : language === 'IT' ? 'offerte mostrate' : language === 'EN' ? 'jobs shown' : 'Stellen angezeigt'}{liveTotal && liveTotal > displayJobs.length ? ` (${liveTotal.toLocaleString('de-CH')} total)` : ''}
-            </div>
-            {liveSource === 'adzuna' && (
-              <span className="px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
-                via Adzuna API
-              </span>
-            )}
-          </div>
-        )}
-        {!isLiveResult && (
-          <p className="text-[11px] text-[#9A9A94] dark:text-[#5C5C58]">
-            {displayJobs.length} {language === 'FR' ? <>offres exemples · Cliquez sur <strong>Recherche IA</strong> pour des résultats en direct</> : language === 'IT' ? <>offerte esempio · Clicca su <strong>Ricerca IA</strong> per risultati live</> : language === 'EN' ? <>sample jobs · Click <strong>AI Search</strong> for live results</> : <>Muster-Stellen · Klicke <strong>KI-Suche</strong> für echte Live-Ergebnisse</>}
-          </p>
-        )}
-
-        {/* Job cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <AnimatePresence mode="popLayout">
-            {displayJobs.map((job, i) => (
-              <motion.div
-                key={job.id || i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: i * 0.04 }}
-                whileHover={{ y: -3 }}
-                onClick={() => handleOpenJob(job.url, job)}
-                className="bg-white dark:bg-[#2A2A26] p-6 border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md transition-all cursor-pointer group"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="space-y-1 flex-1 pr-4">
-                    <h3 className="text-lg font-serif group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors dark:text-[#FAFAF8] leading-snug">{job.title}</h3>
-                    <p className="text-xs font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58]">{job.company}</p>
-                  </div>
-                  <div className="px-2 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 text-[#004225] dark:text-[#00A854] text-[9px] font-bold uppercase tracking-widest shrink-0">
-                    {job.category}
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-xs text-[#6B6B66] dark:text-[#9A9A94] mb-4 flex-wrap">
-                  <div className="flex items-center gap-1">
-                    <MapPin size={12} />
-                    {job.location}
-                  </div>
-                  {job.salary_min && (
-                    <div className="flex items-center gap-1 text-[#004225] dark:text-[#00A854] font-medium">
-                      CHF {Math.round(job.salary_min / 1000)}k{job.salary_max ? `–${Math.round(job.salary_max / 1000)}k` : '+'}
-                    </div>
-                  )}
-                </div>
-                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] line-clamp-2 mb-6 font-light">{(language === 'EN' && job.description_en) || (language === 'FR' && job.description_fr) || (language === 'IT' && job.description_it) || job.description}</p>
-                <div className="flex justify-between items-center">
-                  <div className="flex gap-2 flex-wrap">
-                    {job.ats_keywords?.slice(0, 3).map((kw: string) => (
-                      <span key={kw} className="text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 bg-black/5 dark:bg-white/5 text-[#9A9A94] dark:text-[#5C5C58]">{kw}</span>
-                    ))}
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    {t.tool_open} <ArrowRight size={12} />
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-
-        {displayJobs.length === 0 && !isSearching && (
-          <div className="py-24 text-center space-y-4">
-            <div className="w-16 h-16 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto text-[#9A9A94]">
-              <Search size={32} />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-xl font-serif dark:text-[#FAFAF8]">{t.search_no_results}</h3>
-              <p className="text-sm text-[#9A9A94] font-light">{t.search_no_results_desc}</p>
-            </div>
-          </div>
-        )}
-
-        {/* External links */}
-        <div className="pt-4 border-t border-black/5 dark:border-white/5">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] dark:text-[#5C5C58] mb-3">{language === 'FR' ? 'Rechercher d\'autres postes directement' : language === 'IT' ? 'Cerca altri posti direttamente' : language === 'EN' ? 'Search more jobs directly' : 'Weitere Stellen direkt suchen'}</p>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { label: 'Jobs.ch', url: 'https://www.jobs.ch/de/vakanzen/' },
-              { label: 'Indeed CH', url: 'https://ch.indeed.com/' },
-              { label: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs/search/?location=Switzerland' },
-              { label: 'Jobup.ch', url: 'https://www.jobup.ch/de/jobs/' },
-              { label: 'Yousty.ch', url: 'https://www.yousty.ch/de-CH/stellen' },
-            ].map(({ label, url }) => (
-              <a
-                key={label}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-1.5 border border-black/10 dark:border-white/10 text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] hover:border-[#004225] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors flex items-center gap-1"
-              >
-                {label} <ArrowRight size={10} />
-              </a>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
   };
 
   // Search State
@@ -1897,18 +1633,36 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         updateDoc(doc(db, 'users', user.id), { cv_context: text }).catch(e => handleDbError(e, 'db', `users/${user.id}`)),
       ]);
 
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe deinen Lebenslauf "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
-      }]);
-      
-      if (!isStellaOpen) setIsStellaOpen(true);
+      if (STELLA_CHAT_ENABLED) {
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: language === 'FR' ? `J'ai bien lu ton CV "${file.name}". J'ai analysé le contenu et suis prêt à t'aider dans tes candidatures !` : language === 'IT' ? `Ho letto con successo il tuo CV "${file.name}". Ho analizzato il contenuto e sono pronto ad aiutarti con le tue candidature!` : language === 'EN' ? `I've successfully read your CV "${file.name}". I've analysed the content and am ready to help you with your applications!` : `Ich habe deinen Lebenslauf "${file.name}" erfolgreich eingelesen. Ich habe den Inhalt analysiert und bin bereit, dir bei deinen Bewerbungen zu helfen!`
+        }]);
+        if (!isStellaOpen) setIsStellaOpen(true);
+      } else {
+        showToast(
+          language === 'FR' ? `CV "${file.name}" importé avec succès`
+            : language === 'IT' ? `CV "${file.name}" importato con successo`
+            : language === 'EN' ? `CV "${file.name}" imported successfully`
+            : `Lebenslauf "${file.name}" erfolgreich importiert`
+        );
+      }
     } catch (error) {
       console.error("PDF extraction error:", error);
-      setMessages(prev => [...prev, {
-        role: 'ai',
-        content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines Lebenslaufs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
-      }]);
+      if (STELLA_CHAT_ENABLED) {
+        setMessages(prev => [...prev, {
+          role: 'ai',
+          content: language === 'FR' ? `Désolé, une erreur s'est produite lors de la lecture de ton CV "${file.name}". Essaie avec un autre fichier.` : language === 'IT' ? `Scusa, si è verificato un errore durante la lettura del tuo CV "${file.name}". Prova con un altro file.` : language === 'EN' ? `Sorry, an error occurred while reading your CV "${file.name}". Please try with a different file.` : `Entschuldigung, beim Einlesen deines Lebenslaufs "${file.name}" ist ein Fehler aufgetreten. Bitte versuche es mit einer anderen Datei.`
+        }]);
+      } else {
+        showToast(
+          language === 'FR' ? `Impossible de lire "${file.name}". Essaie un autre fichier.`
+            : language === 'IT' ? `Impossibile leggere "${file.name}". Prova un altro file.`
+            : language === 'EN' ? `Couldn't read "${file.name}". Please try a different file.`
+            : `"${file.name}" konnte nicht gelesen werden. Bitte versuche eine andere Datei.`,
+          'error'
+        );
+      }
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -2760,50 +2514,6 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             }
             Antworte NUR mit dem JSON-Objekt.
           `;
-          break;
-        case 'job-search':
-          const keyword = (toolInput.keyword || '').toLowerCase();
-          const loc = (toolInput.location || '').toLowerCase();
-          const ind = (toolInput.industry || '').toLowerCase();
-          
-          const filteredJobs = (sampleJobs as any[]).filter(job => {
-            const matchesKeyword = !keyword || 
-              job.title.toLowerCase().includes(keyword) || 
-              job.description.toLowerCase().includes(keyword) ||
-              (job.ats_keywords && job.ats_keywords.some((k: string) => k.toLowerCase().includes(keyword)));
-            const matchesLocation = !loc || job.location.toLowerCase().includes(loc);
-            const matchesIndustry = !ind || job.category.toLowerCase().includes(ind);
-            return matchesKeyword && matchesLocation && matchesIndustry;
-          });
-
-          if (filteredJobs.length > 0) {
-            const jobList = filteredJobs.map(job => 
-              `### ${job.title}\n**Firma:** ${job.company}\n**Standort:** ${job.location}\n**Bereich:** ${job.category}\n\n${job.description}\n\n**Anforderungen:** ${job.requirements}\n\n---`
-            ).join('\n\n');
-            
-            prompt = `
-              Der Nutzer sucht nach Jobs in der Schweiz.
-              Hier sind die gefundenen Stellen aus unserer Datenbank:
-              
-              ${jobList}
-              
-              HANDLUNGSANWEISUNG:
-              1. Präsentiere diese Stellen dem Nutzer auf ansprechende Weise.
-              2. Analysiere kurz, welche dieser Stellen am besten zum Profil des Nutzers passt (CV: ${cvContext || 'Kein CV vorhanden'}).
-              3. Gib Tipps für die Bewerbung bei diesen spezifischen Firmen.
-              4. Falls weniger als 3 Stellen gefunden wurden, schlage vor, die Suchkriterien zu erweitern.
-            `;
-          } else {
-            prompt = `
-              Der Nutzer sucht nach Jobs in der Schweiz (Keyword: "${keyword}", Ort: "${loc}", Branche: "${ind}").
-              Leider wurden in unserer Datenbank keine exakten Treffer gefunden.
-              
-              HANDLUNGSANWEISUNG:
-              1. Informiere den Nutzer höflich, dass aktuell keine exakten Treffer in der Datenbank vorliegen.
-              2. Gib allgemeine Tipps für die Jobsuche in der Schweiz für diesen Bereich ("${ind}") und diesen Ort ("${loc}").
-              3. Nenne 3-4 grosse Arbeitgeber in dieser Region/Branche, bei denen der Nutzer direkt suchen könnte.
-            `;
-          }
           break;
         case 'ats-sim':
           prompt = `
@@ -9100,8 +8810,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           showToast(t.search_nav_profile);
                         } else if (result.type === 'tool') {
                           handleToolClick(result.id);
-                        } else if (result.type === 'job') {
-                          handleJobClick(result.id);
                         } else if (result.type === 'page') {
                           navigate(result.view);
                         } else if (result.link) {
@@ -9202,8 +8910,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                       showToast(t.search_nav_profile);
                                     } else if (result.type === 'tool') {
                                       handleToolClick(result.id);
-                                    } else if (result.type === 'job') {
-                                      handleJobClick(result.id);
                                     } else if (result.type === 'page') {
                                       navigate(result.view);
                                     } else if (result.link) {
@@ -9269,7 +8975,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border-t border-black/5 dark:border-white/5 flex justify-between items-center">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                  {t.search_results.replace('{count}', searchResults.length.toString())}
+                  {searchQuery.trim().length < 2
+                    ? ''
+                    : t.search_results.replace('{count}', searchResults.length.toString())}
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
@@ -10332,104 +10040,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                   )}
                 </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* --- JOB DETAIL MODAL --- */}
-      <AnimatePresence>
-        {isJobModalOpen && selectedJob && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-[#1A1A18] w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors"
-            >
-              <div className="p-6 border-b border-black/8 dark:border-white/8 flex items-center justify-between gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26]">
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-11 h-11 shrink-0 bg-[#004225] text-white flex items-center justify-center shadow-md">
-                    <Briefcase size={20} />
-                  </div>
-                  <div className="min-w-0">
-                    <h3 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate">{selectedJob.title}</h3>
-                    <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] font-bold uppercase tracking-widest mt-0.5">{selectedJob.company}</p>
-                  </div>
-                </div>
-                <button onClick={() => setIsJobModalOpen(false)} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.job_location}</p>
-                    <p className="text-sm font-medium flex items-center gap-2 dark:text-[#FAFAF8]">
-                      <MapPin size={14} className="text-[#004225] dark:text-[#FAFAF8]" />
-                      {selectedJob.location}
-                    </p>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.job_category}</p>
-                    <p className="text-sm font-medium flex items-center gap-2 dark:text-[#FAFAF8]">
-                      <Compass size={14} className="text-[#004225] dark:text-[#FAFAF8]" />
-                      {selectedJob.category}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_description}</h4>
-                  <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed font-light">
-                    {(language === 'EN' && selectedJob.description_en) || (language === 'FR' && selectedJob.description_fr) || (language === 'IT' && selectedJob.description_it) || selectedJob.description}
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_requirements}</h4>
-                  <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed font-light">
-                    {selectedJob.requirements}
-                  </p>
-                </div>
-
-                {selectedJob.ats_keywords && (
-                  <div className="space-y-3">
-                    <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">{t.job_keywords}</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedJob.ats_keywords.map((kw: string, i: number) => (
-                        <span key={i} className="px-2 py-1 bg-[#004225]/5 dark:bg-white/5 text-[#004225] dark:text-[#FAFAF8] text-[10px] font-medium rounded border border-[#004225]/10 dark:border-white/10">
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="p-6 border-t border-black/5 dark:border-white/5 flex flex-col sm:flex-row justify-end gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26]">
-                <button 
-                  onClick={() => {
-                    setIsJobModalOpen(false);
-                    handleToolClick('ats-sim');
-                    setToolInput({ ...toolInput, jobAd: `${selectedJob.title} bei ${selectedJob.company}\n\n${selectedJob.description}\n\n${selectedJob.requirements}` });
-                  }}
-                  className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest border border-[#004225] dark:border-[#FAFAF8] text-[#004225] dark:text-[#FAFAF8] hover:bg-[#004225] dark:hover:bg-[#FDFCFB] hover:text-white dark:hover:text-[#1A1A18] transition-all flex items-center justify-center gap-2"
-                >
-                  <Target size={14} />
-                  ATS Check
-                </button>
-                <button 
-                  onClick={() => {
-                    setIsJobModalOpen(false);
-                    handleToolClick('cv-gen');
-                    setToolInput({ ...toolInput, jobAd: `${selectedJob.title} bei ${selectedJob.company}\n\n${selectedJob.description}\n\n${selectedJob.requirements}` });
-                  }}
-                  className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest bg-[#004225] text-white hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
-                >
-                  <Sparkles size={14} />
-                  {t.apply_now}
-                </button>
               </div>
             </motion.div>
           </div>
