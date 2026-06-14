@@ -3660,7 +3660,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "Keine Ergebnisse gefunden",
       search_no_results_desc: "Versuche es mit anderen Suchbegriffen oder Kategorien.",
       search_close: "ESC zum Schliessen",
-      search_stella: "ENTER für Stella-Beratung",
       job_board_title: "Job-Börse",
       job_board_desc: "Entdecke aktuelle Stellenangebote, die perfekt zu deinem Profil passen.",
       filter_all: "Alle Branchen",
@@ -3989,7 +3988,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "verbleibend",
       search_close_label: "Schliessen",
       search_open_selection: "Auswahl öffnen",
-      search_stella_advice: "Stella-Beratung",
       premium_analysis_desc: "Tiefgehende Prüfung nach Schweizer Standards",
       salary_median_label: "Geschätzter Medianlohn (Brutto/Jahr)",
       salary_important_notice: "Wichtiger Hinweis",
@@ -4283,7 +4281,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "Aucun résultat trouvé",
       search_no_results_desc: "Essayez d'autres termes de recherche ou catégories.",
       search_close: "ESC pour fermer",
-      search_stella: "ENTER pour le conseil Stella",
       job_board_title: "Bourse à l'emploi",
       job_board_desc: "Découvrez les offres d'emploi actuelles qui correspondent parfaitement à votre profil.",
       filter_all: "Tous les secteurs",
@@ -4612,7 +4609,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "restants",
       search_close_label: "Fermer",
       search_open_selection: "Ouvrir la sélection",
-      search_stella_advice: "Conseil Stella",
       premium_analysis_desc: "Examen approfondi selon les normes suisses",
       salary_median_label: "Salaire médian estimé (Brut/An)",
       salary_important_notice: "Remarque importante",
@@ -4800,7 +4796,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "Nessun risultato trovato",
       search_no_results_desc: "Prova altri termini di ricerca o categorie.",
       search_close: "ESC per chiudere",
-      search_stella: "ENTER per la consulenza Stella",
       job_board_title: "Bacheca del lavoro",
       job_board_desc: "Scopri le attuali offerte di lavoro che corrispondono perfettamente al tuo profilo.",
       filter_all: "Tutti i settori",
@@ -5129,7 +5124,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "rimanenti",
       search_close_label: "Chiudi",
       search_open_selection: "Apri selezione",
-      search_stella_advice: "Consulenza Stella",
       premium_analysis_desc: "Esame approfondito secondo gli standard svizzeri",
       salary_median_label: "Stipendio mediano stimato (Lordo/Anno)",
       salary_important_notice: "Nota importante",
@@ -5317,7 +5311,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       search_no_results: "No results found",
       search_no_results_desc: "Try other search terms or categories.",
       search_close: "ESC to close",
-      search_stella: "ENTER for Stella advice",
       job_board_title: "Job Board",
       job_board_desc: "Discover current job openings that perfectly match your profile.",
       filter_all: "All Industries",
@@ -5646,7 +5639,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       remaining: "remaining",
       search_close_label: "Close",
       search_open_selection: "Open Selection",
-      search_stella_advice: "Stella Advice",
       premium_analysis_desc: "Deep review according to Swiss standards",
       salary_median_label: "Estimated Median Salary (Gross/Year)",
       salary_important_notice: "Important Notice",
@@ -9117,12 +9109,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         }
                         setIsSearchOpen(false);
                         setSearchQuery('');
-                      } else if (searchQuery.trim().length > 0) {
-                        // No results → ask Stella
-                        setIsStellaOpen(true);
-                        setIsSearchOpen(false);
-                        sendMessage(searchQuery);
-                        setSearchQuery('');
                       }
                     } else if (e.key === 'Escape') {
                       setIsSearchOpen(false);
@@ -9290,13 +9276,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <span className="px-1.5 py-0.5 bg-black/5 dark:bg-white/10 rounded text-[8px]">ESC</span>
                     {t.search_close_label}
                   </div>
-                  <div className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${selectedSearchIndex >= 0 ? 'text-[#004225] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}>
-                    <span className={`px-1.5 py-0.5 rounded text-[8px] transition-colors ${selectedSearchIndex >= 0 ? 'bg-[#004225] text-white' : 'bg-black/5 dark:bg-white/10'}`}>ENTER</span>
-                    {selectedSearchIndex >= 0
-                      ? t.search_open_selection
-                      : t.search_stella_advice
-                    }
-                  </div>
+                  {selectedSearchIndex >= 0 && (
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
+                      <span className="px-1.5 py-0.5 rounded text-[8px] bg-[#004225] text-white">ENTER</span>
+                      {t.search_open_selection}
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
