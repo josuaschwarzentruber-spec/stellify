@@ -414,8 +414,8 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         />
       </div>
       <div className="space-y-2">
-        <h4 className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight break-words pr-20" title={app.company}>{app.company}</h4>
-        <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-medium leading-snug break-words" title={app.position}>{app.position}</p>
+        <h4 className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate pr-20" title={app.company}>{app.company}</h4>
+        <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-medium leading-snug truncate" title={app.position}>{app.position}</p>
         {app.location && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94]">
             <MapPin size={11} className="shrink-0" />
@@ -3598,10 +3598,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_rate: "Quote",
       stat_based_on: "von",
       stat_no_data: "–",
-      tracker_reminder: "Nachfassen am",
+      tracker_reminder: "Erinnerung am",
       tracker_reminder_due: "Heute fällig",
       tracker_reminder_overdue: "überfällig",
-      tracker_reminder_short: "Nachfassen",
+      tracker_reminder_short: "Erinnerung",
       tracker_export_csv: "CSV-Export",
       transparency_badge: "Transparenz",
       transparency_title: "Was geht — und was nicht",
