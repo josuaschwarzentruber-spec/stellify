@@ -776,6 +776,7 @@ function StellifyApp() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isAvatarDragOver, setIsAvatarDragOver] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
@@ -1682,30 +1683,52 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (file) processFile(file);
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
+  // Square-crop + resize to 512×512 JPEG before sending. Smaller payload
+  // means faster upload, cheaper Gemini moderation, and avatars that
+  // render crisply at every size we use them at (header, profile card).
+  const resizeImageForAvatar = (file: File): Promise<{ base64: string; mimeType: string }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const TARGET = 512;
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width - side) / 2;
+        const sy = (img.height - side) / 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = TARGET;
+        canvas.height = TARGET;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas-Kontext nicht verfügbar')); return; }
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, TARGET, TARGET);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        const base64 = dataUrl.split(',')[1] || '';
+        resolve({ base64, mimeType: 'image/jpeg' });
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht gelesen werden')); };
+      img.src = url;
+    });
+  };
+
+  const processAvatarFile = async (file: File) => {
     if (!file || !user) return;
     if (!/^image\/(jpe?g|png|webp)$/.test(file.type)) {
       showToast(language === 'FR' ? 'Format non supporté (JPG, PNG, WEBP)' : language === 'IT' ? 'Formato non supportato (JPG, PNG, WEBP)' : language === 'EN' ? 'Unsupported format (JPG, PNG, WEBP)' : 'Format nicht unterstützt (JPG, PNG, WEBP)', 'error');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      showToast(language === 'FR' ? "L'image dépasse 5 Mo" : language === 'IT' ? "L'immagine supera 5 MB" : language === 'EN' ? 'Image exceeds 5 MB' : 'Bild grösser als 5 MB', 'error');
+    if (file.size > 10 * 1024 * 1024) {
+      showToast(language === 'FR' ? "L'image dépasse 10 Mo" : language === 'IT' ? "L'immagine supera 10 MB" : language === 'EN' ? 'Image exceeds 10 MB' : 'Bild grösser als 10 MB', 'error');
       return;
     }
     setIsUploadingAvatar(true);
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      let binary = '';
-      const bytes = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-      const base64 = btoa(binary);
+      const { base64, mimeType } = await resizeImageForAvatar(file);
       const token = await getAuthToken();
       const res = await fetch('/api/upload-avatar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ base64, mimeType: file.type }),
+        body: JSON.stringify({ base64, mimeType }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -1717,6 +1740,36 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     } catch (err: any) {
       console.error('Avatar upload error:', err);
       showToast(err?.message || (language === 'FR' ? 'Erreur lors du téléversement' : language === 'IT' ? 'Errore durante il caricamento' : language === 'EN' ? 'Upload error' : 'Upload-Fehler'), 'error');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) await processAvatarFile(file);
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!user) return;
+    setIsUploadingAvatar(true);
+    try {
+      const token = await getAuthToken();
+      const res = await fetch('/api/upload-avatar', {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.error || (language === 'FR' ? 'Suppression échouée' : language === 'IT' ? 'Eliminazione fallita' : language === 'EN' ? 'Removal failed' : 'Entfernen fehlgeschlagen'), 'error');
+        return;
+      }
+      setUser({ ...user, avatar_url: undefined });
+      showToast(language === 'FR' ? 'Photo de profil supprimée' : language === 'IT' ? 'Foto profilo rimossa' : language === 'EN' ? 'Profile photo removed' : 'Profilbild entfernt');
+    } catch (err: any) {
+      console.error('Avatar remove error:', err);
+      showToast(err?.message || 'Fehler', 'error');
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -3449,11 +3502,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_email: "E-Mail",
       profile_account_plan: "Aktiver Plan",
       profile_account_member_since: "Mitglied seit",
+      profile_apps_overview: "Bewerbungs-Übersicht",
+      profile_open_tracker: "Zum Tracker",
+      profile_stat_interviews: "Interviews",
+      profile_stat_offers: "Angebote",
+      profile_stat_rejected: "Abgesagt",
+      profile_recent_apps: "Letzte Bewerbungen",
+      profile_activity: "Letzte Tool-Nutzung",
+      profile_open_tools: "Zu den Tools",
       profile_photo: "Profilbild",
-      profile_photo_hint: "JPG, PNG oder WEBP. Maximal 5 MB. Wird vor dem Speichern automatisch geprüft.",
+      profile_photo_hint: "JPG, PNG oder WEBP. Hier ablegen oder klicken. Bilder werden vor dem Speichern automatisch geprüft.",
       profile_photo_change: "Bild ändern",
       profile_photo_upload: "Bild hochladen",
       profile_photo_uploading: "Wird geprüft…",
+      profile_photo_remove: "Entfernen",
       tools: "Tools",
       pricing: "Preise",
       login: "Anmelden",
@@ -4083,11 +4145,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_email: "E-mail",
       profile_account_plan: "Abonnement actif",
       profile_account_member_since: "Membre depuis",
+      profile_apps_overview: "Vue d'ensemble candidatures",
+      profile_open_tracker: "Ouvrir le tracker",
+      profile_stat_interviews: "Entretiens",
+      profile_stat_offers: "Offres",
+      profile_stat_rejected: "Refusées",
+      profile_recent_apps: "Dernières candidatures",
+      profile_activity: "Activité récente",
+      profile_open_tools: "Voir les outils",
       profile_photo: "Photo de profil",
-      profile_photo_hint: "JPG, PNG ou WEBP. Maximum 5 Mo. Vérifié automatiquement avant l'enregistrement.",
+      profile_photo_hint: "JPG, PNG ou WEBP. Glisse ici ou clique. Vérifié automatiquement avant l'enregistrement.",
       profile_photo_change: "Changer l'image",
       profile_photo_upload: "Téléverser une image",
       profile_photo_uploading: "Vérification…",
+      profile_photo_remove: "Retirer",
       tools: "Outils",
       pricing: "Tarifs",
       login: "Connexion",
@@ -4611,11 +4682,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_email: "E-mail",
       profile_account_plan: "Piano attivo",
       profile_account_member_since: "Membro dal",
+      profile_apps_overview: "Panoramica candidature",
+      profile_open_tracker: "Apri il tracker",
+      profile_stat_interviews: "Colloqui",
+      profile_stat_offers: "Offerte",
+      profile_stat_rejected: "Rifiutate",
+      profile_recent_apps: "Ultime candidature",
+      profile_activity: "Attività recente",
+      profile_open_tools: "Vai agli strumenti",
       profile_photo: "Foto profilo",
-      profile_photo_hint: "JPG, PNG o WEBP. Massimo 5 MB. Controllato automaticamente prima del salvataggio.",
+      profile_photo_hint: "JPG, PNG o WEBP. Trascina qui o clicca. Controllato automaticamente prima del salvataggio.",
       profile_photo_change: "Cambia immagine",
       profile_photo_upload: "Carica immagine",
       profile_photo_uploading: "Verifica in corso…",
+      profile_photo_remove: "Rimuovi",
       tools: "Strumenti",
       pricing: "Prezzi",
       login: "Accedi",
@@ -5139,11 +5219,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_email: "Email",
       profile_account_plan: "Active plan",
       profile_account_member_since: "Member since",
+      profile_apps_overview: "Applications overview",
+      profile_open_tracker: "Open tracker",
+      profile_stat_interviews: "Interviews",
+      profile_stat_offers: "Offers",
+      profile_stat_rejected: "Rejected",
+      profile_recent_apps: "Recent applications",
+      profile_activity: "Recent activity",
+      profile_open_tools: "View tools",
       profile_photo: "Profile photo",
-      profile_photo_hint: "JPG, PNG or WEBP. Up to 5 MB. Reviewed automatically before saving.",
+      profile_photo_hint: "JPG, PNG or WEBP. Drop here or click. Reviewed automatically before saving.",
       profile_photo_change: "Change photo",
       profile_photo_upload: "Upload photo",
       profile_photo_uploading: "Checking…",
+      profile_photo_remove: "Remove",
       tools: "Tools",
       pricing: "Pricing",
       login: "Login",
@@ -6057,6 +6146,19 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <Settings size={16} />
               </button>
 
+              <button
+                onClick={() => navigate('profile')}
+                title={t.profile_nav}
+                className="shrink-0 w-8 h-8 rounded-full overflow-hidden border border-black/10 dark:border-white/10 hover:ring-2 hover:ring-[#004225]/30 dark:hover:ring-[#00A854]/40 transition-all"
+              >
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-[11px] font-serif font-medium text-[#004225] dark:text-[#00A854]">
+                    {(user.firstName || '?').charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </button>
               <span className="text-[13px] font-medium hidden lg:inline text-[#5C5C58] dark:text-[#9A9A94]">{t.nav_greeting}, {user.firstName}</span>
               <button
                 onClick={handleLogout}
@@ -6169,7 +6271,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div className="lg:col-span-2 space-y-6">
                 <header>
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
@@ -6950,80 +7053,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
               </div>
-            )}
-
-            {activeView === 'profile' && (
-            <div className="space-y-8 max-w-3xl">
-              <header>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
-                  {t.profile_kicker}
-                </div>
-                <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
-                <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
-              </header>
-
-              {/* Profile photo */}
-              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_photo}</p>
-                <div className="flex items-center gap-5 sm:gap-6">
-                  <div className="relative shrink-0">
-                    {user.avatar_url ? (
-                      <img src={user.avatar_url} alt="" className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-black/10 dark:border-white/10" />
-                    ) : (
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-2xl sm:text-3xl font-serif text-[#004225] dark:text-[#00A854]">
-                        {(user.firstName || '?').charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    {isUploadingAvatar && (
-                      <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0 space-y-3">
-                    <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{t.profile_photo_hint}</p>
-                    <button
-                      onClick={() => avatarInputRef.current?.click()}
-                      disabled={isUploadingAvatar}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      <Upload size={12} />
-                      {isUploadingAvatar ? t.profile_photo_uploading : (user.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Account / personal data */}
-              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
-                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
-                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_plan}</p>
-                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">
-                      {user.role === 'unlimited' ? 'Karriere+' : user.role === 'pro' ? 'Pro' : user.role === 'admin' ? 'Admin' : (language === 'FR' ? 'Gratuit' : language === 'IT' ? 'Gratuito' : language === 'EN' ? 'Free' : 'Gratis')}
-                    </p>
-                  </div>
-                  <div className="flex items-end justify-start sm:justify-end">
-                    <button
-                      onClick={() => navigate('pricing')}
-                      className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] border-b border-[#004225]/30 dark:border-[#00A854]/30 hover:border-[#004225] dark:hover:border-[#00A854] pb-0.5 transition-all"
-                    >
-                      {language === 'FR' ? 'Plan gérer' : language === 'IT' ? 'Gestisci piano' : language === 'EN' ? 'Manage plan' : 'Plan verwalten'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-6">
                 <div className="p-8 bg-[#004225] text-white space-y-6">
                   <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
@@ -7216,6 +7245,112 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
+            </div>
+            )}
+
+            {activeView === 'profile' && (
+            <div className="space-y-8 max-w-3xl">
+              <header>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                  {t.profile_kicker}
+                </div>
+                <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
+                <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
+              </header>
+
+              {/* Account / personal data */}
+              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
+                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
+                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_plan}</p>
+                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">
+                      {user.role === 'unlimited' ? 'Karriere+' : user.role === 'pro' ? 'Pro' : user.role === 'admin' ? 'Admin' : (language === 'FR' ? 'Gratuit' : language === 'IT' ? 'Gratuito' : language === 'EN' ? 'Free' : 'Gratis')}
+                    </p>
+                  </div>
+                  <div className="flex items-end justify-start sm:justify-end">
+                    <button
+                      onClick={() => navigate('pricing')}
+                      className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] border-b border-[#004225]/30 dark:border-[#00A854]/30 hover:border-[#004225] dark:hover:border-[#00A854] pb-0.5 transition-all"
+                    >
+                      {language === 'FR' ? 'Plan gérer' : language === 'IT' ? 'Gestisci piano' : language === 'EN' ? 'Manage plan' : 'Plan verwalten'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Application stats — synced with the dashboard tracker */}
+              {(() => {
+                const active = applications.filter((a: any) => !a.archived);
+                const interviews = active.filter((a: any) => a.status === 'interview').length;
+                const offers = active.filter((a: any) => a.status === 'angebot' || a.status === 'offer').length;
+                const rejected = active.filter((a: any) => a.status === 'abgelehnt' || a.status === 'rejected').length;
+                return (
+                  <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                    <div className="flex items-center justify-between mb-5">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_apps_overview}</p>
+                      <button onClick={() => navigate('dashboard')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tracker}</button>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                      {[
+                        { label: t.stat_total, value: active.length },
+                        { label: t.profile_stat_interviews, value: interviews },
+                        { label: t.profile_stat_offers, value: offers },
+                        { label: t.profile_stat_rejected, value: rejected },
+                      ].map((s, i) => (
+                        <div key={i} className="p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{s.label}</p>
+                          <p className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{s.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {active.length > 0 && (
+                      <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5 space-y-2">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-3">{t.profile_recent_apps}</p>
+                        {active.slice(0, 4).map((a: any) => (
+                          <div key={a.id} className="flex items-center justify-between gap-4 py-2 border-b border-black/5 dark:border-white/5 last:border-0">
+                            <div className="min-w-0">
+                              <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate">{a.company}</p>
+                              <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{a.position}</p>
+                            </div>
+                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] shrink-0">{a.status}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              {/* Tool activity — last few generations */}
+              {toolHistory.length > 0 && (
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                  <div className="flex items-center justify-between mb-5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_activity}</p>
+                    <button onClick={() => navigate('tools')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tools}</button>
+                  </div>
+                  <div className="space-y-2">
+                    {toolHistory.slice(0, 5).map((item: any, i: number) => (
+                      <div key={i} className="flex items-center justify-between gap-4 py-2 border-b border-black/5 dark:border-white/5 last:border-0">
+                        <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{tools.find(tl => tl.id === item.toolId)?.title || item.toolTitle}</p>
+                        <span className="text-[9px] font-mono text-[#9A9A94] shrink-0">
+                          {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : ''}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
             </div>
             )}
 
@@ -10239,6 +10374,61 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="p-8 space-y-8 overflow-y-auto">
                 <section className="space-y-4">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.profile}</h4>
+
+                  {/* Profile photo */}
+                  <div
+                    onDragOver={(e) => { e.preventDefault(); if (!isUploadingAvatar) setIsAvatarDragOver(true); }}
+                    onDragLeave={() => setIsAvatarDragOver(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsAvatarDragOver(false);
+                      if (isUploadingAvatar) return;
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) processAvatarFile(file);
+                    }}
+                    className={`p-4 sm:p-5 border-2 ${isAvatarDragOver ? 'border-[#004225] bg-[#004225]/5' : 'border-black/8 bg-[#FDFCFB]'} transition-colors`}
+                  >
+                    <div className="flex items-center gap-4 sm:gap-5">
+                      <div className="relative shrink-0">
+                        {user?.avatar_url ? (
+                          <img src={user.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover border border-black/10" />
+                        ) : (
+                          <div className="w-16 h-16 rounded-full bg-[#004225]/8 flex items-center justify-center text-xl font-serif text-[#004225]">
+                            {(user?.firstName || '?').charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        {isUploadingAvatar && (
+                          <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_photo}</p>
+                        <p className="text-[11px] text-[#5C5C58] font-light leading-snug mb-3">{t.profile_photo_hint}</p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <button
+                            onClick={() => avatarInputRef.current?.click()}
+                            disabled={isUploadingAvatar}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-60"
+                          >
+                            <Upload size={11} />
+                            {isUploadingAvatar ? t.profile_photo_uploading : (user?.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
+                          </button>
+                          {user?.avatar_url && !isUploadingAvatar && (
+                            <button
+                              onClick={handleAvatarRemove}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#5C5C58] hover:text-red-600 transition-colors"
+                            >
+                              <Trash2 size={11} />
+                              {t.profile_photo_remove}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className="block text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94]">{t.settings_first_name}</label>
