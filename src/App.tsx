@@ -7249,8 +7249,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             )}
 
             {activeView === 'profile' && (
-            <div className="space-y-8 max-w-3xl">
-              <header>
+            <div className="space-y-8">
+              <header className="max-w-3xl">
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
                   {t.profile_kicker}
@@ -7259,97 +7259,133 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
               </header>
 
-              {/* Account / personal data */}
-              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
-                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
-                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
-                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_plan}</p>
-                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">
-                      {user.role === 'unlimited' ? 'Karriere+' : user.role === 'pro' ? 'Pro' : user.role === 'admin' ? 'Admin' : (language === 'FR' ? 'Gratuit' : language === 'IT' ? 'Gratuito' : language === 'EN' ? 'Free' : 'Gratis')}
-                    </p>
-                  </div>
-                  <div className="flex items-end justify-start sm:justify-end">
-                    <button
-                      onClick={() => navigate('pricing')}
-                      className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] border-b border-[#004225]/30 dark:border-[#00A854]/30 hover:border-[#004225] dark:hover:border-[#00A854] pb-0.5 transition-all"
-                    >
-                      {language === 'FR' ? 'Plan gérer' : language === 'IT' ? 'Gestisci piano' : language === 'EN' ? 'Manage plan' : 'Plan verwalten'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Application stats — synced with the dashboard tracker */}
+              {/* TOP STATS BAR — full width, four big numbers */}
               {(() => {
                 const active = applications.filter((a: any) => !a.archived);
                 const interviews = active.filter((a: any) => a.status === 'interview').length;
                 const offers = active.filter((a: any) => a.status === 'angebot' || a.status === 'offer').length;
                 const rejected = active.filter((a: any) => a.status === 'abgelehnt' || a.status === 'rejected').length;
+                const stats = [
+                  { label: t.stat_total, value: active.length, accent: 'text-[#1A1A18] dark:text-[#FAFAF8]' },
+                  { label: t.profile_stat_interviews, value: interviews, accent: 'text-[#D4A852]' },
+                  { label: t.profile_stat_offers, value: offers, accent: 'text-[#004225] dark:text-[#00A854]' },
+                  { label: t.profile_stat_rejected, value: rejected, accent: 'text-[#9A9A94]' },
+                ];
                 return (
-                  <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                    <div className="flex items-center justify-between mb-5">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_apps_overview}</p>
-                      <button onClick={() => navigate('dashboard')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tracker}</button>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                      {[
-                        { label: t.stat_total, value: active.length },
-                        { label: t.profile_stat_interviews, value: interviews },
-                        { label: t.profile_stat_offers, value: offers },
-                        { label: t.profile_stat_rejected, value: rejected },
-                      ].map((s, i) => (
-                        <div key={i} className="p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{s.label}</p>
-                          <p className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{s.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                    {active.length > 0 && (
-                      <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5 space-y-2">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-3">{t.profile_recent_apps}</p>
-                        {active.slice(0, 4).map((a: any) => (
-                          <div key={a.id} className="flex items-center justify-between gap-4 py-2 border-b border-black/5 dark:border-white/5 last:border-0">
-                            <div className="min-w-0">
-                              <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate">{a.company}</p>
-                              <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{a.position}</p>
-                            </div>
-                            <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] shrink-0">{a.status}</span>
-                          </div>
-                        ))}
+                  <div className="grid grid-cols-2 lg:grid-cols-4 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 divide-x divide-y lg:divide-y-0 divide-black/5 dark:divide-white/5">
+                    {stats.map((s, i) => (
+                      <div key={i} className="p-6 sm:p-8">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-3">{s.label}</p>
+                        <p className={`text-5xl font-serif tracking-tight ${s.accent}`}>{s.value}</p>
                       </div>
-                    )}
+                    ))}
                   </div>
                 );
               })()}
 
-              {/* Tool activity — last few generations */}
-              {toolHistory.length > 0 && (
-                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+              {/* MID GRID — Konto (left) + Tool activity (right) */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
+                  <div className="space-y-5">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
+                      <p className="text-base text-[#1A1A18] dark:text-[#FAFAF8] font-medium">{user.firstName || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
+                      <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] truncate" title={user.email}>{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-2 p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
                   <div className="flex items-center justify-between mb-5">
                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_activity}</p>
                     <button onClick={() => navigate('tools')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tools}</button>
                   </div>
-                  <div className="space-y-2">
-                    {toolHistory.slice(0, 5).map((item: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between gap-4 py-2 border-b border-black/5 dark:border-white/5 last:border-0">
-                        <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{tools.find(tl => tl.id === item.toolId)?.title || item.toolTitle}</p>
-                        <span className="text-[9px] font-mono text-[#9A9A94] shrink-0">
-                          {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : ''}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                  {toolHistory.length > 0 ? (
+                    <div className="space-y-1">
+                      {toolHistory.slice(0, 6).map((item: any, i: number) => {
+                        const tool = tools.find(tl => tl.id === item.toolId);
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => tool && handleToolClick(tool.id)}
+                            className="w-full flex items-center justify-between gap-4 py-2.5 border-b border-black/5 dark:border-white/5 last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group text-left px-1"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-8 h-8 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854] flex items-center justify-center">
+                                {tool?.icon || <Wrench size={14} />}
+                              </div>
+                              <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool?.title || item.toolTitle}</p>
+                            </div>
+                            <span className="text-[10px] font-mono text-[#9A9A94] shrink-0">
+                              {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#9A9A94] font-light italic py-6">{language === 'FR' ? "Aucune activité pour l'instant. Lance ton premier outil." : language === 'IT' ? 'Nessuna attività ancora. Avvia il tuo primo strumento.' : language === 'EN' ? 'No activity yet. Run your first tool.' : 'Noch keine Aktivität. Starte dein erstes Tool.'}</p>
+                  )}
                 </div>
-              )}
+              </div>
+
+              {/* MINI-KANBAN — five status columns, top 3 cards each */}
+              {(() => {
+                const active = applications.filter((a: any) => !a.archived);
+                const STATUSES = [
+                  { key: 'wunschliste', label: language === 'FR' ? 'Liste de souhaits' : language === 'IT' ? 'Lista desideri' : language === 'EN' ? 'Wishlist' : 'Wunschliste', accent: '#9A9A94' },
+                  { key: 'beworben',    label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', accent: '#5C5C58' },
+                  { key: 'interview',   label: 'Interview', accent: '#D4A852' },
+                  { key: 'angebot',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', accent: '#004225' },
+                  { key: 'abgelehnt',   label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', accent: '#B91C1C' },
+                ];
+                return (
+                  <div className="bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 p-6 sm:p-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_apps_overview}</p>
+                      <button onClick={() => navigate('dashboard')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tracker}</button>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                      {STATUSES.map((col) => {
+                        const items = active.filter((a: any) => a.status === col.key);
+                        return (
+                          <div key={col.key} className="space-y-2">
+                            <div className="flex items-center justify-between px-1">
+                              <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: col.accent }}>{col.label}</span>
+                              <span className="text-[9px] font-bold text-[#9A9A94]">{items.length}</span>
+                            </div>
+                            {items.slice(0, 3).map((a: any) => (
+                              <div key={a.id} className="bg-[#FDFCFB] dark:bg-[#1A1A18] border-l-2 p-2.5" style={{ borderLeftColor: col.accent }}>
+                                <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate">{a.company}</p>
+                                <p className="text-xs font-medium text-[#1A1A18] dark:text-[#FAFAF8] truncate mt-0.5">{a.position}</p>
+                                {a.salary && (() => {
+                                  const num = String(a.salary).replace(/[^\d.]/g, '');
+                                  const n = parseFloat(num);
+                                  if (isNaN(n)) return null;
+                                  const f = n >= 10000 ? `${Math.round(n / 1000)}k` : n.toLocaleString('de-CH');
+                                  return <p className="text-[10px] text-[#004225] dark:text-[#00A854] font-bold mt-1">CHF {f}</p>;
+                                })()}
+                              </div>
+                            ))}
+                            {items.length === 0 && (
+                              <div className="border border-dashed border-black/8 dark:border-white/8 h-16 flex items-center justify-center">
+                                <span className="text-[#9A9A94] text-[10px] uppercase tracking-widest">{language === 'FR' ? 'Vide' : language === 'IT' ? 'Vuoto' : language === 'EN' ? 'Empty' : 'Leer'}</span>
+                              </div>
+                            )}
+                            {items.length > 3 && (
+                              <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] text-center pt-1">+ {items.length - 3} {language === 'FR' ? 'autres' : language === 'IT' ? 'altre' : language === 'EN' ? 'more' : 'mehr'}</p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
 
             </div>
             )}
