@@ -6295,6 +6295,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
+              <>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                 <div className="lg:col-span-2 space-y-6">
                 <header>
@@ -6512,6 +6513,204 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
 
+                </div>
+              <div className="lg:col-span-1 space-y-6">
+              <div className="space-y-6">
+                <div className="p-8 bg-[#004225] text-white space-y-6">
+                  <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
+                      <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
+                    </div>
+                    <div className="flex items-center gap-3 opacity-60">
+                      <div className={`w-2 h-2 rounded-full ${backendStatus === 'online' ? 'bg-[#059669]' : backendStatus === 'checking' ? 'bg-yellow-500' : 'bg-red-500'}`} />
+                      <span className="text-[10px] uppercase tracking-widest font-bold">Backend: {backendStatus}</span>
+                    </div>
+                    <CVDropzone 
+                      onFileAccepted={processFile} 
+                      isUploading={isUploading} 
+                      t={t} 
+                    />
+                  </div>
+                  {cvContext && (
+                    <div className="pt-6 border-t border-white/10">
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
+                          <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-8 border border-black/5 bg-white space-y-6">
+                  <h3 className="text-lg font-serif">{t.stella_roadmap}</h3>
+                  <div className="space-y-4">
+                    {isGeneratingRoadmap ? (
+                      <div className="flex flex-col gap-3">
+                        {[1, 2, 3].map(i => (
+                          <div key={i} className="h-4 bg-black/5 animate-pulse rounded" />
+                        ))}
+                      </div>
+                    ) : careerRoadmap.length > 0 ? (
+                      careerRoadmap.map((step, i) => (
+                        <div key={i} className="flex gap-3">
+                          <div className="w-6 h-6 rounded-full bg-[#004225]/10 flex items-center justify-center text-[10px] font-bold text-[#004225] shrink-0">{i + 1}</div>
+                          <p className="text-xs text-[#5C5C58] font-light">{step.replace(/^\d+\.\s*/, '')}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light italic">{t.stella_roadmap_empty}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 space-y-6 transition-colors">
+                  <h3 className="text-lg font-serif text-[#004225] dark:text-[#FAFAF8]">{t.stella_insights}</h3>
+                  <div className="space-y-4">
+                    {latestAnalysis ? (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_market_score}</span>
+                          <span className="text-lg font-serif text-[#004225]">{latestAnalysis.score}/100</span>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_top_keywords}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {latestAnalysis.keywords.slice(0, 5).map((k: string) => (
+                              <span key={k} className="px-2 py-0.5 bg-[#004225]/10 text-[8px] font-medium text-[#004225]">{k}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_best_match}</p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-xs font-light text-[#004225]/80">{latestAnalysis.industryMatch}</p>
+                            <span className="px-1 py-0.5 bg-[#004225]/5 border border-[#004225]/10 text-[6px] font-bold uppercase tracking-tighter text-[#004225]/60">NOGA Standard</span>
+                          </div>
+                        </div>
+                        {latestAnalysis.linguisticFixes && latestAnalysis.linguisticFixes.length > 0 && (
+                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_corrections}</p>
+                            <ul className="space-y-1">
+                              {latestAnalysis.linguisticFixes.map((fix: string, i: number) => (
+                                <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
+                                  <span className="text-[#004225] mt-0.5">✓</span>
+                                  {fix}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {latestAnalysis.improvements && latestAnalysis.improvements.length > 0 && (
+                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_tips}</p>
+                            <ul className="space-y-1">
+                              {latestAnalysis.improvements.map((imp: string, i: number) => (
+                                <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
+                                  <span className="text-[#004225] mt-0.5">→</span>
+                                  {imp}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        {latestAnalysis.optimizedSummary && (
+                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_short_profile}</p>
+                            <p className="text-[10px] font-light text-[#004225]/80 leading-relaxed italic">
+                              "{latestAnalysis.optimizedSummary}"
+                            </p>
+                          </div>
+                        )}
+                        {latestAnalysis.optimizedHighlights && (
+                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
+                            <div className="flex items-center justify-between">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_highlights}</p>
+                              <button 
+                                onClick={() => {
+                                  const text = latestAnalysis.optimizedHighlights.join('\n');
+                                  navigator.clipboard.writeText(text);
+                                }}
+                                className="p-1 hover:bg-[#004225]/10 rounded transition-colors text-[#004225]/60"
+                                title="Kopieren"
+                              >
+                                <Copy size={12} />
+                              </button>
+                            </div>
+                            <ul className="space-y-2">
+                              {latestAnalysis.optimizedHighlights.map((h: string, i: number) => (
+                                <li key={i} className="text-[10px] font-light text-[#004225]/80 leading-relaxed flex gap-2">
+                                  <span className="text-[#004225] font-bold">•</span>
+                                  {h}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <div className="pt-4 border-t border-[#004225]/10">
+                          <details className="group">
+                            <summary className="text-[8px] font-bold uppercase tracking-widest text-[#004225]/40 cursor-pointer hover:text-[#004225]/60 transition-colors list-none flex items-center gap-1">
+                              <span className="group-open:rotate-90 transition-transform">▶</span>
+                              {t.stella_raw_json}
+                            </summary>
+                            <pre className="mt-2 p-2 bg-[#004225]/5 text-[8px] font-mono text-[#004225]/60 overflow-x-auto custom-scrollbar">
+                              {JSON.stringify(latestAnalysis, null, 2)}
+                            </pre>
+                          </details>
+                        </div>
+                        <button 
+                          onClick={() => handleToolClick('cv-analysis')}
+                          className="w-full py-2 border border-[#004225]/20 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:bg-[#004225]/5 transition-all"
+                        >
+                          {t.stella_full_analysis}
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-[#004225]/70 dark:text-[#FAFAF8]/70 font-light leading-relaxed">
+                        {cvContext ? t.stella_insights_with_cv : t.stella_insights_no_cv}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                {salaryCalculations.length > 0 && (
+                  <div className="p-8 border border-black/5 bg-white space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-serif">{t.salary_history}</h3>
+                      <Coins size={18} className="text-[#004225]/40" />
+                    </div>
+                    <div className="space-y-4">
+                      {salaryCalculations.map((calc) => (
+                        <div key={calc.id} className="p-4 bg-[#FDFCFB] border border-black/5 space-y-2 group hover:border-[#004225]/20 transition-all">
+                          <div className="flex justify-between items-start">
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A18] truncate pr-4">{calc.jobTitle}</h4>
+                            <span className="text-[8px] font-mono text-[#9A9A94]">{calc.createdAt?.toDate ? calc.createdAt.toDate().toLocaleDateString('de-CH') : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[9px] text-[#6B6B66]">
+                            <span>{calc.industry}</span>
+                            <span className="w-1 h-1 rounded-full bg-black/10" />
+                            <span>{calc.canton}</span>
+                          </div>
+                          <div className="pt-2 flex items-center justify-between">
+                            <span className="text-[10px] font-serif text-[#004225]">CHF {calc.medianSalary.toLocaleString('de-CH')}</span>
+                            <div className="flex gap-1">
+                              <span className="text-[8px] text-[#9A9A94]">Range:</span>
+                              <span className="text-[8px] font-mono text-[#9A9A94]">{calc.minSalary / 1000}k - {calc.maxSalary / 1000}k</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+              </div>
+              </div>
+
+              <div className="space-y-6">
                 {/* Job Tracker / Kanban Board */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
@@ -7085,201 +7284,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
               </div>
-              <div className="lg:col-span-1 space-y-6">
-              <div className="space-y-6">
-                <div className="p-8 bg-[#004225] text-white space-y-6">
-                  <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
-                      <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
-                    </div>
-                    <div className="flex items-center gap-3 opacity-60">
-                      <div className={`w-2 h-2 rounded-full ${backendStatus === 'online' ? 'bg-[#059669]' : backendStatus === 'checking' ? 'bg-yellow-500' : 'bg-red-500'}`} />
-                      <span className="text-[10px] uppercase tracking-widest font-bold">Backend: {backendStatus}</span>
-                    </div>
-                    <CVDropzone 
-                      onFileAccepted={processFile} 
-                      isUploading={isUploading} 
-                      t={t} 
-                    />
-                  </div>
-                  {cvContext && (
-                    <div className="pt-6 border-t border-white/10">
-                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
-                          <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="p-8 border border-black/5 bg-white space-y-6">
-                  <h3 className="text-lg font-serif">{t.stella_roadmap}</h3>
-                  <div className="space-y-4">
-                    {isGeneratingRoadmap ? (
-                      <div className="flex flex-col gap-3">
-                        {[1, 2, 3].map(i => (
-                          <div key={i} className="h-4 bg-black/5 animate-pulse rounded" />
-                        ))}
-                      </div>
-                    ) : careerRoadmap.length > 0 ? (
-                      careerRoadmap.map((step, i) => (
-                        <div key={i} className="flex gap-3">
-                          <div className="w-6 h-6 rounded-full bg-[#004225]/10 flex items-center justify-center text-[10px] font-bold text-[#004225] shrink-0">{i + 1}</div>
-                          <p className="text-xs text-[#5C5C58] font-light">{step.replace(/^\d+\.\s*/, '')}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light italic">{t.stella_roadmap_empty}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 space-y-6 transition-colors">
-                  <h3 className="text-lg font-serif text-[#004225] dark:text-[#FAFAF8]">{t.stella_insights}</h3>
-                  <div className="space-y-4">
-                    {latestAnalysis ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_market_score}</span>
-                          <span className="text-lg font-serif text-[#004225]">{latestAnalysis.score}/100</span>
-                        </div>
-                        <div className="space-y-2">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_top_keywords}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {latestAnalysis.keywords.slice(0, 5).map((k: string) => (
-                              <span key={k} className="px-2 py-0.5 bg-[#004225]/10 text-[8px] font-medium text-[#004225]">{k}</span>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_best_match}</p>
-                          <div className="flex items-center gap-2">
-                            <p className="text-xs font-light text-[#004225]/80">{latestAnalysis.industryMatch}</p>
-                            <span className="px-1 py-0.5 bg-[#004225]/5 border border-[#004225]/10 text-[6px] font-bold uppercase tracking-tighter text-[#004225]/60">NOGA Standard</span>
-                          </div>
-                        </div>
-                        {latestAnalysis.linguisticFixes && latestAnalysis.linguisticFixes.length > 0 && (
-                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_corrections}</p>
-                            <ul className="space-y-1">
-                              {latestAnalysis.linguisticFixes.map((fix: string, i: number) => (
-                                <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
-                                  <span className="text-[#004225] mt-0.5">✓</span>
-                                  {fix}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {latestAnalysis.improvements && latestAnalysis.improvements.length > 0 && (
-                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_ch_tips}</p>
-                            <ul className="space-y-1">
-                              {latestAnalysis.improvements.map((imp: string, i: number) => (
-                                <li key={i} className="text-[9px] font-light text-[#004225]/80 leading-tight flex gap-1.5 items-start">
-                                  <span className="text-[#004225] mt-0.5">→</span>
-                                  {imp}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {latestAnalysis.optimizedSummary && (
-                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_short_profile}</p>
-                            <p className="text-[10px] font-light text-[#004225]/80 leading-relaxed italic">
-                              "{latestAnalysis.optimizedSummary}"
-                            </p>
-                          </div>
-                        )}
-                        {latestAnalysis.optimizedHighlights && (
-                          <div className="space-y-2 pt-2 border-t border-[#004225]/10">
-                            <div className="flex items-center justify-between">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]/60">{t.stella_highlights}</p>
-                              <button 
-                                onClick={() => {
-                                  const text = latestAnalysis.optimizedHighlights.join('\n');
-                                  navigator.clipboard.writeText(text);
-                                }}
-                                className="p-1 hover:bg-[#004225]/10 rounded transition-colors text-[#004225]/60"
-                                title="Kopieren"
-                              >
-                                <Copy size={12} />
-                              </button>
-                            </div>
-                            <ul className="space-y-2">
-                              {latestAnalysis.optimizedHighlights.map((h: string, i: number) => (
-                                <li key={i} className="text-[10px] font-light text-[#004225]/80 leading-relaxed flex gap-2">
-                                  <span className="text-[#004225] font-bold">•</span>
-                                  {h}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        <div className="pt-4 border-t border-[#004225]/10">
-                          <details className="group">
-                            <summary className="text-[8px] font-bold uppercase tracking-widest text-[#004225]/40 cursor-pointer hover:text-[#004225]/60 transition-colors list-none flex items-center gap-1">
-                              <span className="group-open:rotate-90 transition-transform">▶</span>
-                              {t.stella_raw_json}
-                            </summary>
-                            <pre className="mt-2 p-2 bg-[#004225]/5 text-[8px] font-mono text-[#004225]/60 overflow-x-auto custom-scrollbar">
-                              {JSON.stringify(latestAnalysis, null, 2)}
-                            </pre>
-                          </details>
-                        </div>
-                        <button 
-                          onClick={() => handleToolClick('cv-analysis')}
-                          className="w-full py-2 border border-[#004225]/20 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:bg-[#004225]/5 transition-all"
-                        >
-                          {t.stella_full_analysis}
-                        </button>
-                      </div>
-                    ) : (
-                      <p className="text-xs text-[#004225]/70 dark:text-[#FAFAF8]/70 font-light leading-relaxed">
-                        {cvContext ? t.stella_insights_with_cv : t.stella_insights_no_cv}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {salaryCalculations.length > 0 && (
-                  <div className="p-8 border border-black/5 bg-white space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-serif">{t.salary_history}</h3>
-                      <Coins size={18} className="text-[#004225]/40" />
-                    </div>
-                    <div className="space-y-4">
-                      {salaryCalculations.map((calc) => (
-                        <div key={calc.id} className="p-4 bg-[#FDFCFB] border border-black/5 space-y-2 group hover:border-[#004225]/20 transition-all">
-                          <div className="flex justify-between items-start">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A18] truncate pr-4">{calc.jobTitle}</h4>
-                            <span className="text-[8px] font-mono text-[#9A9A94]">{calc.createdAt?.toDate ? calc.createdAt.toDate().toLocaleDateString('de-CH') : ''}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-[9px] text-[#6B6B66]">
-                            <span>{calc.industry}</span>
-                            <span className="w-1 h-1 rounded-full bg-black/10" />
-                            <span>{calc.canton}</span>
-                          </div>
-                          <div className="pt-2 flex items-center justify-between">
-                            <span className="text-[10px] font-serif text-[#004225]">CHF {calc.medianSalary.toLocaleString('de-CH')}</span>
-                            <div className="flex gap-1">
-                              <span className="text-[8px] text-[#9A9A94]">Range:</span>
-                              <span className="text-[8px] font-mono text-[#9A9A94]">{calc.minSalary / 1000}k - {calc.maxSalary / 1000}k</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-              </div>
-              </div>
+              </>
             )}
 
             {activeView === 'profile' && (
