@@ -1494,7 +1494,12 @@ function StellifyApp() {
   const extractTextFromPDF = async (file: File): Promise<string> => {
     const arrayBuffer = await file.arrayBuffer();
     const pdfjsLib = await import('pdfjs-dist');
-    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+    // pdfjs-dist v5 ships the worker as an ESM module (.mjs). Bundle it via
+    // Vite's ?url import so we don't depend on an external CDN or a stale
+    // URL shape (the previous '.js' URL silently 404'd, which is what made
+    // every PDF upload fail with "konnte nicht gelesen werden").
+    const workerUrl = (await import('pdfjs-dist/build/pdf.worker.min.mjs?url')).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     let fullText = '';
 
