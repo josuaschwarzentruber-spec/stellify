@@ -947,6 +947,30 @@ function StellifyApp() {
   
   // Tool Modal State
   const [activeTool, setActiveTool] = useState<any | null>(null);
+
+  // Browser tab title — "Stellify - <current page>" so the open tab is always
+  // identifiable. Localised; the active tool name wins when a tool is open,
+  // otherwise the view name.
+  useEffect(() => {
+    const map: Record<string, Record<string, string>> = {
+      dashboard:   { DE: 'Dashboard', FR: 'Tableau de bord', IT: 'Dashboard', EN: 'Dashboard' },
+      profile:     { DE: 'Profil', FR: 'Profil', IT: 'Profilo', EN: 'Profile' },
+      tools:       { DE: 'Tools', FR: 'Outils', IT: 'Strumenti', EN: 'Tools' },
+      jobs:        { DE: 'Offene Stellen', FR: 'Offres', IT: 'Offerte', EN: 'Jobs' },
+      pricing:     { DE: 'Preise', FR: 'Tarifs', IT: 'Prezzi', EN: 'Pricing' },
+      about:       { DE: 'Über uns', FR: 'À propos', IT: 'Chi siamo', EN: 'About' },
+      datenschutz: { DE: 'Datenschutz', FR: 'Confidentialité', IT: 'Privacy', EN: 'Privacy' },
+      impressum:   { DE: 'Impressum', FR: 'Mentions légales', IT: 'Note legali', EN: 'Imprint' },
+      agb:         { DE: 'AGB', FR: 'CGV', IT: 'Termini', EN: 'Terms' },
+    };
+    const tagline = language === 'FR' ? "L'assistant de carrière IA suisse"
+      : language === 'IT' ? "L'assistente di carriera AI svizzero"
+      : language === 'EN' ? 'The Swiss AI career assistant'
+      : 'Der Schweizer KI-Karriereassistent';
+    const page = activeTool?.title || map[activeView]?.[language] || map[activeView]?.EN || '';
+    document.title = page ? `Stellify - ${page}` : `Stellify - ${tagline}`;
+  }, [activeView, activeTool, language]);
+
   const [toolInput, setToolInput] = useState<any>({});
   const [toolResult, setToolResult] = useState<string | null>(null);
   const [toolResultEditable, setToolResultEditable] = useState<string>('');
@@ -6267,7 +6291,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
 
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about') && (user ? (
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about') && ((user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tools' || activeView === 'jobs')) || !user) && (user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tools' || activeView === 'jobs') ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
@@ -7688,8 +7712,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </section>
       ))}
 
-      {/* --- MARKETING SECTIONS (hidden on legal pages) --- */}
-      {activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
+      {/* --- MARKETING SECTIONS ---
+           Only for visitors (landing) or the Preise page. Logged-in users on
+           dashboard / profile / tools / jobs see the app, not the landing
+           marketing stacked underneath. Hidden on legal + about pages. */}
+      {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
       {/* --- TOOLS GRID --- */}
       <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">

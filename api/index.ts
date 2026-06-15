@@ -1526,32 +1526,40 @@ app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
   }
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const moderation = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({
-        model: mdl,
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType, data: base64 } },
-            { text: 'Du bist ein Inhaltsmoderator für eine seriöse Schweizer Karriere-Plattform. Bewerte ob dieses Bild als Profilfoto erlaubt ist. NICHT erlaubt: Nacktheit, sexueller Inhalt, Gewalt, Waffen, Drogen, Hass-Symbole, beleidigende Gesten, Logos politischer Bewegungen, Markenlogos im Vordergrund, sowie Bilder anderer (echter) Personen die offensichtlich nicht der Profilinhaber sein können (z.B. Prominente, Memes). Erlaubt: neutrale Portraits, Personen in Berufskleidung, Outdoor-Portraits, Avatar-Illustrationen. Antworte AUSSCHLIESSLICH mit kompaktem JSON: {"ok": true|false, "reason": "kurzer Grund auf Deutsch"}.' }
-          ]
-        }],
-        config: { temperature: 0, maxOutputTokens: 120 }
-      })
-    , 2, PRO_MODEL);
+    // Moderation step — wrapped on its own so a Gemini API/infra failure
+    // (403/503/network) does NOT block the upload. Only an explicit
+    // {ok:false} content verdict rejects the image. This keeps the feature
+    // usable even if the moderation model is temporarily unreachable; the
+    // check re-engages automatically once Gemini responds again.
+    try {
+      const ai = new GoogleGenAI({ apiKey });
+      const moderation = await geminiWithRetry((mdl) =>
+        ai.models.generateContent({
+          model: mdl,
+          contents: [{
+            role: 'user',
+            parts: [
+              { inlineData: { mimeType, data: base64 } },
+              { text: 'Du bist ein Inhaltsmoderator für eine seriöse Schweizer Karriere-Plattform. Bewerte ob dieses Bild als Profilfoto erlaubt ist. NICHT erlaubt: Nacktheit, sexueller Inhalt, Gewalt, Waffen, Drogen, Hass-Symbole, beleidigende Gesten, Logos politischer Bewegungen, Markenlogos im Vordergrund, sowie Bilder anderer (echter) Personen die offensichtlich nicht der Profilinhaber sein können (z.B. Prominente, Memes). Erlaubt: neutrale Portraits, Personen in Berufskleidung, Outdoor-Portraits, Avatar-Illustrationen. Antworte AUSSCHLIESSLICH mit kompaktem JSON: {"ok": true|false, "reason": "kurzer Grund auf Deutsch"}.' }
+            ]
+          }],
+          config: { temperature: 0, maxOutputTokens: 120 }
+        })
+      , 2, PRO_MODEL);
 
-    const raw = (moderation.text || '').trim();
-    const jsonMatch = raw.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.warn('[AVATAR MOD] no JSON in response:', raw);
-      return res.status(502).json({ error: 'Moderation-Service hat ungültig geantwortet' });
-    }
-    let verdict: { ok?: boolean; reason?: string };
-    try { verdict = JSON.parse(jsonMatch[0]); }
-    catch { return res.status(502).json({ error: 'Moderation-Antwort nicht lesbar' }); }
-    if (!verdict.ok) {
-      return res.status(422).json({ error: verdict.reason || 'Bild abgelehnt' });
+      const raw = (moderation.text || '').trim();
+      const jsonMatch = raw.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const verdict = JSON.parse(jsonMatch[0]) as { ok?: boolean; reason?: string };
+        if (verdict.ok === false) {
+          return res.status(422).json({ error: verdict.reason || 'Bild abgelehnt' });
+        }
+      } else {
+        console.warn('[AVATAR MOD] no JSON in response, allowing:', raw.slice(0, 120));
+      }
+    } catch (modErr: any) {
+      // API error, not a content rejection — log and proceed with the upload.
+      console.warn('[AVATAR MOD] moderation unavailable, allowing upload:', (modErr?.message || '').slice(0, 160));
     }
 
     const { adminDb, adminStorage } = getAdminServices();
