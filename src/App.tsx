@@ -37,7 +37,8 @@ import {
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon,
   Pause, Volume2, VolumeX,
-  Archive, ArchiveRestore, LayoutGrid, List as ListIcon
+  Archive, ArchiveRestore, LayoutGrid, List as ListIcon,
+  Clock
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -3800,14 +3801,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_ultimate: "Karriere+ wählen",
       pricing_recommended: "Empfohlen",
       pricing_popular: "Beliebteste Wahl",
-      value_title: "CHF 19.90: lohnt sich das?",
+      value_title: "Was Stellify dir spart",
       value_items: [
-        "Ein Karriereberater kostet CHF 200–400 / Sitzung",
-        "Zeugnis nicht verstanden = falscher Job",
-        "Wenn dein Lebenslauf unsichtbar bleibt, bekommst du nie eine Einladung",
-        "Eine schlechte Bewerbung = verpasste Stelle",
-        "Mit einer besseren Stelle amortisiert sich das Abo sofort",
-        "Stellify spart dir 3–5 Std. pro Bewerbung"
+        { icon: "Coins", title: "CHF 200 bis 400", desc: "kostet eine einzige Karriereberatung. Stellify deckt das ganze Jahr ab." },
+        { icon: "Clock", title: "3 bis 5 Stunden", desc: "weniger Arbeit pro Bewerbung. Mehr Zeit für die Stellen, die zählen." },
+        { icon: "Target", title: "Mehr Einladungen", desc: "Ein optimierter Lebenslauf kommt durch jeden ATS-Filter." },
+        { icon: "TrendingUp", title: "Schnell amortisiert", desc: "Eine bessere Stelle bezahlt das Abo vielfach zurück." }
       ],
       tools_data: {
         'cv-optimizer': {
@@ -4421,14 +4420,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_ultimate: "Choisir Karriere+",
       pricing_recommended: "Recommandé",
       pricing_popular: "Choix le plus populaire",
-      value_title: "CHF 19.90 : cela en vaut-il la peine ?",
+      value_title: "Ce que Stellify te fait économiser",
       value_items: [
-        "Un conseiller en carrière coûte CHF 200–400 / séance",
-        "Certificat non compris = mauvais emploi",
-        "Un mauvais score ATS = le CV n'est jamais lu",
-        "Une mauvaise candidature = poste manqué",
-        "Un meilleur poste rembourse l'abonnement immédiatement",
-        "Stellify vous fait gagner 3–5 h par candidature"
+        { icon: "Coins", title: "CHF 200 à 400", desc: "coûte une seule séance de coaching. Stellify couvre toute l'année." },
+        { icon: "Clock", title: "3 à 5 heures", desc: "de travail en moins par candidature. Plus de temps pour les bons postes." },
+        { icon: "Target", title: "Plus d'entretiens", desc: "Un CV optimisé passe chaque filtre ATS." },
+        { icon: "TrendingUp", title: "Vite rentabilisé", desc: "Un meilleur poste rembourse l'abonnement plusieurs fois." }
       ],
       tools_data: {
         'cv-optimizer': { title: 'Optimiseur de CV', desc: 'Analyse votre CV selon les standards suisses et optimise la formulation.', input_label: 'Quelle section optimiser ?', input_placeholder: 'ex: Expérience professionnelle...' },
@@ -4936,14 +4933,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_ultimate: "Scegli Karriere+",
       pricing_recommended: "Consigliato",
       pricing_popular: "Scelta più popolare",
-      value_title: "CHF 19.90: ne vale la pena?",
+      value_title: "Cosa ti fa risparmiare Stellify",
       value_items: [
-        "Un consulente di carriera costa CHF 200–400 / sessione",
-        "Certificato non compreso = lavoro sbagliato",
-        "Un cattivo punteggio ATS = il CV non viene mai letto",
-        "Una cattiva candidatura = posto mancato",
-        "Con un posto migliore l'abbonamento si ripaga subito",
-        "Stellify ti fa risparmiare 3–5 ore per candidatura"
+        { icon: "Coins", title: "CHF 200 a 400", desc: "costa una sola sessione di coaching. Stellify copre tutto l'anno." },
+        { icon: "Clock", title: "3 a 5 ore", desc: "di lavoro in meno per candidatura. Più tempo per i posti che contano." },
+        { icon: "Target", title: "Più colloqui", desc: "Un CV ottimizzato supera ogni filtro ATS." },
+        { icon: "TrendingUp", title: "Si ripaga in fretta", desc: "Un lavoro migliore restituisce l'abbonamento molte volte." }
       ],
       tools_data: {
         'cv-optimizer': { title: 'Ottimizzatore CV', desc: 'Analizza il tuo CV secondo gli standard svizzeri e ottimizza la formulazione.', input_label: 'Quale sezione ottimizzare?', input_placeholder: 'es. Esperienza professionale...' },
@@ -5451,14 +5446,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_cta_ultimate: "Choose Karriere+",
       pricing_recommended: "Recommended",
       pricing_popular: "Most Popular",
-      value_title: "CHF 19.90: is it worth it?",
+      value_title: "What Stellify saves you",
       value_items: [
-        "A career counselor costs CHF 200–400 / session",
-        "Certificate not understood = wrong job",
-        "A bad ATS score = CV is never read",
-        "A bad application = missed position",
-        "One better job offer covers the entire subscription cost",
-        "Stellify saves you 3–5 hours per application"
+        { icon: "Coins", title: "CHF 200 to 400", desc: "for a single coaching session. Stellify covers the whole year." },
+        { icon: "Clock", title: "3 to 5 hours", desc: "of work per application. More time for the roles that matter." },
+        { icon: "Target", title: "More interviews", desc: "An optimized CV gets through every ATS filter." },
+        { icon: "TrendingUp", title: "Pays off quickly", desc: "A better job repays the subscription many times over." }
       ],
       tools_data: {
         'cv-optimizer': { title: 'CV Optimizer', desc: 'Analyzes your CV for Swiss standards & optimizes wording.', input_label: 'Which section to optimize?', input_placeholder: 'e.g. Work experience...' },
@@ -6123,20 +6116,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               /* Free User Usage — one canonical "Tool-Nutzung" counter
                                  (freeGenerationsUsed and toolUses are incremented in
                                  lockstep; showing both was confusing on the live tile). */
-                              <div className="space-y-4">
-                                {/* Tool Usage */}
-                                <div className="space-y-1">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 3</span>
-                                  </div>
-                                  <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                    <div
-                                      className="h-full bg-[#004225] transition-all duration-700"
-                                      style={{ width: `${Math.min(100, Math.round(((user.toolUses || 0) / 3) * 100))}%` }}
-                                    />
-                                  </div>
-                                </div>
+                              <div className="flex justify-between items-center">
+                                <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
+                                <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 3</span>
                               </div>
                             )}
                           </div>
@@ -7867,15 +7849,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </motion.div>
 
           {/* VALUE BOX */}
-          <div className="max-w-3xl mx-auto p-8 border border-[#004225]/30 bg-[#004225]/5 rounded-none mb-16">
-            <h3 className="text-xl font-serif mb-6 text-center">{t.value_title}</h3>
-            <div className="grid md:grid-cols-2 gap-x-12 gap-y-4">
-              {t.value_items.map((item: string, i: number) => (
-                <div key={i} className="flex items-start gap-3 text-sm text-white/60 font-light">
-                  <CheckCircle2 size={14} className="text-[#004225] mt-1 shrink-0" />
-                  {item}
-                </div>
-              ))}
+          <div className="max-w-5xl mx-auto mb-16">
+            <h3 className="text-2xl lg:text-3xl font-serif text-center text-white mb-10 tracking-tight">{t.value_title}</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
+              {t.value_items.map((item: any, i: number) => {
+                const Icon = item.icon === 'Coins' ? Coins
+                  : item.icon === 'Clock' ? Clock
+                  : item.icon === 'Target' ? Target
+                  : TrendingUp;
+                return (
+                  <div key={i} className="bg-[#0a1410] p-7 hover:bg-[#0c1813] transition-colors">
+                    <div className="w-9 h-9 flex items-center justify-center bg-[#004225] text-white mb-5">
+                      <Icon size={16} />
+                    </div>
+                    <p className="text-lg font-serif text-white leading-tight mb-2">{item.title}</p>
+                    <p className="text-xs text-white/55 font-light leading-relaxed">{item.desc}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
