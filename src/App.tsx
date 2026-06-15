@@ -96,6 +96,7 @@ interface UserData {
   subscriptionExpiresAt?: string;
   subscriptionInterval?: 'monthly' | 'annual';
   stripeCustomerId?: string;
+  avatar_url?: string;
 }
 
 // --- ERROR BOUNDARY ---
@@ -774,6 +775,8 @@ function StellifyApp() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
@@ -1677,6 +1680,46 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) processFile(file);
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !user) return;
+    if (!/^image\/(jpe?g|png|webp)$/.test(file.type)) {
+      showToast(language === 'FR' ? 'Format non supporté (JPG, PNG, WEBP)' : language === 'IT' ? 'Formato non supportato (JPG, PNG, WEBP)' : language === 'EN' ? 'Unsupported format (JPG, PNG, WEBP)' : 'Format nicht unterstützt (JPG, PNG, WEBP)', 'error');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast(language === 'FR' ? "L'image dépasse 5 Mo" : language === 'IT' ? "L'immagine supera 5 MB" : language === 'EN' ? 'Image exceeds 5 MB' : 'Bild grösser als 5 MB', 'error');
+      return;
+    }
+    setIsUploadingAvatar(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      let binary = '';
+      const bytes = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const base64 = btoa(binary);
+      const token = await getAuthToken();
+      const res = await fetch('/api/upload-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ base64, mimeType: file.type }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.error || (language === 'FR' ? 'Upload refusé' : language === 'IT' ? 'Upload rifiutato' : language === 'EN' ? 'Upload rejected' : 'Upload abgelehnt'), 'error');
+        return;
+      }
+      setUser({ ...user, avatar_url: data.url });
+      showToast(language === 'FR' ? 'Photo de profil mise à jour' : language === 'IT' ? 'Foto profilo aggiornata' : language === 'EN' ? 'Profile photo updated' : 'Profilbild aktualisiert');
+    } catch (err: any) {
+      console.error('Avatar upload error:', err);
+      showToast(err?.message || (language === 'FR' ? 'Erreur lors du téléversement' : language === 'IT' ? 'Errore durante il caricamento' : language === 'EN' ? 'Upload error' : 'Upload-Fehler'), 'error');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -3399,6 +3442,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profil",
       profile_title: "Dein Profil",
       profile_desc: "Verwalte deinen Lebenslauf, deine Roadmap und Stellas Wissen über dich an einem Ort.",
+      profile_photo: "Profilbild",
+      profile_photo_hint: "JPG, PNG oder WEBP. Maximal 5 MB. Wird vor dem Speichern automatisch geprüft.",
+      profile_photo_change: "Bild ändern",
+      profile_photo_upload: "Bild hochladen",
+      profile_photo_uploading: "Wird geprüft…",
       tools: "Tools",
       pricing: "Preise",
       login: "Anmelden",
@@ -4021,6 +4069,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profil",
       profile_title: "Ton profil",
       profile_desc: "Gère ton CV, ta roadmap et ce que Stella sait de toi au même endroit.",
+      profile_photo: "Photo de profil",
+      profile_photo_hint: "JPG, PNG ou WEBP. Maximum 5 Mo. Vérifié automatiquement avant l'enregistrement.",
+      profile_photo_change: "Changer l'image",
+      profile_photo_upload: "Téléverser une image",
+      profile_photo_uploading: "Vérification…",
       tools: "Outils",
       pricing: "Tarifs",
       login: "Connexion",
@@ -4537,6 +4590,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profilo",
       profile_title: "Il tuo profilo",
       profile_desc: "Gestisci il tuo CV, la tua roadmap e ciò che Stella sa di te in un unico posto.",
+      profile_photo: "Foto profilo",
+      profile_photo_hint: "JPG, PNG o WEBP. Massimo 5 MB. Controllato automaticamente prima del salvataggio.",
+      profile_photo_change: "Cambia immagine",
+      profile_photo_upload: "Carica immagine",
+      profile_photo_uploading: "Verifica in corso…",
       tools: "Strumenti",
       pricing: "Prezzi",
       login: "Accedi",
@@ -5053,6 +5111,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profile",
       profile_title: "Your profile",
       profile_desc: "Manage your CV, your roadmap and what Stella knows about you in one place.",
+      profile_photo: "Profile photo",
+      profile_photo_hint: "JPG, PNG or WEBP. Up to 5 MB. Reviewed automatically before saving.",
+      profile_photo_change: "Change photo",
+      profile_photo_upload: "Upload photo",
+      profile_photo_uploading: "Checking…",
       tools: "Tools",
       pricing: "Pricing",
       login: "Login",
@@ -6863,6 +6926,39 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
                 <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
               </header>
+
+              {/* Profile photo */}
+              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_photo}</p>
+                <div className="flex items-center gap-5 sm:gap-6">
+                  <div className="relative shrink-0">
+                    {user.avatar_url ? (
+                      <img src={user.avatar_url} alt="" className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-black/10 dark:border-white/10" />
+                    ) : (
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-2xl sm:text-3xl font-serif text-[#004225] dark:text-[#00A854]">
+                        {(user.firstName || '?').charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    {isUploadingAvatar && (
+                      <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-3">
+                    <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{t.profile_photo_hint}</p>
+                    <button
+                      onClick={() => avatarInputRef.current?.click()}
+                      disabled={isUploadingAvatar}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                      <Upload size={12} />
+                      {isUploadingAvatar ? t.profile_photo_uploading : (user.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-6">
                 <div className="p-8 bg-[#004225] text-white space-y-6">
                   <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
@@ -10421,6 +10517,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           const file = e.target.files?.[0];
           if (file) processFile(file);
         }}
+      />
+      <input
+        type="file"
+        ref={avatarInputRef}
+        className="hidden"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        onChange={handleAvatarUpload}
       />
       <input
         type="file"
