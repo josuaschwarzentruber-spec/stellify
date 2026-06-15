@@ -1504,6 +1504,72 @@ app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
   }
 });
 
+// ── Avatar upload with Gemini moderation ─────────────────────────────────────
+// Two-step: ask Gemini (multimodal) to flag inappropriate content, then store
+// the image in Firebase Storage under avatars/<uid>/avatar.<ext> and save the
+// signed URL on the user document. We err on the side of rejecting borderline
+// content — this is a career platform, not a social network.
+app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
+  const { base64, mimeType } = req.body as { base64?: string; mimeType?: string };
+  const uid = (req as any).uid;
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
+  if (!base64) return res.status(400).json({ error: "base64 fehlt" });
+  if (!mimeType || !/^image\/(jpe?g|png|webp)$/.test(mimeType)) {
+    return res.status(400).json({ error: "Nur JPG, PNG oder WEBP" });
+  }
+
+  // Size cap: 5 MB raw (base64 inflates ~33%).
+  const approxBytes = (base64.length * 3) / 4;
+  if (approxBytes > 5 * 1024 * 1024) {
+    return res.status(413).json({ error: "Bild ist grösser als 5 MB" });
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey });
+    const moderation = await geminiWithRetry((mdl) =>
+      ai.models.generateContent({
+        model: mdl,
+        contents: [{
+          role: 'user',
+          parts: [
+            { inlineData: { mimeType, data: base64 } },
+            { text: 'Du bist ein Inhaltsmoderator für eine seriöse Schweizer Karriere-Plattform. Bewerte ob dieses Bild als Profilfoto erlaubt ist. NICHT erlaubt: Nacktheit, sexueller Inhalt, Gewalt, Waffen, Drogen, Hass-Symbole, beleidigende Gesten, Logos politischer Bewegungen, Markenlogos im Vordergrund, sowie Bilder anderer (echter) Personen die offensichtlich nicht der Profilinhaber sein können (z.B. Prominente, Memes). Erlaubt: neutrale Portraits, Personen in Berufskleidung, Outdoor-Portraits, Avatar-Illustrationen. Antworte AUSSCHLIESSLICH mit kompaktem JSON: {"ok": true|false, "reason": "kurzer Grund auf Deutsch"}.' }
+          ]
+        }],
+        config: { temperature: 0, maxOutputTokens: 120 }
+      })
+    , 2, PRO_MODEL);
+
+    const raw = (moderation.text || '').trim();
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      console.warn('[AVATAR MOD] no JSON in response:', raw);
+      return res.status(502).json({ error: 'Moderation-Service hat ungültig geantwortet' });
+    }
+    let verdict: { ok?: boolean; reason?: string };
+    try { verdict = JSON.parse(jsonMatch[0]); }
+    catch { return res.status(502).json({ error: 'Moderation-Antwort nicht lesbar' }); }
+    if (!verdict.ok) {
+      return res.status(422).json({ error: verdict.reason || 'Bild abgelehnt' });
+    }
+
+    const { adminDb, adminStorage } = getAdminServices();
+    const buffer = Buffer.from(base64, 'base64');
+    const ext = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
+    const path = `avatars/${uid}/avatar_${Date.now()}.${ext}`;
+    const bucket = adminStorage.bucket();
+    const file = bucket.file(path);
+    await file.save(buffer, { contentType: mimeType });
+    const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2100' });
+    await adminDb.collection('users').doc(uid).update({ avatar_url: url, avatar_path: path });
+    res.json({ success: true, url });
+  } catch (error: any) {
+    console.error("[AVATAR UPLOAD ERROR]", error);
+    res.status(500).json({ error: error.message || 'Avatar-Upload fehlgeschlagen' });
+  }
+});
+
 // ── LinkedIn Profile Import OAuth (separate from Supabase login) ──────────────
 // Generates a random state token per request to prevent CSRF
 const linkedInStates = new Map<string, number>();
