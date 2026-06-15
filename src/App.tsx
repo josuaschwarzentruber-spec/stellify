@@ -414,8 +414,8 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         />
       </div>
       <div className="space-y-2">
-        <h4 className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate pr-20" title={app.company}>{app.company}</h4>
-        <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-medium leading-snug truncate" title={app.position}>{app.position}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate pr-20" title={app.company}>{app.company}</p>
+        <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug truncate" title={app.position}>{app.position}</p>
         {app.location && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94]">
             <MapPin size={11} className="shrink-0" />
@@ -3412,7 +3412,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abonnement",
       data_privacy: "Datenschutz",
       tools_title: "Profil einmal anlegen. Alle Tools nutzen.",
-      tools_badge: "20+ Tools, ein Abo",
+      tools_badge: "Alle Tools, ein Abo",
       tools_view_all: "Alle Tools ansehen",
       market_title: "Warum jetzt. Warum Schweiz.",
       market_badge: "Marktpotenzial",
@@ -3468,7 +3468,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Alles was du wissen musst",
       faq_contact: "Noch Fragen?",
       cta_final_title: "Deine Karriere verdient deinen persönlichen Copilot.",
-      cta_final_desc: "Kostenlos starten. 20+ Tools. Schweizer Standard. Kein Abo-Risiko.",
+      cta_final_desc: "Kostenlos starten. Alle Tools. Schweizer Standard. Kein Abo-Risiko.",
       cta_final_btn: "Jetzt kostenlos starten",
       settings_first_name: "Vorname",
       settings_email: "E-Mail",
@@ -4033,7 +4033,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abonnement",
       data_privacy: "Confidentialité",
       tools_title: "Créez votre profil une fois. Utilisez tous les outils.",
-      tools_badge: "20+ Outils, un abonnement",
+      tools_badge: "Tous les outils, un abonnement",
       tools_view_all: "Voir tous les outils",
       market_title: "Pourquoi maintenant. Pourquoi la Suisse.",
       market_badge: "Potentiel du marché",
@@ -4089,7 +4089,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Tout ce que vous devez savoir",
       faq_contact: "Encore des questions ?",
       cta_final_title: "Votre carrière mérite votre copilote personnel.",
-      cta_final_desc: "Démarrage gratuit. 20+ outils. Standard suisse. Sans risque d'abonnement.",
+      cta_final_desc: "Démarrage gratuit. Tous les outils. Standard suisse. Sans risque d'abonnement.",
       cta_final_btn: "Démarrer gratuitement maintenant",
       settings_first_name: "Prénom",
       settings_email: "E-mail",
@@ -4548,7 +4548,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abbonamento",
       data_privacy: "Privacy",
       tools_title: "Crea il tuo profilo una volta. Usa tutti gli strumenti.",
-      tools_badge: "20+ Strumenti, un abbonamento",
+      tools_badge: "Tutti gli strumenti, un abbonamento",
       tools_view_all: "Vedi tutti gli strumenti",
       market_title: "Perché ora. Perché la Svizzera.",
       market_badge: "Potenziale di mercato",
@@ -4604,7 +4604,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Tutto quello che devi sapere",
       faq_contact: "Altre domande?",
       cta_final_title: "La tua carriera merita il tuo copilota personale.",
-      cta_final_desc: "Inizia gratuitamente. 20+ strumenti. Standard svizzero. Nessun rischio di abbonamento.",
+      cta_final_desc: "Inizia gratuitamente. Tutti gli strumenti. Standard svizzero. Nessun rischio di abbonamento.",
       cta_final_btn: "Inizia ora gratuitamente",
       settings_first_name: "Nome",
       settings_email: "E-mail",
@@ -5063,7 +5063,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Subscription",
       data_privacy: "Privacy",
       tools_title: "Create profile once. Use all tools.",
-      tools_badge: "20+ Tools, one subscription",
+      tools_badge: "All tools, one subscription",
       tools_view_all: "View all tools",
       market_title: "Why now. Why Switzerland.",
       market_badge: "Market Potential",
@@ -5119,7 +5119,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_subtitle: "Everything you need to know",
       faq_contact: "Any questions?",
       cta_final_title: "Your career deserves your personal copilot.",
-      cta_final_desc: "Start for free. 20+ tools. Swiss standard. No subscription risk.",
+      cta_final_desc: "Start for free. All tools. Swiss standard. No subscription risk.",
       cta_final_btn: "Start for free now",
       settings_first_name: "First Name",
       settings_email: "Email",
@@ -7494,12 +7494,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-8 max-w-lg">
               {language === 'FR'
-                ? 'Un Kanban simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes, ne rate plus jamais un suivi. Disponible dans chaque plan — y compris le plan Gratuit.'
+                ? 'Une vue d\'ensemble simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes, ne rate plus jamais un suivi. Disponible dans chaque plan. Y compris le plan Gratuit.'
                 : language === 'IT'
-                ? 'Una Kanban semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note, non perdere mai un follow-up. Disponibile in ogni piano — anche in quello Gratuito.'
+                ? 'Una panoramica semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note, non perdere mai un follow-up. Disponibile in ogni piano. Anche in quello Gratuito.'
                 : language === 'EN'
-                ? 'A simple Kanban: Applied, Interview, Offer. Drag cards, add notes, never miss a follow-up. Available on every plan — including Free.'
-                : 'Ein einfaches Kanban: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen, nie wieder ein Follow-up verpassen. In jedem Plan dabei — auch im Gratis-Plan.'}
+                ? 'A simple overview: Applied, Interview, Offer. Drag the cards, add notes, never miss a follow-up. Available on every plan. Free plan included.'
+                : 'Eine einfache Übersicht: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen, nie wieder ein Follow-up verpassen. In jedem Plan dabei. Auch im Gratis-Plan.'}
             </p>
             <button
               onClick={() => user ? navigate('dashboard') : setIsAuthModalOpen(true)}
