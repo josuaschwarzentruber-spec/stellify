@@ -3442,6 +3442,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profil",
       profile_title: "Dein Profil",
       profile_desc: "Verwalte deinen Lebenslauf, deine Roadmap und Stellas Wissen über dich an einem Ort.",
+      profile_kicker: "Über dich",
+      dashboard_kicker: "Dein Arbeitsbereich",
+      profile_account: "Konto",
+      profile_account_name: "Name",
+      profile_account_email: "E-Mail",
+      profile_account_plan: "Aktiver Plan",
+      profile_account_member_since: "Mitglied seit",
       profile_photo: "Profilbild",
       profile_photo_hint: "JPG, PNG oder WEBP. Maximal 5 MB. Wird vor dem Speichern automatisch geprüft.",
       profile_photo_change: "Bild ändern",
@@ -4069,6 +4076,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profil",
       profile_title: "Ton profil",
       profile_desc: "Gère ton CV, ta roadmap et ce que Stella sait de toi au même endroit.",
+      profile_kicker: "À ton sujet",
+      dashboard_kicker: "Ton espace de travail",
+      profile_account: "Compte",
+      profile_account_name: "Nom",
+      profile_account_email: "E-mail",
+      profile_account_plan: "Abonnement actif",
+      profile_account_member_since: "Membre depuis",
       profile_photo: "Photo de profil",
       profile_photo_hint: "JPG, PNG ou WEBP. Maximum 5 Mo. Vérifié automatiquement avant l'enregistrement.",
       profile_photo_change: "Changer l'image",
@@ -4590,6 +4604,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profilo",
       profile_title: "Il tuo profilo",
       profile_desc: "Gestisci il tuo CV, la tua roadmap e ciò che Stella sa di te in un unico posto.",
+      profile_kicker: "Su di te",
+      dashboard_kicker: "La tua area di lavoro",
+      profile_account: "Account",
+      profile_account_name: "Nome",
+      profile_account_email: "E-mail",
+      profile_account_plan: "Piano attivo",
+      profile_account_member_since: "Membro dal",
       profile_photo: "Foto profilo",
       profile_photo_hint: "JPG, PNG o WEBP. Massimo 5 MB. Controllato automaticamente prima del salvataggio.",
       profile_photo_change: "Cambia immagine",
@@ -5111,6 +5132,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_nav: "Profile",
       profile_title: "Your profile",
       profile_desc: "Manage your CV, your roadmap and what Stella knows about you in one place.",
+      profile_kicker: "About you",
+      dashboard_kicker: "Your workspace",
+      profile_account: "Account",
+      profile_account_name: "Name",
+      profile_account_email: "Email",
+      profile_account_plan: "Active plan",
+      profile_account_member_since: "Member since",
       profile_photo: "Profile photo",
       profile_photo_hint: "JPG, PNG or WEBP. Up to 5 MB. Reviewed automatically before saving.",
       profile_photo_change: "Change photo",
@@ -6143,6 +6171,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             {activeView === 'dashboard' && (
               <div className="space-y-6">
                 <header>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                    {t.dashboard_kicker}
+                  </div>
                   <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">
                     {t.dashboard_welcome} <span className="italic opacity-80">{user.firstName || t.dashboard_pro}</span>.
                   </h1>
@@ -6923,6 +6955,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             {activeView === 'profile' && (
             <div className="space-y-8 max-w-3xl">
               <header>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                  {t.profile_kicker}
+                </div>
                 <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
                 <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
               </header>
@@ -6954,6 +6990,35 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     >
                       <Upload size={12} />
                       {isUploadingAvatar ? t.profile_photo_uploading : (user.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Account / personal data */}
+              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
+                <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
+                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
+                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_plan}</p>
+                    <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">
+                      {user.role === 'unlimited' ? 'Karriere+' : user.role === 'pro' ? 'Pro' : user.role === 'admin' ? 'Admin' : (language === 'FR' ? 'Gratuit' : language === 'IT' ? 'Gratuito' : language === 'EN' ? 'Free' : 'Gratis')}
+                    </p>
+                  </div>
+                  <div className="flex items-end justify-start sm:justify-end">
+                    <button
+                      onClick={() => navigate('pricing')}
+                      className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] border-b border-[#004225]/30 dark:border-[#00A854]/30 hover:border-[#004225] dark:hover:border-[#00A854] pb-0.5 transition-all"
+                    >
+                      {language === 'FR' ? 'Plan gérer' : language === 'IT' ? 'Gestisci piano' : language === 'EN' ? 'Manage plan' : 'Plan verwalten'}
                     </button>
                   </div>
                 </div>
