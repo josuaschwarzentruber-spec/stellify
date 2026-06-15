@@ -1512,8 +1512,10 @@ app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
 app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
   const { base64, mimeType } = req.body as { base64?: string; mimeType?: string };
   const uid = (req as any).uid;
+  // Gemini is only used for image moderation. In DeepSeek-only setups (no
+  // GEMINI_API_KEY) the upload still works — moderation is simply skipped,
+  // since DeepSeek has no vision capability.
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
   if (!base64) return res.status(400).json({ error: "base64 fehlt" });
   if (!mimeType || !/^image\/(jpe?g|png|webp)$/.test(mimeType)) {
     return res.status(400).json({ error: "Nur JPG, PNG oder WEBP" });
@@ -1531,7 +1533,7 @@ app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
     // {ok:false} content verdict rejects the image. This keeps the feature
     // usable even if the moderation model is temporarily unreachable; the
     // check re-engages automatically once Gemini responds again.
-    try {
+    if (apiKey) try {
       const ai = new GoogleGenAI({ apiKey });
       const moderation = await geminiWithRetry((mdl) =>
         ai.models.generateContent({
