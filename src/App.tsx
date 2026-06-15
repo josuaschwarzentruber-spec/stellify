@@ -776,6 +776,7 @@ function StellifyApp() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isAvatarDragOver, setIsAvatarDragOver] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
@@ -1682,30 +1683,52 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (file) processFile(file);
   };
 
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
+  // Square-crop + resize to 512×512 JPEG before sending. Smaller payload
+  // means faster upload, cheaper Gemini moderation, and avatars that
+  // render crisply at every size we use them at (header, profile card).
+  const resizeImageForAvatar = (file: File): Promise<{ base64: string; mimeType: string }> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const TARGET = 512;
+        const side = Math.min(img.width, img.height);
+        const sx = (img.width - side) / 2;
+        const sy = (img.height - side) / 2;
+        const canvas = document.createElement('canvas');
+        canvas.width = TARGET;
+        canvas.height = TARGET;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas-Kontext nicht verfügbar')); return; }
+        ctx.drawImage(img, sx, sy, side, side, 0, 0, TARGET, TARGET);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
+        const base64 = dataUrl.split(',')[1] || '';
+        resolve({ base64, mimeType: 'image/jpeg' });
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Bild konnte nicht gelesen werden')); };
+      img.src = url;
+    });
+  };
+
+  const processAvatarFile = async (file: File) => {
     if (!file || !user) return;
     if (!/^image\/(jpe?g|png|webp)$/.test(file.type)) {
       showToast(language === 'FR' ? 'Format non supporté (JPG, PNG, WEBP)' : language === 'IT' ? 'Formato non supportato (JPG, PNG, WEBP)' : language === 'EN' ? 'Unsupported format (JPG, PNG, WEBP)' : 'Format nicht unterstützt (JPG, PNG, WEBP)', 'error');
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      showToast(language === 'FR' ? "L'image dépasse 5 Mo" : language === 'IT' ? "L'immagine supera 5 MB" : language === 'EN' ? 'Image exceeds 5 MB' : 'Bild grösser als 5 MB', 'error');
+    if (file.size > 10 * 1024 * 1024) {
+      showToast(language === 'FR' ? "L'image dépasse 10 Mo" : language === 'IT' ? "L'immagine supera 10 MB" : language === 'EN' ? 'Image exceeds 10 MB' : 'Bild grösser als 10 MB', 'error');
       return;
     }
     setIsUploadingAvatar(true);
     try {
-      const arrayBuffer = await file.arrayBuffer();
-      let binary = '';
-      const bytes = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-      const base64 = btoa(binary);
+      const { base64, mimeType } = await resizeImageForAvatar(file);
       const token = await getAuthToken();
       const res = await fetch('/api/upload-avatar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ base64, mimeType: file.type }),
+        body: JSON.stringify({ base64, mimeType }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -1717,6 +1740,36 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     } catch (err: any) {
       console.error('Avatar upload error:', err);
       showToast(err?.message || (language === 'FR' ? 'Erreur lors du téléversement' : language === 'IT' ? 'Errore durante il caricamento' : language === 'EN' ? 'Upload error' : 'Upload-Fehler'), 'error');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (file) await processAvatarFile(file);
+  };
+
+  const handleAvatarRemove = async () => {
+    if (!user) return;
+    setIsUploadingAvatar(true);
+    try {
+      const token = await getAuthToken();
+      const res = await fetch('/api/upload-avatar', {
+        method: 'DELETE',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        showToast(data.error || (language === 'FR' ? 'Suppression échouée' : language === 'IT' ? 'Eliminazione fallita' : language === 'EN' ? 'Removal failed' : 'Entfernen fehlgeschlagen'), 'error');
+        return;
+      }
+      setUser({ ...user, avatar_url: undefined });
+      showToast(language === 'FR' ? 'Photo de profil supprimée' : language === 'IT' ? 'Foto profilo rimossa' : language === 'EN' ? 'Profile photo removed' : 'Profilbild entfernt');
+    } catch (err: any) {
+      console.error('Avatar remove error:', err);
+      showToast(err?.message || 'Fehler', 'error');
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -3450,10 +3503,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_plan: "Aktiver Plan",
       profile_account_member_since: "Mitglied seit",
       profile_photo: "Profilbild",
-      profile_photo_hint: "JPG, PNG oder WEBP. Maximal 5 MB. Wird vor dem Speichern automatisch geprüft.",
+      profile_photo_hint: "JPG, PNG oder WEBP. Hier ablegen oder klicken. Bilder werden vor dem Speichern automatisch geprüft.",
       profile_photo_change: "Bild ändern",
       profile_photo_upload: "Bild hochladen",
       profile_photo_uploading: "Wird geprüft…",
+      profile_photo_remove: "Entfernen",
       tools: "Tools",
       pricing: "Preise",
       login: "Anmelden",
@@ -4084,10 +4138,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_plan: "Abonnement actif",
       profile_account_member_since: "Membre depuis",
       profile_photo: "Photo de profil",
-      profile_photo_hint: "JPG, PNG ou WEBP. Maximum 5 Mo. Vérifié automatiquement avant l'enregistrement.",
+      profile_photo_hint: "JPG, PNG ou WEBP. Glisse ici ou clique. Vérifié automatiquement avant l'enregistrement.",
       profile_photo_change: "Changer l'image",
       profile_photo_upload: "Téléverser une image",
       profile_photo_uploading: "Vérification…",
+      profile_photo_remove: "Retirer",
       tools: "Outils",
       pricing: "Tarifs",
       login: "Connexion",
@@ -4612,10 +4667,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_plan: "Piano attivo",
       profile_account_member_since: "Membro dal",
       profile_photo: "Foto profilo",
-      profile_photo_hint: "JPG, PNG o WEBP. Massimo 5 MB. Controllato automaticamente prima del salvataggio.",
+      profile_photo_hint: "JPG, PNG o WEBP. Trascina qui o clicca. Controllato automaticamente prima del salvataggio.",
       profile_photo_change: "Cambia immagine",
       profile_photo_upload: "Carica immagine",
       profile_photo_uploading: "Verifica in corso…",
+      profile_photo_remove: "Rimuovi",
       tools: "Strumenti",
       pricing: "Prezzi",
       login: "Accedi",
@@ -5140,10 +5196,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_account_plan: "Active plan",
       profile_account_member_since: "Member since",
       profile_photo: "Profile photo",
-      profile_photo_hint: "JPG, PNG or WEBP. Up to 5 MB. Reviewed automatically before saving.",
+      profile_photo_hint: "JPG, PNG or WEBP. Drop here or click. Reviewed automatically before saving.",
       profile_photo_change: "Change photo",
       profile_photo_upload: "Upload photo",
       profile_photo_uploading: "Checking…",
+      profile_photo_remove: "Remove",
       tools: "Tools",
       pricing: "Pricing",
       login: "Login",
@@ -6057,6 +6114,19 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <Settings size={16} />
               </button>
 
+              <button
+                onClick={() => navigate('profile')}
+                title={t.profile_nav}
+                className="shrink-0 w-8 h-8 rounded-full overflow-hidden border border-black/10 dark:border-white/10 hover:ring-2 hover:ring-[#004225]/30 dark:hover:ring-[#00A854]/40 transition-all"
+              >
+                {user.avatar_url ? (
+                  <img src={user.avatar_url} alt="" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-[11px] font-serif font-medium text-[#004225] dark:text-[#00A854]">
+                    {(user.firstName || '?').charAt(0).toUpperCase()}
+                  </div>
+                )}
+              </button>
               <span className="text-[13px] font-medium hidden lg:inline text-[#5C5C58] dark:text-[#9A9A94]">{t.nav_greeting}, {user.firstName}</span>
               <button
                 onClick={handleLogout}
@@ -6964,7 +7034,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </header>
 
               {/* Profile photo */}
-              <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+              <div
+                onDragOver={(e) => { e.preventDefault(); if (!isUploadingAvatar) setIsAvatarDragOver(true); }}
+                onDragLeave={() => setIsAvatarDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setIsAvatarDragOver(false);
+                  if (isUploadingAvatar) return;
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) processAvatarFile(file);
+                }}
+                className={`p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border-2 ${isAvatarDragOver ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/5 dark:bg-[#00A854]/10' : 'border-black/5 dark:border-white/5'} transition-colors`}
+              >
                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_photo}</p>
                 <div className="flex items-center gap-5 sm:gap-6">
                   <div className="relative shrink-0">
@@ -6983,14 +7064,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                   <div className="flex-1 min-w-0 space-y-3">
                     <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{t.profile_photo_hint}</p>
-                    <button
-                      onClick={() => avatarInputRef.current?.click()}
-                      disabled={isUploadingAvatar}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      <Upload size={12} />
-                      {isUploadingAvatar ? t.profile_photo_uploading : (user.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        onClick={() => avatarInputRef.current?.click()}
+                        disabled={isUploadingAvatar}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        <Upload size={12} />
+                        {isUploadingAvatar ? t.profile_photo_uploading : (user.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
+                      </button>
+                      {user.avatar_url && !isUploadingAvatar && (
+                        <button
+                          onClick={handleAvatarRemove}
+                          className="inline-flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#5C5C58] dark:text-[#9A9A94] hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                        >
+                          <Trash2 size={12} />
+                          {t.profile_photo_remove}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
