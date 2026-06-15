@@ -7794,14 +7794,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </section>
       ))}
 
-      {/* --- MARKETING SECTIONS ---
-           Only for visitors (landing) or the Preise page. Logged-in users on
-           dashboard / profile / tools / jobs see the app, not the landing
-           marketing stacked underneath. Hidden on legal + about pages. */}
-      {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
+      {/* --- MARKETING / OVERVIEW SECTIONS ---
+           Shown for visitors (landing), on the logged-in Dashboard (a full
+           overview of the whole site, incl. price comparison), and on the
+           Preise page (pricing only). Hidden on profile / tools / jobs
+           (focused app views) and on legal + about pages. */}
+      {(!user || activeView === 'dashboard' || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
       {/* --- TOOLS GRID --- */}
-      {!user && (
+      {(!user || activeView === 'dashboard') && (
       <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
@@ -7861,7 +7862,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- TRACKER SHOWCASE --- */}
-      {!user && (
+      {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
@@ -7948,7 +7949,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- WHY STELLIFY SECTION --- */}
-      {!user && (
+      {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -8294,7 +8295,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
-      {!user && (
+      {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -8355,7 +8356,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- FAQ SECTION --- */}
-      {!user && (
+      {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-3xl mx-auto">
           <div className="text-left mb-16">
@@ -8385,7 +8386,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- FINAL CTA --- */}
-      {!user && (
+      {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white text-center relative overflow-hidden">
         <motion.div
           aria-hidden="true"
