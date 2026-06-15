@@ -11,7 +11,7 @@ import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth as getAdminAuth } from "firebase-admin/auth";
-import { getFirestore } from "firebase-admin/firestore";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
 dotenv.config();
@@ -1567,6 +1567,26 @@ app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
   } catch (error: any) {
     console.error("[AVATAR UPLOAD ERROR]", error);
     res.status(500).json({ error: error.message || 'Avatar-Upload fehlgeschlagen' });
+  }
+});
+
+app.delete("/api/upload-avatar", requireAuth, async (req, res) => {
+  const uid = (req as any).uid;
+  try {
+    const { adminDb, adminStorage } = getAdminServices();
+    const snap = await adminDb.collection('users').doc(uid).get();
+    const path = snap.data()?.avatar_path as string | undefined;
+    if (path) {
+      await adminStorage.bucket().file(path).delete().catch(() => {});
+    }
+    await adminDb.collection('users').doc(uid).update({
+      avatar_url: FieldValue.delete(),
+      avatar_path: FieldValue.delete(),
+    });
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error("[AVATAR DELETE ERROR]", error);
+    res.status(500).json({ error: error.message || 'Avatar konnte nicht entfernt werden' });
   }
 });
 
