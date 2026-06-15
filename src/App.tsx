@@ -6295,7 +6295,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                <div className="lg:col-span-2 space-y-6">
                 <header>
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
@@ -7084,71 +7085,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
               </div>
-            )}
-
-            {activeView === 'profile' && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-              <div className="lg:col-span-2 space-y-6">
-                <header className="max-w-3xl">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
-                    {t.profile_kicker}
-                  </div>
-                  <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
-                  <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
-                </header>
-
-                {/* Account / personal data */}
-                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
-                  <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
-                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
-                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tool activity */}
-                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                  <div className="flex items-center justify-between mb-5">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_activity}</p>
-                    <button onClick={() => navigate('tools')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tools}</button>
-                  </div>
-                  {toolHistory.length > 0 ? (
-                    <div className="space-y-1">
-                      {toolHistory.slice(0, 6).map((item: any, i: number) => {
-                        const tool = tools.find(tl => tl.id === item.toolId);
-                        return (
-                          <button
-                            key={i}
-                            onClick={() => tool && handleToolClick(tool.id)}
-                            className="w-full flex items-center justify-between gap-4 py-2.5 border-b border-black/5 dark:border-white/5 last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group text-left px-1"
-                          >
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-8 h-8 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854] flex items-center justify-center">
-                                {tool?.icon || <Wrench size={14} />}
-                              </div>
-                              <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool?.title || item.toolTitle}</p>
-                            </div>
-                            <span className="text-[10px] font-mono text-[#9A9A94] shrink-0">
-                              {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : ''}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-[#9A9A94] font-light italic py-6">{language === 'FR' ? "Aucune activité pour l'instant. Lance ton premier outil." : language === 'IT' ? 'Nessuna attività ancora. Avvia il tuo primo strumento.' : language === 'EN' ? 'No activity yet. Run your first tool.' : 'Noch keine Aktivität. Starte dein erstes Tool.'}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Sidebar — Stella's view of you */}
               <div className="lg:col-span-1 space-y-6">
               <div className="space-y-6">
                 <div className="p-8 bg-[#004225] text-white space-y-6">
@@ -7342,6 +7278,152 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
+              </div>
+              </div>
+            )}
+
+            {activeView === 'profile' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+              <div className="lg:col-span-2 space-y-6">
+                <header className="max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                    {t.profile_kicker}
+                  </div>
+                  <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
+                  <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
+                </header>
+
+                {/* Profile photo */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); if (!isUploadingAvatar) setIsAvatarDragOver(true); }}
+                  onDragLeave={() => setIsAvatarDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsAvatarDragOver(false);
+                    if (isUploadingAvatar) return;
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) processAvatarFile(file);
+                  }}
+                  className={`p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border-2 ${isAvatarDragOver ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/5 dark:bg-[#00A854]/10' : 'border-black/5 dark:border-white/5'} transition-colors`}
+                >
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_photo}</p>
+                  <div className="flex items-center gap-5 sm:gap-6">
+                    <div className="relative shrink-0">
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt="" className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border border-black/10 dark:border-white/10" />
+                      ) : (
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-2xl sm:text-3xl font-serif text-[#004225] dark:text-[#00A854]">
+                          {(user.firstName || '?').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                      {isUploadingAvatar && (
+                        <div className="absolute inset-0 rounded-full bg-black/50 flex items-center justify-center">
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0 space-y-3">
+                      <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{t.profile_photo_hint}</p>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <button
+                          onClick={() => avatarInputRef.current?.click()}
+                          disabled={isUploadingAvatar}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          <Upload size={12} />
+                          {isUploadingAvatar ? t.profile_photo_uploading : (user.avatar_url ? t.profile_photo_change : t.profile_photo_upload)}
+                        </button>
+                        {user.avatar_url && !isUploadingAvatar && (
+                          <button
+                            onClick={handleAvatarRemove}
+                            className="inline-flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#5C5C58] dark:text-[#9A9A94] hover:text-red-600 dark:hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 size={12} />
+                            {t.profile_photo_remove}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Account / personal data */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_account}</p>
+                  <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
+                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
+                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tool activity */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                  <div className="flex items-center justify-between mb-5">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{t.profile_activity}</p>
+                    <button onClick={() => navigate('tools')} className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline">{t.profile_open_tools}</button>
+                  </div>
+                  {toolHistory.length > 0 ? (
+                    <div className="space-y-1">
+                      {toolHistory.slice(0, 6).map((item: any, i: number) => {
+                        const tool = tools.find(tl => tl.id === item.toolId);
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => tool && handleToolClick(tool.id)}
+                            className="w-full flex items-center justify-between gap-4 py-2.5 border-b border-black/5 dark:border-white/5 last:border-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors group text-left px-1"
+                          >
+                            <div className="flex items-center gap-3 min-w-0">
+                              <div className="w-8 h-8 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854] flex items-center justify-center">
+                                {tool?.icon || <Wrench size={14} />}
+                              </div>
+                              <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool?.title || item.toolTitle}</p>
+                            </div>
+                            <span className="text-[10px] font-mono text-[#9A9A94] shrink-0">
+                              {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : ''}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-[#9A9A94] font-light italic py-6">{language === 'FR' ? "Aucune activité pour l'instant. Lance ton premier outil." : language === 'IT' ? 'Nessuna attività ancora. Avvia il tuo primo strumento.' : language === 'EN' ? 'No activity yet. Run your first tool.' : 'Noch keine Aktivität. Starte dein erstes Tool.'}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Right column — CV upload + status */}
+              <div className="lg:col-span-1 space-y-6">
+                <div className="p-8 bg-[#004225] text-white space-y-6">
+                  <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
+                      <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
+                    </div>
+                    <CVDropzone
+                      onFileAccepted={processFile}
+                      isUploading={isUploading}
+                      t={t}
+                    />
+                  </div>
+                  {cvContext && (
+                    <div className="pt-6 border-t border-white/10">
+                      <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
+                          <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
             )}
@@ -7719,6 +7801,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
       {/* --- TOOLS GRID --- */}
+      {!user && (
       <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
@@ -7776,7 +7859,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
+      )}
       {/* --- TRACKER SHOWCASE --- */}
+      {!user && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
@@ -7861,7 +7946,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
+      )}
       {/* --- WHY STELLIFY SECTION --- */}
+      {!user && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
@@ -7933,6 +8020,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
+      )}
       {/* --- PRICING SECTION --- */}
       <section id="pricing" className="px-6 lg:px-12 py-24 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
@@ -8206,6 +8294,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
+      {!user && (
       <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
@@ -8264,7 +8353,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
+      )}
       {/* --- FAQ SECTION --- */}
+      {!user && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-3xl mx-auto">
           <div className="text-left mb-16">
@@ -8292,7 +8383,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
+      )}
       {/* --- FINAL CTA --- */}
+      {!user && (
       <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white text-center relative overflow-hidden">
         <motion.div
           aria-hidden="true"
@@ -8335,8 +8428,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </motion.button>
         </motion.div>
       </section>
+      )}
 
-      {/* --- SUBSCRIPTION EXPIRY BANNER --- */}
+      </> /* end marketing sections */}
+
+      {/* --- SUBSCRIPTION EXPIRY BANNER (always rendered) --- */}
       <AnimatePresence>
         {expiryBanner && (
           <motion.div
@@ -8385,8 +8481,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </motion.div>
         )}
       </AnimatePresence>
-
-      </> /* end marketing sections */}
 
       {/* --- FOOTER (always visible — also on legal pages) --- */}
       <footer className="bg-[#1A1A18] text-white/50 px-6 lg:px-12 py-24 border-t border-white/5">
