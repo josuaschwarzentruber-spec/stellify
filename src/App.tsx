@@ -776,7 +776,7 @@ function StellifyApp() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -862,7 +862,7 @@ function StellifyApp() {
   }, [activeView]);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about') => {
+  const navigate = (view: 'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
@@ -875,8 +875,8 @@ function StellifyApp() {
   };
 
   useEffect(() => {
-    type RouteView = 'dashboard' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
-    const validViews: RouteView[] = ['dashboard', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about'];
+    type RouteView = 'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
+    const validViews: RouteView[] = ['dashboard', 'profile', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about'];
     const viewFromPath = (path: string): RouteView | null => {
       const slug = path.replace(/^\/+/, '').replace(/\/+$/, '');
       if (!slug) return 'dashboard';
@@ -1024,7 +1024,6 @@ function StellifyApp() {
       return () => clearTimeout(timer);
     }
   }, [showLoginWelcome]);
-  const [showSwissNotice, setShowSwissNotice] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedSearchIndex, setSelectedSearchIndex] = useState(-1);
@@ -3397,6 +3396,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       update_cv: "Lebenslauf aktualisieren",
       cv_info: "① Lebenslauf hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
       dashboard: "Dashboard",
+      profile_nav: "Profil",
+      profile_title: "Dein Profil",
+      profile_desc: "Verwalte deinen Lebenslauf, deine Roadmap und Stellas Wissen über dich an einem Ort.",
       tools: "Tools",
       pricing: "Preise",
       login: "Anmelden",
@@ -4016,6 +4018,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       update_cv: "Mettre à jour CV (Lebenslauf)",
       cv_info: "Un CV (Curriculum Vitae) est votre parcours professionnel. C'est le document le plus important de votre candidature.",
       dashboard: "Tableau de bord",
+      profile_nav: "Profil",
+      profile_title: "Ton profil",
+      profile_desc: "Gère ton CV, ta roadmap et ce que Stella sait de toi au même endroit.",
       tools: "Outils",
       pricing: "Tarifs",
       login: "Connexion",
@@ -4529,6 +4534,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       update_cv: "Aggiorna CV (Lebenslauf)",
       cv_info: "Un CV (Curriculum Vitae) è la tua storia professionale. È il documento più importante della tua candidatura.",
       dashboard: "Dashboard",
+      profile_nav: "Profilo",
+      profile_title: "Il tuo profilo",
+      profile_desc: "Gestisci il tuo CV, la tua roadmap e ciò che Stella sa di te in un unico posto.",
       tools: "Strumenti",
       pricing: "Prezzi",
       login: "Accedi",
@@ -5042,6 +5050,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       update_cv: "Update CV (Resume)",
       cv_info: "A CV (Curriculum Vitae) is your professional history. It is the most important document in your application.",
       dashboard: "Dashboard",
+      profile_nav: "Profile",
+      profile_title: "Your profile",
+      profile_desc: "Manage your CV, your roadmap and what Stella knows about you in one place.",
       tools: "Tools",
       pricing: "Pricing",
       login: "Login",
@@ -5808,6 +5819,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.dashboard}
                 </button>
                 <button
+                  onClick={() => navigate('profile')}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'profile' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                >
+                  {t.profile_nav}
+                </button>
+                <button
                   onClick={() => navigate('tools')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
@@ -5997,6 +6014,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {user ? (
                 <>
                   <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
+                  <button onClick={() => { navigate('profile'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'profile' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.profile_nav}</button>
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
                   <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
                   <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
@@ -6060,9 +6078,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-              {/* Main Dashboard Area */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="space-y-6">
                 <header>
                   <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">
                     {t.dashboard_welcome} <span className="italic opacity-80">{user.firstName || t.dashboard_pro}</span>.
@@ -6093,9 +6109,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <div className={`text-2xl font-serif ${stat.color || 'text-[#1A1A18] dark:text-[#FAFAF8]'}`}>{stat.value}</div>
                       
                       {(stat.label === t.dashboard_stat_plan && (user.role === 'pro' || user.role === 'client')) && (
-                        <div className="mt-auto pt-4 space-y-3">
-                          <div className="h-px bg-black/5 dark:bg-white/5 w-full" />
-                          
+                        <div className="mt-3">
                           <div className="space-y-3">
                             {user.role === 'pro' ? (
                               <>
@@ -6841,9 +6855,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Sidebar / Stella Context */}
-              <div className="lg:col-span-1 space-y-6">
+            {activeView === 'profile' && (
+            <div className="space-y-8 max-w-3xl">
+              <header>
+                <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.profile_title}</h1>
+                <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
+              </header>
+              <div className="space-y-6">
                 <div className="p-8 bg-[#004225] text-white space-y-6">
                   <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
                   <div className="space-y-4">
@@ -9620,38 +9640,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 >
                   {t.close}
                 </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* --- SWISS STANDARD BADGE --- */}
-      <AnimatePresence>
-        {showSwissNotice && (
-          <div className="fixed bottom-6 left-6 z-[100] hidden md:block">
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="bg-white/80 dark:bg-[#1A1A18]/80 backdrop-blur-md border border-[#004225]/10 dark:border-[#FAFAF8]/10 p-3 shadow-xl flex items-center gap-3 group hover:border-[#004225]/30 transition-all cursor-default relative pr-8"
-            >
-              <button 
-                onClick={() => setShowSwissNotice(false)}
-                className="absolute top-1 right-1 p-1 text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors"
-              >
-                <X size={10} />
-              </button>
-              <div className="w-8 h-8 bg-[#004225] text-white flex items-center justify-center text-[10px] font-bold">
-                CH
-              </div>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
-                  {t.swiss_standard_notice_title}
-                </p>
-                <p className="text-[9px] text-[#4A4A45] dark:text-[#9A9A94] font-light max-w-[180px] leading-tight mt-0.5">
-                  {t.swiss_standard_notice_text}
-                </p>
               </div>
             </motion.div>
           </div>
