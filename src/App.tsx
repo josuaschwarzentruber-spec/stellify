@@ -779,7 +779,8 @@ function StellifyApp() {
   const [editingApp, setEditingApp] = useState<any | null>(null);
   const [newApp, setNewApp] = useState({ company: '', position: '', status: 'Applied' as any, location: '', salary: '', notes: '', reminder_at: '' });
   const [trackerSearch, setTrackerSearch] = useState('');
-  const [trackerView, setTrackerView] = useState<'kanban' | 'table'>('kanban');
+  // Kanban view was removed per user feedback — tracker only renders the
+  // table now (with drag-to-reorder).
   const [showArchived, setShowArchived] = useState(false);
   // Main view list — affected only by the archive toggle.
   const viewApplications = useMemo(
@@ -841,7 +842,7 @@ function StellifyApp() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -927,7 +928,7 @@ function StellifyApp() {
   }, [activeView]);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about') => {
+  const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
@@ -940,8 +941,8 @@ function StellifyApp() {
   };
 
   useEffect(() => {
-    type RouteView = 'dashboard' | 'profile' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
-    const validViews: RouteView[] = ['dashboard', 'profile', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about'];
+    type RouteView = 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
+    const validViews: RouteView[] = ['dashboard', 'profile', 'tracker', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about'];
     const viewFromPath = (path: string): RouteView | null => {
       const slug = path.replace(/^\/+/, '').replace(/\/+$/, '');
       if (!slug) return 'dashboard';
@@ -3610,6 +3611,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       cv_info: "① Lebenslauf hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
       dashboard: "Dashboard",
       profile_nav: "Profil",
+      tracker_nav: "Tracker",
+      tracker_page_title: "Bewerbungs-Tracker",
+      tracker_page_desc: "Alle Bewerbungen, synchron mit dem Dashboard. Sortiere per Drag & Drop, ändere Status oder archiviere.",
+      tracker_page_kicker: "Dein Pipeline-Überblick",
       profile_title: "Dein Profil",
       profile_desc: "Verwalte deinen Lebenslauf, deine Roadmap und Stellas Wissen über dich an einem Ort.",
       profile_kicker: "Über dich",
@@ -4253,6 +4258,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       cv_info: "Un CV (Curriculum Vitae) est votre parcours professionnel. C'est le document le plus important de votre candidature.",
       dashboard: "Tableau de bord",
       profile_nav: "Profil",
+      tracker_nav: "Tracker",
+      tracker_page_title: "Suivi des candidatures",
+      tracker_page_desc: "Toutes tes candidatures, synchronisées avec le tableau de bord. Trie par glisser-déposer, change de statut ou archive.",
+      tracker_page_kicker: "Ton aperçu de pipeline",
       profile_title: "Ton profil",
       profile_desc: "Gère ton CV, ta roadmap et ce que Stella sait de toi au même endroit.",
       profile_kicker: "À ton sujet",
@@ -4790,6 +4799,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       cv_info: "Un CV (Curriculum Vitae) è la tua storia professionale. È il documento più importante della tua candidatura.",
       dashboard: "Dashboard",
       profile_nav: "Profilo",
+      tracker_nav: "Tracker",
+      tracker_page_title: "Tracker candidature",
+      tracker_page_desc: "Tutte le tue candidature, sincronizzate con la dashboard. Riordina con trascinamento, cambia stato o archivia.",
+      tracker_page_kicker: "La tua panoramica della pipeline",
       profile_title: "Il tuo profilo",
       profile_desc: "Gestisci il tuo CV, la tua roadmap e ciò che Stella sa di te in un unico posto.",
       profile_kicker: "Su di te",
@@ -5327,6 +5340,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       cv_info: "A CV (Curriculum Vitae) is your professional history. It is the most important document in your application.",
       dashboard: "Dashboard",
       profile_nav: "Profile",
+      tracker_nav: "Tracker",
+      tracker_page_title: "Application Tracker",
+      tracker_page_desc: "Every application, synced with your dashboard. Drag to reorder, change status, or archive.",
+      tracker_page_kicker: "Your pipeline overview",
       profile_title: "Your profile",
       profile_desc: "Manage your CV, your roadmap and what Stella knows about you in one place.",
       profile_kicker: "About you",
@@ -6085,6 +6102,390 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
+  // Shared tracker section — rendered on the dashboard AND on the dedicated
+  // /tracker page. Both views read the same `applications` state, kept in
+  // sync by the Firestore onSnapshot listener — naturally synchronised.
+  const trackerSection = (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-end">
+                    <div className="space-y-1">
+                      <h2 className="text-xl font-serif">{t.tracker_title}</h2>
+                      <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{t.tracker_desc}</p>
+                    </div>
+                    <button 
+                      onClick={() => setIsAddingApp(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
+                    >
+                      <Plus size={14} />
+                      {t.tracker_add}
+                    </button>
+                  </div>
+
+                  {applications.length > 0 && (
+                    <div className="flex flex-col md:flex-row md:items-center gap-3">
+                      <div className="relative flex-1">
+                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94] pointer-events-none z-10" />
+                        <input
+                          type="text"
+                          value={trackerSearch}
+                          onChange={(e) => setTrackerSearch(e.target.value)}
+                          placeholder={t.tracker_search_ph}
+                          className="w-full pl-9 pr-9 py-2.5 bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                        />
+                        {trackerSearch && (
+                          <button
+                            onClick={() => setTrackerSearch('')}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#9A9A94] hover:text-[#1A1A18] rounded z-10"
+                            aria-label="clear"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                        {trackerSearch.trim() && (
+                          <div className="absolute left-0 right-0 top-full mt-2 z-30 bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 shadow-xl max-h-80 overflow-y-auto">
+                            {searchMatches.length === 0 ? (
+                              <div className="px-4 py-6 text-center text-sm text-[#6B6B66] dark:text-[#9A9A94]">
+                                {t.tracker_no_results}
+                              </div>
+                            ) : (
+                              <>
+                                <div className="px-4 py-2 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] border-b border-black/5 dark:border-white/5 bg-[#FAFAF8] dark:bg-[#1A1A18]">
+                                  {searchMatches.length} {searchMatches.length === 1 ? (language === 'FR' ? 'résultat' : language === 'IT' ? 'risultato' : language === 'EN' ? 'result' : 'Treffer') : (language === 'FR' ? 'résultats' : language === 'IT' ? 'risultati' : language === 'EN' ? 'results' : 'Treffer')}
+                                </div>
+                                {searchMatches.map((app) => {
+                                  const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
+                                    app.status === 'Applied' ? t.tracker_applied :
+                                    app.status === 'Interview' ? t.tracker_interview :
+                                    app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
+                                  return (
+                                    <button
+                                      key={app.id}
+                                      onClick={() => { setEditingApp(app); setTrackerSearch(''); }}
+                                      className="w-full text-left px-4 py-3 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] border-b border-black/5 dark:border-white/5 last:border-b-0 transition-all flex items-center gap-3"
+                                    >
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                          <span className="font-bold text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{app.company}</span>
+                                          {app.archived && <Archive size={11} className="text-[#9A9A94] shrink-0" />}
+                                        </div>
+                                        <div className="text-xs text-[#5C5C58] dark:text-[#9A9A94] truncate">
+                                          {app.position}
+                                          {app.location && <span className="text-[#9A9A94]"> · {app.location}</span>}
+                                          {app.salary && <span className="text-[#004225] font-medium"> · CHF {(() => {
+                                            const n = parseFloat(String(app.salary).replace(/[^\d.]/g, ''));
+                                            return isNaN(n) ? app.salary : n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
+                                          })()}</span>}
+                                        </div>
+                                      </div>
+                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#004225] bg-[#004225]/8 px-2 py-1 shrink-0">{statusLabel}</span>
+                                    </button>
+                                  );
+                                })}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {archivedCount > 0 && (
+                          <button
+                            onClick={() => setShowArchived((v) => !v)}
+                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${showArchived ? 'bg-[#004225] text-white border-[#004225]' : 'bg-white dark:bg-[#2A2A26] text-[#5C5C58] dark:text-[#9A9A94] border-black/10 dark:border-white/10 hover:bg-black/5'}`}
+                          >
+                            {showArchived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
+                            <span className="hidden sm:inline">{showArchived ? t.tracker_hide_archived : t.tracker_show_archived}</span>
+                            <span className="font-mono text-[9px] opacity-70">({archivedCount})</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={exportApplicationsCsv}
+                          title={t.tracker_export_csv}
+                          className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border bg-white dark:bg-[#2A2A26] text-[#5C5C58] dark:text-[#9A9A94] border-black/10 dark:border-white/10 hover:bg-black/5 transition-all"
+                        >
+                          <Download size={12} />
+                          <span className="hidden sm:inline">{t.tracker_export_csv}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {trackerStats.total > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_total}</p>
+                        <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.inProcess} {t.stat_in_process}</p>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_interviews}</p>
+                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.interview}</p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.interviewRate}% {t.stat_rate}</p>
+                      </div>
+                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
+                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.offerRate}% {t.stat_rate}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {isAddingApp && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
+                          <input
+                            type="text"
+                            value={newApp.company}
+                            onChange={(e) => setNewApp({...newApp, company: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                            placeholder={t.tracker_company_ph}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
+                          <input
+                            type="text"
+                            value={newApp.position}
+                            onChange={(e) => setNewApp({...newApp, position: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                            placeholder={t.tracker_position_ph}
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
+                          <select
+                            value={newApp.status}
+                            onChange={(e) => setNewApp({...newApp, status: e.target.value as any})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          >
+                            <option value="Wishlist">{t.tracker_wishlist}</option>
+                            <option value="Applied">{t.tracker_applied}</option>
+                            <option value="Interview">{t.tracker_interview}</option>
+                            <option value="Offer">{t.tracker_offer}</option>
+                            <option value="Rejected">{t.tracker_rejected}</option>
+                          </select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
+                          <input
+                            type="text"
+                            value={newApp.location}
+                            onChange={(e) => setNewApp({...newApp, location: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                            placeholder={t.tracker_location_ph}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
+                          <input
+                            type="text"
+                            value={newApp.salary}
+                            onChange={(e) => setNewApp({...newApp, salary: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                            placeholder={t.tracker_salary_ph}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_reminder}</label>
+                          <input
+                            type="date"
+                            value={newApp.reminder_at}
+                            onChange={(e) => setNewApp({...newApp, reminder_at: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
+                        <textarea
+                          value={newApp.notes}
+                          onChange={(e) => setNewApp({...newApp, notes: e.target.value})}
+                          className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all min-h-[80px]"
+                          placeholder={t.tracker_notes_ph}
+                        />
+                      </div>
+                      <div className="flex justify-end gap-3 pt-2">
+                        <button
+                          onClick={() => setIsAddingApp(false)}
+                          className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
+                        >
+                          {t.tracker_cancel}
+                        </button>
+                        <button
+                          onClick={addApplication}
+                          className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
+                        >
+                          {t.tracker_save}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {editingApp && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
+                    >
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
+                          <input
+                            type="text"
+                            value={editingApp.company}
+                            onChange={(e) => setEditingApp({...editingApp, company: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
+                          <input
+                            type="text"
+                            value={editingApp.position}
+                            onChange={(e) => setEditingApp({...editingApp, position: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
+                          <select
+                            value={editingApp.status}
+                            onChange={(e) => setEditingApp({...editingApp, status: e.target.value as any})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          >
+                            <option value="Wishlist">{t.tracker_wishlist}</option>
+                            <option value="Applied">{t.tracker_applied}</option>
+                            <option value="Interview">{t.tracker_interview}</option>
+                            <option value="Offer">{t.tracker_offer}</option>
+                            <option value="Rejected">{t.tracker_rejected}</option>
+                          </select>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
+                          <input
+                            type="text"
+                            value={editingApp.location}
+                            onChange={(e) => setEditingApp({...editingApp, location: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
+                          <input
+                            type="text"
+                            value={editingApp.salary}
+                            onChange={(e) => setEditingApp({...editingApp, salary: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_reminder}</label>
+                          <input
+                            type="date"
+                            value={editingApp.reminder_at || ''}
+                            onChange={(e) => setEditingApp({...editingApp, reminder_at: e.target.value})}
+                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
+                        <textarea
+                          value={editingApp.notes}
+                          onChange={(e) => setEditingApp({...editingApp, notes: e.target.value})}
+                          className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all min-h-[80px]"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-3 pt-2">
+                        <button
+                          onClick={() => setEditingApp(null)}
+                          className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
+                        >
+                          {t.tracker_cancel}
+                        </button>
+                        <button
+                          onClick={updateApplication}
+                          className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
+                        >
+                          {t.tracker_update}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                    <DndContext
+                      sensors={dndSensors}
+                      onDragEnd={(event: DragEndEvent) => {
+                        const { active, over } = event;
+                        if (!over || active.id === over.id) return;
+                        const ids = viewApplications.map((a: any) => a.id);
+                        const from = ids.indexOf(String(active.id));
+                        const to = ids.indexOf(String(over.id));
+                        if (from < 0 || to < 0) return;
+                        const next = arrayMove(ids, from, to);
+                        updateApplicationOrder(next);
+                      }}
+                    >
+                      <div className="overflow-x-auto bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10">
+                        <table className="w-full text-sm">
+                          <thead className="bg-[#FAFAF8] dark:bg-[#1A1A18] border-b border-black/10 dark:border-white/10">
+                            <tr>
+                              <th className="px-2 py-3 w-8"></th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_position}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_location}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_salary}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden lg:table-cell">{t.tracker_col_updated}</th>
+                              <th className="px-4 py-3"></th>
+                            </tr>
+                          </thead>
+                          <SortableContext items={viewApplications.map((a: any) => a.id)} strategy={verticalListSortingStrategy}>
+                            <tbody>
+                              {viewApplications.map((app: any) => {
+                                const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
+                                  app.status === 'Applied' ? t.tracker_applied :
+                                  app.status === 'Interview' ? t.tracker_interview :
+                                  app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
+                                const salaryFmt = (() => {
+                                  if (!app.salary) return '';
+                                  const num = String(app.salary).replace(/[^\d.]/g, '');
+                                  if (!num) return app.salary;
+                                  const n = parseFloat(num);
+                                  if (isNaN(n)) return app.salary;
+                                  return `CHF ${n.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`;
+                                })();
+                                return (
+                                  <SortableAppRow
+                                    key={app.id}
+                                    app={app}
+                                    t={t}
+                                    language={language}
+                                    statusLabel={statusLabel}
+                                    salaryFmt={salaryFmt}
+                                    onEdit={setEditingApp}
+                                    onArchive={setApplicationArchived}
+                                    onDelete={deleteApplication}
+                                    onStatusChange={updateApplicationStatus}
+                                  />
+                                );
+                              })}
+                            </tbody>
+                          </SortableContext>
+                        </table>
+                      </div>
+                    </DndContext>
+                </div>
+  );
 
   return (
     <div className="min-h-screen bg-[#FDFCFB] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">
@@ -6120,6 +6521,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'profile' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.profile_nav}
+                </button>
+                <button
+                  onClick={() => navigate('tracker')}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tracker' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                >
+                  {t.tracker_nav}
                 </button>
                 <button
                   onClick={() => navigate('tools')}
@@ -6325,6 +6732,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <>
                   <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
                   <button onClick={() => { navigate('profile'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'profile' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.profile_nav}</button>
+                  <button onClick={() => { navigate('tracker'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tracker' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tracker_nav}</button>
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
                   <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
                   <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
@@ -6384,7 +6792,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
 
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about') && ((user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tools' || activeView === 'jobs')) || !user) && (user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tools' || activeView === 'jobs') ? (
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about') && ((user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs')) || !user) && (user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs') ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
@@ -6805,450 +7213,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               <div className="space-y-6">
                 {/* Job Tracker / Kanban Board */}
-                <div className="space-y-6">
-                  <div className="flex justify-between items-end">
-                    <div className="space-y-1">
-                      <h2 className="text-xl font-serif">{t.tracker_title}</h2>
-                      <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{t.tracker_desc}</p>
-                    </div>
-                    <button 
-                      onClick={() => setIsAddingApp(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
-                    >
-                      <Plus size={14} />
-                      {t.tracker_add}
-                    </button>
-                  </div>
-
-                  {applications.length > 0 && (
-                    <div className="flex flex-col md:flex-row md:items-center gap-3">
-                      <div className="relative flex-1">
-                        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9A94] pointer-events-none z-10" />
-                        <input
-                          type="text"
-                          value={trackerSearch}
-                          onChange={(e) => setTrackerSearch(e.target.value)}
-                          placeholder={t.tracker_search_ph}
-                          className="w-full pl-9 pr-9 py-2.5 bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                        />
-                        {trackerSearch && (
-                          <button
-                            onClick={() => setTrackerSearch('')}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[#9A9A94] hover:text-[#1A1A18] rounded z-10"
-                            aria-label="clear"
-                          >
-                            <X size={14} />
-                          </button>
-                        )}
-                        {trackerSearch.trim() && (
-                          <div className="absolute left-0 right-0 top-full mt-2 z-30 bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 shadow-xl max-h-80 overflow-y-auto">
-                            {searchMatches.length === 0 ? (
-                              <div className="px-4 py-6 text-center text-sm text-[#6B6B66] dark:text-[#9A9A94]">
-                                {t.tracker_no_results}
-                              </div>
-                            ) : (
-                              <>
-                                <div className="px-4 py-2 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] border-b border-black/5 dark:border-white/5 bg-[#FAFAF8] dark:bg-[#1A1A18]">
-                                  {searchMatches.length} {searchMatches.length === 1 ? (language === 'FR' ? 'résultat' : language === 'IT' ? 'risultato' : language === 'EN' ? 'result' : 'Treffer') : (language === 'FR' ? 'résultats' : language === 'IT' ? 'risultati' : language === 'EN' ? 'results' : 'Treffer')}
-                                </div>
-                                {searchMatches.map((app) => {
-                                  const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
-                                    app.status === 'Applied' ? t.tracker_applied :
-                                    app.status === 'Interview' ? t.tracker_interview :
-                                    app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
-                                  return (
-                                    <button
-                                      key={app.id}
-                                      onClick={() => { setEditingApp(app); setTrackerSearch(''); }}
-                                      className="w-full text-left px-4 py-3 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] border-b border-black/5 dark:border-white/5 last:border-b-0 transition-all flex items-center gap-3"
-                                    >
-                                      <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2">
-                                          <span className="font-bold text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate">{app.company}</span>
-                                          {app.archived && <Archive size={11} className="text-[#9A9A94] shrink-0" />}
-                                        </div>
-                                        <div className="text-xs text-[#5C5C58] dark:text-[#9A9A94] truncate">
-                                          {app.position}
-                                          {app.location && <span className="text-[#9A9A94]"> · {app.location}</span>}
-                                          {app.salary && <span className="text-[#004225] font-medium"> · CHF {(() => {
-                                            const n = parseFloat(String(app.salary).replace(/[^\d.]/g, ''));
-                                            return isNaN(n) ? app.salary : n.toLocaleString('de-CH', { maximumFractionDigits: 0 });
-                                          })()}</span>}
-                                        </div>
-                                      </div>
-                                      <span className="text-[9px] font-bold uppercase tracking-widest text-[#004225] bg-[#004225]/8 px-2 py-1 shrink-0">{statusLabel}</span>
-                                    </button>
-                                  );
-                                })}
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="inline-flex border border-black/10 bg-white dark:bg-[#2A2A26] dark:border-white/10">
-                          <button
-                            onClick={() => setTrackerView('kanban')}
-                            title={t.tracker_view_kanban}
-                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${trackerView === 'kanban' ? 'bg-[#004225] text-white' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5'}`}
-                          >
-                            <LayoutGrid size={12} />
-                            <span className="hidden sm:inline">{t.tracker_view_kanban}</span>
-                          </button>
-                          <button
-                            onClick={() => setTrackerView('table')}
-                            title={t.tracker_view_table}
-                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest transition-all ${trackerView === 'table' ? 'bg-[#004225] text-white' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5'}`}
-                          >
-                            <ListIcon size={12} />
-                            <span className="hidden sm:inline">{t.tracker_view_table}</span>
-                          </button>
-                        </div>
-                        {archivedCount > 0 && (
-                          <button
-                            onClick={() => setShowArchived((v) => !v)}
-                            className={`flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border transition-all ${showArchived ? 'bg-[#004225] text-white border-[#004225]' : 'bg-white dark:bg-[#2A2A26] text-[#5C5C58] dark:text-[#9A9A94] border-black/10 dark:border-white/10 hover:bg-black/5'}`}
-                          >
-                            {showArchived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
-                            <span className="hidden sm:inline">{showArchived ? t.tracker_hide_archived : t.tracker_show_archived}</span>
-                            <span className="font-mono text-[9px] opacity-70">({archivedCount})</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={exportApplicationsCsv}
-                          title={t.tracker_export_csv}
-                          className="flex items-center gap-1.5 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border bg-white dark:bg-[#2A2A26] text-[#5C5C58] dark:text-[#9A9A94] border-black/10 dark:border-white/10 hover:bg-black/5 transition-all"
-                        >
-                          <Download size={12} />
-                          <span className="hidden sm:inline">{t.tracker_export_csv}</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {trackerStats.total > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_total}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.inProcess} {t.stat_in_process}</p>
-                      </div>
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_interviews}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.interview}</p>
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.interviewRate}% {t.stat_rate}</p>
-                      </div>
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.offerRate}% {t.stat_rate}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  {isAddingApp && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
-                    >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
-                          <input
-                            type="text"
-                            value={newApp.company}
-                            onChange={(e) => setNewApp({...newApp, company: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                            placeholder={t.tracker_company_ph}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
-                          <input
-                            type="text"
-                            value={newApp.position}
-                            onChange={(e) => setNewApp({...newApp, position: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                            placeholder={t.tracker_position_ph}
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
-                          <select
-                            value={newApp.status}
-                            onChange={(e) => setNewApp({...newApp, status: e.target.value as any})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          >
-                            <option value="Wishlist">{t.tracker_wishlist}</option>
-                            <option value="Applied">{t.tracker_applied}</option>
-                            <option value="Interview">{t.tracker_interview}</option>
-                            <option value="Offer">{t.tracker_offer}</option>
-                            <option value="Rejected">{t.tracker_rejected}</option>
-                          </select>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
-                          <input
-                            type="text"
-                            value={newApp.location}
-                            onChange={(e) => setNewApp({...newApp, location: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                            placeholder={t.tracker_location_ph}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
-                          <input
-                            type="text"
-                            value={newApp.salary}
-                            onChange={(e) => setNewApp({...newApp, salary: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                            placeholder={t.tracker_salary_ph}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_reminder}</label>
-                          <input
-                            type="date"
-                            value={newApp.reminder_at}
-                            onChange={(e) => setNewApp({...newApp, reminder_at: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
-                        <textarea
-                          value={newApp.notes}
-                          onChange={(e) => setNewApp({...newApp, notes: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all min-h-[80px]"
-                          placeholder={t.tracker_notes_ph}
-                        />
-                      </div>
-                      <div className="flex justify-end gap-3 pt-2">
-                        <button
-                          onClick={() => setIsAddingApp(false)}
-                          className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
-                        >
-                          {t.tracker_cancel}
-                        </button>
-                        <button
-                          onClick={addApplication}
-                          className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
-                        >
-                          {t.tracker_save}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {editingApp && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: -20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
-                    >
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_company}</label>
-                          <input
-                            type="text"
-                            value={editingApp.company}
-                            onChange={(e) => setEditingApp({...editingApp, company: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_position}</label>
-                          <input
-                            type="text"
-                            value={editingApp.position}
-                            onChange={(e) => setEditingApp({...editingApp, position: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_status}</label>
-                          <select
-                            value={editingApp.status}
-                            onChange={(e) => setEditingApp({...editingApp, status: e.target.value as any})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          >
-                            <option value="Wishlist">{t.tracker_wishlist}</option>
-                            <option value="Applied">{t.tracker_applied}</option>
-                            <option value="Interview">{t.tracker_interview}</option>
-                            <option value="Offer">{t.tracker_offer}</option>
-                            <option value="Rejected">{t.tracker_rejected}</option>
-                          </select>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_location}</label>
-                          <input
-                            type="text"
-                            value={editingApp.location}
-                            onChange={(e) => setEditingApp({...editingApp, location: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_salary}</label>
-                          <input
-                            type="text"
-                            value={editingApp.salary}
-                            onChange={(e) => setEditingApp({...editingApp, salary: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_reminder}</label>
-                          <input
-                            type="date"
-                            value={editingApp.reminder_at || ''}
-                            onChange={(e) => setEditingApp({...editingApp, reminder_at: e.target.value})}
-                            className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          />
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45]">{t.tracker_notes}</label>
-                        <textarea
-                          value={editingApp.notes}
-                          onChange={(e) => setEditingApp({...editingApp, notes: e.target.value})}
-                          className="w-full px-4 py-3 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all min-h-[80px]"
-                        />
-                      </div>
-                      <div className="flex justify-end gap-3 pt-2">
-                        <button
-                          onClick={() => setEditingApp(null)}
-                          className="px-6 py-3 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] hover:bg-black/5 transition-all"
-                        >
-                          {t.tracker_cancel}
-                        </button>
-                        <button
-                          onClick={updateApplication}
-                          className="px-8 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
-                        >
-                          {t.tracker_update}
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {trackerView === 'kanban' ? (
-                    <DndContext
-                      sensors={dndSensors}
-                      onDragStart={(event: DragStartEvent) => setDraggedAppId(String(event.active.id))}
-                      onDragEnd={(event: DragEndEvent) => {
-                        setDraggedAppId(null);
-                        const { active, over } = event;
-                        if (!over) return;
-                        const newStatus = String(over.id);
-                        const dragged = applications.find((a) => a.id === active.id);
-                        if (dragged && dragged.status !== newStatus) {
-                          updateApplicationStatus(String(active.id), newStatus);
-                        }
-                      }}
-                      onDragCancel={() => setDraggedAppId(null)}
-                    >
-                      <div className="space-y-4 sm:space-y-0 sm:flex sm:gap-4 sm:overflow-x-auto sm:snap-x sm:snap-mandatory sm:-mx-4 sm:px-4 sm:pb-2 lg:grid lg:grid-cols-5 lg:gap-4 lg:overflow-visible lg:mx-0 lg:px-0 [&>*]:sm:scroll-mt-4 tracker-scroll">
-                        {['Wishlist', 'Applied', 'Interview', 'Offer', 'Rejected'].map((status) => (
-                          <DroppableStatusColumn
-                            key={status}
-                            status={status}
-                            t={t}
-                            language={language}
-                            applications={viewApplications}
-                            activeId={draggedAppId}
-                            onEdit={setEditingApp}
-                            onDelete={deleteApplication}
-                            onArchive={setApplicationArchived}
-                            onStatusChange={updateApplicationStatus}
-                          />
-                        ))}
-                      </div>
-                      <DragOverlay dropAnimation={null}>
-                        {draggedAppId ? (() => {
-                          const a = applications.find((x) => x.id === draggedAppId);
-                          if (!a) return null;
-                          return (
-                            <div className="p-4 bg-white border border-[#004225]/40 shadow-2xl rotate-2 cursor-grabbing pointer-events-none">
-                              <h4 className="text-sm font-bold text-[#1A1A18] leading-tight">{a.company}</h4>
-                              <p className="text-xs text-[#5C5C58] mt-1">{a.position}</p>
-                            </div>
-                          );
-                        })() : null}
-                      </DragOverlay>
-                    </DndContext>
-                  ) : (
-                    <DndContext
-                      sensors={dndSensors}
-                      onDragEnd={(event: DragEndEvent) => {
-                        const { active, over } = event;
-                        if (!over || active.id === over.id) return;
-                        const ids = viewApplications.map((a: any) => a.id);
-                        const from = ids.indexOf(String(active.id));
-                        const to = ids.indexOf(String(over.id));
-                        if (from < 0 || to < 0) return;
-                        const next = arrayMove(ids, from, to);
-                        updateApplicationOrder(next);
-                      }}
-                    >
-                      <div className="overflow-x-auto bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10">
-                        <table className="w-full text-sm">
-                          <thead className="bg-[#FAFAF8] dark:bg-[#1A1A18] border-b border-black/10 dark:border-white/10">
-                            <tr>
-                              <th className="px-2 py-3 w-8"></th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_position}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_location}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_salary}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden lg:table-cell">{t.tracker_col_updated}</th>
-                              <th className="px-4 py-3"></th>
-                            </tr>
-                          </thead>
-                          <SortableContext items={viewApplications.map((a: any) => a.id)} strategy={verticalListSortingStrategy}>
-                            <tbody>
-                              {viewApplications.map((app: any) => {
-                                const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
-                                  app.status === 'Applied' ? t.tracker_applied :
-                                  app.status === 'Interview' ? t.tracker_interview :
-                                  app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
-                                const salaryFmt = (() => {
-                                  if (!app.salary) return '';
-                                  const num = String(app.salary).replace(/[^\d.]/g, '');
-                                  if (!num) return app.salary;
-                                  const n = parseFloat(num);
-                                  if (isNaN(n)) return app.salary;
-                                  return `CHF ${n.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`;
-                                })();
-                                return (
-                                  <SortableAppRow
-                                    key={app.id}
-                                    app={app}
-                                    t={t}
-                                    language={language}
-                                    statusLabel={statusLabel}
-                                    salaryFmt={salaryFmt}
-                                    onEdit={setEditingApp}
-                                    onArchive={setApplicationArchived}
-                                    onDelete={deleteApplication}
-                                    onStatusChange={updateApplicationStatus}
-                                  />
-                                );
-                              })}
-                            </tbody>
-                          </SortableContext>
-                        </table>
-                      </div>
-                    </DndContext>
-                  )}
-                </div>
+                {trackerSection}
 
                 {/* Quick Tools */}
                 <div className="space-y-6">
@@ -7506,6 +7471,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
               </div>
             </div>
+            )}
+
+            {activeView === 'tracker' && (
+              <div className="space-y-8">
+                <header className="max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                    {t.tracker_page_kicker}
+                  </div>
+                  <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_page_title}</h1>
+                  <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl leading-relaxed">{t.tracker_page_desc}</p>
+                </header>
+                {trackerSection}
+              </div>
             )}
 
             {activeView === 'jobs' && (
