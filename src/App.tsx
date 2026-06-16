@@ -12,6 +12,10 @@ import {
   DndContext, useSensor, useSensors, PointerSensor, TouchSensor, KeyboardSensor,
   useDraggable, useDroppable, DragOverlay, type DragEndEvent, type DragStartEvent,
 } from '@dnd-kit/core';
+import {
+  SortableContext, useSortable, verticalListSortingStrategy, arrayMove,
+} from '@dnd-kit/sortable';
+import { CSS as DndCSS } from '@dnd-kit/utilities';
 import { 
   TrendingUp,
   Globe,
@@ -373,6 +377,63 @@ function CardActionButton({ onClick, label, icon, className }: { onClick: () => 
         {label}
       </span>
     </div>
+  );
+}
+
+// Sortable table row — drag handle on the left, rest of the row stays clickable.
+function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange }: any) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: app.id });
+  const style: React.CSSProperties = {
+    transform: DndCSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    background: isDragging ? 'rgba(0,66,37,0.04)' : undefined,
+  };
+  return (
+    <tr ref={setNodeRef} style={style} className={`border-b border-black/5 dark:border-white/5 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] transition-colors ${app.archived ? 'opacity-60' : ''}`}>
+      <td className="pl-2 pr-1 py-3 w-8">
+        <button
+          {...attributes}
+          {...listeners}
+          aria-label={language === 'FR' ? 'Réorganiser' : language === 'IT' ? 'Riordina' : language === 'EN' ? 'Reorder' : 'Sortieren'}
+          title={language === 'FR' ? 'Ziehen zum Verschieben' : language === 'IT' ? 'Trascina per riordinare' : language === 'EN' ? 'Drag to reorder' : 'Zum Verschieben ziehen'}
+          className="text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] cursor-grab active:cursor-grabbing touch-none p-1 -m-1"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
+            <circle cx="3" cy="3" r="1" /><circle cx="9" cy="3" r="1" />
+            <circle cx="3" cy="6" r="1" /><circle cx="9" cy="6" r="1" />
+            <circle cx="3" cy="9" r="1" /><circle cx="9" cy="9" r="1" />
+          </svg>
+        </button>
+      </td>
+      <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{app.company}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94]">{app.position}</td>
+      <td className="px-4 py-3">
+        <select
+          value={app.status}
+          onChange={(e) => onStatusChange(app.id, e.target.value)}
+          className="text-[11px] font-medium text-[#004225] bg-transparent border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2 py-1 cursor-pointer transition-all"
+        >
+          <option value="Wishlist">{t.tracker_wishlist}</option>
+          <option value="Applied">{t.tracker_applied}</option>
+          <option value="Interview">{t.tracker_interview}</option>
+          <option value="Offer">{t.tracker_offer}</option>
+          <option value="Rejected">{t.tracker_rejected}</option>
+        </select>
+      </td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '–'}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '–'}</td>
+      <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
+        {app.updated_at ? new Date(app.updated_at).toLocaleDateString('de-CH') : (app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '–')}
+      </td>
+      <td className="px-4 py-3">
+        <div className="flex gap-1 justify-end">
+          <button onClick={() => onEdit(app)} title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'} className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"><Edit2 size={12} /></button>
+          <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all">{app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}</button>
+          <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"><Trash2 size={12} /></button>
+        </div>
+      </td>
+    </tr>
   );
 }
 
@@ -1407,8 +1468,17 @@ function StellifyApp() {
       appsQuery,
       (snap) => {
         const docs = snap.docs.map(d => ({ id: d.id, ...(d.data() as any) }));
-        // Sort newest first based on created_at (string ISO date)
-        docs.sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+        // Sort: rows with a manual sort_index win (ascending), then the rest
+        // newest-first by created_at. Lets the table view persist drag order
+        // while new apps still appear at the top by default.
+        docs.sort((a, b) => {
+          const ai = typeof a.sort_index === 'number';
+          const bi = typeof b.sort_index === 'number';
+          if (ai && bi) return a.sort_index - b.sort_index;
+          if (ai) return -1;
+          if (bi) return 1;
+          return (b.created_at || '').localeCompare(a.created_at || '');
+        });
         setApplications(docs);
       },
       (err) => {
@@ -2099,6 +2169,29 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     } catch (e: any) {
       handleDbError(e, 'db', `applications/${appId}`);
       showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
+    }
+  };
+
+  // Persist a new manual order: every row gets a sort_index matching its
+  // position in `orderedIds`. Optimistically reorder the local state so the
+  // drag feels instant; revert if Firestore fails.
+  const updateApplicationOrder = async (orderedIds: string[]) => {
+    if (!user) return;
+    const indexById = new Map(orderedIds.map((id, i) => [id, i]));
+    const prev = applications;
+    setApplications((curr) => [...curr].sort((a, b) => {
+      const ai = indexById.has(a.id) ? indexById.get(a.id)! : Number.MAX_SAFE_INTEGER;
+      const bi = indexById.has(b.id) ? indexById.get(b.id)! : Number.MAX_SAFE_INTEGER;
+      return ai - bi;
+    }));
+    try {
+      await Promise.all(orderedIds.map((id, i) =>
+        updateDoc(doc(db, 'applications', id), { sort_index: i })
+      ));
+    } catch (e: any) {
+      setApplications(prev);
+      handleDbError(e, 'db', 'applications/order');
+      showToast(language === 'FR' ? 'Réorganisation échouée' : language === 'IT' ? 'Riordino fallito' : language === 'EN' ? 'Reorder failed' : 'Sortierung fehlgeschlagen', 'error');
     }
   };
 
@@ -7092,86 +7185,68 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </DragOverlay>
                     </DndContext>
                   ) : (
-                    <div className="overflow-x-auto bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10">
-                      <table className="w-full text-sm">
-                        <thead className="bg-[#FAFAF8] dark:bg-[#1A1A18] border-b border-black/10 dark:border-white/10">
-                          <tr>
-                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
-                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_position}</th>
-                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
-                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_location}</th>
-                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_salary}</th>
-                            <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden lg:table-cell">{t.tracker_col_updated}</th>
-                            <th className="px-4 py-3"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {viewApplications.map((app) => {
-                            const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
-                              app.status === 'Applied' ? t.tracker_applied :
-                              app.status === 'Interview' ? t.tracker_interview :
-                              app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
-                            const salaryFmt = (() => {
-                              if (!app.salary) return '';
-                              const num = String(app.salary).replace(/[^\d.]/g, '');
-                              if (!num) return app.salary;
-                              const n = parseFloat(num);
-                              if (isNaN(n)) return app.salary;
-                              return `CHF ${n.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`;
-                            })();
-                            return (
-                              <tr key={app.id} className={`border-b border-black/5 dark:border-white/5 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] transition-all ${app.archived ? 'opacity-60' : ''}`}>
-                                <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{app.company}</td>
-                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94]">{app.position}</td>
-                                <td className="px-4 py-3">
-                                  <select
-                                    value={app.status}
-                                    onChange={(e) => updateApplicationStatus(app.id, e.target.value)}
-                                    className="text-[11px] font-medium text-[#004225] bg-transparent border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2 py-1 cursor-pointer transition-all"
-                                  >
-                                    <option value="Wishlist">{t.tracker_wishlist}</option>
-                                    <option value="Applied">{t.tracker_applied}</option>
-                                    <option value="Interview">{t.tracker_interview}</option>
-                                    <option value="Offer">{t.tracker_offer}</option>
-                                    <option value="Rejected">{t.tracker_rejected}</option>
-                                  </select>
-                                </td>
-                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '–'}</td>
-                                <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '–'}</td>
-                                <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
-                                  {app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '–'}
-                                </td>
-                                <td className="px-4 py-3">
-                                  <div className="flex gap-1 justify-end">
-                                    <button
-                                      onClick={() => setEditingApp(app)}
-                                      title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
-                                      className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"
-                                    >
-                                      <Edit2 size={12} />
-                                    </button>
-                                    <button
-                                      onClick={() => setApplicationArchived(app.id, !app.archived)}
-                                      title={app.archived ? t.tracker_unarchive : t.tracker_archive}
-                                      className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all"
-                                    >
-                                      {app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}
-                                    </button>
-                                    <button
-                                      onClick={() => deleteApplication(app.id)}
-                                      title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
-                                      className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"
-                                    >
-                                      <Trash2 size={12} />
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            );
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
+                    <DndContext
+                      sensors={dndSensors}
+                      onDragEnd={(event: DragEndEvent) => {
+                        const { active, over } = event;
+                        if (!over || active.id === over.id) return;
+                        const ids = viewApplications.map((a: any) => a.id);
+                        const from = ids.indexOf(String(active.id));
+                        const to = ids.indexOf(String(over.id));
+                        if (from < 0 || to < 0) return;
+                        const next = arrayMove(ids, from, to);
+                        updateApplicationOrder(next);
+                      }}
+                    >
+                      <div className="overflow-x-auto bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10">
+                        <table className="w-full text-sm">
+                          <thead className="bg-[#FAFAF8] dark:bg-[#1A1A18] border-b border-black/10 dark:border-white/10">
+                            <tr>
+                              <th className="px-2 py-3 w-8"></th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_position}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_location}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_salary}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden lg:table-cell">{t.tracker_col_updated}</th>
+                              <th className="px-4 py-3"></th>
+                            </tr>
+                          </thead>
+                          <SortableContext items={viewApplications.map((a: any) => a.id)} strategy={verticalListSortingStrategy}>
+                            <tbody>
+                              {viewApplications.map((app: any) => {
+                                const statusLabel = app.status === 'Wishlist' ? t.tracker_wishlist :
+                                  app.status === 'Applied' ? t.tracker_applied :
+                                  app.status === 'Interview' ? t.tracker_interview :
+                                  app.status === 'Offer' ? t.tracker_offer : t.tracker_rejected;
+                                const salaryFmt = (() => {
+                                  if (!app.salary) return '';
+                                  const num = String(app.salary).replace(/[^\d.]/g, '');
+                                  if (!num) return app.salary;
+                                  const n = parseFloat(num);
+                                  if (isNaN(n)) return app.salary;
+                                  return `CHF ${n.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`;
+                                })();
+                                return (
+                                  <SortableAppRow
+                                    key={app.id}
+                                    app={app}
+                                    t={t}
+                                    language={language}
+                                    statusLabel={statusLabel}
+                                    salaryFmt={salaryFmt}
+                                    onEdit={setEditingApp}
+                                    onArchive={setApplicationArchived}
+                                    onDelete={deleteApplication}
+                                    onStatusChange={updateApplicationStatus}
+                                  />
+                                );
+                              })}
+                            </tbody>
+                          </SortableContext>
+                        </table>
+                      </div>
+                    </DndContext>
                   )}
                 </div>
 
