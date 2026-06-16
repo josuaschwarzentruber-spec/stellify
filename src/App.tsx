@@ -7212,6 +7212,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="space-y-6">
+                {/* Job Tracker / Kanban Board */}
+                {trackerSection}
+
                 {/* Quick Tools */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
@@ -7250,9 +7253,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     ))}
                   </div>
                 </div>
-
-                {/* Job Tracker / Kanban Board */}
-                {trackerSection}
 
                 {/* Interview Live CTA Banner */}
                 <motion.div
