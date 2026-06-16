@@ -8221,7 +8221,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 ))}
               </ul>
               <button
-                onClick={() => user ? setActiveView('dashboard') : (setAuthTab('register'), setIsAuthModalOpen(true))}
+                onClick={() => user ? navigate('dashboard') : (setAuthTab('register'), setIsAuthModalOpen(true))}
                 className="relative w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium min-h-[52px]"
               >{user ? t.dashboard : t.pricing_cta_free}</button>
             </motion.div>
