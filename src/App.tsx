@@ -818,8 +818,11 @@ function StellifyApp() {
     return {
       total: active.length,
       inProcess: wishlist + applied + interview,
+      wishlist,
+      applied,
       interview,
       offer,
+      rejected,
       interviewRate,
       offerRate,
       avgSalary,
@@ -6931,6 +6934,72 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </button>
                   </motion.div>
                 )}
+
+                {/* Pipeline funnel — visual snapshot of the user's application flow.
+                    Lives between the CV banner and the tracker so the space neither
+                    feels empty (issue from screenshot) nor duplicates the table below. */}
+                {(() => {
+                  const cols = [
+                    { key: 'wishlist',  label: language === 'FR' ? 'Liste de souhaits' : language === 'IT' ? 'Lista desideri' : language === 'EN' ? 'Wishlist' : 'Wunschliste', value: trackerStats.wishlist, accent: '#9A9A94', tint: 'bg-[#9A9A94]' },
+                    { key: 'applied',   label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', value: trackerStats.applied, accent: '#5C5C58', tint: 'bg-[#5C5C58]' },
+                    { key: 'interview', label: 'Interview', value: trackerStats.interview, accent: '#D4A852', tint: 'bg-[#D4A852]' },
+                    { key: 'offer',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', value: trackerStats.offer, accent: '#004225', tint: 'bg-[#004225] dark:bg-[#00A854]' },
+                    { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: trackerStats.rejected, accent: '#B91C1C', tint: 'bg-[#B91C1C]' },
+                  ];
+                  const max = Math.max(1, ...cols.map(c => c.value));
+                  const empty = trackerStats.total === 0;
+                  const kickerText = language === 'FR' ? 'Ta pipeline en un coup d\'œil' : language === 'IT' ? 'La tua pipeline a colpo d\'occhio' : language === 'EN' ? 'Your pipeline at a glance' : 'Deine Pipeline auf einen Blick';
+                  const emptyText = language === 'FR' ? 'Pas encore de candidature. Ajoute la première ci-dessous.' : language === 'IT' ? 'Nessuna candidatura ancora. Aggiungi la prima qui sotto.' : language === 'EN' ? 'No applications yet. Add your first one below.' : 'Noch keine Bewerbung. Trag deine erste unten ein.';
+                  const summary = language === 'FR'
+                    ? `${trackerStats.total} dans la pipeline · ${trackerStats.interviewRate}% entretiens · ${trackerStats.offerRate}% offres`
+                    : language === 'IT'
+                    ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% colloqui · ${trackerStats.offerRate}% offerte`
+                    : language === 'EN'
+                    ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% interview rate · ${trackerStats.offerRate}% offer rate`
+                    : `${trackerStats.total} in der Pipeline · ${trackerStats.interviewRate}% Interview-Quote · ${trackerStats.offerRate}% Erfolgsquote`;
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.25, duration: 0.45 }}
+                      className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 transition-colors"
+                    >
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{kickerText}</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+                        {cols.map((c) => {
+                          const pct = empty ? 0 : Math.round((c.value / max) * 100);
+                          return (
+                            <div key={c.key} className="space-y-2">
+                              <div className="flex items-baseline justify-between gap-2">
+                                <span className="text-[9px] font-bold uppercase tracking-widest truncate" style={{ color: c.accent }}>{c.label}</span>
+                                <span className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${pct}%` }}
+                                  transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+                                  className={`h-full ${c.tint}`}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-3">
+                        <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+                          {empty ? emptyText : summary}
+                        </p>
+                        <button
+                          onClick={() => setIsAddingApp(true)}
+                          className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline shrink-0"
+                        >
+                          + {t.tracker_add}
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })()}
 
                 {user?.email === 'support.stellify@gmail.com' && (
                   <div className="p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
