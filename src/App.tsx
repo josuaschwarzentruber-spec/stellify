@@ -533,7 +533,7 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
           <select
             value={app.status}
             onChange={(e) => onStatusChange(app.id, e.target.value)}
-            className="w-full text-[11px] font-medium text-[#004225] bg-white border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2.5 py-1.5 pr-7 cursor-pointer transition-all appearance-none"
+            className="w-full text-[11px] font-medium text-[#004225] dark:text-[#00A854] bg-white dark:bg-[#2A2A26] border border-[#004225]/20 dark:border-[#00A854]/30 hover:border-[#004225]/50 dark:hover:border-[#00A854]/60 focus:border-[#004225] dark:focus:border-[#00A854] focus:outline-none px-2.5 py-1.5 pr-7 cursor-pointer transition-all appearance-none"
             style={{ backgroundImage: "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3 3 3-3' stroke='%23004225' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center' }}
           >
             <option value="Wishlist">{t.tracker_wishlist}</option>
@@ -6109,7 +6109,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-serif">{t.tracker_title}</h2>
+                      <h2 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_title}</h2>
                       <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{t.tracker_desc}</p>
                     </div>
                     <button 
@@ -6233,7 +6233,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <motion.div 
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
+                      className="p-6 bg-white dark:bg-[#2A2A26] border border-[#004225]/20 dark:border-[#00A854]/25 shadow-xl space-y-4 transition-colors"
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -6332,7 +6332,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <motion.div 
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-white border border-[#004225]/20 shadow-xl space-y-4"
+                      className="p-6 bg-white dark:bg-[#2A2A26] border border-[#004225]/20 dark:border-[#00A854]/25 shadow-xl space-y-4 transition-colors"
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
@@ -7046,20 +7046,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   )}
                 </div>
 
-                <div className="p-8 border border-black/5 bg-white space-y-6">
-                  <h3 className="text-lg font-serif">{t.stella_roadmap}</h3>
+                <div className="p-8 border border-black/5 dark:border-white/5 bg-white dark:bg-[#2A2A26] space-y-6 transition-colors">
+                  <h3 className="text-lg font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.stella_roadmap}</h3>
                   <div className="space-y-4">
                     {isGeneratingRoadmap ? (
                       <div className="flex flex-col gap-3">
                         {[1, 2, 3].map(i => (
-                          <div key={i} className="h-4 bg-black/5 animate-pulse rounded" />
+                          <div key={i} className="h-4 bg-black/5 dark:bg-white/5 animate-pulse rounded" />
                         ))}
                       </div>
                     ) : careerRoadmap.length > 0 ? (
                       careerRoadmap.map((step, i) => (
                         <div key={i} className="flex gap-3">
-                          <div className="w-6 h-6 rounded-full bg-[#004225]/10 flex items-center justify-center text-[10px] font-bold text-[#004225] shrink-0">{i + 1}</div>
-                          <p className="text-xs text-[#5C5C58] font-light">{step.replace(/^\d+\.\s*/, '')}</p>
+                          <div className="w-6 h-6 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center text-[10px] font-bold text-[#004225] dark:text-[#00A854] shrink-0">{i + 1}</div>
+                          <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">{step.replace(/^\d+\.\s*/, '')}</p>
                         </div>
                       ))
                     ) : (
@@ -7178,25 +7178,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
 
                 {salaryCalculations.length > 0 && (
-                  <div className="p-8 border border-black/5 bg-white space-y-6">
+                  <div className="p-8 border border-black/5 dark:border-white/5 bg-white dark:bg-[#2A2A26] space-y-6 transition-colors">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-serif">{t.salary_history}</h3>
+                      <h3 className="text-lg font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.salary_history}</h3>
                       <Coins size={18} className="text-[#004225]/40" />
                     </div>
                     <div className="space-y-4">
                       {salaryCalculations.map((calc) => (
-                        <div key={calc.id} className="p-4 bg-[#FDFCFB] border border-black/5 space-y-2 group hover:border-[#004225]/20 transition-all">
+                        <div key={calc.id} className="p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 space-y-2 group hover:border-[#004225]/20 dark:hover:border-[#00A854]/30 transition-all">
                           <div className="flex justify-between items-start">
-                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A18] truncate pr-4">{calc.jobTitle}</h4>
+                            <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8] truncate pr-4">{calc.jobTitle}</h4>
                             <span className="text-[8px] font-mono text-[#9A9A94]">{calc.createdAt?.toDate ? calc.createdAt.toDate().toLocaleDateString('de-CH') : ''}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-[9px] text-[#6B6B66]">
+                          <div className="flex items-center gap-2 text-[9px] text-[#6B6B66] dark:text-[#9A9A94]">
                             <span>{calc.industry}</span>
-                            <span className="w-1 h-1 rounded-full bg-black/10" />
+                            <span className="w-1 h-1 rounded-full bg-black/10 dark:bg-white/10" />
                             <span>{calc.canton}</span>
                           </div>
                           <div className="pt-2 flex items-center justify-between">
-                            <span className="text-[10px] font-serif text-[#004225]">CHF {calc.medianSalary.toLocaleString('de-CH')}</span>
+                            <span className="text-[10px] font-serif text-[#004225] dark:text-[#00A854]">CHF {calc.medianSalary.toLocaleString('de-CH')}</span>
                             <div className="flex gap-1">
                               <span className="text-[8px] text-[#9A9A94]">Range:</span>
                               <span className="text-[8px] font-mono text-[#9A9A94]">{calc.minSalary / 1000}k - {calc.maxSalary / 1000}k</span>
@@ -7212,13 +7212,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="space-y-6">
-                {/* Job Tracker / Kanban Board */}
-                {trackerSection}
-
                 {/* Quick Tools */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <h2 className="text-xl font-serif">{t.quick_tools}</h2>
+                    <h2 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.quick_tools}</h2>
                     <button
                       onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                       className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1"
@@ -7248,11 +7245,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             </div>
                           )}
                         </div>
-                        <h4 className="text-[11px] md:text-xs font-bold uppercase tracking-wider group-hover:text-[#004225] transition-colors line-clamp-2">{tool.title}</h4>
+                        <h4 className="text-[11px] md:text-xs font-bold uppercase tracking-wider text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors line-clamp-2">{tool.title}</h4>
                       </motion.div>
                     ))}
                   </div>
                 </div>
+
+                {/* Job Tracker / Kanban Board */}
+                {trackerSection}
 
                 {/* Interview Live CTA Banner */}
                 <motion.div
@@ -7283,7 +7283,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Recent Activity / Documents */}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
-                    <h2 className="text-xl font-serif">{t.recent_docs}</h2>
+                    <h2 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.recent_docs}</h2>
                     <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1">{t.view_all}</button>
                   </div>
                   <div className="grid gap-4">
@@ -7291,7 +7291,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       toolHistory.map((item) => (
                         <div 
                           key={item.id} 
-                          className="p-6 bg-white border border-black/5 hover:border-[#004225]/20 transition-all flex items-center justify-between group cursor-pointer"
+                          className="p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#00A854]/30 transition-all flex items-center justify-between group cursor-pointer"
                           onClick={() => {
                             const tool = tools.find(t => t.id === item.toolId);
                             if (tool) {
@@ -7302,11 +7302,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           }}
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-[#FDFCFB] flex items-center justify-center text-[#004225]">
+                            <div className="w-10 h-10 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854]">
                               {tools.find(t => t.id === item.toolId)?.icon || <FileText size={20} />}
                             </div>
                             <div>
-                              <h4 className="font-medium group-hover:text-[#004225] transition-colors">{tools.find(t => t.id === item.toolId)?.title || item.toolTitle}</h4>
+                              <h4 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tools.find(t => t.id === item.toolId)?.title || item.toolTitle}</h4>
                               <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">
                                 {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH') : t.time_just_now}
                               </p>
@@ -7316,8 +7316,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         </div>
                       ))
                     ) : (
-                      <div className="p-12 bg-white border border-dashed border-black/10 text-center space-y-4">
-                        <div className="w-12 h-12 bg-[#FDFCFB] flex items-center justify-center text-2xl mx-auto opacity-30">📄</div>
+                      <div className="p-12 bg-white dark:bg-[#2A2A26] border border-dashed border-black/10 dark:border-white/10 text-center space-y-4 transition-colors">
+                        <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-2xl mx-auto opacity-30">📄</div>
                         <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.docs_empty}</p>
                       </div>
                     )}
