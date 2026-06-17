@@ -8256,6 +8256,191 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
+      {/* --- SWISS CAREER HOTSPOTS MAP ---
+           A stylised Switzerland silhouette with key cities pinned by their
+           dominant industries. Hand-crafted SVG so there are no map-library
+           dependencies. Doubles as a brand statement: 'we know the Swiss
+           market' — something generic career platforms can't claim. */}
+      {(!user || activeView === 'dashboard') && (
+      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+              {language === 'FR' ? 'Marché suisse' : language === 'IT' ? 'Mercato svizzero' : language === 'EN' ? 'Swiss market' : 'Schweizer Arbeitsmarkt'}
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
+              {language === 'FR' ? 'Stella connaît le terrain.'
+                : language === 'IT' ? 'Stella conosce il terreno.'
+                : language === 'EN' ? 'Stella knows the ground.'
+                : 'Stella kennt die Schweiz.'}
+            </h2>
+            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+              {language === 'FR'
+                ? 'De la pharma à Bâle au banking à Zurich, du fédéral à Berne aux multinationales à Genève — chaque conseil est aligné sur le bon canton.'
+                : language === 'IT'
+                ? 'Dal farmaceutico a Basilea al banking a Zurigo, dal federale a Berna alle multinazionali a Ginevra — ogni consiglio è calibrato sul cantone giusto.'
+                : language === 'EN'
+                ? 'From pharma in Basel to banking in Zurich, from federal Berne to multinationals in Geneva — every recommendation is tuned to the right canton.'
+                : 'Von der Pharma in Basel bis Banking in Zürich, vom Bund in Bern bis zu Multis in Genf — jede Empfehlung sitzt am richtigen Ort.'}
+            </p>
+          </div>
+
+          {(() => {
+            const cities = [
+              { key: 'basel', x: 195, y: 105,
+                name: { DE: 'Basel', FR: 'Bâle', IT: 'Basilea', EN: 'Basel' },
+                ind:  { DE: 'Pharma · Chemie', FR: 'Pharma · Chimie', IT: 'Farma · Chimica', EN: 'Pharma · Chemicals' },
+                lx: 130, ly: 90, anchor: 'end' as const },
+              { key: 'zurich', x: 460, y: 130,
+                name: { DE: 'Zürich', FR: 'Zurich', IT: 'Zurigo', EN: 'Zurich' },
+                ind:  { DE: 'Banking · Tech', FR: 'Banque · Tech', IT: 'Banca · Tech', EN: 'Banking · Tech' },
+                lx: 480, ly: 105, anchor: 'start' as const },
+              { key: 'stgallen', x: 605, y: 155,
+                name: { DE: 'St. Gallen', FR: 'Saint-Gall', IT: 'San Gallo', EN: 'St. Gallen' },
+                ind:  { DE: 'Handel · Bildung', FR: 'Commerce · Éducation', IT: 'Commercio · Educazione', EN: 'Trade · Education' },
+                lx: 625, ly: 140, anchor: 'start' as const },
+              { key: 'zug', x: 440, y: 185,
+                name: { DE: 'Zug', FR: 'Zoug', IT: 'Zugo', EN: 'Zug' },
+                ind:  { DE: 'Crypto · Rohstoffe', FR: 'Crypto · Mat. premières', IT: 'Crypto · Materie prime', EN: 'Crypto · Commodities' },
+                lx: 540, ly: 195, anchor: 'start' as const },
+              { key: 'luzern', x: 385, y: 215,
+                name: { DE: 'Luzern', FR: 'Lucerne', IT: 'Lucerna', EN: 'Lucerne' },
+                ind:  { DE: 'Versicherung · Tourismus', FR: 'Assurance · Tourisme', IT: 'Assicurazione · Turismo', EN: 'Insurance · Tourism' },
+                lx: 360, ly: 245, anchor: 'end' as const },
+              { key: 'bern', x: 275, y: 235,
+                name: { DE: 'Bern', FR: 'Berne', IT: 'Berna', EN: 'Bern' },
+                ind:  { DE: 'Verwaltung · SBB', FR: 'Administration · CFF', IT: 'Amministrazione · FFS', EN: 'Federal · SBB' },
+                lx: 230, ly: 265, anchor: 'end' as const },
+              { key: 'lausanne', x: 145, y: 310,
+                name: { DE: 'Lausanne', FR: 'Lausanne', IT: 'Losanna', EN: 'Lausanne' },
+                ind:  { DE: 'Tech · EPFL · Sport', FR: 'Tech · EPFL · Sport', IT: 'Tech · EPFL · Sport', EN: 'Tech · EPFL · Sport' },
+                lx: 110, ly: 340, anchor: 'end' as const },
+              { key: 'geneva', x: 65, y: 345,
+                name: { DE: 'Genf', FR: 'Genève', IT: 'Ginevra', EN: 'Geneva' },
+                ind:  { DE: 'UN · Banking · Luxus', FR: 'ONU · Banque · Luxe', IT: 'ONU · Banca · Lusso', EN: 'UN · Banking · Luxury' },
+                lx: 30, ly: 325, anchor: 'start' as const },
+              { key: 'lugano', x: 480, y: 410,
+                name: { DE: 'Lugano', FR: 'Lugano', IT: 'Lugano', EN: 'Lugano' },
+                ind:  { DE: 'Finanz · Mode', FR: 'Finance · Mode', IT: 'Finanza · Moda', EN: 'Finance · Fashion' },
+                lx: 510, ly: 425, anchor: 'start' as const },
+            ];
+            return (
+              <div className="relative max-w-5xl mx-auto">
+                <motion.svg
+                  viewBox="0 0 800 480"
+                  className="w-full h-auto"
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true, margin: '-80px' }}
+                  transition={{ duration: 0.8 }}
+                >
+                  {/* Switzerland silhouette — stylised, not strictly geographical. */}
+                  <motion.path
+                    d="M 150 100
+                       C 200 92, 280 88, 360 92
+                       C 440 96, 510 102, 575 118
+                       C 620 132, 660 145, 690 165
+                       C 715 190, 712 215, 690 225
+                       C 670 235, 645 245, 625 265
+                       C 600 290, 580 305, 555 330
+                       C 530 360, 510 395, 490 415
+                       C 475 432, 460 438, 445 432
+                       C 425 422, 405 410, 380 405
+                       C 345 398, 305 388, 270 378
+                       C 230 366, 190 350, 155 335
+                       C 115 318, 80 298, 65 270
+                       C 55 245, 75 225, 95 215
+                       C 90 195, 88 175, 100 155
+                       C 115 130, 130 115, 150 100 Z"
+                    fill="currentColor"
+                    className="text-[#004225]/[0.06] dark:text-[#00A854]/[0.10]"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    initial={{ pathLength: 0 }}
+                    whileInView={{ pathLength: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.6, ease: 'easeInOut' }}
+                  />
+                  {/* Lake Geneva hint */}
+                  <ellipse cx="110" cy="335" rx="48" ry="7" fill="#3b82f6" opacity="0.18" />
+                  {/* Lake Constance hint */}
+                  <ellipse cx="610" cy="135" rx="45" ry="7" fill="#3b82f6" opacity="0.18" />
+
+                  {/* City pins + labels */}
+                  {cities.map((c, i) => (
+                    <g key={c.key}>
+                      {/* connector line from dot to label */}
+                      <motion.line
+                        x1={c.x} y1={c.y} x2={c.lx} y2={c.ly}
+                        stroke="currentColor"
+                        className="text-[#004225]/30 dark:text-[#00A854]/40"
+                        strokeWidth="0.75"
+                        strokeDasharray="2 2"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
+                      />
+                      {/* pulse ring */}
+                      <motion.circle
+                        cx={c.x} cy={c.y} r="14"
+                        fill="currentColor"
+                        className="text-[#004225] dark:text-[#00A854]"
+                        opacity="0"
+                        animate={{ opacity: [0, 0.25, 0], scale: [0.6, 1.6, 1.6] }}
+                        transition={{ duration: 2.4, delay: 1 + i * 0.15, repeat: Infinity, repeatDelay: 4 }}
+                      />
+                      {/* dot */}
+                      <motion.circle
+                        cx={c.x} cy={c.y} r="5"
+                        fill="currentColor"
+                        className="text-[#004225] dark:text-[#00A854]"
+                        initial={{ scale: 0 }}
+                        whileInView={{ scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.4 + i * 0.08, type: 'spring', stiffness: 300, damping: 18 }}
+                      />
+                      {/* label */}
+                      <motion.text
+                        x={c.lx} y={c.ly}
+                        textAnchor={c.anchor}
+                        fill="currentColor"
+                        className="text-[#1A1A18] dark:text-[#FAFAF8] font-bold uppercase tracking-widest"
+                        style={{ fontSize: '11px' }}
+                        initial={{ opacity: 0, y: 4 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.7 + i * 0.08, duration: 0.4 }}
+                      >
+                        {c.name[language as 'DE' | 'FR' | 'IT' | 'EN'] || c.name.EN}
+                      </motion.text>
+                      <motion.text
+                        x={c.lx} y={c.ly + 14}
+                        textAnchor={c.anchor}
+                        fill="currentColor"
+                        className="text-[#5C5C58] dark:text-[#9A9A94]"
+                        style={{ fontSize: '10px' }}
+                        initial={{ opacity: 0, y: 4 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.8 + i * 0.08, duration: 0.4 }}
+                      >
+                        {c.ind[language as 'DE' | 'FR' | 'IT' | 'EN'] || c.ind.EN}
+                      </motion.text>
+                    </g>
+                  ))}
+                </motion.svg>
+
+                <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mt-6">
+                  {language === 'FR' ? '9 cantons · Industries dominantes' : language === 'IT' ? '9 cantoni · Industrie dominanti' : language === 'EN' ? '9 cantons · Leading industries' : '9 Kantone · Leitbranchen'}
+                </p>
+              </div>
+            );
+          })()}
+        </div>
+      </section>
+      )}
       {/* --- PRICING SECTION --- */}
       <section id="pricing" className="px-6 lg:px-12 py-24 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
