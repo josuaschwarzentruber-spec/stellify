@@ -8270,19 +8270,19 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {language === 'FR' ? 'Marché suisse' : language === 'IT' ? 'Mercato svizzero' : language === 'EN' ? 'Swiss market' : 'Schweizer Arbeitsmarkt'}
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
-              {language === 'FR' ? 'Stella connaît le terrain.'
-                : language === 'IT' ? 'Stella conosce il terreno.'
-                : language === 'EN' ? 'Stella knows the ground.'
-                : 'Stella kennt die Schweiz.'}
+              {language === 'FR' ? 'Pour chaque métier. Partout en Suisse.'
+                : language === 'IT' ? 'Per ogni mestiere. In tutta la Svizzera.'
+                : language === 'EN' ? 'For every job. Across all of Switzerland.'
+                : 'Für jeden Beruf. In der ganzen Schweiz.'}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
               {language === 'FR'
-                ? 'De la pharma à Bâle au banking à Zurich, du fédéral à Berne aux multinationales à Genève — chaque conseil est aligné sur le bon canton.'
+                ? "De l'apprenti aux soins, de la gastronomie à la pharma, du commerce de détail à la tech — Stella connaît les filières, les diplômes (CFC, ES, HES) et le marché de chaque canton."
                 : language === 'IT'
-                ? 'Dal farmaceutico a Basilea al banking a Zurigo, dal federale a Berna alle multinazionali a Ginevra — ogni consiglio è calibrato sul cantone giusto.'
+                ? "Dall'apprendista alla cura, dalla gastronomia alla farmaceutica, dal commercio al dettaglio alla tecnologia — Stella conosce le filiere, i diplomi (AFC, SSS, SUP) e il mercato di ogni cantone."
                 : language === 'EN'
-                ? 'From pharma in Basel to banking in Zurich, from federal Berne to multinationals in Geneva — every recommendation is tuned to the right canton.'
-                : 'Von der Pharma in Basel bis Banking in Zürich, vom Bund in Bern bis zu Multis in Genf — jede Empfehlung sitzt am richtigen Ort.'}
+                ? 'From apprentice to care worker, from gastronomy to pharma, from retail to tech — Stella knows the trades, the diplomas (EFZ, HF, FH) and the market in every canton.'
+                : 'Vom Lehrling bis zur Pflege, von Gastronomie bis Pharma, vom Detailhandel bis Tech — Stella kennt die Berufsbilder, die Abschlüsse (EFZ, HF, FH) und den Markt in jedem Kanton.'}
             </p>
           </div>
 
@@ -8290,39 +8290,39 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             const cities = [
               { key: 'basel', x: 195, y: 105,
                 name: { DE: 'Basel', FR: 'Bâle', IT: 'Basilea', EN: 'Basel' },
-                ind:  { DE: 'Pharma · Chemie', FR: 'Pharma · Chimie', IT: 'Farma · Chimica', EN: 'Pharma · Chemicals' },
+                ind:  { DE: 'Pharma · Chemie · Pflege', FR: 'Pharma · Chimie · Soins', IT: 'Farma · Chimica · Cura', EN: 'Pharma · Chem · Care' },
                 lx: 130, ly: 90, anchor: 'end' as const },
               { key: 'zurich', x: 460, y: 130,
                 name: { DE: 'Zürich', FR: 'Zurich', IT: 'Zurigo', EN: 'Zurich' },
-                ind:  { DE: 'Banking · Tech', FR: 'Banque · Tech', IT: 'Banca · Tech', EN: 'Banking · Tech' },
+                ind:  { DE: 'Banking · Tech · KV-Lehre', FR: 'Banque · Tech · App. comm.', IT: 'Banca · Tech · AFC comm.', EN: 'Banking · Tech · Apprentice' },
                 lx: 480, ly: 105, anchor: 'start' as const },
               { key: 'stgallen', x: 605, y: 155,
                 name: { DE: 'St. Gallen', FR: 'Saint-Gall', IT: 'San Gallo', EN: 'St. Gallen' },
-                ind:  { DE: 'Handel · Bildung', FR: 'Commerce · Éducation', IT: 'Commercio · Educazione', EN: 'Trade · Education' },
+                ind:  { DE: 'Handel · Textil · HSG', FR: 'Commerce · Textile · HSG', IT: 'Commercio · Tessile · HSG', EN: 'Trade · Textile · HSG' },
                 lx: 625, ly: 140, anchor: 'start' as const },
               { key: 'zug', x: 440, y: 185,
                 name: { DE: 'Zug', FR: 'Zoug', IT: 'Zugo', EN: 'Zug' },
-                ind:  { DE: 'Crypto · Rohstoffe', FR: 'Crypto · Mat. premières', IT: 'Crypto · Materie prime', EN: 'Crypto · Commodities' },
+                ind:  { DE: 'Rohstoffe · KMU · IT', FR: 'Mat. prem. · PME · IT', IT: 'Materie prime · PMI · IT', EN: 'Commodities · SME · IT' },
                 lx: 540, ly: 195, anchor: 'start' as const },
               { key: 'luzern', x: 385, y: 215,
                 name: { DE: 'Luzern', FR: 'Lucerne', IT: 'Lucerna', EN: 'Lucerne' },
-                ind:  { DE: 'Versicherung · Tourismus', FR: 'Assurance · Tourisme', IT: 'Assicurazione · Turismo', EN: 'Insurance · Tourism' },
+                ind:  { DE: 'Hotellerie · Bau · Pflege', FR: 'Hôtellerie · Bâtiment · Soins', IT: 'Alberghi · Edilizia · Cura', EN: 'Hospitality · Building · Care' },
                 lx: 360, ly: 245, anchor: 'end' as const },
               { key: 'bern', x: 275, y: 235,
                 name: { DE: 'Bern', FR: 'Berne', IT: 'Berna', EN: 'Bern' },
-                ind:  { DE: 'Verwaltung · SBB', FR: 'Administration · CFF', IT: 'Amministrazione · FFS', EN: 'Federal · SBB' },
+                ind:  { DE: 'Bund · SBB · Landwirtschaft', FR: 'Fédéral · CFF · Agriculture', IT: 'Federale · FFS · Agricoltura', EN: 'Federal · SBB · Agri' },
                 lx: 230, ly: 265, anchor: 'end' as const },
               { key: 'lausanne', x: 145, y: 310,
                 name: { DE: 'Lausanne', FR: 'Lausanne', IT: 'Losanna', EN: 'Lausanne' },
-                ind:  { DE: 'Tech · EPFL · Sport', FR: 'Tech · EPFL · Sport', IT: 'Tech · EPFL · Sport', EN: 'Tech · EPFL · Sport' },
+                ind:  { DE: 'Tech · EPFL · Gastronomie', FR: 'Tech · EPFL · Gastronomie', IT: 'Tech · EPFL · Ristorazione', EN: 'Tech · EPFL · Gastronomy' },
                 lx: 110, ly: 340, anchor: 'end' as const },
               { key: 'geneva', x: 65, y: 345,
                 name: { DE: 'Genf', FR: 'Genève', IT: 'Ginevra', EN: 'Geneva' },
-                ind:  { DE: 'UN · Banking · Luxus', FR: 'ONU · Banque · Luxe', IT: 'ONU · Banca · Lusso', EN: 'UN · Banking · Luxury' },
+                ind:  { DE: 'UNO · Uhren · Detailhandel', FR: 'ONU · Horlogerie · Détail', IT: 'ONU · Orologi · Dettaglio', EN: 'UN · Watchmaking · Retail' },
                 lx: 30, ly: 325, anchor: 'start' as const },
               { key: 'lugano', x: 480, y: 410,
                 name: { DE: 'Lugano', FR: 'Lugano', IT: 'Lugano', EN: 'Lugano' },
-                ind:  { DE: 'Finanz · Mode', FR: 'Finance · Mode', IT: 'Finanza · Moda', EN: 'Finance · Fashion' },
+                ind:  { DE: 'Finanz · Mode · Gastronomie', FR: 'Finance · Mode · Restauration', IT: 'Finanza · Moda · Ristorazione', EN: 'Finance · Fashion · Restaurants' },
                 lx: 510, ly: 425, anchor: 'start' as const },
             ];
             return (
@@ -8433,8 +8433,46 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </motion.svg>
 
                 <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mt-6">
-                  {language === 'FR' ? '9 cantons · Industries dominantes' : language === 'IT' ? '9 cantoni · Industrie dominanti' : language === 'EN' ? '9 cantons · Leading industries' : '9 Kantone · Leitbranchen'}
+                  {language === 'FR' ? "Tous métiers · de l'apprentissage à la direction"
+                    : language === 'IT' ? 'Tutti i mestieri · dall\'apprendistato alla direzione'
+                    : language === 'EN' ? 'Every profession · from apprentice to executive'
+                    : 'Alle Berufe · vom Lehrling bis zur Geschäftsleitung'}
                 </p>
+
+                {/* Profession tag row — visual proof that 'every job' isn't lip-service. */}
+                {(() => {
+                  const tags = language === 'FR' ? [
+                    'Apprentissage CFC','Soins infirmiers','Bâtiment & Artisanat','Hôtellerie & Restauration','Commerce de détail','Banque & Finance','IT & Tech','Pharma & Santé','Administration','Logistique','Agriculture','Tourisme','Éducation','Industrie & Machines','Vente','Coiffure & Beauté'
+                  ] : language === 'IT' ? [
+                    'Apprendistato AFC','Cure infermieristiche','Edilizia & Artigianato','Alberghi & Ristorazione','Commercio al dettaglio','Banche & Finanza','IT & Tech','Farma & Sanità','Amministrazione','Logistica','Agricoltura','Turismo','Educazione','Industria & Meccanica','Vendite','Parrucchieri & Bellezza'
+                  ] : language === 'EN' ? [
+                    'Apprenticeships (EFZ)','Nursing & Care','Construction & Trades','Hospitality','Retail','Banking & Finance','IT & Tech','Pharma & Health','Public Admin','Logistics','Agriculture','Tourism','Education','Industry & Machinery','Sales','Beauty & Hairdressing'
+                  ] : [
+                    'Lehre (EFZ)','Pflege & Betreuung','Bau & Handwerk','Hotellerie & Gastronomie','Detailhandel','Banking & Finanzen','IT & Tech','Pharma & Gesundheit','Verwaltung','Logistik','Landwirtschaft','Tourismus','Bildung','Industrie & Mechanik','Verkauf','Coiffure & Beauty'
+                  ];
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-50px' }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      className="mt-10 flex flex-wrap gap-2 justify-center max-w-4xl mx-auto"
+                    >
+                      {tags.map((tag, i) => (
+                        <motion.span
+                          key={tag}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          whileInView={{ opacity: 1, scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.25 + i * 0.04, duration: 0.35 }}
+                          className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 text-[#004225] dark:text-[#00A854] rounded-full"
+                        >
+                          {tag}
+                        </motion.span>
+                      ))}
+                    </motion.div>
+                  );
+                })()}
               </div>
             );
           })()}
