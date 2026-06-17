@@ -8256,15 +8256,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
-      {/* --- SWISS CAREER HOTSPOTS MAP ---
-           A stylised Switzerland silhouette with key cities pinned by their
-           dominant industries. Hand-crafted SVG so there are no map-library
-           dependencies. Doubles as a brand statement: 'we know the Swiss
-           market' — something generic career platforms can't claim. */}
+      {/* --- SWISS CAREER HOTSPOTS ---
+           Premium redesign per user feedback (labels overlapped, silhouette
+           looked blobby). Now: a clean Switzerland silhouette as a quiet
+           visual anchor on the left, then a structured city grid on the
+           right (no label collisions, scales to mobile), and a profession-
+           tag wall below to prove every job is covered. */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="text-center max-w-2xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
               {language === 'FR' ? 'Marché suisse' : language === 'IT' ? 'Mercato svizzero' : language === 'EN' ? 'Swiss market' : 'Schweizer Arbeitsmarkt'}
@@ -8288,192 +8289,205 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
           {(() => {
             const cities = [
-              { key: 'basel', x: 195, y: 105,
+              { key: 'basel',    x: 195, y: 105, no: '01',
                 name: { DE: 'Basel', FR: 'Bâle', IT: 'Basilea', EN: 'Basel' },
-                ind:  { DE: 'Pharma · Chemie · Pflege', FR: 'Pharma · Chimie · Soins', IT: 'Farma · Chimica · Cura', EN: 'Pharma · Chem · Care' },
-                lx: 130, ly: 90, anchor: 'end' as const },
-              { key: 'zurich', x: 460, y: 130,
+                ind:  { DE: 'Pharma · Chemie · Pflege', FR: 'Pharma · Chimie · Soins', IT: 'Farma · Chimica · Cura', EN: 'Pharma · Chem · Care' } },
+              { key: 'zurich',   x: 455, y: 145, no: '02',
                 name: { DE: 'Zürich', FR: 'Zurich', IT: 'Zurigo', EN: 'Zurich' },
-                ind:  { DE: 'Banking · Tech · KV-Lehre', FR: 'Banque · Tech · App. comm.', IT: 'Banca · Tech · AFC comm.', EN: 'Banking · Tech · Apprentice' },
-                lx: 480, ly: 105, anchor: 'start' as const },
-              { key: 'stgallen', x: 605, y: 155,
+                ind:  { DE: 'Banking · Tech · KV-Lehre', FR: 'Banque · Tech · App. comm.', IT: 'Banca · Tech · AFC comm.', EN: 'Banking · Tech · Apprentice' } },
+              { key: 'stgallen', x: 590, y: 165, no: '03',
                 name: { DE: 'St. Gallen', FR: 'Saint-Gall', IT: 'San Gallo', EN: 'St. Gallen' },
-                ind:  { DE: 'Handel · Textil · HSG', FR: 'Commerce · Textile · HSG', IT: 'Commercio · Tessile · HSG', EN: 'Trade · Textile · HSG' },
-                lx: 625, ly: 140, anchor: 'start' as const },
-              { key: 'zug', x: 440, y: 185,
+                ind:  { DE: 'Handel · Textil · HSG', FR: 'Commerce · Textile · HSG', IT: 'Commercio · Tessile · HSG', EN: 'Trade · Textile · HSG' } },
+              { key: 'zug',      x: 435, y: 200, no: '04',
                 name: { DE: 'Zug', FR: 'Zoug', IT: 'Zugo', EN: 'Zug' },
-                ind:  { DE: 'Rohstoffe · KMU · IT', FR: 'Mat. prem. · PME · IT', IT: 'Materie prime · PMI · IT', EN: 'Commodities · SME · IT' },
-                lx: 540, ly: 195, anchor: 'start' as const },
-              { key: 'luzern', x: 385, y: 215,
+                ind:  { DE: 'Rohstoffe · KMU · IT', FR: 'Mat. prem. · PME · IT', IT: 'Materie prime · PMI · IT', EN: 'Commodities · SME · IT' } },
+              { key: 'luzern',   x: 375, y: 225, no: '05',
                 name: { DE: 'Luzern', FR: 'Lucerne', IT: 'Lucerna', EN: 'Lucerne' },
-                ind:  { DE: 'Hotellerie · Bau · Pflege', FR: 'Hôtellerie · Bâtiment · Soins', IT: 'Alberghi · Edilizia · Cura', EN: 'Hospitality · Building · Care' },
-                lx: 360, ly: 245, anchor: 'end' as const },
-              { key: 'bern', x: 275, y: 235,
+                ind:  { DE: 'Hotellerie · Bau · Pflege', FR: 'Hôtellerie · Bâtiment · Soins', IT: 'Alberghi · Edilizia · Cura', EN: 'Hospitality · Building · Care' } },
+              { key: 'bern',     x: 265, y: 250, no: '06',
                 name: { DE: 'Bern', FR: 'Berne', IT: 'Berna', EN: 'Bern' },
-                ind:  { DE: 'Bund · SBB · Landwirtschaft', FR: 'Fédéral · CFF · Agriculture', IT: 'Federale · FFS · Agricoltura', EN: 'Federal · SBB · Agri' },
-                lx: 230, ly: 265, anchor: 'end' as const },
-              { key: 'lausanne', x: 145, y: 310,
+                ind:  { DE: 'Bund · SBB · Landwirtschaft', FR: 'Fédéral · CFF · Agriculture', IT: 'Federale · FFS · Agricoltura', EN: 'Federal · SBB · Agri' } },
+              { key: 'lausanne', x: 140, y: 320, no: '07',
                 name: { DE: 'Lausanne', FR: 'Lausanne', IT: 'Losanna', EN: 'Lausanne' },
-                ind:  { DE: 'Tech · EPFL · Gastronomie', FR: 'Tech · EPFL · Gastronomie', IT: 'Tech · EPFL · Ristorazione', EN: 'Tech · EPFL · Gastronomy' },
-                lx: 110, ly: 340, anchor: 'end' as const },
-              { key: 'geneva', x: 65, y: 345,
+                ind:  { DE: 'Tech · EPFL · Gastronomie', FR: 'Tech · EPFL · Gastronomie', IT: 'Tech · EPFL · Ristorazione', EN: 'Tech · EPFL · Gastronomy' } },
+              { key: 'geneva',   x: 60,  y: 335, no: '08',
                 name: { DE: 'Genf', FR: 'Genève', IT: 'Ginevra', EN: 'Geneva' },
-                ind:  { DE: 'UNO · Uhren · Detailhandel', FR: 'ONU · Horlogerie · Détail', IT: 'ONU · Orologi · Dettaglio', EN: 'UN · Watchmaking · Retail' },
-                lx: 30, ly: 325, anchor: 'start' as const },
-              { key: 'lugano', x: 480, y: 410,
+                ind:  { DE: 'UNO · Uhren · Detailhandel', FR: 'ONU · Horlogerie · Détail', IT: 'ONU · Orologi · Dettaglio', EN: 'UN · Watchmaking · Retail' } },
+              { key: 'lugano',   x: 470, y: 430, no: '09',
                 name: { DE: 'Lugano', FR: 'Lugano', IT: 'Lugano', EN: 'Lugano' },
-                ind:  { DE: 'Finanz · Mode · Gastronomie', FR: 'Finance · Mode · Restauration', IT: 'Finanza · Moda · Ristorazione', EN: 'Finance · Fashion · Restaurants' },
-                lx: 510, ly: 425, anchor: 'start' as const },
+                ind:  { DE: 'Finanz · Mode · Gastronomie', FR: 'Finance · Mode · Restauration', IT: 'Finanza · Moda · Ristorazione', EN: 'Finance · Fashion · Restaurants' } },
+            ];
+            const lang = language as 'DE' | 'FR' | 'IT' | 'EN';
+            return (
+              <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+                {/* Map */}
+                <div className="lg:col-span-7 relative">
+                  <motion.svg
+                    viewBox="0 0 700 500"
+                    className="w-full h-auto"
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true, margin: '-80px' }}
+                    transition={{ duration: 0.8 }}
+                    aria-label="Schweizer Karriere-Karte"
+                  >
+                    <defs>
+                      <linearGradient id="chFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="currentColor" stopOpacity="0.10" />
+                        <stop offset="100%" stopColor="currentColor" stopOpacity="0.04" />
+                      </linearGradient>
+                      <filter id="chShadow" x="-10%" y="-10%" width="120%" height="120%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="6" />
+                        <feOffset dx="0" dy="4" result="offsetblur" />
+                        <feComponentTransfer><feFuncA type="linear" slope="0.18" /></feComponentTransfer>
+                        <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
+                      </filter>
+                    </defs>
+
+                    {/* Switzerland silhouette — closer to the real outline (still
+                        simplified for elegance). Single smooth cubic path. */}
+                    <motion.path
+                      d="M 175 95
+                         C 220 88, 290 85, 360 90
+                         C 425 96, 480 105, 530 122
+                         C 565 134, 600 150, 625 175
+                         C 645 197, 655 220, 650 245
+                         C 642 268, 615 285, 590 300
+                         C 565 314, 540 330, 520 355
+                         C 498 380, 482 405, 472 432
+                         C 466 450, 458 455, 446 450
+                         C 432 442, 420 425, 405 415
+                         C 370 405, 320 405, 270 410
+                         C 220 415, 175 410, 135 395
+                         C 95 380, 55 365, 30 335
+                         C 15 315, 12 295, 25 280
+                         C 40 265, 60 268, 80 270
+                         C 88 250, 80 225, 72 205
+                         C 65 180, 72 158, 88 135
+                         C 110 115, 140 102, 175 95 Z"
+                      fill="url(#chFill)"
+                      stroke="currentColor"
+                      strokeWidth="1.25"
+                      strokeLinejoin="round"
+                      className="text-[#004225] dark:text-[#00A854]"
+                      filter="url(#chShadow)"
+                      initial={{ pathLength: 0 }}
+                      whileInView={{ pathLength: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1.8, ease: 'easeInOut' }}
+                    />
+
+                    {/* Subtle hint of major lakes — quiet, never the focus. */}
+                    <ellipse cx="105" cy="335" rx="42" ry="6" fill="#3b82f6" opacity="0.16" />
+                    <ellipse cx="595" cy="135" rx="40" ry="5" fill="#3b82f6" opacity="0.16" />
+
+                    {/* City pins — number badge + soft pulse, no text inside SVG. */}
+                    {cities.map((c, i) => (
+                      <g key={c.key}>
+                        <motion.circle
+                          cx={c.x} cy={c.y} r="16"
+                          fill="currentColor"
+                          className="text-[#004225] dark:text-[#00A854]"
+                          opacity="0"
+                          animate={{ opacity: [0, 0.18, 0], scale: [0.6, 1.6, 1.6] }}
+                          transition={{ duration: 2.8, delay: 1.2 + i * 0.18, repeat: Infinity, repeatDelay: 5 }}
+                        />
+                        <motion.circle
+                          cx={c.x} cy={c.y} r="11"
+                          fill="white"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          className="text-[#004225] dark:text-[#00A854] dark:fill-[#1A1A18]"
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.5 + i * 0.08, type: 'spring', stiffness: 300, damping: 18 }}
+                        />
+                        <motion.text
+                          x={c.x} y={c.y + 4}
+                          textAnchor="middle"
+                          fill="currentColor"
+                          className="text-[#004225] dark:text-[#00A854] font-bold"
+                          style={{ fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.8 + i * 0.08 }}
+                        >
+                          {c.no}
+                        </motion.text>
+                      </g>
+                    ))}
+                  </motion.svg>
+                </div>
+
+                {/* City grid — paired with the pin numbers on the map. */}
+                <div className="lg:col-span-5">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {cities.map((c, i) => (
+                      <motion.div
+                        key={c.key}
+                        initial={{ opacity: 0, y: 12 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: '-40px' }}
+                        transition={{ delay: 0.35 + i * 0.05, duration: 0.4 }}
+                        className="group p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/30 dark:hover:border-[#00A854]/40 transition-colors"
+                      >
+                        <div className="flex items-start gap-3">
+                          <span className="text-[10px] font-mono font-bold text-[#004225] dark:text-[#00A854] mt-0.5 shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.no}</span>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{c.name[lang] || c.name.EN}</p>
+                            <p className="text-[10px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-1 leading-snug">{c.ind[lang] || c.ind.EN}</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Profession tag row — visual proof that 'every job' isn't lip-service. */}
+          {(() => {
+            const tags = language === 'FR' ? [
+              'Apprentissage CFC','Soins infirmiers','Bâtiment & Artisanat','Hôtellerie & Restauration','Commerce de détail','Banque & Finance','IT & Tech','Pharma & Santé','Administration','Logistique','Agriculture','Tourisme','Éducation','Industrie & Machines','Vente','Coiffure & Beauté'
+            ] : language === 'IT' ? [
+              'Apprendistato AFC','Cure infermieristiche','Edilizia & Artigianato','Alberghi & Ristorazione','Commercio al dettaglio','Banche & Finanza','IT & Tech','Farma & Sanità','Amministrazione','Logistica','Agricoltura','Turismo','Educazione','Industria & Meccanica','Vendite','Parrucchieri & Bellezza'
+            ] : language === 'EN' ? [
+              'Apprenticeships (EFZ)','Nursing & Care','Construction & Trades','Hospitality','Retail','Banking & Finance','IT & Tech','Pharma & Health','Public Admin','Logistics','Agriculture','Tourism','Education','Industry & Machinery','Sales','Beauty & Hairdressing'
+            ] : [
+              'Lehre (EFZ)','Pflege & Betreuung','Bau & Handwerk','Hotellerie & Gastronomie','Detailhandel','Banking & Finanzen','IT & Tech','Pharma & Gesundheit','Verwaltung','Logistik','Landwirtschaft','Tourismus','Bildung','Industrie & Mechanik','Verkauf','Coiffure & Beauty'
             ];
             return (
-              <div className="relative max-w-5xl mx-auto">
-                <motion.svg
-                  viewBox="0 0 800 480"
-                  className="w-full h-auto"
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  viewport={{ once: true, margin: '-80px' }}
-                  transition={{ duration: 0.8 }}
-                >
-                  {/* Switzerland silhouette — stylised, not strictly geographical. */}
-                  <motion.path
-                    d="M 150 100
-                       C 200 92, 280 88, 360 92
-                       C 440 96, 510 102, 575 118
-                       C 620 132, 660 145, 690 165
-                       C 715 190, 712 215, 690 225
-                       C 670 235, 645 245, 625 265
-                       C 600 290, 580 305, 555 330
-                       C 530 360, 510 395, 490 415
-                       C 475 432, 460 438, 445 432
-                       C 425 422, 405 410, 380 405
-                       C 345 398, 305 388, 270 378
-                       C 230 366, 190 350, 155 335
-                       C 115 318, 80 298, 65 270
-                       C 55 245, 75 225, 95 215
-                       C 90 195, 88 175, 100 155
-                       C 115 130, 130 115, 150 100 Z"
-                    fill="currentColor"
-                    className="text-[#004225]/[0.06] dark:text-[#00A854]/[0.10]"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    initial={{ pathLength: 0 }}
-                    whileInView={{ pathLength: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1.6, ease: 'easeInOut' }}
-                  />
-                  {/* Lake Geneva hint */}
-                  <ellipse cx="110" cy="335" rx="48" ry="7" fill="#3b82f6" opacity="0.18" />
-                  {/* Lake Constance hint */}
-                  <ellipse cx="610" cy="135" rx="45" ry="7" fill="#3b82f6" opacity="0.18" />
-
-                  {/* City pins + labels */}
-                  {cities.map((c, i) => (
-                    <g key={c.key}>
-                      {/* connector line from dot to label */}
-                      <motion.line
-                        x1={c.x} y1={c.y} x2={c.lx} y2={c.ly}
-                        stroke="currentColor"
-                        className="text-[#004225]/30 dark:text-[#00A854]/40"
-                        strokeWidth="0.75"
-                        strokeDasharray="2 2"
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.6 + i * 0.08, duration: 0.4 }}
-                      />
-                      {/* pulse ring */}
-                      <motion.circle
-                        cx={c.x} cy={c.y} r="14"
-                        fill="currentColor"
-                        className="text-[#004225] dark:text-[#00A854]"
-                        opacity="0"
-                        animate={{ opacity: [0, 0.25, 0], scale: [0.6, 1.6, 1.6] }}
-                        transition={{ duration: 2.4, delay: 1 + i * 0.15, repeat: Infinity, repeatDelay: 4 }}
-                      />
-                      {/* dot */}
-                      <motion.circle
-                        cx={c.x} cy={c.y} r="5"
-                        fill="currentColor"
-                        className="text-[#004225] dark:text-[#00A854]"
-                        initial={{ scale: 0 }}
-                        whileInView={{ scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.4 + i * 0.08, type: 'spring', stiffness: 300, damping: 18 }}
-                      />
-                      {/* label */}
-                      <motion.text
-                        x={c.lx} y={c.ly}
-                        textAnchor={c.anchor}
-                        fill="currentColor"
-                        className="text-[#1A1A18] dark:text-[#FAFAF8] font-bold uppercase tracking-widest"
-                        style={{ fontSize: '11px' }}
-                        initial={{ opacity: 0, y: 4 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.7 + i * 0.08, duration: 0.4 }}
-                      >
-                        {c.name[language as 'DE' | 'FR' | 'IT' | 'EN'] || c.name.EN}
-                      </motion.text>
-                      <motion.text
-                        x={c.lx} y={c.ly + 14}
-                        textAnchor={c.anchor}
-                        fill="currentColor"
-                        className="text-[#5C5C58] dark:text-[#9A9A94]"
-                        style={{ fontSize: '10px' }}
-                        initial={{ opacity: 0, y: 4 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.8 + i * 0.08, duration: 0.4 }}
-                      >
-                        {c.ind[language as 'DE' | 'FR' | 'IT' | 'EN'] || c.ind.EN}
-                      </motion.text>
-                    </g>
-                  ))}
-                </motion.svg>
-
-                <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mt-6">
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="mt-16 pt-10 border-t border-black/5 dark:border-white/5"
+              >
+                <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-6">
                   {language === 'FR' ? "Tous métiers · de l'apprentissage à la direction"
-                    : language === 'IT' ? 'Tutti i mestieri · dall\'apprendistato alla direzione'
+                    : language === 'IT' ? "Tutti i mestieri · dall'apprendistato alla direzione"
                     : language === 'EN' ? 'Every profession · from apprentice to executive'
                     : 'Alle Berufe · vom Lehrling bis zur Geschäftsleitung'}
                 </p>
-
-                {/* Profession tag row — visual proof that 'every job' isn't lip-service. */}
-                {(() => {
-                  const tags = language === 'FR' ? [
-                    'Apprentissage CFC','Soins infirmiers','Bâtiment & Artisanat','Hôtellerie & Restauration','Commerce de détail','Banque & Finance','IT & Tech','Pharma & Santé','Administration','Logistique','Agriculture','Tourisme','Éducation','Industrie & Machines','Vente','Coiffure & Beauté'
-                  ] : language === 'IT' ? [
-                    'Apprendistato AFC','Cure infermieristiche','Edilizia & Artigianato','Alberghi & Ristorazione','Commercio al dettaglio','Banche & Finanza','IT & Tech','Farma & Sanità','Amministrazione','Logistica','Agricoltura','Turismo','Educazione','Industria & Meccanica','Vendite','Parrucchieri & Bellezza'
-                  ] : language === 'EN' ? [
-                    'Apprenticeships (EFZ)','Nursing & Care','Construction & Trades','Hospitality','Retail','Banking & Finance','IT & Tech','Pharma & Health','Public Admin','Logistics','Agriculture','Tourism','Education','Industry & Machinery','Sales','Beauty & Hairdressing'
-                  ] : [
-                    'Lehre (EFZ)','Pflege & Betreuung','Bau & Handwerk','Hotellerie & Gastronomie','Detailhandel','Banking & Finanzen','IT & Tech','Pharma & Gesundheit','Verwaltung','Logistik','Landwirtschaft','Tourismus','Bildung','Industrie & Mechanik','Verkauf','Coiffure & Beauty'
-                  ];
-                  return (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-50px' }}
-                      transition={{ duration: 0.5, delay: 0.2 }}
-                      className="mt-10 flex flex-wrap gap-2 justify-center max-w-4xl mx-auto"
+                <div className="flex flex-wrap gap-2 justify-center max-w-4xl mx-auto">
+                  {tags.map((tag, i) => (
+                    <motion.span
+                      key={tag}
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.25 + i * 0.04, duration: 0.35 }}
+                      className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 text-[#004225] dark:text-[#00A854] rounded-full"
                     >
-                      {tags.map((tag, i) => (
-                        <motion.span
-                          key={tag}
-                          initial={{ opacity: 0, scale: 0.85 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.25 + i * 0.04, duration: 0.35 }}
-                          className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 text-[#004225] dark:text-[#00A854] rounded-full"
-                        >
-                          {tag}
-                        </motion.span>
-                      ))}
-                    </motion.div>
-                  );
-                })()}
-              </div>
+                      {tag}
+                    </motion.span>
+                  ))}
+                </div>
+              </motion.div>
             );
           })()}
         </div>
