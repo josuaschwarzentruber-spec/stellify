@@ -6490,6 +6490,84 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
   );
 
+  // Pipeline funnel — visual snapshot of the user's application flow.
+  // Rendered on the Dashboard (clickable, jumps to /tracker) and on the
+  // Tracker page (non-clickable, since the user is already there).
+  const renderPipelineFunnel = (clickable: boolean) => {
+    const cols = [
+      { key: 'wishlist',  label: language === 'FR' ? 'Liste de souhaits' : language === 'IT' ? 'Lista desideri' : language === 'EN' ? 'Wishlist' : 'Wunschliste', value: trackerStats.wishlist, accent: '#9A9A94', tint: 'bg-[#9A9A94]' },
+      { key: 'applied',   label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', value: trackerStats.applied, accent: '#5C5C58', tint: 'bg-[#5C5C58]' },
+      { key: 'interview', label: 'Interview', value: trackerStats.interview, accent: '#D4A852', tint: 'bg-[#D4A852]' },
+      { key: 'offer',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', value: trackerStats.offer, accent: '#004225', tint: 'bg-[#004225] dark:bg-[#00A854]' },
+      { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: trackerStats.rejected, accent: '#B91C1C', tint: 'bg-[#B91C1C]' },
+    ];
+    const max = Math.max(1, ...cols.map(c => c.value));
+    const empty = trackerStats.total === 0;
+    const kickerText = language === 'FR' ? 'Ta pipeline en un coup d\'œil' : language === 'IT' ? 'La tua pipeline a colpo d\'occhio' : language === 'EN' ? 'Your pipeline at a glance' : 'Deine Pipeline auf einen Blick';
+    const emptyText = language === 'FR' ? 'Pas encore de candidature. Ajoute la première ci-dessous.' : language === 'IT' ? 'Nessuna candidatura ancora. Aggiungi la prima qui sotto.' : language === 'EN' ? 'No applications yet. Add your first one below.' : 'Noch keine Bewerbung. Trag deine erste unten ein.';
+    const summary = language === 'FR'
+      ? `${trackerStats.total} dans la pipeline · ${trackerStats.interviewRate}% entretiens · ${trackerStats.offerRate}% offres`
+      : language === 'IT'
+      ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% colloqui · ${trackerStats.offerRate}% offerte`
+      : language === 'EN'
+      ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% interview rate · ${trackerStats.offerRate}% offer rate`
+      : `${trackerStats.total} in der Pipeline · ${trackerStats.interviewRate}% Interview-Quote · ${trackerStats.offerRate}% Erfolgsquote`;
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25, duration: 0.45 }}
+        onClick={clickable ? () => navigate('tracker') : undefined}
+        role={clickable ? 'button' : undefined}
+        tabIndex={clickable ? 0 : undefined}
+        onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate('tracker'); } } : undefined}
+        className={`p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 transition-all ${clickable ? 'cursor-pointer hover:border-[#004225]/30 dark:hover:border-[#00A854]/40 hover:shadow-md focus:outline-none focus:border-[#004225]/50 dark:focus:border-[#00A854]/60' : ''}`}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{kickerText}</p>
+          {clickable && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854]">
+              {language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen'}
+              <ArrowRight size={11} />
+            </span>
+          )}
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+          {cols.map((c) => {
+            const pct = empty ? 0 : Math.round((c.value / max) * 100);
+            return (
+              <div key={c.key} className="space-y-2">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="text-[9px] font-bold uppercase tracking-widest truncate" style={{ color: c.accent }}>{c.label}</span>
+                  <span className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
+                </div>
+                <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
+                    className={`h-full ${c.tint}`}
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+            {empty ? emptyText : summary}
+          </p>
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsAddingApp(true); }}
+            className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline shrink-0"
+          >
+            + {t.tracker_add}
+          </button>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#FDFCFB] dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] font-sans selection:bg-[#004225] selection:text-white transition-colors duration-300">
       {/* --- NAVIGATION --- */}
@@ -6935,71 +7013,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </motion.div>
                 )}
 
-                {/* Pipeline funnel — visual snapshot of the user's application flow.
-                    Lives between the CV banner and the tracker so the space neither
-                    feels empty (issue from screenshot) nor duplicates the table below. */}
-                {(() => {
-                  const cols = [
-                    { key: 'wishlist',  label: language === 'FR' ? 'Liste de souhaits' : language === 'IT' ? 'Lista desideri' : language === 'EN' ? 'Wishlist' : 'Wunschliste', value: trackerStats.wishlist, accent: '#9A9A94', tint: 'bg-[#9A9A94]' },
-                    { key: 'applied',   label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', value: trackerStats.applied, accent: '#5C5C58', tint: 'bg-[#5C5C58]' },
-                    { key: 'interview', label: 'Interview', value: trackerStats.interview, accent: '#D4A852', tint: 'bg-[#D4A852]' },
-                    { key: 'offer',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', value: trackerStats.offer, accent: '#004225', tint: 'bg-[#004225] dark:bg-[#00A854]' },
-                    { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: trackerStats.rejected, accent: '#B91C1C', tint: 'bg-[#B91C1C]' },
-                  ];
-                  const max = Math.max(1, ...cols.map(c => c.value));
-                  const empty = trackerStats.total === 0;
-                  const kickerText = language === 'FR' ? 'Ta pipeline en un coup d\'œil' : language === 'IT' ? 'La tua pipeline a colpo d\'occhio' : language === 'EN' ? 'Your pipeline at a glance' : 'Deine Pipeline auf einen Blick';
-                  const emptyText = language === 'FR' ? 'Pas encore de candidature. Ajoute la première ci-dessous.' : language === 'IT' ? 'Nessuna candidatura ancora. Aggiungi la prima qui sotto.' : language === 'EN' ? 'No applications yet. Add your first one below.' : 'Noch keine Bewerbung. Trag deine erste unten ein.';
-                  const summary = language === 'FR'
-                    ? `${trackerStats.total} dans la pipeline · ${trackerStats.interviewRate}% entretiens · ${trackerStats.offerRate}% offres`
-                    : language === 'IT'
-                    ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% colloqui · ${trackerStats.offerRate}% offerte`
-                    : language === 'EN'
-                    ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% interview rate · ${trackerStats.offerRate}% offer rate`
-                    : `${trackerStats.total} in der Pipeline · ${trackerStats.interviewRate}% Interview-Quote · ${trackerStats.offerRate}% Erfolgsquote`;
-                  return (
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.25, duration: 0.45 }}
-                      className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 transition-colors"
-                    >
-                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{kickerText}</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-                        {cols.map((c) => {
-                          const pct = empty ? 0 : Math.round((c.value / max) * 100);
-                          return (
-                            <div key={c.key} className="space-y-2">
-                              <div className="flex items-baseline justify-between gap-2">
-                                <span className="text-[9px] font-bold uppercase tracking-widest truncate" style={{ color: c.accent }}>{c.label}</span>
-                                <span className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
-                              </div>
-                              <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
-                                <motion.div
-                                  initial={{ width: 0 }}
-                                  animate={{ width: `${pct}%` }}
-                                  transition={{ duration: 0.7, delay: 0.3, ease: [0.21, 0.47, 0.32, 0.98] }}
-                                  className={`h-full ${c.tint}`}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                      <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-3">
-                        <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
-                          {empty ? emptyText : summary}
-                        </p>
-                        <button
-                          onClick={() => setIsAddingApp(true)}
-                          className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline shrink-0"
-                        >
-                          + {t.tracker_add}
-                        </button>
-                      </div>
-                    </motion.div>
-                  );
-                })()}
+                <div className="mb-6">{renderPipelineFunnel(true)}</div>
 
                 {user?.email === 'support.stellify@gmail.com' && (
                   <div className="p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
@@ -7552,6 +7566,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_page_title}</h1>
                   <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl leading-relaxed">{t.tracker_page_desc}</p>
                 </header>
+                {renderPipelineFunnel(false)}
                 {trackerSection}
               </div>
             )}
@@ -8073,6 +8088,97 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               ))}
             </div>
           </div>
+        </div>
+      </section>
+      )}
+      {/* --- PIPELINE PREVIEW (landing-only static demo of the dashboard funnel) --- */}
+      {(!user || activeView === 'dashboard') && (
+      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
+              {language === 'FR' ? 'Statistiques · Aperçu' : language === 'IT' ? 'Statistiche · Panoramica' : language === 'EN' ? 'Stats · Overview' : 'Statistik · Übersicht'}
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
+              {language === 'FR' ? 'Tu sais en un coup d\'œil, où tu en es.'
+                : language === 'IT' ? 'Capisci a colpo d\'occhio a che punto sei.'
+                : language === 'EN' ? 'See exactly where you stand. At a glance.'
+                : 'Du siehst auf einen Blick, wo du stehst.'}
+            </h2>
+            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+              {language === 'FR'
+                ? 'Pipeline, taux d\'entretiens, taux de succès. Stellify calcule en direct, automatiquement.'
+                : language === 'IT'
+                ? 'Pipeline, tasso di colloqui, tasso di successo. Stellify calcola in tempo reale, automaticamente.'
+                : language === 'EN'
+                ? 'Pipeline, interview rate, offer rate. Stellify computes it live, automatically.'
+                : 'Pipeline, Interview-Quote, Erfolgsquote. Stellify rechnet live, automatisch.'}
+            </p>
+          </div>
+
+          {(() => {
+            const cols = [
+              { key: 'wishlist',  label: language === 'FR' ? 'Liste de souhaits' : language === 'IT' ? 'Lista desideri' : language === 'EN' ? 'Wishlist' : 'Wunschliste', value: 5, accent: '#9A9A94', tint: 'bg-[#9A9A94]' },
+              { key: 'applied',   label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', value: 8, accent: '#5C5C58', tint: 'bg-[#5C5C58]' },
+              { key: 'interview', label: 'Interview', value: 4, accent: '#D4A852', tint: 'bg-[#D4A852]' },
+              { key: 'offer',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', value: 2, accent: '#004225', tint: 'bg-[#004225] dark:bg-[#00A854]' },
+              { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: 1, accent: '#B91C1C', tint: 'bg-[#B91C1C]' },
+            ];
+            const max = Math.max(...cols.map(c => c.value));
+            const kickerText = language === 'FR' ? 'Aperçu de la pipeline' : language === 'IT' ? 'Panoramica pipeline' : language === 'EN' ? 'Pipeline overview' : 'Pipeline-Überblick';
+            const exampleHint = language === 'FR' ? 'Exemple — tes chiffres apparaîtront automatiquement.' : language === 'IT' ? 'Esempio — i tuoi numeri appariranno automaticamente.' : language === 'EN' ? 'Example — your numbers populate automatically.' : 'Beispiel — deine Zahlen erscheinen automatisch.';
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.6 }}
+                className="max-w-4xl mx-auto p-6 sm:p-10 bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{kickerText}</p>
+                  <span className="text-[9px] font-mono text-[#9A9A94] uppercase tracking-widest">{exampleHint}</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+                  {cols.map((c, i) => {
+                    const pct = Math.round((c.value / max) * 100);
+                    return (
+                      <div key={c.key} className="space-y-2">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-[9px] font-bold uppercase tracking-widest truncate" style={{ color: c.accent }}>{c.label}</span>
+                          <span className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${pct}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.9, delay: 0.2 + i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
+                            className={`h-full ${c.tint}`}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5 grid sm:grid-cols-3 gap-6 text-center">
+                  <div>
+                    <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">20</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mt-2">{language === 'FR' ? 'Total candidatures' : language === 'IT' ? 'Candidature totali' : language === 'EN' ? 'Total applications' : 'Bewerbungen gesamt'}</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-serif text-[#D4A852] leading-none">40%</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mt-2">{language === 'FR' ? 'Taux d\'entretiens' : language === 'IT' ? 'Tasso colloqui' : language === 'EN' ? 'Interview rate' : 'Interview-Quote'}</p>
+                  </div>
+                  <div>
+                    <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] leading-none">13%</p>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mt-2">{language === 'FR' ? 'Taux d\'offres' : language === 'IT' ? 'Tasso offerte' : language === 'EN' ? 'Offer rate' : 'Erfolgsquote'}</p>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })()}
         </div>
       </section>
       )}
@@ -9205,15 +9311,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </button>
       )}
 
-      {/* --- TOOL MODAL --- */}
+      {/* --- TOOL MODAL ---
+           Default tools open as a focused mid-size modal. The Bewerbungs-
+           Generator opens as a full-screen experience because the design-
+           gallery + multi-step form needs the whole canvas. */}
       <AnimatePresence>
-        {activeTool && (
-          <div className="fixed inset-0 z-[300] flex items-end sm:items-center justify-center sm:p-4 bg-black/40 backdrop-blur-sm">
+        {activeTool && (() => {
+          const isFullPage = activeTool.id === 'bewerbungs-gen';
+          return (
+          <div className={`fixed inset-0 z-[300] flex justify-center bg-black/40 backdrop-blur-sm ${isFullPage ? '' : 'items-end sm:items-center sm:p-4'}`}>
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 40 }}
-              className="bg-white dark:bg-[#1A1A18] w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col shadow-2xl transition-colors sm:rounded-none"
+              className={`bg-white dark:bg-[#1A1A18] overflow-hidden flex flex-col shadow-2xl transition-colors ${isFullPage ? 'w-full h-full sm:rounded-none' : 'w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] sm:rounded-none'}`}
             >
               <div className="p-4 sm:p-6 border-b border-black/8 dark:border-white/8 flex items-center justify-between gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26] shrink-0">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -10106,7 +10217,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
             </motion.div>
           </div>
-        )}
+          );
+        })()}
       </AnimatePresence>
 
       {/* --- GENERATED APP MODAL --- */}
