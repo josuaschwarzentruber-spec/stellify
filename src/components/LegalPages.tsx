@@ -370,7 +370,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Rechtliche, steuerliche, medizinische oder ähnlich beratungsintensive Aussagen</li>
                 </ul>
                 <p className="mt-2">Falsche oder erfundene Angaben in Bewerbungsunterlagen können <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">arbeitsrechtliche, vertragliche oder strafrechtliche Folgen</strong> haben (z.B. Anfechtung des Arbeitsvertrags, fristlose Kündigung, Urkundenfälschung, Betrug). Diese liegen ausschliesslich beim Nutzer.</p>
-                <p className="mt-2">Stellify haftet ausdrücklich nicht für Schäden, die durch ungeprüftes Verwenden KI-generierter Inhalte entstehen — insbesondere nicht für nicht erfolgreiche Bewerbungen, abgelehnte Stellen, Rückzug von Stellenangeboten, Vertragsverletzungen oder Reputationsschäden. Diese Klausel ergänzt §9 (Haftungsbeschränkung) und gilt vorrangig.</p>
+                <p className="mt-2">Stellify haftet ausdrücklich nicht für Schäden, die durch ungeprüftes Verwenden KI-generierter Inhalte entstehen. insbesondere nicht für nicht erfolgreiche Bewerbungen, abgelehnte Stellen, Rückzug von Stellenangeboten, Vertragsverletzungen oder Reputationsschäden. Diese Klausel ergänzt §9 (Haftungsbeschränkung) und gilt vorrangig.</p>
               </Section>
               <Section title="10. Verfügbarkeit"><p>Keine Garantie auf unterbrechungsfreie Verfügbarkeit. Ausfälle von Firebase, Stripe oder Google AI liegen ausserhalb unseres Einflussbereichs.</p></Section>
               <Section title="11. Änderungen"><p>Anpassungen mit 30 Tagen Frist. Wesentliche Änderungen per E-Mail. Fortgesetzte Nutzung gilt als Zustimmung.</p></Section>
@@ -423,7 +423,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Affirmations juridiques, fiscales, médicales ou autres nécessitant un conseil professionnel</li>
                 </ul>
                 <p className="mt-2">Des informations fausses ou inventées dans des dossiers de candidature peuvent avoir des <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">conséquences en droit du travail, contractuelles ou pénales</strong> (p. ex. annulation du contrat de travail, licenciement immédiat, faux et usage de faux, escroquerie). Celles-ci incombent exclusivement à l'utilisateur.</p>
-                <p className="mt-2">Stellify n'est expressément pas responsable des dommages résultant de l'utilisation non vérifiée des contenus générés par l'IA — notamment pour des candidatures infructueuses, postes refusés, retraits d'offres d'emploi, violations contractuelles ou atteintes à la réputation. Cette clause complète §9 (Limitation de responsabilité) et prime sur celle-ci.</p>
+                <p className="mt-2">Stellify n'est expressément pas responsable des dommages résultant de l'utilisation non vérifiée des contenus générés par l'IA. notamment pour des candidatures infructueuses, postes refusés, retraits d'offres d'emploi, violations contractuelles ou atteintes à la réputation. Cette clause complète §9 (Limitation de responsabilité) et prime sur celle-ci.</p>
               </Section>
               <Section title="10. Disponibilité"><p>Aucune garantie de disponibilité ininterrompue. Les pannes de Firebase, Stripe ou Google AI échappent à notre contrôle.</p></Section>
               <Section title="11. Modifications"><p>Modifications avec un préavis de 30 jours. Changements importants communiqués par e-mail.</p></Section>
@@ -476,7 +476,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Affermazioni legali, fiscali, mediche o altre che richiedono consulenza professionale</li>
                 </ul>
                 <p className="mt-2">Informazioni false o inventate nei documenti di candidatura possono avere <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">conseguenze giuslavoristiche, contrattuali o penali</strong> (ad es. annullamento del contratto di lavoro, licenziamento immediato, falsificazione di documenti, truffa). Queste ricadono esclusivamente sull'utente.</p>
-                <p className="mt-2">Stellify non è espressamente responsabile dei danni derivanti dall'uso non verificato dei contenuti generati dall'IA — in particolare per candidature non riuscite, posizioni rifiutate, ritiri di offerte di lavoro, violazioni contrattuali o danni reputazionali. Questa clausola integra §9 (Limitazione di responsabilità) e ha precedenza.</p>
+                <p className="mt-2">Stellify non è espressamente responsabile dei danni derivanti dall'uso non verificato dei contenuti generati dall'IA. in particolare per candidature non riuscite, posizioni rifiutate, ritiri di offerte di lavoro, violazioni contrattuali o danni reputazionali. Questa clausola integra §9 (Limitazione di responsabilità) e ha precedenza.</p>
               </Section>
               <Section title="10. Disponibilità"><p>Nessuna garanzia di disponibilità ininterrotta. I guasti di Firebase, Stripe o Google AI esulano dal nostro controllo.</p></Section>
               <Section title="11. Modifiche"><p>Modifiche con 30 giorni di preavviso. Cambiamenti sostanziali comunicati via e-mail.</p></Section>
@@ -529,7 +529,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Legal, tax, medical or other statements requiring professional advice</li>
                 </ul>
                 <p className="mt-2">Incorrect or fabricated information in application materials may have <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">employment-law, contractual or criminal consequences</strong> (e.g. rescission of the employment contract, immediate dismissal, document forgery, fraud). These rest exclusively with the user.</p>
-                <p className="mt-2">Stellify is expressly not liable for damages caused by unverified use of AI-generated content — in particular not for unsuccessful applications, rejected positions, withdrawn job offers, breaches of contract or reputational damage. This clause supplements §9 (Limitation of Liability) and takes precedence.</p>
+                <p className="mt-2">Stellify is expressly not liable for damages caused by unverified use of AI-generated content. in particular not for unsuccessful applications, rejected positions, withdrawn job offers, breaches of contract or reputational damage. This clause supplements §9 (Limitation of Liability) and takes precedence.</p>
               </Section>
               <Section title="10. Availability"><p>No guarantee of uninterrupted availability. Outages of Firebase, Stripe or Google AI are outside our control.</p></Section>
               <Section title="11. Changes"><p>Changes to these Terms with 30 days' notice. Material changes communicated by email. Continued use constitutes acceptance.</p></Section>
@@ -629,7 +629,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             ifyDesc: "From the Latin stellificare. It means becoming a star. An old idea from Roman mythology that great figures would turn into stars in the sky.",
             nameSummary: 'Stellify thus literally means to turn someone into a star. A professional identity that shines.',
             stellaTitle: 'Stella, the AI behind Stellify',
-            stellaDesc: 'Stella is the name of our AI. The word comes from Latin, where stella simply means star. Stella works in the background of every tool: she writes your applications, optimises your CV, analyses job ads and prepares you for interviews. You don\'t chat with her — you use her. Like a star quietly showing the way.',
+            stellaDesc: 'Stella is the name of our AI. The word comes from Latin, where stella simply means star. Stella works in the background of every tool: she writes your applications, optimises your CV, analyses job ads and prepares you for interviews. You don\'t chat with her. you use her. Like a star quietly showing the way.',
             statLanguages: 'Languages', statAvailable: 'Available', statHq: 'Swiss HQ', statLaw: 'Law and Privacy',
             oneClickTitle: 'One click. Done.',
             oneClickLabel: 'Click',
@@ -688,7 +688,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 {c.nameIntro}
               </p>
 
-              {/* Big wordmark display — full brand lockup */}
+              {/* Big wordmark display. full brand lockup */}
               <div className="text-center my-16 pt-16 pb-20 border-y border-[#004225]/10 dark:border-white/10">
                 <svg width="56" height="56" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] mx-auto mb-8" aria-hidden="true">
                   <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>

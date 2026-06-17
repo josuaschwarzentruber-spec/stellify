@@ -3738,7 +3738,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
       faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung. Du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück, ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Karriere+, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Eine Generierung entspricht einer Tool-Nutzung — also einer erstellten Bewerbung, einem Motivationsschreiben, einer Lebenslaufanalyse, einer Stellenanalyse oder einem Interviewtraining. Der Gratis-Plan beinhaltet 3 Generierungen lebenslang, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 50 Generierungen pro Monat mit allen Kern-Funktionen. Karriere+ erweitert das auf 150 Generierungen pro Monat und schaltet zusätzlich ATS Premium-Analyse, erweiterten Interview Coach, Karriere- und Skill-Gap-Analyse, Premium-Vorlagen und priorisierte KI-Verarbeitung frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
+      faq_3_a: "Eine Generierung entspricht einer Tool-Nutzung. also einer erstellten Bewerbung, einem Motivationsschreiben, einer Lebenslaufanalyse, einer Stellenanalyse oder einem Interviewtraining. Der Gratis-Plan beinhaltet 3 Generierungen lebenslang, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 50 Generierungen pro Monat mit allen Kern-Funktionen. Karriere+ erweitert das auf 150 Generierungen pro Monat und schaltet zusätzlich ATS Premium-Analyse, erweiterten Interview Coach, Karriere- und Skill-Gap-Analyse, Premium-Vorlagen und priorisierte KI-Verarbeitung frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -3754,7 +3754,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_cv_title: "Lade deinen Lebenslauf hoch",
       onboarding_cv_desc: "Lade deinen Lebenslauf hoch, damit Stella dich und deine Erfahrungen besser versteht. So erhältst du personalisierte Tipps.",
       onboarding_chat_title: "Stella im Hintergrund",
-      onboarding_chat_desc: "Stella ist die KI, die in jedem Tool im Hintergrund arbeitet — sie schreibt deine Bewerbung, optimiert deinen Lebenslauf und bereitet dich auf Vorstellungsgespräche vor. Du musst sie nicht erst fragen, sie ist immer da.",
+      onboarding_chat_desc: "Stella ist die KI, die in jedem Tool im Hintergrund arbeitet. sie schreibt deine Bewerbung, optimiert deinen Lebenslauf und bereitet dich auf Vorstellungsgespräche vor. Du musst sie nicht erst fragen, sie ist immer da.",
       onboarding_tools_title: "Experten-Tools",
       onboarding_tools_desc: "Nutze unsere spezialisierten Tools für Gehaltschecks, Lebenslauf-Prüfung und Marktanalyse.",
       onboarding_next: "Weiter",
@@ -3854,16 +3854,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_short: "Erinnerung",
       tracker_export_csv: "CSV-Export",
       transparency_badge: "Transparenz",
-      transparency_title: "Was geht — und was nicht",
+      transparency_title: "Was geht. und was nicht",
       transparency_sub: "Damit du genau weisst woran du bist. Alle Limits beziehen sich auf KI-Anfragen (Tools + Chat).",
       tr_can_title: "Das kannst du", tr_cannot_title: "Das geht nicht",
       tr_can_1: "Alle Tools auf jedem Plan ausprobieren",
       tr_can_2: "Bewerbungen erstellen, speichern und als PDF oder Word exportieren",
       tr_can_3: "Auf Deutsch, Französisch, Italienisch und Englisch arbeiten",
       tr_can_4: "Schweizer Lohnbänder, Standards und Arbeitsmarkt-Kontext nutzen",
-      tr_can_5: "Jederzeit Plan wechseln, kündigen oder pausieren — keine Bindung",
-      tr_cannot_1: "Stellify ersetzt keinen Anwalt oder Steuerberater — KI-Inhalte immer prüfen",
-      tr_cannot_2: "Keine Garantie auf Stellenangebote — wir sind ein Werkzeug, kein Vermittler",
+      tr_can_5: "Jederzeit Plan wechseln, kündigen oder pausieren. keine Bindung",
+      tr_cannot_1: "Stellify ersetzt keinen Anwalt oder Steuerberater. KI-Inhalte immer prüfen",
+      tr_cannot_2: "Keine Garantie auf Stellenangebote. wir sind ein Werkzeug, kein Vermittler",
       tr_cannot_3: "Keine Verarbeitung sensibler Daten (z.B. Gesundheits-, Religions-, Sozialhilfe-Daten)",
       tr_cannot_4: "Keine Massenbewerbungen oder Automatisierung gegen unsere AGB",
       tr_limits_title: "Konkrete KI-Limits pro Plan",
@@ -4385,7 +4385,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
       faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer : vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement. Votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Karriere+, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Une génération correspond à une utilisation d'outil — une candidature, une lettre de motivation, une analyse de CV, une analyse d'offre ou un entraînement d'entretien. Le plan Gratuit comprend 3 générations à vie, idéal pour découvrir sans engagement. Le plan Pro offre 50 générations par mois avec toutes les fonctions essentielles. Karriere+ étend cela à 150 générations par mois et débloque en plus l'analyse ATS Premium, le coach d'entretien avancé, l'analyse de carrière et Skill-Gap, les modèles Premium et le traitement IA prioritaire. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
+      faq_3_a: "Une génération correspond à une utilisation d'outil. une candidature, une lettre de motivation, une analyse de CV, une analyse d'offre ou un entraînement d'entretien. Le plan Gratuit comprend 3 générations à vie, idéal pour découvrir sans engagement. Le plan Pro offre 50 générations par mois avec toutes les fonctions essentielles. Karriere+ étend cela à 150 générations par mois et débloque en plus l'analyse ATS Premium, le coach d'entretien avancé, l'analyse de carrière et Skill-Gap, les modèles Premium et le traitement IA prioritaire. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -4401,7 +4401,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_cv_title: "Téléchargez votre CV",
       onboarding_cv_desc: "Téléchargez votre CV pour que Stella puisse mieux vous comprendre, vous et vos expériences. Vous recevrez ainsi des conseils personnalisés.",
       onboarding_chat_title: "Stella en arrière-plan",
-      onboarding_chat_desc: "Stella est l'IA qui travaille en arrière-plan de chaque outil — elle rédige tes candidatures, optimise ton CV et te prépare aux entretiens. Pas besoin de la solliciter, elle est toujours présente.",
+      onboarding_chat_desc: "Stella est l'IA qui travaille en arrière-plan de chaque outil. elle rédige tes candidatures, optimise ton CV et te prépare aux entretiens. Pas besoin de la solliciter, elle est toujours présente.",
       onboarding_tools_title: "Outils d'experts",
       onboarding_tools_desc: "Utilisez nos outils spécialisés pour les vérifications de salaire, l'optimisation ATS et l'analyse du marché.",
       onboarding_next: "Suivant",
@@ -4501,16 +4501,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_short: "Relance",
       tracker_export_csv: "Export CSV",
       transparency_badge: "Transparence",
-      transparency_title: "Ce qui est possible — et ce qui ne l'est pas",
+      transparency_title: "Ce qui est possible. et ce qui ne l'est pas",
       transparency_sub: "Pour que tu saches exactement à quoi t'attendre. Toutes les limites concernent les requêtes IA (outils + chat).",
       tr_can_title: "Ce que tu peux faire", tr_cannot_title: "Ce qui n'est pas possible",
       tr_can_1: "Essayer tous les outils sur n'importe quel plan",
       tr_can_2: "Créer des candidatures, les sauvegarder et exporter en PDF ou Word",
       tr_can_3: "Travailler en allemand, français, italien et anglais",
       tr_can_4: "Utiliser les fourchettes salariales, normes et contexte du marché suisse",
-      tr_can_5: "Changer de plan, résilier ou suspendre à tout moment — sans engagement",
-      tr_cannot_1: "Stellify ne remplace pas un avocat ou un fiscaliste — vérifie toujours le contenu IA",
-      tr_cannot_2: "Aucune garantie d'offre d'emploi — nous sommes un outil, pas un intermédiaire",
+      tr_can_5: "Changer de plan, résilier ou suspendre à tout moment. sans engagement",
+      tr_cannot_1: "Stellify ne remplace pas un avocat ou un fiscaliste. vérifie toujours le contenu IA",
+      tr_cannot_2: "Aucune garantie d'offre d'emploi. nous sommes un outil, pas un intermédiaire",
       tr_cannot_3: "Pas de traitement de données sensibles (santé, religion, aide sociale, …)",
       tr_cannot_4: "Pas de candidatures de masse ni d'automatisation contre nos CGV",
       tr_limits_title: "Limites IA concrètes par plan",
@@ -4926,7 +4926,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Come funziona l'abbonamento Stellify?",
       faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare: hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento. Il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Karriere+, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Una generazione corrisponde a un utilizzo di strumento — una candidatura, una lettera di motivazione, un'analisi del CV, un'analisi dell'annuncio o un allenamento al colloquio. Il piano Gratuito include 3 generazioni a vita, ideale per provare senza impegno. Il piano Pro offre 50 generazioni al mese con tutte le funzioni essenziali. Karriere+ estende a 150 generazioni al mese e sblocca inoltre l'analisi ATS Premium, il coach colloqui avanzato, l'analisi di carriera e Skill-Gap, i modelli Premium e l'elaborazione IA prioritaria. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
+      faq_3_a: "Una generazione corrisponde a un utilizzo di strumento. una candidatura, una lettera di motivazione, un'analisi del CV, un'analisi dell'annuncio o un allenamento al colloquio. Il piano Gratuito include 3 generazioni a vita, ideale per provare senza impegno. Il piano Pro offre 50 generazioni al mese con tutte le funzioni essenziali. Karriere+ estende a 150 generazioni al mese e sblocca inoltre l'analisi ATS Premium, il coach colloqui avanzato, l'analisi di carriera e Skill-Gap, i modelli Premium e l'elaborazione IA prioritaria. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -4942,7 +4942,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_cv_title: "Carica il tuo CV",
       onboarding_cv_desc: "Carica il tuo curriculum in modo che Stella possa capire meglio te e le tue esperienze. Riceverai così consigli personalizzati.",
       onboarding_chat_title: "Stella in background",
-      onboarding_chat_desc: "Stella è l'IA che lavora in background in ogni strumento — scrive le tue candidature, ottimizza il tuo CV e ti prepara ai colloqui. Non devi chiederle nulla, è sempre presente.",
+      onboarding_chat_desc: "Stella è l'IA che lavora in background in ogni strumento. scrive le tue candidature, ottimizza il tuo CV e ti prepara ai colloqui. Non devi chiederle nulla, è sempre presente.",
       onboarding_tools_title: "Strumenti esperti",
       onboarding_tools_desc: "Usa i nostri strumenti specializzati per controlli salariali, ottimizzazione ATS e analisi di mercato.",
       onboarding_next: "Avanti",
@@ -5042,16 +5042,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_short: "Ricontatta",
       tracker_export_csv: "Esporta CSV",
       transparency_badge: "Trasparenza",
-      transparency_title: "Cosa è possibile — e cosa no",
+      transparency_title: "Cosa è possibile. e cosa no",
       transparency_sub: "Per sapere esattamente cosa aspettarsi. Tutti i limiti riguardano le richieste IA (strumenti + chat).",
       tr_can_title: "Cosa puoi fare", tr_cannot_title: "Cosa non è possibile",
       tr_can_1: "Provare tutti gli strumenti su qualsiasi piano",
       tr_can_2: "Creare candidature, salvarle ed esportarle in PDF o Word",
       tr_can_3: "Lavorare in tedesco, francese, italiano e inglese",
       tr_can_4: "Usare fasce salariali, standard e contesto del mercato svizzero",
-      tr_can_5: "Cambiare piano, disdire o sospendere in qualsiasi momento — nessun vincolo",
-      tr_cannot_1: "Stellify non sostituisce avvocato o commercialista — verifica sempre i contenuti IA",
-      tr_cannot_2: "Nessuna garanzia di offerte di lavoro — siamo uno strumento, non un intermediario",
+      tr_can_5: "Cambiare piano, disdire o sospendere in qualsiasi momento. nessun vincolo",
+      tr_cannot_1: "Stellify non sostituisce avvocato o commercialista. verifica sempre i contenuti IA",
+      tr_cannot_2: "Nessuna garanzia di offerte di lavoro. siamo uno strumento, non un intermediario",
       tr_cannot_3: "Nessun trattamento di dati sensibili (salute, religione, assistenza sociale)",
       tr_cannot_4: "Nessuna candidatura di massa o automazione contro le nostre condizioni",
       tr_limits_title: "Limiti IA concreti per piano",
@@ -5467,7 +5467,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "How does the Stellify subscription work?",
       faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required: you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again. Your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Karriere+, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "One generation equals one tool use — a created application, a cover letter, a CV analysis, a job analysis or an interview training. The Free plan includes 3 lifetime generations, ideal to explore with no commitment. The Pro plan offers 50 generations per month with all core features. Karriere+ extends this to 150 generations per month and additionally unlocks ATS Premium analysis, the advanced Interview Coach, career and Skill-Gap analysis, Premium templates and prioritised AI processing. The exact limits are shown transparently on the Pricing page and in our Terms.",
+      faq_3_a: "One generation equals one tool use. a created application, a cover letter, a CV analysis, a job analysis or an interview training. The Free plan includes 3 lifetime generations, ideal to explore with no commitment. The Pro plan offers 50 generations per month with all core features. Karriere+ extends this to 150 generations per month and additionally unlocks ATS Premium analysis, the advanced Interview Coach, career and Skill-Gap analysis, Premium templates and prioritised AI processing. The exact limits are shown transparently on the Pricing page and in our Terms.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -5483,7 +5483,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       onboarding_cv_title: "Upload your CV",
       onboarding_cv_desc: "Upload your resume so Stella can better understand you and your experiences. This way you get personalized tips.",
       onboarding_chat_title: "Stella in the background",
-      onboarding_chat_desc: "Stella is the AI working in the background of every tool — she writes your applications, optimises your CV and prepares you for interviews. You don't have to ask her, she's always there.",
+      onboarding_chat_desc: "Stella is the AI working in the background of every tool. she writes your applications, optimises your CV and prepares you for interviews. You don't have to ask her, she's always there.",
       onboarding_tools_title: "Expert Tools",
       onboarding_tools_desc: "Use our specialized tools for salary checks, ATS optimization and market analysis.",
       onboarding_next: "Next",
@@ -5583,16 +5583,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_reminder_short: "Follow-up",
       tracker_export_csv: "Export CSV",
       transparency_badge: "Transparency",
-      transparency_title: "What you can do — and what you can't",
+      transparency_title: "What you can do. and what you can't",
       transparency_sub: "So you know exactly where you stand. All limits cover AI requests (tools + chat).",
       tr_can_title: "What you can do", tr_cannot_title: "What's not possible",
       tr_can_1: "Try every tool on any plan",
       tr_can_2: "Create applications, save them and export as PDF or Word",
       tr_can_3: "Work in German, French, Italian and English",
       tr_can_4: "Use Swiss salary ranges, standards and labour-market context",
-      tr_can_5: "Switch plans, cancel or pause anytime — no lock-in",
-      tr_cannot_1: "Stellify doesn't replace a lawyer or tax advisor — always check AI output",
-      tr_cannot_2: "No guarantee of job offers — we're a tool, not an agency",
+      tr_can_5: "Switch plans, cancel or pause anytime. no lock-in",
+      tr_cannot_1: "Stellify doesn't replace a lawyer or tax advisor. always check AI output",
+      tr_cannot_2: "No guarantee of job offers. we're a tool, not an agency",
       tr_cannot_3: "No processing of sensitive data (health, religion, social-benefit data)",
       tr_cannot_4: "No mass applications or automation against our terms",
       tr_limits_title: "Concrete AI limits by plan",
@@ -7482,7 +7482,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
-                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '—'}</p>
+                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '–'}</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
@@ -7612,7 +7612,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         : 'Deine Stellen erscheinen genau dort, wo Kandidaten ihre Bewerbung mit KI erstellen. Sie bewerben sich mit einem Klick bei dir. Melde dich, um zu den ersten Arbeitgebern zu gehören.'}
                     </p>
                     <a
-                      href={`mailto:support@stellify.ch?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise — publier des postes sur Stellify' : language === 'IT' ? 'Azienda — pubblicare posizioni su Stellify' : language === 'EN' ? 'Company — list roles on Stellify' : 'Unternehmen — Stellen auf Stellify ausschreiben')}`}
+                      href={`mailto:support@stellify.ch?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise. publier des postes sur Stellify' : language === 'IT' ? 'Azienda. pubblicare posizioni su Stellify' : language === 'EN' ? 'Company. list roles on Stellify' : 'Unternehmen. Stellen auf Stellify ausschreiben')}`}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#004225] text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#FAFAF8] transition-all"
                     >
                       {language === 'FR' ? 'Nous contacter' : language === 'IT' ? 'Contattaci' : language === 'EN' ? 'Get in touch' : 'Kontakt aufnehmen'}
@@ -7627,7 +7627,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     {language === 'FR' ? 'En attendant' : language === 'IT' ? 'Nel frattempo' : language === 'EN' ? 'In the meantime' : 'In der Zwischenzeit'}
                   </p>
                   <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light mb-5 max-w-xl leading-relaxed">
-                    {language === 'FR' ? 'Prépare des candidatures parfaites avec nos outils IA — prêt dès qu\'un poste t\'intéresse.' : language === 'IT' ? 'Prepara candidature perfette con i nostri strumenti IA — pronto appena trovi una posizione.' : language === 'EN' ? 'Get perfect applications ready with our AI tools — so you\'re set the moment a role catches your eye.' : 'Bereite mit unseren KI-Tools perfekte Bewerbungen vor — damit du bereit bist, sobald dich eine Stelle interessiert.'}
+                    {language === 'FR' ? 'Prépare des candidatures parfaites avec nos outils IA. prêt dès qu\'un poste t\'intéresse.' : language === 'IT' ? 'Prepara candidature perfette con i nostri strumenti IA. pronto appena trovi una posizione.' : language === 'EN' ? 'Get perfect applications ready with our AI tools. so you\'re set the moment a role catches your eye.' : 'Bereite mit unseren KI-Tools perfekte Bewerbungen vor. damit du bereit bist, sobald dich eine Stelle interessiert.'}
                   </p>
                   <button
                     onClick={() => navigate('tools')}
@@ -8127,7 +8127,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ];
             const max = Math.max(...cols.map(c => c.value));
             const kickerText = language === 'FR' ? 'Aperçu de la pipeline' : language === 'IT' ? 'Panoramica pipeline' : language === 'EN' ? 'Pipeline overview' : 'Pipeline-Überblick';
-            const exampleHint = language === 'FR' ? 'Exemple — tes chiffres apparaîtront automatiquement.' : language === 'IT' ? 'Esempio — i tuoi numeri appariranno automaticamente.' : language === 'EN' ? 'Example — your numbers populate automatically.' : 'Beispiel — deine Zahlen erscheinen automatisch.';
+            const exampleHint = language === 'FR' ? 'Exemple. tes chiffres apparaîtront automatiquement.' : language === 'IT' ? 'Esempio. i tuoi numeri appariranno automaticamente.' : language === 'EN' ? 'Example. your numbers populate automatically.' : 'Beispiel. deine Zahlen erscheinen automatisch.';
             return (
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
@@ -8256,72 +8256,61 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
-      {/* --- SWISS CAREER HOTSPOTS ---
-           Premium redesign per user feedback (labels overlapped, silhouette
-           looked blobby). Now: a clean Switzerland silhouette as a quiet
-           visual anchor on the left, then a structured city grid on the
-           right (no label collisions, scales to mobile), and a profession-
-           tag wall below to prove every job is covered. */}
+      {/* --- SWISS CITIES MAP ---
+           Simplified per user: just the Swiss silhouette with the major
+           cities marked. No profession descriptions, no tag wall.
+           Visual presence in every region, nothing more. */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors overflow-hidden">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
-              {language === 'FR' ? 'Marché suisse' : language === 'IT' ? 'Mercato svizzero' : language === 'EN' ? 'Swiss market' : 'Schweizer Arbeitsmarkt'}
+              {language === 'FR' ? 'Suisse' : language === 'IT' ? 'Svizzera' : language === 'EN' ? 'Switzerland' : 'Schweiz'}
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
-              {language === 'FR' ? 'Pour chaque métier. Partout en Suisse.'
-                : language === 'IT' ? 'Per ogni mestiere. In tutta la Svizzera.'
-                : language === 'EN' ? 'For every job. Across all of Switzerland.'
-                : 'Für jeden Beruf. In der ganzen Schweiz.'}
+              {language === 'FR' ? 'Stella connaît la Suisse.'
+                : language === 'IT' ? 'Stella conosce la Svizzera.'
+                : language === 'EN' ? 'Stella knows Switzerland.'
+                : 'Stella kennt die Schweiz.'}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
               {language === 'FR'
-                ? "De l'apprenti aux soins, de la gastronomie à la pharma, du commerce de détail à la tech — Stella connaît les filières, les diplômes (CFC, ES, HES) et le marché de chaque canton."
+                ? 'De Bâle à Lugano, de Genève à Saint-Gall. Présente dans toutes les régions.'
                 : language === 'IT'
-                ? "Dall'apprendista alla cura, dalla gastronomia alla farmaceutica, dal commercio al dettaglio alla tecnologia — Stella conosce le filiere, i diplomi (AFC, SSS, SUP) e il mercato di ogni cantone."
+                ? 'Da Basilea a Lugano, da Ginevra a San Gallo. Presente in tutte le regioni.'
                 : language === 'EN'
-                ? 'From apprentice to care worker, from gastronomy to pharma, from retail to tech — Stella knows the trades, the diplomas (EFZ, HF, FH) and the market in every canton.'
-                : 'Vom Lehrling bis zur Pflege, von Gastronomie bis Pharma, vom Detailhandel bis Tech — Stella kennt die Berufsbilder, die Abschlüsse (EFZ, HF, FH) und den Markt in jedem Kanton.'}
+                ? 'From Basel to Lugano, from Geneva to St. Gallen. Present in every region.'
+                : 'Von Basel bis Lugano, von Genf bis St. Gallen. Präsent in allen Regionen.'}
             </p>
           </div>
 
           {(() => {
             const cities = [
               { key: 'basel',    x: 195, y: 105, no: '01',
-                name: { DE: 'Basel', FR: 'Bâle', IT: 'Basilea', EN: 'Basel' },
-                ind:  { DE: 'Pharma · Chemie · Pflege', FR: 'Pharma · Chimie · Soins', IT: 'Farma · Chimica · Cura', EN: 'Pharma · Chem · Care' } },
+                name: { DE: 'Basel', FR: 'Bâle', IT: 'Basilea', EN: 'Basel' } },
               { key: 'zurich',   x: 455, y: 145, no: '02',
-                name: { DE: 'Zürich', FR: 'Zurich', IT: 'Zurigo', EN: 'Zurich' },
-                ind:  { DE: 'Banking · Tech · KV-Lehre', FR: 'Banque · Tech · App. comm.', IT: 'Banca · Tech · AFC comm.', EN: 'Banking · Tech · Apprentice' } },
+                name: { DE: 'Zürich', FR: 'Zurich', IT: 'Zurigo', EN: 'Zurich' } },
               { key: 'stgallen', x: 590, y: 165, no: '03',
-                name: { DE: 'St. Gallen', FR: 'Saint-Gall', IT: 'San Gallo', EN: 'St. Gallen' },
-                ind:  { DE: 'Handel · Textil · HSG', FR: 'Commerce · Textile · HSG', IT: 'Commercio · Tessile · HSG', EN: 'Trade · Textile · HSG' } },
+                name: { DE: 'St. Gallen', FR: 'Saint-Gall', IT: 'San Gallo', EN: 'St. Gallen' } },
               { key: 'zug',      x: 435, y: 200, no: '04',
-                name: { DE: 'Zug', FR: 'Zoug', IT: 'Zugo', EN: 'Zug' },
-                ind:  { DE: 'Rohstoffe · KMU · IT', FR: 'Mat. prem. · PME · IT', IT: 'Materie prime · PMI · IT', EN: 'Commodities · SME · IT' } },
+                name: { DE: 'Zug', FR: 'Zoug', IT: 'Zugo', EN: 'Zug' } },
               { key: 'luzern',   x: 375, y: 225, no: '05',
-                name: { DE: 'Luzern', FR: 'Lucerne', IT: 'Lucerna', EN: 'Lucerne' },
-                ind:  { DE: 'Hotellerie · Bau · Pflege', FR: 'Hôtellerie · Bâtiment · Soins', IT: 'Alberghi · Edilizia · Cura', EN: 'Hospitality · Building · Care' } },
+                name: { DE: 'Luzern', FR: 'Lucerne', IT: 'Lucerna', EN: 'Lucerne' } },
               { key: 'bern',     x: 265, y: 250, no: '06',
-                name: { DE: 'Bern', FR: 'Berne', IT: 'Berna', EN: 'Bern' },
-                ind:  { DE: 'Bund · SBB · Landwirtschaft', FR: 'Fédéral · CFF · Agriculture', IT: 'Federale · FFS · Agricoltura', EN: 'Federal · SBB · Agri' } },
+                name: { DE: 'Bern', FR: 'Berne', IT: 'Berna', EN: 'Bern' } },
               { key: 'lausanne', x: 140, y: 320, no: '07',
-                name: { DE: 'Lausanne', FR: 'Lausanne', IT: 'Losanna', EN: 'Lausanne' },
-                ind:  { DE: 'Tech · EPFL · Gastronomie', FR: 'Tech · EPFL · Gastronomie', IT: 'Tech · EPFL · Ristorazione', EN: 'Tech · EPFL · Gastronomy' } },
+                name: { DE: 'Lausanne', FR: 'Lausanne', IT: 'Losanna', EN: 'Lausanne' } },
               { key: 'geneva',   x: 60,  y: 335, no: '08',
-                name: { DE: 'Genf', FR: 'Genève', IT: 'Ginevra', EN: 'Geneva' },
-                ind:  { DE: 'UNO · Uhren · Detailhandel', FR: 'ONU · Horlogerie · Détail', IT: 'ONU · Orologi · Dettaglio', EN: 'UN · Watchmaking · Retail' } },
+                name: { DE: 'Genf', FR: 'Genève', IT: 'Ginevra', EN: 'Geneva' } },
               { key: 'lugano',   x: 470, y: 430, no: '09',
-                name: { DE: 'Lugano', FR: 'Lugano', IT: 'Lugano', EN: 'Lugano' },
-                ind:  { DE: 'Finanz · Mode · Gastronomie', FR: 'Finance · Mode · Restauration', IT: 'Finanza · Moda · Ristorazione', EN: 'Finance · Fashion · Restaurants' } },
+                name: { DE: 'Lugano', FR: 'Lugano', IT: 'Lugano', EN: 'Lugano' } },
             ];
             const lang = language as 'DE' | 'FR' | 'IT' | 'EN';
             return (
               <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
                 {/* Map */}
-                <div className="lg:col-span-7 relative">
+                <div className="lg:col-span-8 relative">
                   <motion.svg
                     viewBox="0 0 700 500"
                     className="w-full h-auto"
@@ -8329,14 +8318,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true, margin: '-80px' }}
                     transition={{ duration: 0.8 }}
-                    aria-label="Schweizer Karriere-Karte"
+                    aria-label="Schweizer Städtekarte"
                   >
                     <defs>
-                      <linearGradient id="chFill" x1="0" y1="0" x2="0" y2="1">
+                      <linearGradient id="chFill2" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="currentColor" stopOpacity="0.10" />
                         <stop offset="100%" stopColor="currentColor" stopOpacity="0.04" />
                       </linearGradient>
-                      <filter id="chShadow" x="-10%" y="-10%" width="120%" height="120%">
+                      <filter id="chShadow2" x="-10%" y="-10%" width="120%" height="120%">
                         <feGaussianBlur in="SourceAlpha" stdDeviation="6" />
                         <feOffset dx="0" dy="4" result="offsetblur" />
                         <feComponentTransfer><feFuncA type="linear" slope="0.18" /></feComponentTransfer>
@@ -8344,8 +8333,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </filter>
                     </defs>
 
-                    {/* Switzerland silhouette — closer to the real outline (still
-                        simplified for elegance). Single smooth cubic path. */}
                     <motion.path
                       d="M 175 95
                          C 220 88, 290 85, 360 90
@@ -8365,23 +8352,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                          C 88 250, 80 225, 72 205
                          C 65 180, 72 158, 88 135
                          C 110 115, 140 102, 175 95 Z"
-                      fill="url(#chFill)"
+                      fill="url(#chFill2)"
                       stroke="currentColor"
                       strokeWidth="1.25"
                       strokeLinejoin="round"
                       className="text-[#004225] dark:text-[#00A854]"
-                      filter="url(#chShadow)"
+                      filter="url(#chShadow2)"
                       initial={{ pathLength: 0 }}
                       whileInView={{ pathLength: 1 }}
                       viewport={{ once: true }}
                       transition={{ duration: 1.8, ease: 'easeInOut' }}
                     />
 
-                    {/* Subtle hint of major lakes — quiet, never the focus. */}
                     <ellipse cx="105" cy="335" rx="42" ry="6" fill="#3b82f6" opacity="0.16" />
                     <ellipse cx="595" cy="135" rx="40" ry="5" fill="#3b82f6" opacity="0.16" />
 
-                    {/* City pins — number badge + soft pulse, no text inside SVG. */}
                     {cities.map((c, i) => (
                       <g key={c.key}>
                         <motion.circle
@@ -8421,73 +8406,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </motion.svg>
                 </div>
 
-                {/* City grid — paired with the pin numbers on the map. */}
-                <div className="lg:col-span-5">
-                  <div className="grid sm:grid-cols-2 gap-3">
+                {/* Compact city list — name + number, no professions. */}
+                <div className="lg:col-span-4">
+                  <ul className="space-y-2">
                     {cities.map((c, i) => (
-                      <motion.div
+                      <motion.li
                         key={c.key}
-                        initial={{ opacity: 0, y: 12 }}
-                        whileInView={{ opacity: 1, y: 0 }}
+                        initial={{ opacity: 0, x: 12 }}
+                        whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: '-40px' }}
                         transition={{ delay: 0.35 + i * 0.05, duration: 0.4 }}
-                        className="group p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/30 dark:hover:border-[#00A854]/40 transition-colors"
+                        className="flex items-center gap-4 py-2 border-b border-black/5 dark:border-white/5 last:border-0"
                       >
-                        <div className="flex items-start gap-3">
-                          <span className="text-[10px] font-mono font-bold text-[#004225] dark:text-[#00A854] mt-0.5 shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.no}</span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{c.name[lang] || c.name.EN}</p>
-                            <p className="text-[10px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-1 leading-snug">{c.ind[lang] || c.ind.EN}</p>
-                          </div>
-                        </div>
-                      </motion.div>
+                        <span className="text-xs font-mono font-bold text-[#004225] dark:text-[#00A854] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.no}</span>
+                        <span className="text-base font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{c.name[lang] || c.name.EN}</span>
+                      </motion.li>
                     ))}
-                  </div>
+                  </ul>
                 </div>
               </div>
-            );
-          })()}
-
-          {/* Profession tag row — visual proof that 'every job' isn't lip-service. */}
-          {(() => {
-            const tags = language === 'FR' ? [
-              'Apprentissage CFC','Soins infirmiers','Bâtiment & Artisanat','Hôtellerie & Restauration','Commerce de détail','Banque & Finance','IT & Tech','Pharma & Santé','Administration','Logistique','Agriculture','Tourisme','Éducation','Industrie & Machines','Vente','Coiffure & Beauté'
-            ] : language === 'IT' ? [
-              'Apprendistato AFC','Cure infermieristiche','Edilizia & Artigianato','Alberghi & Ristorazione','Commercio al dettaglio','Banche & Finanza','IT & Tech','Farma & Sanità','Amministrazione','Logistica','Agricoltura','Turismo','Educazione','Industria & Meccanica','Vendite','Parrucchieri & Bellezza'
-            ] : language === 'EN' ? [
-              'Apprenticeships (EFZ)','Nursing & Care','Construction & Trades','Hospitality','Retail','Banking & Finance','IT & Tech','Pharma & Health','Public Admin','Logistics','Agriculture','Tourism','Education','Industry & Machinery','Sales','Beauty & Hairdressing'
-            ] : [
-              'Lehre (EFZ)','Pflege & Betreuung','Bau & Handwerk','Hotellerie & Gastronomie','Detailhandel','Banking & Finanzen','IT & Tech','Pharma & Gesundheit','Verwaltung','Logistik','Landwirtschaft','Tourismus','Bildung','Industrie & Mechanik','Verkauf','Coiffure & Beauty'
-            ];
-            return (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-50px' }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="mt-16 pt-10 border-t border-black/5 dark:border-white/5"
-              >
-                <p className="text-center text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-6">
-                  {language === 'FR' ? "Tous métiers · de l'apprentissage à la direction"
-                    : language === 'IT' ? "Tutti i mestieri · dall'apprendistato alla direzione"
-                    : language === 'EN' ? 'Every profession · from apprentice to executive'
-                    : 'Alle Berufe · vom Lehrling bis zur Geschäftsleitung'}
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center max-w-4xl mx-auto">
-                  {tags.map((tag, i) => (
-                    <motion.span
-                      key={tag}
-                      initial={{ opacity: 0, scale: 0.85 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.25 + i * 0.04, duration: 0.35 }}
-                      className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 text-[#004225] dark:text-[#00A854] rounded-full"
-                    >
-                      {tag}
-                    </motion.span>
-                  ))}
-                </div>
-              </motion.div>
             );
           })()}
         </div>

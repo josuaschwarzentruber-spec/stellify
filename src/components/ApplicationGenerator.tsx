@@ -12,7 +12,7 @@ import {
 } from 'firebase/firestore';
 
 /* ──────────────────────────────────────────────────────────────────────────
-   Design system — six original, code-defined application designs.
+   Design system. six original, code-defined application designs.
    A design is pure data; ApplicationDocument renders it. The same renderer
    will drive the PDF/DOCX export in phase 2, so design === export layout.
    ────────────────────────────────────────────────────────────────────────── */
@@ -27,7 +27,7 @@ export type DesignConfig = {
   layout: 'classic' | 'sidebar' | 'minimal' | 'elegant' | 'block' | 'executive';
   custom?: boolean;
   name?: string;
-  /** Ultimate-only design — locked for Free + Pro */
+  /** Ultimate-only design. locked for Free + Pro */
   premium?: boolean;
 };
 
@@ -207,7 +207,7 @@ const STR: Record<string, Record<string, string>> = {
     load_saved: 'Saved applications', load: 'Open', no_saved: 'No saved applications yet.',
     subject: 'Application for the position of', attachment_note: 'Enclosures: CV, references',
     greeting: 'Dear Sir or Madam', closing: 'Kind regards',
-    motivation_placeholder: 'Your application text will appear here. Fill in the form — your motivation text forms the core of the letter. In the next step, the AI turns it into a complete, professional cover letter.',
+    motivation_placeholder: 'Your application text will appear here. Fill in the form. your motivation text forms the core of the letter. In the next step, the AI turns it into a complete, professional cover letter.',
     profile_title: 'Profile', skills_title: 'Skills', exp_title: 'Experience', edu_title: 'Education',
     locked_title: 'Pro Tool', locked_text: 'The application generator is part of the Pro plan.', locked_cta: 'See plans',
     required_hint: 'Fill in first name, last name, company and position to continue.',
@@ -234,7 +234,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   const headFont = design.font === 'sans' ? sans : serif;
   const bodyFont = design.font === 'serif' ? serif : sans;
   const a = design.accent;
-  const fullName = [form.firstName, form.lastName].filter(Boolean).join(' ') || '—';
+  const fullName = [form.firstName, form.lastName].filter(Boolean).join(' ') || '–';
   const contactBits = [form.address, form.phone, form.email].filter(Boolean);
   const bodyText = generatedText || form.motivation || s.motivation_placeholder;
   const today = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -263,7 +263,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
     </div>
   );
 
-  /* Layout variants — each visually distinct, all original work */
+  /* Layout variants. each visually distinct, all original work */
   if (design.layout === 'sidebar') {
     return (
       <div style={{ display: 'flex', minHeight: '100%', background: '#fff' }}>
@@ -435,7 +435,7 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
   /* Mirror handleProcessTool gating: same thresholds, same messages. */
   // Must mirror the server QUOTA in api/index.ts:
   //   Free: 3 lifetime · Pro: 50/month · Karriere+ (role 'unlimited'): 150/month
-  // No daily cap any more — only the monthly limit + per-minute fair-use guard.
+  // No daily cap any more. only the monthly limit + per-minute fair-use guard.
   const quotaInfo = (() => {
     if (!usage) return null;
     if (!usage.isPro) {
@@ -467,7 +467,7 @@ ${form.skills ? `FÄHIGKEITEN: ${form.skills.substring(0, 600)}` : ''}
 ${form.motivation ? `MOTIVATION: ${form.motivation.substring(0, 800)}` : ''}
 TONALITÄT: ${toneLabel(form.tone)}
 
-AUFGABE — antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
+AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
   "coverLetter": "Vollständiges Bewerbungsanschreiben, 250-350 Wörter, ohne Anrede und ohne Grussformel (werden separat ergänzt), Absätze mit \\n\\n getrennt",
   "cvSummary": "Optimiertes Kurzprofil für den Lebenslauf, 3-4 Sätze",
@@ -534,7 +534,7 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
 
   const exportWord = () => {
     /* Word renders HTML: same letter, design approximated (accent colour,
-       font pairing, simplified layout — sidebar becomes a table). */
+       font pairing, simplified layout. sidebar becomes a table). */
     const a = design.accent;
     const serif = "Georgia, 'Times New Roman', serif";
     const sans = "Helvetica, Arial, sans-serif";
@@ -609,7 +609,7 @@ ${bodyText}
     setIsSaving(true);
     const payload = {
       user_id: user.id,
-      title: `${form.targetPosition || '—'} · ${form.targetCompany || '—'}`,
+      title: `${form.targetPosition || '–'} · ${form.targetCompany || '–'}`,
       design,
       form,
       generated: gen,
@@ -800,7 +800,7 @@ ${bodyText}
                     <div className="space-y-1.5">
                       <label className={labelCls}>{s.f_tone}</label>
                       <select className={inputCls} value={form.tone} onChange={set('tone')}>
-                        <option value="">—</option>
+                        <option value="">–</option>
                         <option value="professional">{s.tone_prof}</option>
                         <option value="confident">{s.tone_conf}</option>
                         <option value="friendly">{s.tone_warm}</option>
