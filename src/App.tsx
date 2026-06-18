@@ -2820,31 +2820,26 @@ Bewerte in 3 Kategorien (je 0–100%):
 → Gesamtscore + 2 wichtigste Verbesserungshinweise.`;
 
           prompt = `
-            HANDLUNGSANWEISUNG: Bereite ${toolInput.firstName || 'den Kandidaten'}${toolInput.lastName ? ' ' + toolInput.lastName : ''} auf ein professionelles Vorstellungsgespräch vor.
+            Bereite ${toolInput.firstName || 'den Kandidaten'} auf ein Vorstellungsgespräch vor.
             POSITION: ${toolInput.jobTitle || 'Nicht angegeben'}.
-            ART DER BEWERBUNG: ${toolInput.applicationType || 'Allgemeine Bewerbung'}.
+            BEWERBUNG: ${toolInput.applicationType || 'Allgemein'}.
             QUALIFIKATIONEN: ${toolInput.qualifications || 'Keine angegeben'}.
-            FOKUS/WÜNSCHE: ${toolInput.description || 'Allgemeines Interview-Training'}.
-            CV: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards'}.
-            SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
+            FOKUS: ${toolInput.description || 'Allgemeines Interview-Training'}.
+            CV: ${(cvContext || 'Kein CV – allgemeine Schweizer Standards').slice(0, 1500)}.
 
-            AUFGABE: Erstelle eine massgeschneiderte Interview-Vorbereitung für Schweizer Unternehmen.
-
-            ${scoringGrid}
-
-            ANTWORTFORMAT: Antworte AUSSCHLIESSLICH mit gültigem JSON (keine Markdown-Codeblöcke, kein Text davor/danach):
+            Antworte NUR mit gültigem JSON (kein Markdown, kein Text davor/danach), Schweizer Hochdeutsch (ss statt ß):
             {
               "title": "Interview-Vorbereitung",
-              "subtitle": "<kurze Zusammenfassung Qualifikation · Zielposition, max 90 Zeichen>",
-              "tags": ["<3-5 zentrale Themen, je 1-3 Wörter>"],
-              "stats": { "questions": <Anzahl Fragen als Zahl>, "topics": <Anzahl Kernthemen als Zahl>, "match": <Eignungs-Score 0-100 als Zahl> },
-              "elevatorPitch": "<überzeugender Elevator Pitch in 3-4 Sätzen auf Schweizer Hochdeutsch, Ich-Form>",
+              "subtitle": "<Qualifikation · Zielposition, max 80 Zeichen>",
+              "tags": ["<3-4 Themen, je 1-2 Wörter>"],
+              "stats": { "questions": 5, "topics": 3, "match": <Eignung 0-100> },
+              "elevatorPitch": "<Elevator Pitch, 3 Sätze, Ich-Form>",
               "questions": [
-                { "question": "<anspruchsvolle Interviewfrage in Anführungszeichen>", "answer": "<optimale Musterantwort auf Schweizer Hochdeutsch, 2-4 Sätze>" }
+                { "question": "<Interviewfrage>", "answer": "<Musterantwort, 2-3 Sätze>" }
               ],
-              "tips": ["<5-6 konkrete Coaching-Tipps: Zahlen nennen, Gehaltsgespräch, Körpersprache, Gegenfragen, Schweizer Kultur>"]
+              "tips": ["<5 kurze Coaching-Tipps: Zahlen, Gehalt, Körpersprache, Gegenfragen, CH-Kultur>"]
             }
-            Erstelle 5-7 Fragen. Alle Texte auf Schweizer Hochdeutsch (kein ß, verwende ss). Kein Markdown, nur reines JSON.
+            Genau 5 Fragen. Antworten kurz und konkret. Nur reines JSON.
           `;
           break;
         }
