@@ -8256,174 +8256,215 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
-      {/* --- SWISS CITIES MAP ---
-           Simplified per user: just the Swiss silhouette with the major
-           cities marked. No profession descriptions, no tag wall.
-           Visual presence in every region, nothing more. */}
+      {/* --- SWISS COVERAGE MAP ---
+           Modern SaaS network-graph aesthetic (Stripe / Linear / Vercel
+           feel). Dark slate background, single Switzerland silhouette with
+           a translucent dark-blue fill and white outline, 9 cyan network
+           nodes connected by glowing lines. Zürich is the brighter hub.
+           No canton borders, no neighbours, no labels on the map. */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
-              {language === 'FR' ? 'Suisse' : language === 'IT' ? 'Svizzera' : language === 'EN' ? 'Switzerland' : 'Schweiz'}
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
-              {language === 'FR' ? 'Stella connaît la Suisse.'
-                : language === 'IT' ? 'Stella conosce la Svizzera.'
-                : language === 'EN' ? 'Stella knows Switzerland.'
-                : 'Stella kennt die Schweiz.'}
+      <section className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0F172A] text-white overflow-hidden relative">
+        {/* Ambient gradient backdrop */}
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
+             style={{ background: 'radial-gradient(ellipse at center, rgba(34,211,238,0.08) 0%, transparent 60%)' }} />
+
+        <div className="max-w-6xl mx-auto relative">
+          {(() => {
+            // Coordinates roughly aligned to Switzerland's real geography
+            // in a 700×440 viewBox. Zürich is the hub (brighter + bigger).
+            const cities: { key: string; x: number; y: number; r: number; hub?: boolean }[] = [
+              { key: 'genf',      x: 38,  y: 352, r: 4.5 },
+              { key: 'lausanne',  x: 111, y: 282, r: 4.5 },
+              { key: 'bern',      x: 236, y: 187, r: 4.5 },
+              { key: 'basel',     x: 257, y: 55,  r: 4.5 },
+              { key: 'luzern',    x: 360, y: 165, r: 4.5 },
+              { key: 'zurich',    x: 403, y: 95,  r: 6.5, hub: true },
+              { key: 'stgallen',  x: 510, y: 110, r: 4.5 },
+              { key: 'chur',      x: 545, y: 215, r: 4.5 },
+              { key: 'lugano',    x: 460, y: 396, r: 4.5 },
+            ];
+            // Network edges — hub-and-spoke from Zürich plus a few lateral
+            // connections for visual rhythm. Not all-to-all (too noisy).
+            const cityById = Object.fromEntries(cities.map(c => [c.key, c]));
+            const edges: [string, string][] = [
+              ['zurich','basel'], ['zurich','stgallen'], ['zurich','luzern'],
+              ['zurich','bern'],  ['zurich','chur'],     ['zurich','lugano'],
+              ['bern','lausanne'], ['lausanne','genf'],  ['bern','luzern'],
+              ['chur','lugano'],   ['basel','bern'],     ['stgallen','chur'],
+            ];
+            return (
+              <motion.div
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.8 }}
+                className="relative max-w-4xl mx-auto"
+              >
+                <svg viewBox="0 0 700 440" className="w-full h-auto" aria-label="Stellify in der ganzen Schweiz">
+                  <defs>
+                    <linearGradient id="chFill3" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%"   stopColor="#1E3A8A" stopOpacity="0.35" />
+                      <stop offset="100%" stopColor="#1E3A8A" stopOpacity="0.18" />
+                    </linearGradient>
+                    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="2.5" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <filter id="cyanGlowBig" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                    <radialGradient id="nodeGlow" cx="0.5" cy="0.5" r="0.5">
+                      <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.8" />
+                      <stop offset="60%" stopColor="#22D3EE" stopOpacity="0.15" />
+                      <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+
+                  {/* Switzerland silhouette — refined cubic path, closer to real shape */}
+                  <motion.path
+                    d="M 215 50
+                       C 260 35, 320 28, 380 30
+                       C 420 32, 460 40, 500 55
+                       C 530 75, 545 105, 555 140
+                       C 565 175, 600 195, 640 215
+                       C 670 230, 685 245, 680 270
+                       C 670 295, 640 310, 605 315
+                       C 575 320, 555 320, 540 335
+                       C 520 360, 500 385, 480 410
+                       C 475 425, 468 432, 460 428
+                       C 455 422, 455 405, 460 380
+                       C 445 360, 410 365, 380 370
+                       C 330 380, 280 380, 240 380
+                       C 200 380, 170 375, 145 365
+                       C 120 355, 95 340, 75 320
+                       C 55 305, 35 295, 25 285
+                       C 15 275, 10 265, 18 255
+                       C 30 250, 50 255, 70 265
+                       C 90 270, 105 270, 115 265
+                       C 125 245, 115 215, 110 185
+                       C 105 155, 110 125, 130 100
+                       C 155 75, 185 60, 215 50 Z"
+                    fill="url(#chFill3)"
+                    stroke="rgba(255,255,255,0.85)"
+                    strokeWidth="1.25"
+                    strokeLinejoin="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    whileInView={{ pathLength: 1, opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 2.2, ease: 'easeInOut' }}
+                  />
+
+                  {/* Network edges — drawn with cyan + glow */}
+                  <g filter="url(#cyanGlow)">
+                    {edges.map(([a, b], i) => {
+                      const ca = cityById[a]; const cb = cityById[b];
+                      if (!ca || !cb) return null;
+                      return (
+                        <motion.line
+                          key={`${a}-${b}`}
+                          x1={ca.x} y1={ca.y} x2={cb.x} y2={cb.y}
+                          stroke="#22D3EE"
+                          strokeWidth="0.85"
+                          strokeOpacity="0.55"
+                          initial={{ pathLength: 0, opacity: 0 }}
+                          whileInView={{ pathLength: 1, opacity: 1 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.9, delay: 1.4 + i * 0.07, ease: 'easeOut' }}
+                        />
+                      );
+                    })}
+                  </g>
+
+                  {/* City nodes — soft halo, hard core, slow pulse */}
+                  {cities.map((c, i) => (
+                    <g key={c.key}>
+                      <circle cx={c.x} cy={c.y} r={c.r * 4} fill="url(#nodeGlow)" />
+                      <motion.circle
+                        cx={c.x} cy={c.y}
+                        r={c.r}
+                        fill="#22D3EE"
+                        filter="url(#cyanGlowBig)"
+                        initial={{ scale: 0, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 2.0 + i * 0.07, type: 'spring', stiffness: 260, damping: 18 }}
+                        animate={{ opacity: c.hub ? [0.85, 1, 0.85] : [0.55, 0.85, 0.55] }}
+                        // @ts-ignore - framer's animate `transition` for repeating
+                        style={{ animationDuration: '3s' }}
+                      />
+                      {c.hub && (
+                        <motion.circle
+                          cx={c.x} cy={c.y} r={c.r + 4}
+                          fill="none" stroke="#22D3EE" strokeOpacity="0.5"
+                          initial={{ scale: 0.8, opacity: 0 }}
+                          animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.55, 0, 0.55] }}
+                          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
+                        />
+                      )}
+                    </g>
+                  ))}
+                </svg>
+              </motion.div>
+            );
+          })()}
+
+          {/* Headline + benefits below the map */}
+          <div className="mt-12 lg:mt-16 text-center max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-white leading-[1.15]">
+              {language === 'FR' ? 'Disponible dans toute la Suisse 🇨🇭'
+                : language === 'IT' ? 'Disponibile in tutta la Svizzera 🇨🇭'
+                : language === 'EN' ? 'Available across all of Switzerland 🇨🇭'
+                : 'In der ganzen Schweiz verfügbar 🇨🇭'}
             </h2>
-            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
-              {language === 'FR'
-                ? 'De Bâle à Lugano, de Genève à Saint-Gall. Présente dans toutes les régions.'
-                : language === 'IT'
-                ? 'Da Basilea a Lugano, da Ginevra a San Gallo. Presente in tutte le regioni.'
-                : language === 'EN'
-                ? 'From Basel to Lugano, from Geneva to St. Gallen. Present in every region.'
-                : 'Von Basel bis Lugano, von Genf bis St. Gallen. Präsent in allen Regionen.'}
+            <p className="mt-3 text-base sm:text-lg text-white/60 font-light">
+              {language === 'FR' ? '26 cantons. Une plateforme.'
+                : language === 'IT' ? '26 cantoni. Una piattaforma.'
+                : language === 'EN' ? '26 cantons. One platform.'
+                : '26 Kantone. Eine Plattform.'}
             </p>
           </div>
 
+          {/* Three small benefits */}
           {(() => {
-            const cities = [
-              { key: 'basel',    x: 195, y: 105, no: '01',
-                name: { DE: 'Basel', FR: 'Bâle', IT: 'Basilea', EN: 'Basel' } },
-              { key: 'zurich',   x: 455, y: 145, no: '02',
-                name: { DE: 'Zürich', FR: 'Zurich', IT: 'Zurigo', EN: 'Zurich' } },
-              { key: 'stgallen', x: 590, y: 165, no: '03',
-                name: { DE: 'St. Gallen', FR: 'Saint-Gall', IT: 'San Gallo', EN: 'St. Gallen' } },
-              { key: 'zug',      x: 435, y: 200, no: '04',
-                name: { DE: 'Zug', FR: 'Zoug', IT: 'Zugo', EN: 'Zug' } },
-              { key: 'luzern',   x: 375, y: 225, no: '05',
-                name: { DE: 'Luzern', FR: 'Lucerne', IT: 'Lucerna', EN: 'Lucerne' } },
-              { key: 'bern',     x: 265, y: 250, no: '06',
-                name: { DE: 'Bern', FR: 'Berne', IT: 'Berna', EN: 'Bern' } },
-              { key: 'lausanne', x: 140, y: 320, no: '07',
-                name: { DE: 'Lausanne', FR: 'Lausanne', IT: 'Losanna', EN: 'Lausanne' } },
-              { key: 'geneva',   x: 60,  y: 335, no: '08',
-                name: { DE: 'Genf', FR: 'Genève', IT: 'Ginevra', EN: 'Geneva' } },
-              { key: 'lugano',   x: 470, y: 430, no: '09',
-                name: { DE: 'Lugano', FR: 'Lugano', IT: 'Lugano', EN: 'Lugano' } },
+            const benefits = language === 'FR' ? [
+              { kicker: 'Pour les employeurs', body: 'Trouver les bons talents plus rapidement.' },
+              { kicker: 'Pour les candidats',  body: 'Faire le prochain pas de carrière plus facilement.' },
+              { kicker: 'Toute la Suisse',     body: 'De Genève à Saint-Gall, de Bâle à Lugano.' },
+            ] : language === 'IT' ? [
+              { kicker: 'Per i datori di lavoro', body: 'Trovare i talenti giusti più velocemente.' },
+              { kicker: 'Per i candidati',        body: 'Fare il prossimo passo di carriera più facilmente.' },
+              { kicker: 'In tutta la Svizzera',   body: 'Da Ginevra a San Gallo, da Basilea a Lugano.' },
+            ] : language === 'EN' ? [
+              { kicker: 'For employers',  body: 'Find the right talent faster.' },
+              { kicker: 'For candidates', body: 'Take your next career step more easily.' },
+              { kicker: 'Nationwide',     body: 'From Geneva to St. Gallen, from Basel to Lugano.' },
+            ] : [
+              { kicker: 'Für Arbeitgeber', body: 'Die passenden Talente schneller finden.' },
+              { kicker: 'Für Bewerber',    body: 'Den nächsten Karriereschritt einfacher starten.' },
+              { kicker: 'Schweizweit',     body: 'Von Genf bis St. Gallen, von Basel bis Lugano.' },
             ];
-            const lang = language as 'DE' | 'FR' | 'IT' | 'EN';
             return (
-              <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-                {/* Map */}
-                <div className="lg:col-span-8 relative">
-                  <motion.svg
-                    viewBox="0 0 700 500"
-                    className="w-full h-auto"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true, margin: '-80px' }}
-                    transition={{ duration: 0.8 }}
-                    aria-label="Schweizer Städtekarte"
+              <div className="mt-12 lg:mt-16 grid sm:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
+                {benefits.map((b, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 12 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-40px' }}
+                    transition={{ delay: 0.25 + i * 0.1, duration: 0.5 }}
+                    className="p-5 border border-white/10 bg-white/[0.03] backdrop-blur-sm"
                   >
-                    <defs>
-                      <linearGradient id="chFill2" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="currentColor" stopOpacity="0.10" />
-                        <stop offset="100%" stopColor="currentColor" stopOpacity="0.04" />
-                      </linearGradient>
-                      <filter id="chShadow2" x="-10%" y="-10%" width="120%" height="120%">
-                        <feGaussianBlur in="SourceAlpha" stdDeviation="6" />
-                        <feOffset dx="0" dy="4" result="offsetblur" />
-                        <feComponentTransfer><feFuncA type="linear" slope="0.18" /></feComponentTransfer>
-                        <feMerge><feMergeNode /><feMergeNode in="SourceGraphic" /></feMerge>
-                      </filter>
-                    </defs>
-
-                    <motion.path
-                      d="M 175 95
-                         C 220 88, 290 85, 360 90
-                         C 425 96, 480 105, 530 122
-                         C 565 134, 600 150, 625 175
-                         C 645 197, 655 220, 650 245
-                         C 642 268, 615 285, 590 300
-                         C 565 314, 540 330, 520 355
-                         C 498 380, 482 405, 472 432
-                         C 466 450, 458 455, 446 450
-                         C 432 442, 420 425, 405 415
-                         C 370 405, 320 405, 270 410
-                         C 220 415, 175 410, 135 395
-                         C 95 380, 55 365, 30 335
-                         C 15 315, 12 295, 25 280
-                         C 40 265, 60 268, 80 270
-                         C 88 250, 80 225, 72 205
-                         C 65 180, 72 158, 88 135
-                         C 110 115, 140 102, 175 95 Z"
-                      fill="url(#chFill2)"
-                      stroke="currentColor"
-                      strokeWidth="1.25"
-                      strokeLinejoin="round"
-                      className="text-[#004225] dark:text-[#00A854]"
-                      filter="url(#chShadow2)"
-                      initial={{ pathLength: 0 }}
-                      whileInView={{ pathLength: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 1.8, ease: 'easeInOut' }}
-                    />
-
-                    <ellipse cx="105" cy="335" rx="42" ry="6" fill="#3b82f6" opacity="0.16" />
-                    <ellipse cx="595" cy="135" rx="40" ry="5" fill="#3b82f6" opacity="0.16" />
-
-                    {cities.map((c, i) => (
-                      <g key={c.key}>
-                        <motion.circle
-                          cx={c.x} cy={c.y} r="16"
-                          fill="currentColor"
-                          className="text-[#004225] dark:text-[#00A854]"
-                          opacity="0"
-                          animate={{ opacity: [0, 0.18, 0], scale: [0.6, 1.6, 1.6] }}
-                          transition={{ duration: 2.8, delay: 1.2 + i * 0.18, repeat: Infinity, repeatDelay: 5 }}
-                        />
-                        <motion.circle
-                          cx={c.x} cy={c.y} r="11"
-                          fill="white"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          className="text-[#004225] dark:text-[#00A854] dark:fill-[#1A1A18]"
-                          initial={{ scale: 0 }}
-                          whileInView={{ scale: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.5 + i * 0.08, type: 'spring', stiffness: 300, damping: 18 }}
-                        />
-                        <motion.text
-                          x={c.x} y={c.y + 4}
-                          textAnchor="middle"
-                          fill="currentColor"
-                          className="text-[#004225] dark:text-[#00A854] font-bold"
-                          style={{ fontSize: '11px', fontVariantNumeric: 'tabular-nums' }}
-                          initial={{ opacity: 0 }}
-                          whileInView={{ opacity: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.8 + i * 0.08 }}
-                        >
-                          {c.no}
-                        </motion.text>
-                      </g>
-                    ))}
-                  </motion.svg>
-                </div>
-
-                {/* Compact city list — name + number, no professions. */}
-                <div className="lg:col-span-4">
-                  <ul className="space-y-2">
-                    {cities.map((c, i) => (
-                      <motion.li
-                        key={c.key}
-                        initial={{ opacity: 0, x: 12 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true, margin: '-40px' }}
-                        transition={{ delay: 0.35 + i * 0.05, duration: 0.4 }}
-                        className="flex items-center gap-4 py-2 border-b border-black/5 dark:border-white/5 last:border-0"
-                      >
-                        <span className="text-xs font-mono font-bold text-[#004225] dark:text-[#00A854] shrink-0" style={{ fontVariantNumeric: 'tabular-nums' }}>{c.no}</span>
-                        <span className="text-base font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{c.name[lang] || c.name.EN}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#22D3EE]">{b.kicker}</p>
+                    <p className="mt-3 text-sm text-white/80 font-light leading-relaxed">{b.body}</p>
+                  </motion.div>
+                ))}
               </div>
             );
           })()}
