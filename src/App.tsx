@@ -8263,25 +8263,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            positioned cyan nodes + connecting lines on a dot-grid canvas
            already convey the country, modern SaaS style. */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0F172A] text-white overflow-hidden relative">
+      <section className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
-             style={{ background: 'radial-gradient(ellipse at center, rgba(34,211,238,0.08) 0%, transparent 60%)' }} />
+             style={{ background: 'radial-gradient(ellipse at center, rgba(0,168,84,0.10) 0%, transparent 60%)' }} />
 
         <div className="max-w-6xl mx-auto relative">
           {/* Headline */}
           <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-[#22D3EE]/30 bg-[#22D3EE]/[0.08] text-[#22D3EE] text-[10px] font-bold tracking-[0.3em] uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] animate-pulse" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-[#00A854]/30 bg-[#00A854]/[0.08] text-[#00A854] text-[10px] font-bold tracking-[0.3em] uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00A854] animate-pulse" />
               {language === 'FR' ? 'Dans chaque canton de Suisse'
                 : language === 'IT' ? 'In ogni cantone della Svizzera'
                 : language === 'EN' ? 'In every canton of Switzerland'
                 : 'In jedem Kanton der Schweiz'}
             </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15]">
-              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#22D3EE]">toute la Suisse</span></>)
-                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#22D3EE]">tutta la Svizzera</span></>)
-                : language === 'EN' ? (<>The job platform for <span className="text-[#22D3EE]">all of Switzerland</span></>)
-                : (<>Die Jobplattform für die <span className="text-[#22D3EE]">ganze Schweiz</span></>)}
+              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#00A854]">toute la Suisse</span></>)
+                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#00A854]">tutta la Svizzera</span></>)
+                : language === 'EN' ? (<>The job platform for <span className="text-[#00A854]">all of Switzerland</span></>)
+                : (<>Die Jobplattform für die <span className="text-[#00A854]">ganze Schweiz</span></>)}
               <svg
                 viewBox="0 0 32 32"
                 aria-label="Schweiz"
@@ -8331,11 +8331,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <svg viewBox="0 0 700 480" className="w-full h-auto block" aria-label="Stellify in der ganzen Schweiz">
                   <defs>
                     <pattern id="bgDots" width="22" height="22" patternUnits="userSpaceOnUse">
-                      <circle cx="2" cy="2" r="1" fill="rgba(125,211,252,0.10)" />
+                      <circle cx="2" cy="2" r="1" fill="rgba(0,168,84,0.13)" />
                     </pattern>
                     <radialGradient id="canvasGlow" cx="0.55" cy="0.45" r="0.6">
-                      <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.08" />
-                      <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+                      <stop offset="0%"  stopColor="#00A854" stopOpacity="0.08" />
+                      <stop offset="100%" stopColor="#00A854" stopOpacity="0" />
                     </radialGradient>
                     <filter id="cyanGlow3" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur stdDeviation="2.5" result="b" />
@@ -8346,9 +8346,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
                     <radialGradient id="nodeGlow3" cx="0.5" cy="0.5" r="0.5">
-                      <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.7" />
-                      <stop offset="55%" stopColor="#22D3EE" stopOpacity="0.12" />
-                      <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+                      <stop offset="0%"  stopColor="#00A854" stopOpacity="0.7" />
+                      <stop offset="55%" stopColor="#00A854" stopOpacity="0.12" />
+                      <stop offset="100%" stopColor="#00A854" stopOpacity="0" />
                     </radialGradient>
                   </defs>
 
@@ -8365,7 +8365,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <motion.line
                           key={a+'-'+b}
                           x1={ca.x} y1={ca.y} x2={cb.x} y2={cb.y}
-                          stroke="#22D3EE"
+                          stroke="#00A854"
                           strokeWidth="1.2"
                           strokeOpacity="0.65"
                           initial={{ pathLength: 0, opacity: 0 }}
@@ -8383,7 +8383,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <circle cx={c.x} cy={c.y} r={c.r * 4.5} fill="url(#nodeGlow3)" />
                       <motion.circle
                         cx={c.x} cy={c.y} r={c.r}
-                        fill="#22D3EE"
+                        fill="#00A854"
                         filter="url(#cyanGlowBig3)"
                         initial={{ scale: 0, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
@@ -8394,7 +8394,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {c.hub && (
                         <motion.circle
                           cx={c.x} cy={c.y} r={c.r + 5}
-                          fill="none" stroke="#22D3EE" strokeOpacity="0.5"
+                          fill="none" stroke="#00A854" strokeOpacity="0.5"
                           animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.5, 0, 0.5] }}
                           transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
                         />
@@ -8448,7 +8448,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     transition={{ delay: 0.25 + i * 0.1, duration: 0.5 }}
                     className="p-6 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm flex items-start gap-4"
                   >
-                    <div className="shrink-0 w-10 h-10 rounded-lg border border-[#22D3EE]/40 bg-[#22D3EE]/[0.08] flex items-center justify-center text-[#22D3EE]">
+                    <div className="shrink-0 w-10 h-10 rounded-lg border border-[#00A854]/40 bg-[#00A854]/[0.08] flex items-center justify-center text-[#00A854]">
                       <b.Icon size={18} strokeWidth={1.75} />
                     </div>
                     <div>
