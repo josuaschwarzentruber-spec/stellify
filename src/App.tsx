@@ -8257,23 +8257,34 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- SWISS COVERAGE MAP ---
-           Per user mockup: dark slate canvas, refined Switzerland
-           silhouette with a soft inner dot-grid texture, glowing cyan
-           network with visible city names, then a headline that accents
-           "ganze Schweiz" in cyan + three benefit cards with icons. */}
+           Network-graph approach (Stripe / Linear / Vercel feel). The
+           Switzerland silhouette path was distorting on render and didn't
+           read as Switzerland; pulled it out entirely. The geographically
+           positioned cyan nodes + connecting lines on a dot-grid canvas
+           already convey the country, modern SaaS style. */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0F172A] text-white overflow-hidden relative">
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-50"
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
              style={{ background: 'radial-gradient(ellipse at center, rgba(34,211,238,0.08) 0%, transparent 60%)' }} />
 
         <div className="max-w-6xl mx-auto relative">
           {/* Headline */}
           <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15]">
-              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#22D3EE]">toute la Suisse</span> 🇨🇭</>)
-                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#22D3EE]">tutta la Svizzera</span> 🇨🇭</>)
-                : language === 'EN' ? (<>The job platform for <span className="text-[#22D3EE]">all of Switzerland</span> 🇨🇭</>)
-                : (<>Die Jobplattform für die <span className="text-[#22D3EE]">ganze Schweiz</span> 🇨🇭</>)}
+              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#22D3EE]">toute la Suisse</span></>)
+                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#22D3EE]">tutta la Svizzera</span></>)
+                : language === 'EN' ? (<>The job platform for <span className="text-[#22D3EE]">all of Switzerland</span></>)
+                : (<>Die Jobplattform für die <span className="text-[#22D3EE]">ganze Schweiz</span></>)}
+              <svg
+                viewBox="0 0 32 32"
+                aria-label="Schweiz"
+                className="inline-block align-middle ml-3"
+                style={{ width: '0.9em', height: '0.9em' }}
+              >
+                <rect width="32" height="32" rx="3" fill="#DA291C" />
+                <rect x="13" y="6" width="6" height="20" fill="#FFFFFF" />
+                <rect x="6" y="13" width="20" height="6" fill="#FFFFFF" />
+              </svg>
             </h2>
             <p className="mt-4 text-base sm:text-lg text-white/60 font-light">
               {language === 'FR' ? 'Connecter intelligemment talents et entreprises.'
@@ -8283,17 +8294,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
           </div>
 
-          {/* Map card */}
+          {/* Map canvas */}
           {(() => {
             const cities: { key: string; x: number; y: number; r: number; lbl: string; lx?: number; ly?: number; anchor?: 'start'|'middle'|'end'; hub?: boolean }[] = [
-              { key: 'genf',     x: 40,  y: 320, r: 5.5,  lbl: language==='FR'?'Genève':language==='IT'?'Ginevra':language==='EN'?'Geneva':'Genf', lx: 40, ly: 342, anchor: 'middle' },
-              { key: 'lausanne', x: 130, y: 285, r: 5.5,  lbl: 'Lausanne', lx: 130, ly: 307, anchor: 'middle' },
-              { key: 'bern',     x: 250, y: 220, r: 5.5,  lbl: language==='FR'?'Berne':language==='IT'?'Berna':'Bern', lx: 250, ly: 242, anchor: 'middle' },
-              { key: 'basel',    x: 295, y: 88,  r: 5.5,  lbl: language==='FR'?'Bâle':language==='IT'?'Basilea':'Basel', lx: 295, ly: 110, anchor: 'middle' },
-              { key: 'luzern',   x: 360, y: 220, r: 5.5,  lbl: language==='FR'?'Lucerne':language==='IT'?'Lucerna':'Luzern', lx: 360, ly: 242, anchor: 'middle' },
-              { key: 'zurich',   x: 430, y: 150, r: 8.5,  lbl: language==='FR'?'Zurich':language==='IT'?'Zurigo':'Zürich', lx: 458, ly: 158, anchor: 'start', hub: true },
-              { key: 'stgallen', x: 555, y: 165, r: 5.5,  lbl: language==='FR'?'Saint-Gall':language==='IT'?'San Gallo':'St. Gallen', lx: 568, ly: 165, anchor: 'start' },
-              { key: 'lugano',   x: 475, y: 410, r: 5.5,  lbl: 'Lugano', lx: 495, ly: 414, anchor: 'start' },
+              { key: 'genf',     x: 80,  y: 360, r: 5.5,  lbl: language==='FR'?'Genève':language==='IT'?'Ginevra':language==='EN'?'Geneva':'Genf', lx: 80, ly: 382, anchor: 'middle' },
+              { key: 'lausanne', x: 160, y: 305, r: 5.5,  lbl: 'Lausanne', lx: 160, ly: 327, anchor: 'middle' },
+              { key: 'bern',     x: 275, y: 220, r: 5.5,  lbl: language==='FR'?'Berne':language==='IT'?'Berna':'Bern', lx: 275, ly: 242, anchor: 'middle' },
+              { key: 'basel',    x: 320, y: 95,  r: 5.5,  lbl: language==='FR'?'Bâle':language==='IT'?'Basilea':'Basel', lx: 320, ly: 80, anchor: 'middle' },
+              { key: 'luzern',   x: 385, y: 220, r: 5.5,  lbl: language==='FR'?'Lucerne':language==='IT'?'Lucerna':'Luzern', lx: 385, ly: 242, anchor: 'middle' },
+              { key: 'zurich',   x: 455, y: 150, r: 9,    lbl: language==='FR'?'Zurich':language==='IT'?'Zurigo':'Zürich', lx: 470, ly: 138, anchor: 'start', hub: true },
+              { key: 'stgallen', x: 575, y: 170, r: 5.5,  lbl: language==='FR'?'Saint-Gall':language==='IT'?'San Gallo':'St. Gallen', lx: 588, ly: 168, anchor: 'start' },
+              { key: 'lugano',   x: 495, y: 410, r: 5.5,  lbl: 'Lugano', lx: 515, ly: 414, anchor: 'start' },
             ];
             const cityById = Object.fromEntries(cities.map(c => [c.key, c]));
             const edges: [string, string][] = [
@@ -8308,104 +8319,38 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.8 }}
-                className="relative border border-white/10 rounded-2xl p-4 sm:p-8 lg:p-12 bg-white/[0.015] backdrop-blur-sm"
+                className="relative border border-white/10 rounded-2xl bg-white/[0.015] backdrop-blur-sm overflow-hidden"
               >
-                <svg viewBox="0 0 700 480" className="w-full h-auto" aria-label="Stellify in der ganzen Schweiz">
+                <svg viewBox="0 0 700 480" className="w-full h-auto block" aria-label="Stellify in der ganzen Schweiz">
                   <defs>
-                    <pattern id="chDots" width="14" height="14" patternUnits="userSpaceOnUse">
-                      <circle cx="2" cy="2" r="0.7" fill="rgba(34,211,238,0.18)" />
+                    <pattern id="bgDots" width="22" height="22" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="1" fill="rgba(125,211,252,0.10)" />
                     </pattern>
-                    <linearGradient id="chFill4" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%"   stopColor="#1E3A8A" stopOpacity="0.35" />
-                      <stop offset="100%" stopColor="#0F2150" stopOpacity="0.55" />
-                    </linearGradient>
-                    <filter id="cyanGlow2" x="-50%" y="-50%" width="200%" height="200%">
+                    <radialGradient id="canvasGlow" cx="0.55" cy="0.45" r="0.6">
+                      <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.08" />
+                      <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
+                    </radialGradient>
+                    <filter id="cyanGlow3" x="-50%" y="-50%" width="200%" height="200%">
                       <feGaussianBlur stdDeviation="2.5" result="b" />
                       <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
-                    <filter id="cyanGlowBig2" x="-60%" y="-60%" width="220%" height="220%">
+                    <filter id="cyanGlowBig3" x="-60%" y="-60%" width="220%" height="220%">
                       <feGaussianBlur stdDeviation="4.5" result="b" />
                       <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
-                    <radialGradient id="nodeGlow2" cx="0.5" cy="0.5" r="0.5">
+                    <radialGradient id="nodeGlow3" cx="0.5" cy="0.5" r="0.5">
                       <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.7" />
                       <stop offset="55%" stopColor="#22D3EE" stopOpacity="0.12" />
                       <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
                     </radialGradient>
                   </defs>
 
-                  {/* Switzerland silhouette — refined path, closer to the real
-                      outline. First filled with the brand-blue gradient, then
-                      a second copy overlays the soft dot grid texture. */}
-                  <motion.path
-                    d="M 245 60
-                       C 270 50, 305 45, 340 50
-                       C 365 53, 390 58, 415 65
-                       C 445 72, 475 82, 505 95
-                       C 525 108, 540 130, 545 155
-                       C 555 175, 580 190, 605 205
-                       C 625 220, 640 240, 638 265
-                       C 632 285, 615 298, 595 305
-                       C 568 312, 545 318, 530 335
-                       C 515 360, 502 388, 488 415
-                       C 482 430, 472 438, 462 432
-                       C 455 422, 458 405, 462 380
-                       C 445 358, 405 360, 375 365
-                       C 335 372, 295 372, 258 370
-                       C 220 370, 190 365, 162 355
-                       C 135 348, 105 335, 80 318
-                       C 60 305, 40 295, 25 285
-                       C 15 275, 8 263, 14 252
-                       C 25 245, 45 248, 62 255
-                       C 80 262, 100 265, 115 260
-                       C 122 245, 115 225, 110 205
-                       C 105 185, 105 165, 110 145
-                       C 115 125, 125 110, 140 95
-                       C 160 80, 185 70, 215 63
-                       C 225 60, 235 60, 245 60 Z"
-                    fill="url(#chFill4)"
-                    stroke="rgba(125,211,252,0.7)"
-                    strokeWidth="1.4"
-                    strokeLinejoin="round"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    whileInView={{ pathLength: 1, opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 2.0, ease: 'easeInOut' }}
-                  />
-                  {/* Second pass: dot-pattern fill clipped to the same path. */}
-                  <path
-                    d="M 245 60
-                       C 270 50, 305 45, 340 50
-                       C 365 53, 390 58, 415 65
-                       C 445 72, 475 82, 505 95
-                       C 525 108, 540 130, 545 155
-                       C 555 175, 580 190, 605 205
-                       C 625 220, 640 240, 638 265
-                       C 632 285, 615 298, 595 305
-                       C 568 312, 545 318, 530 335
-                       C 515 360, 502 388, 488 415
-                       C 482 430, 472 438, 462 432
-                       C 455 422, 458 405, 462 380
-                       C 445 358, 405 360, 375 365
-                       C 335 372, 295 372, 258 370
-                       C 220 370, 190 365, 162 355
-                       C 135 348, 105 335, 80 318
-                       C 60 305, 40 295, 25 285
-                       C 15 275, 8 263, 14 252
-                       C 25 245, 45 248, 62 255
-                       C 80 262, 100 265, 115 260
-                       C 122 245, 115 225, 110 205
-                       C 105 185, 105 165, 110 145
-                       C 115 125, 125 110, 140 95
-                       C 160 80, 185 70, 215 63
-                       C 225 60, 235 60, 245 60 Z"
-                    fill="url(#chDots)"
-                    stroke="none"
-                    opacity="0.55"
-                  />
+                  {/* Dot-grid canvas + soft central glow */}
+                  <rect width="700" height="480" fill="url(#bgDots)" />
+                  <rect width="700" height="480" fill="url(#canvasGlow)" />
 
                   {/* Edges */}
-                  <g filter="url(#cyanGlow2)">
+                  <g filter="url(#cyanGlow3)">
                     {edges.map(([a, b], i) => {
                       const ca = cityById[a]; const cb = cityById[b];
                       if (!ca || !cb) return null;
@@ -8414,12 +8359,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           key={a+'-'+b}
                           x1={ca.x} y1={ca.y} x2={cb.x} y2={cb.y}
                           stroke="#22D3EE"
-                          strokeWidth="1.1"
-                          strokeOpacity="0.6"
+                          strokeWidth="1.2"
+                          strokeOpacity="0.65"
                           initial={{ pathLength: 0, opacity: 0 }}
                           whileInView={{ pathLength: 1, opacity: 1 }}
                           viewport={{ once: true }}
-                          transition={{ duration: 0.9, delay: 1.3 + i * 0.07, ease: 'easeOut' }}
+                          transition={{ duration: 0.9, delay: 0.5 + i * 0.07, ease: 'easeOut' }}
                         />
                       );
                     })}
@@ -8428,16 +8373,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {/* Nodes + labels */}
                   {cities.map((c, i) => (
                     <g key={c.key}>
-                      <circle cx={c.x} cy={c.y} r={c.r * 4} fill="url(#nodeGlow2)" />
+                      <circle cx={c.x} cy={c.y} r={c.r * 4.5} fill="url(#nodeGlow3)" />
                       <motion.circle
                         cx={c.x} cy={c.y} r={c.r}
                         fill="#22D3EE"
-                        filter="url(#cyanGlowBig2)"
+                        filter="url(#cyanGlowBig3)"
                         initial={{ scale: 0, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 1.9 + i * 0.07, type: 'spring', stiffness: 260, damping: 18 }}
-                        animate={{ opacity: c.hub ? [0.9, 1, 0.9] : [0.65, 0.95, 0.65] }}
+                        transition={{ delay: 0.4 + i * 0.07, type: 'spring', stiffness: 260, damping: 18 }}
+                        animate={{ opacity: c.hub ? [0.9, 1, 0.9] : [0.7, 1, 0.7] }}
                       />
                       {c.hub && (
                         <motion.circle
@@ -8455,7 +8400,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         initial={{ opacity: 0, y: 6 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 2.2 + i * 0.06, duration: 0.4 }}
+                        transition={{ delay: 0.9 + i * 0.06, duration: 0.4 }}
                       >
                         {c.lbl}
                       </motion.text>
