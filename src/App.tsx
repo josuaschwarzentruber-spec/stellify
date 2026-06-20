@@ -8270,6 +8270,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="max-w-6xl mx-auto relative">
           {/* Headline */}
           <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-[#22D3EE]/30 bg-[#22D3EE]/[0.08] text-[#22D3EE] text-[10px] font-bold tracking-[0.3em] uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22D3EE] animate-pulse" />
+              {language === 'FR' ? 'Dans chaque canton de Suisse'
+                : language === 'IT' ? 'In ogni cantone della Svizzera'
+                : language === 'EN' ? 'In every canton of Switzerland'
+                : 'In jedem Kanton der Schweiz'}
+            </div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15]">
               {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#22D3EE]">toute la Suisse</span></>)
                 : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#22D3EE]">tutta la Svizzera</span></>)
