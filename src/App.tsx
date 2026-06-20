@@ -8280,17 +8280,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               { key: 'luzern',    x: 360, y: 165, r: 4.5 },
               { key: 'zurich',    x: 403, y: 95,  r: 6.5, hub: true },
               { key: 'stgallen',  x: 510, y: 110, r: 4.5 },
-              { key: 'chur',      x: 545, y: 215, r: 4.5 },
               { key: 'lugano',    x: 460, y: 396, r: 4.5 },
             ];
             // Network edges — hub-and-spoke from Zürich plus a few lateral
             // connections for visual rhythm. Not all-to-all (too noisy).
             const cityById = Object.fromEntries(cities.map(c => [c.key, c]));
             const edges: [string, string][] = [
-              ['zurich','basel'], ['zurich','stgallen'], ['zurich','luzern'],
-              ['zurich','bern'],  ['zurich','chur'],     ['zurich','lugano'],
-              ['bern','lausanne'], ['lausanne','genf'],  ['bern','luzern'],
-              ['chur','lugano'],   ['basel','bern'],     ['stgallen','chur'],
+              ['zurich','basel'],   ['zurich','stgallen'], ['zurich','luzern'],
+              ['zurich','bern'],    ['zurich','lugano'],
+              ['bern','lausanne'],  ['lausanne','genf'],   ['bern','luzern'],
+              ['basel','bern'],     ['stgallen','luzern'], ['luzern','lugano'],
             ];
             return (
               <motion.div
@@ -8418,16 +8417,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           {/* Headline + benefits below the map */}
           <div className="mt-12 lg:mt-16 text-center max-w-3xl mx-auto">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-white leading-[1.15]">
-              {language === 'FR' ? 'Disponible dans toute la Suisse 🇨🇭'
-                : language === 'IT' ? 'Disponibile in tutta la Svizzera 🇨🇭'
-                : language === 'EN' ? 'Available across all of Switzerland 🇨🇭'
-                : 'In der ganzen Schweiz verfügbar 🇨🇭'}
+              {language === 'FR' ? "La plateforme d'emploi pour toute la Suisse 🇨🇭"
+                : language === 'IT' ? 'La piattaforma di lavoro per tutta la Svizzera 🇨🇭'
+                : language === 'EN' ? 'The job platform for all of Switzerland 🇨🇭'
+                : 'Die Jobplattform für die ganze Schweiz 🇨🇭'}
             </h2>
             <p className="mt-3 text-base sm:text-lg text-white/60 font-light">
-              {language === 'FR' ? '26 cantons. Une plateforme.'
-                : language === 'IT' ? '26 cantoni. Una piattaforma.'
-                : language === 'EN' ? '26 cantons. One platform.'
-                : '26 Kantone. Eine Plattform.'}
+              {language === 'FR' ? 'Connecter intelligemment talents et entreprises.'
+                : language === 'IT' ? 'Collegare in modo intelligente talenti e aziende.'
+                : language === 'EN' ? 'Connecting talent and companies intelligently.'
+                : 'Talente und Unternehmen intelligent vernetzen.'}
             </p>
           </div>
 
@@ -8436,19 +8435,19 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             const benefits = language === 'FR' ? [
               { kicker: 'Pour les employeurs', body: 'Trouver les bons talents plus rapidement.' },
               { kicker: 'Pour les candidats',  body: 'Faire le prochain pas de carrière plus facilement.' },
-              { kicker: 'Toute la Suisse',     body: 'De Genève à Saint-Gall, de Bâle à Lugano.' },
+              { kicker: 'Toute la Suisse',     body: 'Conçue pour le marché du travail suisse.' },
             ] : language === 'IT' ? [
               { kicker: 'Per i datori di lavoro', body: 'Trovare i talenti giusti più velocemente.' },
               { kicker: 'Per i candidati',        body: 'Fare il prossimo passo di carriera più facilmente.' },
-              { kicker: 'In tutta la Svizzera',   body: 'Da Ginevra a San Gallo, da Basilea a Lugano.' },
+              { kicker: 'In tutta la Svizzera',   body: 'Progettata per il mercato del lavoro svizzero.' },
             ] : language === 'EN' ? [
               { kicker: 'For employers',  body: 'Find the right talent faster.' },
               { kicker: 'For candidates', body: 'Take your next career step more easily.' },
-              { kicker: 'Nationwide',     body: 'From Geneva to St. Gallen, from Basel to Lugano.' },
+              { kicker: 'Nationwide',     body: 'Built for the Swiss job market.' },
             ] : [
               { kicker: 'Für Arbeitgeber', body: 'Die passenden Talente schneller finden.' },
               { kicker: 'Für Bewerber',    body: 'Den nächsten Karriereschritt einfacher starten.' },
-              { kicker: 'Schweizweit',     body: 'Von Genf bis St. Gallen, von Basel bis Lugano.' },
+              { kicker: 'Schweizweit',     body: 'Entwickelt für den Schweizer Arbeitsmarkt.' },
             ];
             return (
               <div className="mt-12 lg:mt-16 grid sm:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
