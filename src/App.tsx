@@ -8257,33 +8257,44 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- SWISS COVERAGE MAP ---
-           Modern SaaS network-graph aesthetic (Stripe / Linear / Vercel
-           feel). Dark slate background, single Switzerland silhouette with
-           a translucent dark-blue fill and white outline, 9 cyan network
-           nodes connected by glowing lines. Zürich is the brighter hub.
-           No canton borders, no neighbours, no labels on the map. */}
+           Per user mockup: dark slate canvas, refined Switzerland
+           silhouette with a soft inner dot-grid texture, glowing cyan
+           network with visible city names, then a headline that accents
+           "ganze Schweiz" in cyan + three benefit cards with icons. */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0F172A] text-white overflow-hidden relative">
-        {/* Ambient gradient backdrop */}
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-50"
              style={{ background: 'radial-gradient(ellipse at center, rgba(34,211,238,0.08) 0%, transparent 60%)' }} />
 
         <div className="max-w-6xl mx-auto relative">
+          {/* Headline */}
+          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15]">
+              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#22D3EE]">toute la Suisse</span> 🇨🇭</>)
+                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#22D3EE]">tutta la Svizzera</span> 🇨🇭</>)
+                : language === 'EN' ? (<>The job platform for <span className="text-[#22D3EE]">all of Switzerland</span> 🇨🇭</>)
+                : (<>Die Jobplattform für die <span className="text-[#22D3EE]">ganze Schweiz</span> 🇨🇭</>)}
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-white/60 font-light">
+              {language === 'FR' ? 'Connecter intelligemment talents et entreprises.'
+                : language === 'IT' ? 'Collegare in modo intelligente talenti e aziende.'
+                : language === 'EN' ? 'Connecting talent and companies intelligently.'
+                : 'Talente und Unternehmen intelligent vernetzen.'}
+            </p>
+          </div>
+
+          {/* Map card */}
           {(() => {
-            // Coordinates roughly aligned to Switzerland's real geography
-            // in a 700×440 viewBox. Zürich is the hub (brighter + bigger).
-            const cities: { key: string; x: number; y: number; r: number; hub?: boolean }[] = [
-              { key: 'genf',      x: 38,  y: 352, r: 4.5 },
-              { key: 'lausanne',  x: 111, y: 282, r: 4.5 },
-              { key: 'bern',      x: 236, y: 187, r: 4.5 },
-              { key: 'basel',     x: 257, y: 55,  r: 4.5 },
-              { key: 'luzern',    x: 360, y: 165, r: 4.5 },
-              { key: 'zurich',    x: 403, y: 95,  r: 6.5, hub: true },
-              { key: 'stgallen',  x: 510, y: 110, r: 4.5 },
-              { key: 'lugano',    x: 460, y: 396, r: 4.5 },
+            const cities: { key: string; x: number; y: number; r: number; lbl: string; lx?: number; ly?: number; anchor?: 'start'|'middle'|'end'; hub?: boolean }[] = [
+              { key: 'genf',     x: 40,  y: 320, r: 5.5,  lbl: language==='FR'?'Genève':language==='IT'?'Ginevra':language==='EN'?'Geneva':'Genf', lx: 40, ly: 342, anchor: 'middle' },
+              { key: 'lausanne', x: 130, y: 285, r: 5.5,  lbl: 'Lausanne', lx: 130, ly: 307, anchor: 'middle' },
+              { key: 'bern',     x: 250, y: 220, r: 5.5,  lbl: language==='FR'?'Berne':language==='IT'?'Berna':'Bern', lx: 250, ly: 242, anchor: 'middle' },
+              { key: 'basel',    x: 295, y: 88,  r: 5.5,  lbl: language==='FR'?'Bâle':language==='IT'?'Basilea':'Basel', lx: 295, ly: 110, anchor: 'middle' },
+              { key: 'luzern',   x: 360, y: 220, r: 5.5,  lbl: language==='FR'?'Lucerne':language==='IT'?'Lucerna':'Luzern', lx: 360, ly: 242, anchor: 'middle' },
+              { key: 'zurich',   x: 430, y: 150, r: 8.5,  lbl: language==='FR'?'Zurich':language==='IT'?'Zurigo':'Zürich', lx: 458, ly: 158, anchor: 'start', hub: true },
+              { key: 'stgallen', x: 555, y: 165, r: 5.5,  lbl: language==='FR'?'Saint-Gall':language==='IT'?'San Gallo':'St. Gallen', lx: 568, ly: 165, anchor: 'start' },
+              { key: 'lugano',   x: 475, y: 410, r: 5.5,  lbl: 'Lugano', lx: 495, ly: 414, anchor: 'start' },
             ];
-            // Network edges — hub-and-spoke from Zürich plus a few lateral
-            // connections for visual rhythm. Not all-to-all (too noisy).
             const cityById = Object.fromEntries(cities.map(c => [c.key, c]));
             const edges: [string, string][] = [
               ['zurich','basel'],   ['zurich','stgallen'], ['zurich','luzern'],
@@ -8293,120 +8304,161 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ];
             return (
               <motion.div
-                initial={{ opacity: 0 }}
-                whileInView={{ opacity: 1 }}
+                initial={{ opacity: 0, y: 8 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.8 }}
-                className="relative max-w-4xl mx-auto"
+                className="relative border border-white/10 rounded-2xl p-4 sm:p-8 lg:p-12 bg-white/[0.015] backdrop-blur-sm"
               >
-                <svg viewBox="0 0 700 440" className="w-full h-auto" aria-label="Stellify in der ganzen Schweiz">
+                <svg viewBox="0 0 700 480" className="w-full h-auto" aria-label="Stellify in der ganzen Schweiz">
                   <defs>
-                    <linearGradient id="chFill3" x1="0" y1="0" x2="0" y2="1">
+                    <pattern id="chDots" width="14" height="14" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="0.7" fill="rgba(34,211,238,0.18)" />
+                    </pattern>
+                    <linearGradient id="chFill4" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%"   stopColor="#1E3A8A" stopOpacity="0.35" />
-                      <stop offset="100%" stopColor="#1E3A8A" stopOpacity="0.18" />
+                      <stop offset="100%" stopColor="#0F2150" stopOpacity="0.55" />
                     </linearGradient>
-                    <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur stdDeviation="2.5" result="blur" />
-                      <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
+                    <filter id="cyanGlow2" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="2.5" result="b" />
+                      <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
-                    <filter id="cyanGlowBig" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur stdDeviation="4" result="blur" />
-                      <feMerge>
-                        <feMergeNode in="blur" />
-                        <feMergeNode in="SourceGraphic" />
-                      </feMerge>
+                    <filter id="cyanGlowBig2" x="-60%" y="-60%" width="220%" height="220%">
+                      <feGaussianBlur stdDeviation="4.5" result="b" />
+                      <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
                     </filter>
-                    <radialGradient id="nodeGlow" cx="0.5" cy="0.5" r="0.5">
-                      <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.8" />
-                      <stop offset="60%" stopColor="#22D3EE" stopOpacity="0.15" />
+                    <radialGradient id="nodeGlow2" cx="0.5" cy="0.5" r="0.5">
+                      <stop offset="0%"  stopColor="#22D3EE" stopOpacity="0.7" />
+                      <stop offset="55%" stopColor="#22D3EE" stopOpacity="0.12" />
                       <stop offset="100%" stopColor="#22D3EE" stopOpacity="0" />
                     </radialGradient>
                   </defs>
 
-                  {/* Switzerland silhouette — refined cubic path, closer to real shape */}
+                  {/* Switzerland silhouette — refined path, closer to the real
+                      outline. First filled with the brand-blue gradient, then
+                      a second copy overlays the soft dot grid texture. */}
                   <motion.path
-                    d="M 215 50
-                       C 260 35, 320 28, 380 30
-                       C 420 32, 460 40, 500 55
-                       C 530 75, 545 105, 555 140
-                       C 565 175, 600 195, 640 215
-                       C 670 230, 685 245, 680 270
-                       C 670 295, 640 310, 605 315
-                       C 575 320, 555 320, 540 335
-                       C 520 360, 500 385, 480 410
-                       C 475 425, 468 432, 460 428
-                       C 455 422, 455 405, 460 380
-                       C 445 360, 410 365, 380 370
-                       C 330 380, 280 380, 240 380
-                       C 200 380, 170 375, 145 365
-                       C 120 355, 95 340, 75 320
-                       C 55 305, 35 295, 25 285
-                       C 15 275, 10 265, 18 255
-                       C 30 250, 50 255, 70 265
-                       C 90 270, 105 270, 115 265
-                       C 125 245, 115 215, 110 185
-                       C 105 155, 110 125, 130 100
-                       C 155 75, 185 60, 215 50 Z"
-                    fill="url(#chFill3)"
-                    stroke="rgba(255,255,255,0.85)"
-                    strokeWidth="1.25"
+                    d="M 245 60
+                       C 270 50, 305 45, 340 50
+                       C 365 53, 390 58, 415 65
+                       C 445 72, 475 82, 505 95
+                       C 525 108, 540 130, 545 155
+                       C 555 175, 580 190, 605 205
+                       C 625 220, 640 240, 638 265
+                       C 632 285, 615 298, 595 305
+                       C 568 312, 545 318, 530 335
+                       C 515 360, 502 388, 488 415
+                       C 482 430, 472 438, 462 432
+                       C 455 422, 458 405, 462 380
+                       C 445 358, 405 360, 375 365
+                       C 335 372, 295 372, 258 370
+                       C 220 370, 190 365, 162 355
+                       C 135 348, 105 335, 80 318
+                       C 60 305, 40 295, 25 285
+                       C 15 275, 8 263, 14 252
+                       C 25 245, 45 248, 62 255
+                       C 80 262, 100 265, 115 260
+                       C 122 245, 115 225, 110 205
+                       C 105 185, 105 165, 110 145
+                       C 115 125, 125 110, 140 95
+                       C 160 80, 185 70, 215 63
+                       C 225 60, 235 60, 245 60 Z"
+                    fill="url(#chFill4)"
+                    stroke="rgba(125,211,252,0.7)"
+                    strokeWidth="1.4"
                     strokeLinejoin="round"
                     initial={{ pathLength: 0, opacity: 0 }}
                     whileInView={{ pathLength: 1, opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 2.2, ease: 'easeInOut' }}
+                    transition={{ duration: 2.0, ease: 'easeInOut' }}
+                  />
+                  {/* Second pass: dot-pattern fill clipped to the same path. */}
+                  <path
+                    d="M 245 60
+                       C 270 50, 305 45, 340 50
+                       C 365 53, 390 58, 415 65
+                       C 445 72, 475 82, 505 95
+                       C 525 108, 540 130, 545 155
+                       C 555 175, 580 190, 605 205
+                       C 625 220, 640 240, 638 265
+                       C 632 285, 615 298, 595 305
+                       C 568 312, 545 318, 530 335
+                       C 515 360, 502 388, 488 415
+                       C 482 430, 472 438, 462 432
+                       C 455 422, 458 405, 462 380
+                       C 445 358, 405 360, 375 365
+                       C 335 372, 295 372, 258 370
+                       C 220 370, 190 365, 162 355
+                       C 135 348, 105 335, 80 318
+                       C 60 305, 40 295, 25 285
+                       C 15 275, 8 263, 14 252
+                       C 25 245, 45 248, 62 255
+                       C 80 262, 100 265, 115 260
+                       C 122 245, 115 225, 110 205
+                       C 105 185, 105 165, 110 145
+                       C 115 125, 125 110, 140 95
+                       C 160 80, 185 70, 215 63
+                       C 225 60, 235 60, 245 60 Z"
+                    fill="url(#chDots)"
+                    stroke="none"
+                    opacity="0.55"
                   />
 
-                  {/* Network edges — drawn with cyan + glow */}
-                  <g filter="url(#cyanGlow)">
+                  {/* Edges */}
+                  <g filter="url(#cyanGlow2)">
                     {edges.map(([a, b], i) => {
                       const ca = cityById[a]; const cb = cityById[b];
                       if (!ca || !cb) return null;
                       return (
                         <motion.line
-                          key={`${a}-${b}`}
+                          key={a+'-'+b}
                           x1={ca.x} y1={ca.y} x2={cb.x} y2={cb.y}
                           stroke="#22D3EE"
-                          strokeWidth="0.85"
-                          strokeOpacity="0.55"
+                          strokeWidth="1.1"
+                          strokeOpacity="0.6"
                           initial={{ pathLength: 0, opacity: 0 }}
                           whileInView={{ pathLength: 1, opacity: 1 }}
                           viewport={{ once: true }}
-                          transition={{ duration: 0.9, delay: 1.4 + i * 0.07, ease: 'easeOut' }}
+                          transition={{ duration: 0.9, delay: 1.3 + i * 0.07, ease: 'easeOut' }}
                         />
                       );
                     })}
                   </g>
 
-                  {/* City nodes — soft halo, hard core, slow pulse */}
+                  {/* Nodes + labels */}
                   {cities.map((c, i) => (
                     <g key={c.key}>
-                      <circle cx={c.x} cy={c.y} r={c.r * 4} fill="url(#nodeGlow)" />
+                      <circle cx={c.x} cy={c.y} r={c.r * 4} fill="url(#nodeGlow2)" />
                       <motion.circle
-                        cx={c.x} cy={c.y}
-                        r={c.r}
+                        cx={c.x} cy={c.y} r={c.r}
                         fill="#22D3EE"
-                        filter="url(#cyanGlowBig)"
+                        filter="url(#cyanGlowBig2)"
                         initial={{ scale: 0, opacity: 0 }}
                         whileInView={{ scale: 1, opacity: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 2.0 + i * 0.07, type: 'spring', stiffness: 260, damping: 18 }}
-                        animate={{ opacity: c.hub ? [0.85, 1, 0.85] : [0.55, 0.85, 0.55] }}
-                        // @ts-ignore - framer's animate `transition` for repeating
-                        style={{ animationDuration: '3s' }}
+                        transition={{ delay: 1.9 + i * 0.07, type: 'spring', stiffness: 260, damping: 18 }}
+                        animate={{ opacity: c.hub ? [0.9, 1, 0.9] : [0.65, 0.95, 0.65] }}
                       />
                       {c.hub && (
                         <motion.circle
-                          cx={c.x} cy={c.y} r={c.r + 4}
+                          cx={c.x} cy={c.y} r={c.r + 5}
                           fill="none" stroke="#22D3EE" strokeOpacity="0.5"
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.55, 0, 0.55] }}
+                          animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.5, 0, 0.5] }}
                           transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
                         />
                       )}
+                      <motion.text
+                        x={c.lx ?? c.x} y={c.ly ?? c.y + 18}
+                        textAnchor={c.anchor ?? 'middle'}
+                        fill="rgba(255,255,255,0.92)"
+                        style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '0.01em' }}
+                        initial={{ opacity: 0, y: 6 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 2.2 + i * 0.06, duration: 0.4 }}
+                      >
+                        {c.lbl}
+                      </motion.text>
                     </g>
                   ))}
                 </svg>
@@ -8414,43 +8466,27 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             );
           })()}
 
-          {/* Headline + benefits below the map */}
-          <div className="mt-12 lg:mt-16 text-center max-w-3xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-white leading-[1.15]">
-              {language === 'FR' ? "La plateforme d'emploi pour toute la Suisse 🇨🇭"
-                : language === 'IT' ? 'La piattaforma di lavoro per tutta la Svizzera 🇨🇭'
-                : language === 'EN' ? 'The job platform for all of Switzerland 🇨🇭'
-                : 'Die Jobplattform für die ganze Schweiz 🇨🇭'}
-            </h2>
-            <p className="mt-3 text-base sm:text-lg text-white/60 font-light">
-              {language === 'FR' ? 'Connecter intelligemment talents et entreprises.'
-                : language === 'IT' ? 'Collegare in modo intelligente talenti e aziende.'
-                : language === 'EN' ? 'Connecting talent and companies intelligently.'
-                : 'Talente und Unternehmen intelligent vernetzen.'}
-            </p>
-          </div>
-
-          {/* Three small benefits */}
+          {/* Benefit cards with icons */}
           {(() => {
             const benefits = language === 'FR' ? [
-              { kicker: 'Pour les employeurs', body: 'Trouver les bons talents plus rapidement.' },
-              { kicker: 'Pour les candidats',  body: 'Faire le prochain pas de carrière plus facilement.' },
-              { kicker: 'Toute la Suisse',     body: 'Conçue pour le marché du travail suisse.' },
+              { Icon: Briefcase, kicker: 'Pour les employeurs', body: 'Trouver les bons talents plus rapidement.' },
+              { Icon: UserIcon,  kicker: 'Pour les candidats',  body: 'Faire le prochain pas de carrière plus facilement.' },
+              { Icon: MapPin,    kicker: 'Toute la Suisse',     body: 'Conçue pour le marché du travail suisse.' },
             ] : language === 'IT' ? [
-              { kicker: 'Per i datori di lavoro', body: 'Trovare i talenti giusti più velocemente.' },
-              { kicker: 'Per i candidati',        body: 'Fare il prossimo passo di carriera più facilmente.' },
-              { kicker: 'In tutta la Svizzera',   body: 'Progettata per il mercato del lavoro svizzero.' },
+              { Icon: Briefcase, kicker: 'Per i datori di lavoro', body: 'Trovare i talenti giusti più velocemente.' },
+              { Icon: UserIcon,  kicker: 'Per i candidati',        body: 'Fare il prossimo passo di carriera più facilmente.' },
+              { Icon: MapPin,    kicker: 'In tutta la Svizzera',   body: 'Progettata per il mercato del lavoro svizzero.' },
             ] : language === 'EN' ? [
-              { kicker: 'For employers',  body: 'Find the right talent faster.' },
-              { kicker: 'For candidates', body: 'Take your next career step more easily.' },
-              { kicker: 'Nationwide',     body: 'Built for the Swiss job market.' },
+              { Icon: Briefcase, kicker: 'For employers',  body: 'Find the right talent faster.' },
+              { Icon: UserIcon,  kicker: 'For candidates', body: 'Take your next career step more easily.' },
+              { Icon: MapPin,    kicker: 'Nationwide',     body: 'Built for the Swiss job market.' },
             ] : [
-              { kicker: 'Für Arbeitgeber', body: 'Die passenden Talente schneller finden.' },
-              { kicker: 'Für Bewerber',    body: 'Den nächsten Karriereschritt einfacher starten.' },
-              { kicker: 'Schweizweit',     body: 'Entwickelt für den Schweizer Arbeitsmarkt.' },
+              { Icon: Briefcase, kicker: 'Für Arbeitgeber', body: 'Die passenden Talente schneller finden.' },
+              { Icon: UserIcon,  kicker: 'Für Bewerber',    body: 'Den nächsten Karriereschritt einfacher starten.' },
+              { Icon: MapPin,    kicker: 'Schweizweit',     body: 'Entwickelt für den Schweizer Arbeitsmarkt.' },
             ];
             return (
-              <div className="mt-12 lg:mt-16 grid sm:grid-cols-3 gap-6 lg:gap-8 max-w-4xl mx-auto">
+              <div className="mt-10 lg:mt-14 grid sm:grid-cols-3 gap-4 lg:gap-6 max-w-5xl mx-auto">
                 {benefits.map((b, i) => (
                   <motion.div
                     key={i}
@@ -8458,10 +8494,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-40px' }}
                     transition={{ delay: 0.25 + i * 0.1, duration: 0.5 }}
-                    className="p-5 border border-white/10 bg-white/[0.03] backdrop-blur-sm"
+                    className="p-6 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm flex items-start gap-4"
                   >
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#22D3EE]">{b.kicker}</p>
-                    <p className="mt-3 text-sm text-white/80 font-light leading-relaxed">{b.body}</p>
+                    <div className="shrink-0 w-10 h-10 rounded-lg border border-[#22D3EE]/40 bg-[#22D3EE]/[0.08] flex items-center justify-center text-[#22D3EE]">
+                      <b.Icon size={18} strokeWidth={1.75} />
+                    </div>
+                    <div>
+                      <p className="text-base font-semibold text-white leading-tight">{b.kicker}</p>
+                      <p className="mt-1.5 text-sm text-white/65 font-light leading-relaxed">{b.body}</p>
+                    </div>
                   </motion.div>
                 ))}
               </div>
