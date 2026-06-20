@@ -3647,6 +3647,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       register: "Registrieren",
       logout: "Abmelden",
       success_stories: "Erfolgsgeschichten",
+      nav_swiss: "Schweiz",
       promo_spot: "Werbespot",
       features: "Features",
       how_it_works: "So funktioniert's",
@@ -4294,6 +4295,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       register: "S'inscrire",
       logout: "Déconnexion",
       success_stories: "Histoires de réussite",
+      nav_swiss: "Suisse",
       promo_spot: "Spot publicitaire",
       features: "Fonctionnalités",
       how_it_works: "Comment ça marche",
@@ -4835,6 +4837,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       register: "Registrati",
       logout: "Disconnetti",
       success_stories: "Storie di successo",
+      nav_swiss: "Svizzera",
       promo_spot: "Spot pubblicitario",
       features: "Caratteristiche",
       how_it_works: "Come funziona",
@@ -5376,6 +5379,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       register: "Register",
       logout: "Logout",
       success_stories: "Success Stories",
+      nav_swiss: "Switzerland",
       promo_spot: "Promotional Spot",
       features: "Features",
       how_it_works: "How it works",
@@ -6652,9 +6656,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     }
                   };
                   return <>
+                    <a href="#tools" onClick={handleAnchor('tools')} className={goToAnchor('tools')}>{t.tools}</a>
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
-                    <a href="#success" onClick={handleAnchor('success')} className={`${goToAnchor('success')} hidden xl:inline-flex`}>{t.success_stories}</a>
-                    <a href="#how" onClick={handleAnchor('how')} className={goToAnchor('how')}>{t.how_it_works}</a>
+                    <a href="#schweiz" onClick={handleAnchor('schweiz')} className={goToAnchor('schweiz')}>{t.nav_swiss}</a>
                     <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                     <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
@@ -6838,8 +6842,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     };
                     const cls = "px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left";
                     return <>
+                      <a href="#tools" onClick={goAnchor('tools')} className={cls}>{t.tools}</a>
                       <a href="#features" onClick={goAnchor('features')} className={cls}>{t.features}</a>
-                      <a href="#how" onClick={goAnchor('how')} className={cls}>{t.how_it_works}</a>
+                      <a href="#schweiz" onClick={goAnchor('schweiz')} className={cls}>{t.nav_swiss}</a>
                       <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={cls}>{t.pricing}</button>
                     </>;
                   })()}
@@ -8263,7 +8268,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            positioned cyan nodes + connecting lines on a dot-grid canvas
            already convey the country, modern SaaS style. */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
+      <section id="schweiz" className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
              style={{ background: 'radial-gradient(ellipse at center, rgba(0,168,84,0.10) 0%, transparent 60%)' }} />
 
