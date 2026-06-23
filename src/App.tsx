@@ -6658,7 +6658,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   return <>
                     <a href="#tools" onClick={handleAnchor('tools')} className={goToAnchor('tools')}>{t.tools}</a>
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
-                    <a href="#schweiz" onClick={handleAnchor('schweiz')} className={goToAnchor('schweiz')}>{t.nav_swiss}</a>
                     <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                     <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
@@ -6844,7 +6843,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     return <>
                       <a href="#tools" onClick={goAnchor('tools')} className={cls}>{t.tools}</a>
                       <a href="#features" onClick={goAnchor('features')} className={cls}>{t.features}</a>
-                      <a href="#schweiz" onClick={goAnchor('schweiz')} className={cls}>{t.nav_swiss}</a>
                       <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={cls}>{t.pricing}</button>
                     </>;
                   })()}
@@ -9529,14 +9527,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            gallery + multi-step form needs the whole canvas. */}
       <AnimatePresence>
         {activeTool && (() => {
-          const isFullPage = activeTool.id === 'bewerbungs-gen';
+          // Every tool now opens full-screen, matching the Bewerbungs-Generator
+          // pattern. More room for input + result + example panels.
           return (
-          <div className={`fixed inset-0 z-[300] flex justify-center bg-black/40 backdrop-blur-sm ${isFullPage ? '' : 'items-end sm:items-center sm:p-4'}`}>
+          <div className="fixed inset-0 z-[300] flex justify-center bg-black/40 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 40 }}
-              className={`bg-white dark:bg-[#1A1A18] overflow-hidden flex flex-col shadow-2xl transition-colors ${isFullPage ? 'w-full h-full sm:rounded-none' : 'w-full sm:max-w-4xl h-[95vh] sm:h-auto sm:max-h-[90vh] sm:rounded-none'}`}
+              className="bg-white dark:bg-[#1A1A18] overflow-hidden flex flex-col shadow-2xl transition-colors w-full h-full sm:rounded-none"
             >
               <div className="p-4 sm:p-6 border-b border-black/8 dark:border-white/8 flex items-center justify-between gap-4 bg-[#FDFCFB] dark:bg-[#2A2A26] shrink-0">
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0">
