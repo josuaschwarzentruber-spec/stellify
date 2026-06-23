@@ -10369,28 +10369,140 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </div>
                     </motion.div>
                   ) : (
-                    <div className="h-full flex flex-col items-center justify-start pt-6 pb-12 text-center space-y-6 max-w-md mx-auto">
-                      <div className="w-16 h-16 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] rounded-full shrink-0">
-                        <Lightbulb size={32} />
-                      </div>
+                    <div className="h-full flex flex-col items-center justify-start pt-4 pb-12 space-y-6 max-w-2xl mx-auto w-full">
+                      {/* Visual example preview — shows what the tool produces */}
+                      {(() => {
+                        const id = activeTool.id;
+                        const beispiel = language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel';
+                        const ScoreCard = ({ score, label, bullets }: any) => (
+                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
+                            <div className="flex items-center gap-4">
+                              <div className="relative w-16 h-16 shrink-0">
+                                <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
+                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${score} 100`} strokeLinecap="round" />
+                                </svg>
+                                <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">{score}</span>
+                              </div>
+                              <div>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{label}</p>
+                                <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{score}/100</p>
+                              </div>
+                            </div>
+                            <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                              {bullets.map((b: string, i: number) => (
+                                <li key={i} className="flex gap-2"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{b}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        );
+                        const ListCard = ({ title, items, numbered }: any) => (
+                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{title}</p>
+                            <div className="space-y-2.5">
+                              {items.map((it: string, i: number) => (
+                                <div key={i} className="flex gap-3 items-start">
+                                  <span className="shrink-0 w-6 h-6 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854] flex items-center justify-center text-[10px] font-bold">{numbered ? i+1 : '·'}</span>
+                                  <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">{it}</p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                        let body: React.ReactNode = null;
+                        if (id === 'ats-sim') body = <ScoreCard score={82} label="ATS-Score" bullets={['Match auf 7 von 10 Schlüsselbegriffen','Format wird von SuccessFactors gelesen','3 Begriffe fehlen: SAP S/4HANA, IFRS, Stakeholder']} />;
+                        else if (id === 'cv-analysis') body = <ScoreCard score={76} label="Markt-Score" bullets={['Branchen-Fit Banking · Zürich','Top-Keywords: KPI · Reporting · Excel','Empfehlung: Skill „Power BI" ergänzen']} />;
+                        else if (id === 'cv-premium' || id === 'cv-optimizer') body = <ScoreCard score={91} label="Optimiert" bullets={['Aktivierte Verben statt Passiv','Quantifizierte Erfolge (z.B. „+ 18% Umsatz")','Schweizer Hochdeutsch · ATS-konform']} />;
+                        else if (id === 'skill-gap') body = <ListCard title="Skill-Gap Analyse" numbered={false} items={['Power BI · benötigt für 64% der Stellen','SQL Grundlagen · Pflicht bei Konzernen','Englisch C1 · in 8 von 10 Inseraten verlangt']} />;
+                        else if (id === 'career-roadmap') body = <ListCard title="Deine 5-Schritte-Roadmap" numbered={true} items={['Heute: CV auf 1 Seite kürzen','Diese Woche: 5 Bewerbungen versenden','Nächster Monat: 2 Interviews vereinbaren','In 3 Monaten: Power BI Zertifikat','In 6 Monaten: Senior-Position erreichen']} />;
+                        else if (id === 'interview' || id === 'interview-live') body = (
+                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">Frage 1 / 5</p>
+                            <p className="text-base font-medium text-[#1A1A18] dark:text-[#FAFAF8]">„Erzählen Sie uns von einem Projekt, bei dem Sie eine schwierige Entscheidung treffen mussten."</p>
+                            <div className="pt-3 border-t border-black/8 dark:border-white/8 space-y-2">
+                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">Stella-Tipp</p>
+                              <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] italic leading-relaxed">„STAR-Methode: Situation → Aufgabe → Aktion → Resultat. Beziffere den Erfolg konkret."</p>
+                            </div>
+                          </div>
+                        );
+                        else if (id === 'salary-negotiation') body = (
+                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">Median-Lohn · Banking · Zürich · 5 J. Erfahrung</p>
+                            <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">CHF 118'000<span className="text-sm text-[#9A9A94]"> /Jahr</span></p>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]"><span>CHF 95k</span><span>CHF 145k</span></div>
+                              <div className="h-2 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden relative">
+                                <div className="absolute inset-y-0 left-[15%] right-[20%] bg-[#004225] dark:bg-[#00A854] rounded-full" />
+                              </div>
+                            </div>
+                            <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                              <li>+ 13. Monatsgehalt üblich</li>
+                              <li>+ 5–10% Bonus realistisch</li>
+                            </ul>
+                          </div>
+                        );
+                        else if (id === 'matching') body = (
+                          <div className="w-full space-y-2.5">
+                            {[
+                              { match: 92, title: 'Senior Data Analyst', co: 'UBS · Zürich' },
+                              { match: 87, title: 'Business Intelligence Lead', co: 'Swiss Re · Zürich' },
+                              { match: 81, title: 'Reporting Manager', co: 'PostFinance · Bern' },
+                            ].map((m, i) => (
+                              <div key={i} className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg flex items-center gap-4">
+                                <div className="w-12 h-12 shrink-0 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center text-[#004225] dark:text-[#00A854] font-bold text-sm">{m.match}%</div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{m.title}</p>
+                                  <p className="text-xs text-[#9A9A94] truncate">{m.co}</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                        else if (id === 'cv-gen' || id === 'bewerbungs-gen') body = (
+                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-3">
+                            <div className="h-2 w-1/2 bg-[#1A1A18]/80 dark:bg-[#FAFAF8]/80 rounded" />
+                            <div className="h-1.5 w-2/3 bg-black/15 dark:bg-white/15 rounded" />
+                            <div className="space-y-1.5 pt-3">
+                              {[90, 75, 95, 60, 85, 70].map((w, i) => (
+                                <div key={i} className="h-1.5 bg-black/10 dark:bg-white/10 rounded" style={{ width: `${w}%` }} />
+                              ))}
+                            </div>
+                          </div>
+                        );
+                        else body = (
+                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-2.5">
+                            {[90, 70, 85, 60].map((w, i) => (
+                              <div key={i} className="h-2 bg-black/10 dark:bg-white/10 rounded" style={{ width: `${w}%` }} />
+                            ))}
+                          </div>
+                        );
+                        return (
+                          <div className="w-full relative">
+                            <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
+                              <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                              {beispiel}
+                            </div>
+                            <div className="relative">
+                              {body}
+                              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                <span className="text-[60px] font-bold uppercase tracking-[0.3em] text-[#004225]/[0.04] dark:text-white/[0.04] select-none rotate-[-12deg]">{beispiel}</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
 
-                      <div className="space-y-4">
-                        <h4 className="text-lg font-serif">{t.tool_how_to_use}</h4>
+                      <div className="text-center space-y-3 max-w-md">
+                        <h4 className="text-base font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.tool_how_to_use}</h4>
                         <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">
                           {activeTool.desc}
                         </p>
-                        {t.tools_data[activeTool.id]?.tutorial && activeTool.desc.length > 140 && (
-                          <div className="pt-2 flex items-center justify-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] animate-pulse">
-                            <ChevronDown size={12} />
-                            <span>{t.tool_scroll_example}</span>
-                          </div>
-                        )}
                       </div>
-                      
+
                       {t.tools_data[activeTool.id]?.tutorial && (
-                        <div className="w-full p-6 bg-[#004225]/5 border border-[#004225]/10 space-y-3 text-left">
+                        <div className="w-full p-5 bg-[#004225]/5 border border-[#004225]/10 rounded-lg space-y-2 text-left">
                           <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                            <Award size={14} />
+                            <Award size={12} />
                             <span>{t.tool_pro_example}</span>
                           </div>
                           <p className="text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed italic">
