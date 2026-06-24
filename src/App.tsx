@@ -10648,9 +10648,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             )}
                             <div className="relative">
                               {body}
-                              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                                <span className="text-[60px] font-bold uppercase tracking-[0.3em] text-[#004225]/[0.04] dark:text-white/[0.04] select-none rotate-[-12deg]">{beispiel}</span>
-                              </div>
                             </div>
                           </div>
                         );
@@ -10663,17 +10660,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         </p>
                       </div>
 
-                      {t.tools_data[activeTool.id]?.tutorial && (
-                        <div className="w-full p-5 bg-[#004225]/5 border border-[#004225]/10 rounded-lg space-y-2 text-left">
-                          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                            <Award size={12} />
-                            <span>{t.tool_pro_example}</span>
+                      {t.tools_data[activeTool.id]?.tutorial && (() => {
+                        // The DB-side tutorials are conversational ("Beispiel: ...",
+                        // "Exemple : ...", "Esempio: ...", "Example: ..."). The card
+                        // header already labels this as PROFI-BEISPIEL, so strip the
+                        // redundant prefix and any wrapping quotes for a cleaner read.
+                        const raw = t.tools_data[activeTool.id].tutorial as string;
+                        const cleaned = raw
+                          .replace(/^(Beispiel|Exemple|Esempio|Example)\s*[:：]\s*/i, '')
+                          .replace(/^["„«»“”']+|["„«»“”']+$/g, '')
+                          .trim();
+                        return (
+                          <div className="w-full p-5 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06] border-l-2 border-[#004225] dark:border-[#00A854] rounded-r-lg space-y-2.5 text-left">
+                            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854]">
+                              <Award size={12} />
+                              <span>{t.tool_pro_example}</span>
+                            </div>
+                            <p className="text-[13px] text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed">
+                              {cleaned}
+                            </p>
                           </div>
-                          <p className="text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed italic">
-                            "{t.tools_data[activeTool.id].tutorial}"
-                          </p>
-                        </div>
-                      )}
+                        );
+                      })()}
 
                       {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                         (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
