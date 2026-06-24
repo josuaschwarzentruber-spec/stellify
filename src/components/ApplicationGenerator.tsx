@@ -498,6 +498,23 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
       const next = { ...prev };
       if (!next.firstName && profile.firstName) next.firstName = profile.firstName;
       if (!next.email && profile.email) next.email = profile.email;
+      // Derive a last name from the email ONLY when it's clearly safe.
+      // Safe = the local part is `firstname.lastname` (or _ / -) AND the
+      // first token matches the user's known firstName. That covers the
+      // common 'josua.schwarzentruber@…' case without ever guessing on
+      // handles like 'jschwarz@…' or 'cool.dude@…'.
+      const fn = (next.firstName || profile.firstName || '').trim().toLowerCase();
+      if (!next.lastName && fn && profile.email) {
+        const local = profile.email.split('@')[0] || '';
+        const parts = local.split(/[._-]/).filter(Boolean);
+        if (parts.length >= 2 && parts[0].toLowerCase() === fn) {
+          const guess = parts.slice(1)
+            .filter(p => /^[a-zà-öø-ÿ]{2,}$/i.test(p))
+            .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
+            .join(' ');
+          if (guess) next.lastName = guess;
+        }
+      }
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -915,33 +932,40 @@ ${bodyText}
                   </div>
                 </section>
 
-                {/* ── Use uploaded CV toggle + upload-from-here ────────────── */}
-                <section className="flex items-start gap-3 p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg">
-                  <button
-                    onClick={() => { if (cvContext) setUseCv(v => !v); else openCvFilePicker(); }}
-                    role="switch"
-                    aria-checked={!!cvContext && useCv}
-                    aria-label={cvContext ? s.use_cv_label : s.cv_upload_btn}
-                    className={`mt-0.5 shrink-0 w-9 h-5 rounded-full transition-colors relative ${cvContext && useCv ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15 hover:bg-black/25 dark:hover:bg-white/25'}`}
-                  >
-                    <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${cvContext && useCv ? 'left-[18px]' : 'left-0.5'}`} />
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{s.use_cv_label}</p>
-                    <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{cvContext ? s.use_cv_hint : s.no_cv_hint}</p>
-                    {!cvContext && (
-                      <button
-                        type="button"
-                        onClick={openCvFilePicker}
-                        disabled={isUploadingCv}
-                        className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#004225]/30 dark:border-[#00A854]/40 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:bg-[#004225]/5 dark:hover:bg-[#00A854]/10 transition-all disabled:opacity-60"
-                      >
-                        {isUploadingCv
-                          ? <><span className="w-3 h-3 border-2 border-[#004225]/40 border-t-[#004225] dark:border-[#00A854]/40 dark:border-t-[#00A854] rounded-full animate-spin" /> {s.cv_uploading}</>
-                          : <><Upload size={11} /> {s.cv_upload_btn}</>}
-                      </button>
-                    )}
+                {/* ── Use uploaded CV toggle + upload-from-here ──────────────
+                    Two states:
+                    • CV present → toggle is the primary control, on by default.
+                    • No CV → toggle is decorative (and a hint that it activates
+                      after upload). The big primary button below is the action. */}
+                <section className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <button
+                      onClick={() => { if (cvContext) setUseCv(v => !v); else openCvFilePicker(); }}
+                      role="switch"
+                      aria-checked={!!cvContext && useCv}
+                      aria-label={cvContext ? s.use_cv_label : s.cv_upload_btn}
+                      title={cvContext ? undefined : s.no_cv_hint}
+                      className={`mt-0.5 shrink-0 w-9 h-5 rounded-full transition-colors relative ${cvContext && useCv ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'} ${!cvContext ? 'opacity-50' : ''}`}
+                    >
+                      <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all shadow ${cvContext && useCv ? 'left-[18px]' : 'left-0.5'}`} />
+                    </button>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{s.use_cv_label}</p>
+                      <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{cvContext ? s.use_cv_hint : s.no_cv_hint}</p>
+                    </div>
                   </div>
+                  {!cvContext && (
+                    <button
+                      type="button"
+                      onClick={openCvFilePicker}
+                      disabled={isUploadingCv}
+                      className="mt-3 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004225] dark:bg-[#00A854] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] dark:hover:bg-[#00964a] transition-all disabled:opacity-60 rounded"
+                    >
+                      {isUploadingCv
+                        ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {s.cv_uploading}</>
+                        : <><Upload size={12} /> {s.cv_upload_btn}</>}
+                    </button>
+                  )}
                 </section>
 
                 <section>
