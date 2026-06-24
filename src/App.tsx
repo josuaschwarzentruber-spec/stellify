@@ -2670,7 +2670,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'cv-optimizer':
           prompt = `
             HANDLUNGSANWEISUNG: Optimiere die CV-Sektion: ${toolInput.section}.
-            KONTEXT: CV des Nutzers: ${cvContext}.
+            KONTEXT: CV des Nutzers: ${cvContext || 'Kein Lebenslauf hochgeladen – arbeite ausschliesslich mit dem oben angegebenen Abschnitt und allgemeinen Schweizer CV-Standards.'}.
             
             DEINE ROLLE: Du bist ein Senior Recruiter für den Schweizer Markt (Zürich/Genf/Basel/Zug).
             
@@ -2772,7 +2772,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'ats-sim':
           prompt = `
             HANDLUNGSANWEISUNG: Führe eine tiefgehende "Premium ATS-Simulation" (Applicant Tracking System) durch.
-            KONTEXT: CV: ${cvContext}. Inserat: ${toolInput.jobAd}.
+            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen – bewerte nur das Inserat und gib allgemeine ATS-Optimierungen nach Schweizer Standard.'}. Inserat: ${toolInput.jobAd}.
             DEINE ROLLE: Du bist ein technischer Recruiter für einen Schweizer Grosskonzern.
             
             ANALYSE-FOKUS (SCHWEIZER STANDARD):
@@ -2916,7 +2916,7 @@ Bewerte in 3 Kategorien (je 0–100%):
           prompt = `
             HANDLUNGSANWEISUNG: Strategie für den Wiedereinstieg nach einer Pause.
             GRUND: ${toolInput.reason || 'Nicht spezifiziert'}.
-            KONTEXT: CV: ${cvContext}.
+            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen – arbeite mit dem angegebenen Grund und allgemeinen Schweizer Wiedereinstiegs-Strategien.'}.
             INHALT:
             - Wie man die Lücke im CV positiv umformuliert.
             - Argumente für die aktuelle Motivation und Einsatzbereitschaft.
@@ -2937,7 +2937,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'matching':
           prompt = `
             HANDLUNGSANWEISUNG: Job-Matching Analyse.
-            KONTEXT: CV: ${cvContext}.
+            KONTEXT: CV: ${toolInput.cvText || cvContext || 'Kein Lebenslauf vorhanden – bitte den Nutzer höflich, seinen Lebenslauf hochzuladen oder einzufügen, und gib solange allgemeine Schweizer Job-Profile.'}.
             AUFGABE: Basierend auf dem CV, welche 5 Job-Profile in der Schweiz passen am besten?
             Gib für jedes Profil einen Fit-Score (0-100%) und eine kurze Begründung an.
           `;
@@ -2945,7 +2945,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'cv-analysis':
           prompt = `
             HANDLUNGSANWEISUNG: Führe eine tiefgehende "Premium-Analyse" des Lebenslaufs für den Schweizer Arbeitsmarkt durch.
-            KONTEXT: CV: ${cvContext}.
+            KONTEXT: CV: ${toolInput.cvText || cvContext || 'Kein Lebenslauf vorhanden – bitte den Nutzer höflich, seinen Lebenslauf hochzuladen oder einzufügen.'}.
             DEINE ROLLE: Du bist ein Elite Career Consultant für den Schweizer Markt (Zürich, Genf, Basel, Zug).
             
             ANALYSE-PUNKTE (SCHWEIZER PREMIUM-STANDARD):
@@ -2984,7 +2984,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'tracker':
           prompt = `
             HANDLUNGSANWEISUNG: Bewerbungs-Strategie für: ${toolInput.jobTitle}.
-            KONTEXT: CV: ${cvContext}.
+            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen – nutze den angegebenen Jobtitel und allgemeine Schweizer Bewerbungsstrategien.'}.
             AUFGABE: Erstelle einen konkreten Schlachtplan für diese Bewerbung.
             - Recherche-Tipps zum Unternehmen.
             - Wer könnte der Hiring Manager sein?
@@ -3942,6 +3942,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_see_plans: "Pläne ansehen",
       tool_maybe_later: "Vielleicht später",
       tool_inputs: "Eingaben",
+      tool_cv_optional_label: "Lebenslauf (optional, falls keiner hochgeladen)",
+      tool_cv_optional_ph: "Füge deinen Lebenslauf hier ein oder lade eine Datei – oder lass es leer für allgemeine Tipps.",
       tool_load_file: "Datei laden",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
@@ -4590,6 +4592,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_see_plans: "Voir les forfaits",
       tool_maybe_later: "Peut-être plus tard",
       tool_inputs: "Paramètres",
+      tool_cv_optional_label: "CV (optionnel, si aucun n'est téléchargé)",
+      tool_cv_optional_ph: "Colle ton CV ici ou télécharge un fichier – ou laisse vide pour des conseils généraux.",
       tool_load_file: "Charger fichier",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
@@ -5132,6 +5136,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_see_plans: "Vedi i piani",
       tool_maybe_later: "Forse più tardi",
       tool_inputs: "Parametri",
+      tool_cv_optional_label: "CV (opzionale, se non caricato)",
+      tool_cv_optional_ph: "Incolla il tuo CV qui o carica un file – o lascia vuoto per consigli generali.",
       tool_load_file: "Carica file",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
@@ -5674,6 +5680,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_see_plans: "See plans",
       tool_maybe_later: "Maybe later",
       tool_inputs: "Inputs",
+      tool_cv_optional_label: "CV (optional, if none uploaded)",
+      tool_cv_optional_ph: "Paste your CV here or upload a file – or leave empty for general tips.",
       tool_load_file: "Load file",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
@@ -5911,7 +5919,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       icon: <Search size={20} />,
       badge: 'Deep Scan',
       type: 'pro',
-      inputs: []
+      inputs: cvContext ? [] : [{ key: 'cvText', label: t.tool_cv_optional_label, type: 'textarea', placeholder: t.tool_cv_optional_ph }]
     },
     {
       id: 'cv-optimizer',
@@ -6024,13 +6032,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [{ key: 'jobTitle', label: t.tools_data['tracker'].input_label, type: 'text', placeholder: t.tools_data['tracker'].input_placeholder }] 
     },
     { 
-      id: 'matching', 
-      title: t.tools_data['matching'].title, 
-      desc: t.tools_data['matching'].desc, 
-      icon: <Search size={20} />, 
+      id: 'matching',
+      title: t.tools_data['matching'].title,
+      desc: t.tools_data['matching'].desc,
+      icon: <Search size={20} />,
       badge: 'Fit-Score',
       type: 'ultimate',
-      inputs: []
+      inputs: cvContext ? [] : [{ key: 'cvText', label: t.tool_cv_optional_label, type: 'textarea', placeholder: t.tool_cv_optional_ph }]
     },
     {
       id: 'berufseinstieg',
