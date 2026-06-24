@@ -6191,6 +6191,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     || (user?.role === 'pro' && !isUnlimited && toolUses >= 50)
     || (user?.role === 'unlimited' && toolUses >= 150);
   const isDailyLimitReached = false;
+
+  /* ── Demo identity for landing/empty-state previews ─────────────────────
+     When the visitor is logged in we use their own first name (and try to
+     pluck a last name from the email if it's the classic firstname.lastname
+     format — same conservative heuristic the Bewerbungs-Generator uses).
+     Falls back to a Swiss sample name. The tracker preview deliberately
+     keeps company names ("Roche", "Nestlé") — those aren't applicant names. */
+  const previewIdentity = (() => {
+    const firstName = user?.firstName?.trim();
+    if (!firstName) return { name: 'Anna Müller', emailMask: 'anna.mueller@…' };
+    let lastName = '';
+    const local = (user?.email || '').split('@')[0] || '';
+    const parts = local.split(/[._-]/).filter(Boolean);
+    if (parts.length >= 2 && parts[0].toLowerCase() === firstName.toLowerCase()) {
+      const guess = parts[1];
+      if (/^[a-zà-öø-ÿ]{2,}$/i.test(guess)) {
+        lastName = guess.charAt(0).toUpperCase() + guess.slice(1).toLowerCase();
+      }
+    }
+    const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+    const email = user?.email || '';
+    const emailMask = email.length > 26 ? email.slice(0, 23) + '…' : email;
+    return { name: fullName, emailMask };
+  })();
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
@@ -7993,8 +8017,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               {/* Document body */}
               <div className="px-7 py-6">
-                <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">Anna Müller</p>
-                <p className="text-[10px] text-[#9A9A94] mt-0.5">Bahnhofstrasse 12 · 8001 Zürich · anna.mueller@mail.ch</p>
+                <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{previewIdentity.name}</p>
+                <p className="text-[10px] text-[#9A9A94] mt-0.5">Bahnhofstrasse 12 · 8001 Zürich · {previewIdentity.emailMask}</p>
 
                 <div className="my-5 h-px bg-black/8 dark:bg-white/8" />
 
@@ -8017,7 +8041,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <p className="text-[12px] text-[#1A1A18] dark:text-[#EBEBEB]">
                   {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
                 </p>
-                <p className="font-serif text-[13px] text-[#1A1A18] dark:text-[#FAFAF8] mt-1">Anna Müller</p>
+                <p className="font-serif text-[13px] text-[#1A1A18] dark:text-[#FAFAF8] mt-1">{previewIdentity.name}</p>
               </div>
 
               {/* Export footer */}
@@ -8113,9 +8137,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* A4 preview of a finished application — what the generator outputs */}
+          {/* A4 preview of a finished application — what the generator outputs.
+              Real paragraph text (not gray skeleton lines) so visitors can
+              actually read what comes out of the tool. Uses the logged-in
+              user's name + email when available, otherwise a Swiss sample. */}
           <div className="order-2 lg:order-1">
-            <div className="relative mx-auto max-w-[420px]">
+            <div className="relative mx-auto max-w-[520px]">
               <div className="absolute -top-3 -left-3 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
                 <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                 {language === 'FR' ? 'Aperçu' : language === 'IT' ? 'Anteprima' : language === 'EN' ? 'Preview' : 'Vorschau'}
@@ -8124,39 +8151,68 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Sidebar layout, brand-green accent — matches the "Modern" design */}
                 <div className="flex h-full text-[#26261F]">
                   <div className="w-[32%] bg-[#004225] text-white p-4 sm:p-5 flex flex-col">
-                    <p className="font-serif text-[13px] sm:text-[15px] font-bold leading-tight">Anna Müller</p>
-                    <p className="text-[7px] sm:text-[8px] opacity-75 mt-0.5">Marketing Manager</p>
-                    <div className="border-t border-white/25 mt-3 pt-2.5 text-[6.5px] sm:text-[7.5px] leading-[1.8] opacity-90 space-y-0.5">
+                    <p className="font-serif text-[15px] sm:text-[18px] font-bold leading-tight">{previewIdentity.name}</p>
+                    <p className="text-[8.5px] sm:text-[10px] opacity-75 mt-1">
+                      {language === 'FR' ? 'Marketing Manager' : language === 'IT' ? 'Marketing Manager' : language === 'EN' ? 'Marketing Manager' : 'Marketing Managerin'}
+                    </p>
+                    <div className="border-t border-white/25 mt-3.5 pt-3 text-[8px] sm:text-[9px] leading-[1.8] opacity-90 space-y-0.5">
                       <p>Bahnhofstrasse 12</p>
                       <p>8001 Zürich</p>
                       <p>+41 79 123 45 67</p>
-                      <p className="break-all">anna.mueller@…</p>
+                      <p className="break-all">{previewIdentity.emailMask}</p>
                     </div>
-                    <div className="mt-4 text-[6.5px] sm:text-[7.5px] leading-[1.7] opacity-85">
-                      <p className="font-bold uppercase tracking-[1.5px] text-[6px] sm:text-[7px] opacity-100 mb-1">Skills</p>
-                      <p>Brand Strategy · CRM</p>
-                      <p>Social Media · Analytics</p>
-                      <p>DE · FR · EN</p>
+                    <div className="mt-5 text-[8px] sm:text-[9px] leading-[1.7] opacity-85">
+                      <p className="font-bold uppercase tracking-[1.5px] text-[7.5px] sm:text-[8.5px] opacity-100 mb-1.5">Skills</p>
+                      <p>Brand Strategy</p>
+                      <p>CRM · Social Media</p>
+                      <p>Analytics · A/B-Tests</p>
+                      <p className="mt-2">DE · FR · EN</p>
                     </div>
                   </div>
-                  <div className="flex-1 p-4 sm:p-5 font-serif">
-                    <p className="text-[7px] sm:text-[8px] text-[#6B6B66]">14. Mai 2026</p>
-                    <p className="text-[8px] sm:text-[9px] font-bold text-[#004225] mt-1.5 sm:mt-2 mb-2">Bewerbung als Marketing Manager · Nestlé</p>
-                    <p className="text-[7.5px] sm:text-[8.5px] mb-1.5">Sehr geehrte Damen und Herren</p>
-                    <div className="space-y-1.5 text-[7px] sm:text-[8px] leading-[1.7]">
-                      <div className="h-1 bg-[#26261F]/85 w-full rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/85 w-[96%] rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/85 w-[92%] rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/85 w-[88%] rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/70 w-[60%] rounded-sm" />
-                      <div className="h-2" />
-                      <div className="h-1 bg-[#26261F]/85 w-[94%] rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/85 w-[90%] rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/85 w-[97%] rounded-sm" />
-                      <div className="h-1 bg-[#26261F]/70 w-[55%] rounded-sm" />
+                  <div className="flex-1 p-4 sm:p-6 font-serif">
+                    <p className="text-[8.5px] sm:text-[10px] text-[#6B6B66]">14. Mai 2026</p>
+                    <p className="text-[10.5px] sm:text-[12px] font-bold text-[#004225] mt-2 mb-3 leading-tight">
+                      {language === 'FR' ? 'Candidature au poste de Marketing Manager · Nestlé'
+                        : language === 'IT' ? 'Candidatura come Marketing Manager · Nestlé'
+                        : language === 'EN' ? 'Application: Marketing Manager · Nestlé'
+                        : 'Bewerbung als Marketing Managerin · Nestlé'}
+                    </p>
+                    <p className="text-[9.5px] sm:text-[11px] mb-2.5">
+                      {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren'}
+                    </p>
+                    <div className="text-[8.5px] sm:text-[10px] leading-[1.65] text-[#26261F] space-y-2">
+                      <p>
+                        {language === 'FR'
+                          ? 'Avec un grand intérêt, je postule pour le poste de Marketing Manager chez Nestlé. Votre approche de durabilité et de marques locales correspond exactement à ce que je veux faire avancer.'
+                          : language === 'IT'
+                          ? "Con grande interesse mi candido per la posizione di Marketing Manager presso Nestlé. Il vostro approccio alla sostenibilità e ai marchi locali è esattamente ciò che voglio promuovere."
+                          : language === 'EN'
+                          ? 'I am applying with great enthusiasm for the position of Marketing Manager at Nestlé. Your approach to sustainability and local brands is exactly the direction I want to help drive forward.'
+                          : 'Mit grossem Interesse bewerbe ich mich für die Position als Marketing Managerin bei Nestlé. Ihre Strategie für nachhaltige Marken und den Schweizer Markt entspricht exakt dem, was ich vorantreiben möchte.'}
+                      </p>
+                      <p>
+                        {language === 'FR'
+                          ? "Depuis trois ans, je dirige la stratégie de marque d'un grand acteur suisse des biens de consommation. J'ai augmenté la notoriété de la marque de 28% avec un budget de 1,2 MCHF et lancé deux nouveaux produits sur les marchés DACH."
+                          : language === 'IT'
+                          ? "Da tre anni guido la strategia di marca di un importante operatore svizzero dei beni di consumo. Ho aumentato la notorietà del marchio del 28% con un budget di 1,2 milioni di CHF e lanciato due nuovi prodotti sui mercati DACH."
+                          : language === 'EN'
+                          ? 'For three years I have led the brand strategy of a major Swiss consumer goods player. I grew brand awareness by 28% on a CHF 1.2 m budget and launched two new products across the DACH markets.'
+                          : 'Seit drei Jahren verantworte ich die Markenstrategie eines führenden Schweizer Konsumgüterherstellers. Mit einem Budget von CHF 1,2 Mio. steigerte ich die Markenbekanntheit um 28% und lancierte zwei Neuprodukte in der DACH-Region.'}
+                      </p>
+                      <p>
+                        {language === 'FR'
+                          ? "Ma combinaison entre rigueur analytique, trilinguisme (DE/FR/EN) et expérience des campagnes DACH correspond aux exigences de votre offre. Je me réjouis d'en discuter en personne."
+                          : language === 'IT'
+                          ? "La mia combinazione di rigore analitico, trilinguismo (DE/FR/EN) ed esperienza nelle campagne DACH corrisponde ai vostri requisiti. Sarei lieta di approfondire in un colloquio personale."
+                          : language === 'EN'
+                          ? 'My mix of analytical rigour, trilingual fluency (DE/FR/EN) and DACH campaign experience fits your requirements. I would welcome the chance to discuss this in person.'
+                          : 'Meine Kombination aus analytischer Stärke, Dreisprachigkeit (DE/FR/EN) und Erfahrung mit DACH-Kampagnen passt zu Ihren Anforderungen. Auf ein persönliches Gespräch freue ich mich.'}
+                      </p>
                     </div>
-                    <p className="text-[7.5px] sm:text-[8.5px] mt-2.5 mb-0.5">Freundliche Grüsse</p>
-                    <p className="text-[7.5px] sm:text-[8.5px] font-bold">Anna Müller</p>
+                    <p className="text-[9.5px] sm:text-[11px] mt-3 mb-1">
+                      {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
+                    </p>
+                    <p className="text-[9.5px] sm:text-[11px] font-bold">{previewIdentity.name}</p>
                   </div>
                 </div>
               </div>
