@@ -836,6 +836,32 @@ function StellifyApp() {
   // Stella chat is hidden from the UI (kept in code, reversible). Set to true
   // to re-enable the launcher entry points across the app.
   const STELLA_CHAT_ENABLED = false;
+
+  // YouTube video IDs — single source of truth for every video shown across
+  // the app. Setting a value here flips the matching UI on (▶ button on the
+  // landing hero, ▶ Tutorial chip on a tool, Welcome modal after sign-up).
+  // Leave `null` to hide. Use the YouTube video ID only (the part after
+  // "watch?v=" or "youtu.be/"), NOT the full URL.
+  const videoLibrary: { master: string | null; welcome: string | null; tools: Record<string, string | null> } = {
+    master:  null, // shown in the landing hero ("▶ Stellify in 90 Sek.")
+    welcome: null, // shown once after first sign-in
+    tools: {
+      'bewerbungs-gen':     null,
+      'cv-gen':             null,
+      'cv-analysis':        null,
+      'cv-optimizer':       null,
+      'cv-premium':         null,
+      'matching':           null,
+      'interview':          null,
+      'interview-live':     null,
+      'salary-negotiation': null,
+      'ats-sim':            null,
+      'career-roadmap':     null,
+      'skill-gap':          null,
+      'tracker':            null,
+    },
+  };
+  const getToolVideo = (toolId: string): string | null => videoLibrary.tools[toolId] ?? null;
   const [cvContext, setCvContext] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -1092,6 +1118,12 @@ function StellifyApp() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [showLoginWelcome, setShowLoginWelcome] = useState(false);
   const [isPromoOpen, setIsPromoOpen] = useState(false);
+  // ▶ Video modals — master (landing hero), tool tutorials, welcome
+  const [videoModal, setVideoModal] = useState<{ id: string; title: string } | null>(null);
+  const [welcomeVideoSeen, setWelcomeVideoSeen] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('stellify_welcome_video_seen') === '1';
+  });
   const [isPromoVideoOpen, setIsPromoVideoOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
@@ -7773,6 +7805,22 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <ArrowRight size={18} className="relative group-hover:translate-x-1 transition-transform" />
               </motion.button>
 
+              {/* ▶ Watch master video — only visible if a video ID is set */}
+              {videoLibrary.master && (
+                <button
+                  onClick={() => setVideoModal({ id: videoLibrary.master!, title: language === 'FR' ? 'Stellify en 90 secondes' : language === 'IT' ? 'Stellify in 90 secondi' : language === 'EN' ? 'Stellify in 90 seconds' : 'Stellify in 90 Sekunden' })}
+                  className="inline-flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] hover:gap-3 transition-all group"
+                >
+                  <span className="w-9 h-9 rounded-full border border-[#004225]/30 dark:border-[#00A854]/40 bg-[#004225]/5 dark:bg-[#00A854]/10 flex items-center justify-center group-hover:bg-[#004225] dark:group-hover:bg-[#00A854] group-hover:border-[#004225] dark:group-hover:border-[#00A854] transition-colors">
+                    <Play size={12} className="fill-current group-hover:text-white dark:group-hover:text-[#1A1A18] ml-0.5" />
+                  </span>
+                  {language === 'FR' ? 'Stellify en 90 sec.'
+                    : language === 'IT' ? 'Stellify in 90 sec.'
+                    : language === 'EN' ? 'Stellify in 90 sec.'
+                    : 'Stellify in 90 Sek.'}
+                </button>
+              )}
+
               {/* 3-step funnel */}
               <motion.div
                 initial="hidden"
@@ -8923,6 +8971,101 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           >
             {toast.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
             {toast.message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- VIDEO MODAL (YouTube nocookie embed, lazy-mounted) --- */}
+      <AnimatePresence>
+        {videoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            onClick={() => setVideoModal(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="relative w-full max-w-4xl bg-[#0a1410] shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between px-5 py-3 bg-[#0a1410] border-b border-white/10">
+                <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/80">{videoModal.title}</p>
+                <button
+                  onClick={() => setVideoModal(null)}
+                  className="p-1.5 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
+                  aria-label="Close"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube-nocookie.com/embed/${videoModal.id}?autoplay=1&rel=0&modestbranding=1`}
+                  title={videoModal.title}
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* --- WELCOME VIDEO (auto-opens once after first sign-in if a video is set) --- */}
+      <AnimatePresence>
+        {user && !welcomeVideoSeen && videoLibrary.welcome && !videoModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[395] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.96, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="relative w-full max-w-4xl bg-[#0a1410] shadow-2xl overflow-hidden"
+            >
+              <div className="flex items-center justify-between px-5 py-3 border-b border-white/10">
+                <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-white/80">
+                  {language === 'FR' ? 'Bienvenue chez Stellify'
+                    : language === 'IT' ? 'Benvenuto su Stellify'
+                    : language === 'EN' ? 'Welcome to Stellify'
+                    : 'Willkommen bei Stellify'}
+                </p>
+                <button
+                  onClick={() => { localStorage.setItem('stellify_welcome_video_seen','1'); setWelcomeVideoSeen(true); }}
+                  className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 hover:text-white border border-white/20 rounded-full px-3 py-1 transition-colors"
+                >
+                  {language === 'FR' ? 'Passer' : language === 'IT' ? 'Salta' : language === 'EN' ? 'Skip' : 'Überspringen'}
+                </button>
+              </div>
+              <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
+                <iframe
+                  className="absolute inset-0 w-full h-full"
+                  src={`https://www.youtube-nocookie.com/embed/${videoLibrary.welcome}?autoplay=1&rel=0&modestbranding=1`}
+                  title="Welcome to Stellify"
+                  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  onLoad={() => {}}
+                />
+              </div>
+              <div className="px-5 py-3 bg-[#0a1410] border-t border-white/10 text-center">
+                <button
+                  onClick={() => { localStorage.setItem('stellify_welcome_video_seen','1'); setWelcomeVideoSeen(true); }}
+                  className="text-[11px] font-bold uppercase tracking-[0.25em] text-white px-5 py-2 bg-[#004225] hover:bg-[#00331d] transition-colors"
+                >
+                  {language === 'FR' ? "C'est parti" : language === 'IT' ? 'Iniziamo' : language === 'EN' ? "Let's start" : "Los geht's"}
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -10476,12 +10619,22 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             ))}
                           </div>
                         );
+                        const videoId = getToolVideo(id);
                         return (
                           <div className="w-full relative">
                             <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
                               <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                               {beispiel}
                             </div>
+                            {videoId && (
+                              <button
+                                onClick={() => setVideoModal({ id: videoId, title: activeTool.title })}
+                                className="absolute -top-3 right-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1A1A18] border border-[#004225]/30 text-[#004225] dark:text-[#00A854] text-[9px] font-bold tracking-[0.25em] uppercase shadow-md hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-colors"
+                              >
+                                <Play size={9} className="fill-current" />
+                                {language === 'FR' ? 'Tutoriel' : language === 'IT' ? 'Tutorial' : language === 'EN' ? 'Tutorial' : 'Tutorial'}
+                              </button>
+                            )}
                             <div className="relative">
                               {body}
                               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
