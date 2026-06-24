@@ -1060,6 +1060,109 @@ app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req
   }
 });
 
+// ── Job posting fetch from a URL ──────────────────────────────────────────────
+// Takes a job-listing URL (Yousty, jobs.ch, a company careers page, anywhere),
+// fetches it server-side (browsers can't, CORS), strips it to readable text and
+// asks DeepSeek to extract structured fields. Pure DeepSeek — no Gemini needed.
+// SSRF-guarded: only public http/https hosts, no localhost / private ranges.
+function isPrivateHost(host: string): boolean {
+  const h = host.toLowerCase();
+  if (h === 'localhost' || h.endsWith('.local') || h.endsWith('.internal')) return true;
+  // IPv4 private / loopback / link-local ranges
+  const m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+  if (m) {
+    const [a, b] = [parseInt(m[1]), parseInt(m[2])];
+    if (a === 10 || a === 127 || a === 0) return true;
+    if (a === 169 && b === 254) return true;
+    if (a === 172 && b >= 16 && b <= 31) return true;
+    if (a === 192 && b === 168) return true;
+  }
+  if (h === '::1' || h.startsWith('fe80:') || h.startsWith('fc') || h.startsWith('fd')) return true;
+  return false;
+}
+
+function htmlToText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<noscript[\s\S]*?<\/noscript>/gi, ' ')
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<(nav|header|footer|svg|form|aside)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<\/(p|div|li|h[1-6]|br|tr|section|article)>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'")
+    .replace(/&[a-z]+;/gi, ' ')
+    .replace(/[ \t\f\v]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .split('\n').map(l => l.trim()).filter(Boolean).join('\n')
+    .trim();
+}
+
+app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
+  const { url } = req.body as { url?: string };
+  if (!url || typeof url !== 'string') return res.status(400).json({ error: 'URL fehlt' });
+
+  let parsed: URL;
+  try { parsed = new URL(url.trim()); } catch { return res.status(400).json({ error: 'Ungültige URL' }); }
+  if (!/^https?:$/.test(parsed.protocol)) return res.status(400).json({ error: 'Nur http/https erlaubt' });
+  if (isPrivateHost(parsed.hostname)) return res.status(400).json({ error: 'Diese Adresse ist nicht erlaubt' });
+
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12_000);
+    let html = '';
+    try {
+      const r = await fetch(parsed.toString(), {
+        signal: ctrl.signal,
+        redirect: 'follow',
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+          'Accept': 'text/html,application/xhtml+xml',
+          'Accept-Language': 'de-CH,de;q=0.9,en;q=0.8',
+        },
+      });
+      if (!r.ok) {
+        clearTimeout(timer);
+        return res.status(422).json({ error: `Seite nicht erreichbar (${r.status})`, needsManual: true });
+      }
+      html = await r.text();
+    } finally { clearTimeout(timer); }
+
+    const text = htmlToText(html).slice(0, 7000);
+    if (text.length < 120) {
+      return res.status(422).json({ error: 'Konnte den Stelleninhalt nicht lesen. Bitte Text manuell einfügen.', needsManual: true });
+    }
+
+    const { text: aiText } = await generateText({
+      systemInstruction: 'Du extrahierst Stellenanzeigen-Daten und antwortest AUSSCHLIESSLICH mit kompaktem JSON, ohne Markdown.',
+      userContent: `Hier ist der Textinhalt einer Stellenanzeige-Webseite. Extrahiere die relevanten Felder.\n\nText:\n"""${text}"""\n\nAntworte NUR mit diesem JSON (leere Felder als ""):\n{"company":"Firmenname","position":"Stellenbezeichnung","location":"Ort/Kanton","requirements":"Die wichtigsten Anforderungen und Aufgaben in 4-8 stichpunktartigen Zeilen, mit Zeilenumbrüchen getrennt"}`,
+      temperature: 0.1,
+      maxOutputTokens: 900,
+    });
+
+    const match = aiText.match(/\{[\s\S]*\}/);
+    let data: any = {};
+    if (match) { try { data = JSON.parse(match[0]); } catch { /* keep empty */ } }
+
+    res.json({
+      success: true,
+      company: typeof data.company === 'string' ? data.company : '',
+      position: typeof data.position === 'string' ? data.position : '',
+      location: typeof data.location === 'string' ? data.location : '',
+      requirements: typeof data.requirements === 'string' ? data.requirements : '',
+      sourceUrl: parsed.toString(),
+    });
+  } catch (error: any) {
+    const aborted = error?.name === 'AbortError';
+    console.error('[FETCH-JOB ERROR]', (error?.message || error)?.toString().slice(0, 160));
+    res.status(aborted ? 504 : 502).json({
+      error: aborted ? 'Zeitüberschreitung beim Laden der Seite' : 'Seite konnte nicht geladen werden. Bitte Text manuell einfügen.',
+      needsManual: true,
+    });
+  }
+});
+
 // ── LinkedIn Screenshot / Image Text Extraction ───────────────────────────────
 app.post("/api/extract-image", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
   const { base64, mimeType } = req.body;

@@ -9703,6 +9703,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <ApplicationGenerator
                         language={language}
                         user={user}
+                        profile={user ? { firstName: user.firstName, email: user.email } : null}
+                        cvContext={cvContext}
                         locked={isToolLocked}
                         onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
                         showToast={showToast}
