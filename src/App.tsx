@@ -2535,9 +2535,46 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
+  /**
+   * Realistic Swiss demo inputs per tool. Used by the "Mit Beispiel
+   * ausprobieren" CTA on the empty state — fills the form and triggers
+   * processTool() so new users instantly see live AI output instead of
+   * just a mock preview. Keys MUST match each tool's `inputs[].key`.
+   */
+  const TOOL_EXAMPLES: Record<string, Record<string, string>> = {
+    'cv-optimizer':       { section: 'Berufserfahrung als Projektleiter' },
+    'cv-analysis':        { cvText: 'Anna Müller, 32 Jahre, Zürich.\nBerufserfahrung: Senior Business Analyst bei UBS (2020–heute), Business Analyst bei Credit Suisse (2017–2020).\nAusbildung: BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG.\nSprachen: Deutsch (Muttersprache), Englisch (C1), Französisch (B2).\nSkills: SQL, Excel, Power BI, Tableau, Stakeholder Management, agile Projektleitung.' },
+    'cv-premium':         { firstName: 'Anna', lastName: 'Müller', applicationType: 'Bewerbung / Vorstellung', duration: '5 Jahre', qualifications: 'BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG, SQL, Power BI', cvText: 'Anna Müller, 32, Zürich. 5 Jahre Erfahrung als Business Analyst im Banking.', description: 'Vollständige Optimierung auf Schweizer Premium-Standard.' },
+    'cv-gen':             { firstName: 'Anna', lastName: 'Müller', applicationType: 'Bewerbung / Vorstellung', duration: '5 Jahre', qualifications: 'BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG, SQL, Power BI', jobAd: 'Senior Business Analyst (m/w/d), Zürich, Banking. Wir suchen eine analytische Persönlichkeit mit SQL- und BI-Erfahrung für ein Datenstrategie-Team.', description: 'Motiviertes, knappes Anschreiben mit Fokus auf Schweizer Banking-Erfahrung.' },
+    'ats-sim':            { jobAd: 'Senior Business Analyst (m/w/d), Zürich, Banking. Anforderungen: 5+ Jahre Erfahrung im Banking, exzellente SQL- und Power-BI-Kenntnisse, Erfahrung mit Stakeholder Management und agilen Methoden, Deutsch verhandlungssicher, Englisch C1.' },
+    'skill-gap':          { targetJob: 'Senior Data Scientist bei Roche, Basel' },
+    'tracker':            { jobTitle: 'Senior Projektleiterin bei Roche, Basel' },
+    'career-roadmap':     { firstName: 'Anna', lastName: 'Müller', applicationType: 'Bewerbung / Vorstellung', duration: '5 Jahre', qualifications: 'BSc Wirtschaftsinformatik HSLU, Power BI, SQL', goal: 'Head of Business Intelligence in 5 Jahren', description: 'Konkrete Roadmap mit Weiterbildungen für den Schweizer Markt.' },
+    'interview':          { firstName: 'Anna', lastName: 'Müller', jobTitle: 'Product Manager bei ABB, Zürich', applicationType: 'Bewerbung / Vorstellung', qualifications: 'BSc Wirtschaftsinformatik, 5 Jahre Projektleitung', description: 'Fokus auf STAR-Methode und Schweizer Marktkenntnis.' },
+    'interview-live':     { jobTitle: 'Senior UX Designer', company: 'Digitec Galaxus AG, Zürich', jobDesc: 'Wir suchen einen erfahrenen UX Designer für die Optimierung unserer E-Commerce-Plattform. Erfahrung mit Figma, User Research und A/B-Testing erforderlich.' },
+    'salary-negotiation': { jobTitle: 'Senior Business Analyst, Banking, Zürich, 5 J. Erfahrung', targetSalary: 'Von CHF 95k auf CHF 115k inkl. 13. Monatsgehalt' },
+  };
+  const hasExampleFor = (id?: string) => !!(id && TOOL_EXAMPLES[id]);
+  // Two-phase trigger: setToolInput is a setState, so processTool would
+  // still see the previous closure if we called it synchronously. Instead
+  // flip a flag that an effect picks up on the next render — by then the
+  // re-rendered processTool reads the freshly populated input.
+  const [pendingExampleRun, setPendingExampleRun] = useState(false);
+  const runExample = () => {
+    if (!activeTool || !TOOL_EXAMPLES[activeTool.id]) return;
+    setToolInput(TOOL_EXAMPLES[activeTool.id]);
+    setPendingExampleRun(true);
+  };
+  useEffect(() => {
+    if (!pendingExampleRun) return;
+    setPendingExampleRun(false);
+    processTool();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingExampleRun]);
+
   const processTool = async () => {
     if (!activeTool) return;
-    
+
     setIsProcessingTool(true);
     setToolResult(null);
     setToolResultEditable('');
@@ -3992,6 +4029,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "So nutzt du dieses Tool",
       tool_scroll_example: "Runterscrollen für Profi-Beispiel",
       tool_pro_example: "Profi-Beispiel",
+      tool_try_example: "Mit Beispiel ausprobieren",
+      tool_try_example_sub: "Wir füllen die Felder mit realistischen Schweizer Daten und starten die KI.",
       tool_unlimited_access: "Karriere+-Zugang",
       tool_unlock_desc: "Schalte dieses Tool und alle Premium-Funktionen mit Karriere+ frei.",
       tool_discover_unlimited: "Jetzt Karriere+ entdecken",
@@ -4642,6 +4681,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "Comment utiliser cet outil",
       tool_scroll_example: "Faites défiler pour l'exemple professionnel",
       tool_pro_example: "Exemple professionnel",
+      tool_try_example: "Essayer avec un exemple",
+      tool_try_example_sub: "Nous remplissons les champs avec des données suisses réalistes et lançons l'IA.",
       tool_unlimited_access: "Accès Karriere+",
       tool_unlock_desc: "Débloque cet outil et toutes les fonctions premium avec Karriere+.",
       tool_discover_unlimited: "Découvrir Karriere+ maintenant",
@@ -5186,6 +5227,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "Come usare questo strumento",
       tool_scroll_example: "Scorri verso il basso per l'esempio professionale",
       tool_pro_example: "Esempio professionale",
+      tool_try_example: "Prova con un esempio",
+      tool_try_example_sub: "Compiliamo i campi con dati svizzeri realistici e avviamo l'IA.",
       tool_unlimited_access: "Accesso Karriere+",
       tool_unlock_desc: "Sblocca questo strumento e tutte le funzioni premium con Karriere+.",
       tool_discover_unlimited: "Scopri Karriere+ ora",
@@ -5730,6 +5773,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_how_to_use: "How to use this tool",
       tool_scroll_example: "Scroll down for professional example",
       tool_pro_example: "Professional Example",
+      tool_try_example: "Try with example",
+      tool_try_example_sub: "We fill the fields with realistic Swiss data and run the AI.",
       tool_unlimited_access: "Karriere+ Access",
       tool_unlock_desc: "Unlock this tool and all premium features with Karriere+.",
       tool_discover_unlimited: "Discover Unlimited Now",
@@ -10683,7 +10728,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         );
                       })()}
 
-                      {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
+                      {hasExampleFor(activeTool.id) && !isProcessingTool && (
+                        <button
+                          onClick={runExample}
+                          className="group w-full p-5 bg-[#004225] hover:bg-[#00331d] dark:bg-[#00A854] dark:hover:bg-[#00964a] text-white rounded-lg transition-all text-left flex items-center gap-4 shadow-md hover:shadow-lg"
+                        >
+                          <span className="shrink-0 w-10 h-10 rounded-full bg-white/15 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <Sparkles size={18} />
+                          </span>
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-[11px] font-bold uppercase tracking-[0.15em]">{t.tool_try_example}</span>
+                            <span className="block text-[11px] text-white/75 font-light mt-0.5 leading-snug">{t.tool_try_example_sub}</span>
+                          </span>
+                          <ChevronRight size={18} className="shrink-0 opacity-75 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      )}
+
+                      {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                         (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
                         <div className="w-full p-6 bg-amber-50 border border-amber-100 space-y-4 text-center">
                           <div className="flex items-center justify-center gap-2 text-amber-900">
