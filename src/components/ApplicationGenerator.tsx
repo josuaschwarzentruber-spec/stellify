@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Check, ChevronLeft, ChevronRight, Plus, Save, Trash2,
   FolderOpen, Lock, Palette, Eye, X, Sparkles, Download,
-  Pencil, RefreshCw, MessageSquare, ListChecks, UserSquare,
+  Pencil, RefreshCw, MessageSquare, ListChecks, UserSquare, Link2,
 } from 'lucide-react';
 import { db } from '../firebase';
 import {
@@ -102,6 +102,10 @@ const STR: Record<string, Record<string, string>> = {
     interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
     quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/{cap} diesen Monat', quota_pro_day: '{used}/20 heute',
     quota_free_done: 'Gratis-Versuche aufgebraucht', quota_pro_month_done: 'Monatslimit erreicht', quota_pro_day_done: 'Tageslimit erreicht',
+    job_url_title: 'Stelle per Link laden', job_url_sub: 'Füge die URL der Stellenanzeige ein (Yousty, jobs.ch, Firmen-Karriereseite …). Stella liest sie aus und füllt Firma, Position und Anforderungen automatisch.',
+    job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Laden', job_url_loading: 'Lese Stelle …',
+    job_fetch_ok: 'Stelle übernommen. Bitte kurz prüfen.', job_fetch_error: 'Konnte die Stelle nicht laden. Bitte Text manuell einfügen.',
+    use_cv_label: 'Meinen hochgeladenen Lebenslauf verwenden', use_cv_hint: 'Stella nutzt deinen Lebenslauf für Erfahrung, Ausbildung und Skills.', no_cv_hint: 'Kein Lebenslauf hochgeladen. Fülle die Felder unten aus oder lade oben einen Lebenslauf hoch.',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -141,6 +145,10 @@ const STR: Record<string, Record<string, string>> = {
     interview_hint: '10 questions possibles avec suggestions de réponses',
     quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/{cap} ce mois', quota_pro_day: '{used}/20 aujourd\'hui',
     quota_free_done: 'Essais gratuits épuisés', quota_pro_month_done: 'Limite mensuelle atteinte', quota_pro_day_done: 'Limite journalière atteinte',
+    job_url_title: 'Charger une offre par lien', job_url_sub: "Colle l'URL de l'offre (Yousty, jobs.ch, page carrière …). Stella la lit et remplit l'entreprise, le poste et les exigences automatiquement.",
+    job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Charger', job_url_loading: "Lecture de l'offre …",
+    job_fetch_ok: 'Offre importée. Merci de vérifier.', job_fetch_error: "Impossible de charger l'offre. Colle le texte manuellement.",
+    use_cv_label: 'Utiliser mon CV téléchargé', use_cv_hint: 'Stella utilise ton CV pour expérience, formation et compétences.', no_cv_hint: 'Aucun CV téléchargé. Remplis les champs ci-dessous ou télécharge un CV en haut.',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -180,6 +188,10 @@ const STR: Record<string, Record<string, string>> = {
     interview_hint: '10 possibili domande con suggerimenti di risposta',
     quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/{cap} questo mese', quota_pro_day: '{used}/20 oggi',
     quota_free_done: 'Tentativi gratuiti esauriti', quota_pro_month_done: 'Limite mensile raggiunto', quota_pro_day_done: 'Limite giornaliero raggiunto',
+    job_url_title: 'Carica annuncio da link', job_url_sub: "Incolla l'URL dell'annuncio (Yousty, jobs.ch, pagina carriere …). Stella lo legge e compila azienda, posizione e requisiti automaticamente.",
+    job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Carica', job_url_loading: "Lettura dell'annuncio …",
+    job_fetch_ok: 'Annuncio importato. Verifica per favore.', job_fetch_error: "Impossibile caricare l'annuncio. Incolla il testo manualmente.",
+    use_cv_label: 'Usa il mio CV caricato', use_cv_hint: 'Stella usa il tuo CV per esperienza, formazione e competenze.', no_cv_hint: 'Nessun CV caricato. Compila i campi sotto o carica un CV in alto.',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -219,6 +231,10 @@ const STR: Record<string, Record<string, string>> = {
     interview_hint: '10 possible questions with suggested answers',
     quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/{cap} this month', quota_pro_day: '{used}/20 today',
     quota_free_done: 'Free attempts used up', quota_pro_month_done: 'Monthly limit reached', quota_pro_day_done: 'Daily limit reached',
+    job_url_title: 'Load job from link', job_url_sub: 'Paste the job posting URL (Yousty, jobs.ch, a company careers page …). Stella reads it and fills company, position and requirements automatically.',
+    job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Load', job_url_loading: 'Reading job …',
+    job_fetch_ok: 'Job imported. Please review.', job_fetch_error: 'Could not load the job. Please paste the text manually.',
+    use_cv_label: 'Use my uploaded CV', use_cv_hint: 'Stella uses your CV for experience, education and skills.', no_cv_hint: 'No CV uploaded. Fill in the fields below or upload a CV above.',
   },
 };
 
@@ -404,9 +420,11 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, authFetch, recordUsage, usage }: {
+const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, recordUsage, usage }: {
   language: string;
   user: { id: string; email?: string } | null;
+  profile?: { firstName?: string; email?: string } | null;
+  cvContext?: string;
   locked: boolean;
   onUpgrade: () => void;
   showToast: (msg: string, type?: string) => void;
@@ -429,6 +447,54 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
   const [editingLetter, setEditingLetter] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
+  const [jobUrl, setJobUrl] = useState('');
+  const [isFetchingJob, setIsFetchingJob] = useState(false);
+  const [useCv, setUseCv] = useState(true);
+
+  // Prefill the applicant's name + email from the account once, on mount.
+  // Only fills empty fields so it never overwrites the user's own edits.
+  useEffect(() => {
+    if (!profile) return;
+    setForm(prev => {
+      const next = { ...prev };
+      if (!next.firstName && profile.firstName) next.firstName = profile.firstName;
+      if (!next.email && profile.email) next.email = profile.email;
+      return next;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Pull a job posting from a pasted URL and fill company / position / job desc.
+  const fetchJobFromUrl = async () => {
+    const u = jobUrl.trim();
+    if (!u) return;
+    setIsFetchingJob(true);
+    try {
+      const res = await authFetch('/api/fetch-job', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: u }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        showToast(data.error || s.job_fetch_error, 'error');
+        return;
+      }
+      setForm(prev => ({
+        ...prev,
+        targetCompany: data.company || prev.targetCompany,
+        targetPosition: data.position || prev.targetPosition,
+        jobDescription: data.requirements
+          ? (prev.jobDescription ? prev.jobDescription + '\n\n' + data.requirements : data.requirements)
+          : prev.jobDescription,
+      }));
+      showToast(s.job_fetch_ok, 'success');
+    } catch (e: any) {
+      showToast(e?.message || s.job_fetch_error, 'error');
+    } finally {
+      setIsFetchingJob(false);
+    }
+  };
 
   const toneLabel = (v: string) => v === 'confident' ? (s as any).tone_conf : v === 'friendly' ? (s as any).tone_warm : v === 'direct' ? (s as any).tone_direct : (s as any).tone_prof;
 
@@ -455,12 +521,14 @@ const ApplicationGenerator = ({ language, user, locked, onUpgrade, showToast, au
     if (quotaBlocked) { onUpgrade(); return; }
     setIsGenerating(true);
     try {
+      const cvForPrompt = (useCv && cvContext) ? cvContext.substring(0, 2500) : '';
       const prompt = `Erstelle eine vollständige Bewerbung basierend auf diesen Angaben.
 
 BEWERBER: ${form.firstName} ${form.lastName}${form.currentRole ? `, aktuell: ${form.currentRole}` : ''}
 ZIELFIRMA: ${form.targetCompany}
 STELLE: ${form.targetPosition}
 ${form.jobDescription ? `STELLENBESCHREIBUNG: ${form.jobDescription.substring(0, 1500)}` : ''}
+${cvForPrompt ? `LEBENSLAUF DES BEWERBERS (nutze diese echten Angaben für Erfahrung, Ausbildung und Fähigkeiten): ${cvForPrompt}` : ''}
 ${form.experience ? `BERUFSERFAHRUNG: ${form.experience.substring(0, 1200)}` : ''}
 ${form.education ? `AUSBILDUNG: ${form.education.substring(0, 600)}` : ''}
 ${form.skills ? `FÄHIGKEITEN: ${form.skills.substring(0, 600)}` : ''}
@@ -769,6 +837,52 @@ ${bodyText}
           {step === 1 && (
             <motion.div key="form" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="max-w-3xl">
               <div className="space-y-8">
+                {/* ── Job URL importer ─────────────────────────────────────── */}
+                <section className="p-5 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06] border border-[#004225]/15 dark:border-[#00A854]/20 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Link2 size={14} className="text-[#004225] dark:text-[#00A854]" />
+                    <p className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{s.job_url_title}</p>
+                  </div>
+                  <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-3">{s.job_url_sub}</p>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      className={`${inputCls} flex-1`}
+                      type="url"
+                      inputMode="url"
+                      placeholder={s.job_url_ph}
+                      value={jobUrl}
+                      onChange={(e) => setJobUrl(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !isFetchingJob) { e.preventDefault(); fetchJobFromUrl(); } }}
+                    />
+                    <button
+                      onClick={fetchJobFromUrl}
+                      disabled={isFetchingJob || !jobUrl.trim()}
+                      className="shrink-0 px-5 py-2.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-[#00331d] transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+                    >
+                      {isFetchingJob
+                        ? <><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" /> {s.job_url_loading}</>
+                        : <><Download size={12} /> {s.job_url_btn}</>}
+                    </button>
+                  </div>
+                </section>
+
+                {/* ── Use uploaded CV toggle ───────────────────────────────── */}
+                <section className="flex items-start gap-3 p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg">
+                  <button
+                    onClick={() => cvContext && setUseCv(v => !v)}
+                    disabled={!cvContext}
+                    role="switch"
+                    aria-checked={!!cvContext && useCv}
+                    className={`mt-0.5 shrink-0 w-9 h-5 rounded-full transition-colors relative ${cvContext && useCv ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'} ${!cvContext ? 'opacity-40 cursor-not-allowed' : ''}`}
+                  >
+                    <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${cvContext && useCv ? 'left-[18px]' : 'left-0.5'}`} />
+                  </button>
+                  <div>
+                    <p className="text-xs font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{s.use_cv_label}</p>
+                    <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{cvContext ? s.use_cv_hint : s.no_cv_hint}</p>
+                  </div>
+                </section>
+
                 <section>
                   <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_person}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
