@@ -9717,6 +9717,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
                         showToast={showToast}
                         authFetch={authFetch}
+                        onUploadCv={processFile}
                         usage={{
                           toolUses: user?.toolUses || 0,
                           dailyToolUses: user?.dailyToolUses || 0,

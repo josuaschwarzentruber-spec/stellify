@@ -4,6 +4,7 @@ import {
   Check, ChevronLeft, ChevronRight, Plus, Save, Trash2,
   FolderOpen, Lock, Palette, Eye, X, Sparkles, Download,
   Pencil, RefreshCw, MessageSquare, ListChecks, UserSquare, Link2,
+  Upload,
 } from 'lucide-react';
 import { db } from '../firebase';
 import {
@@ -105,7 +106,9 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Stelle per Link laden', job_url_sub: 'Füge die URL der Stellenanzeige ein (Yousty, jobs.ch, Firmen-Karriereseite …). Stella liest sie aus und füllt Firma, Position und Anforderungen automatisch.',
     job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Laden', job_url_loading: 'Lese Stelle …',
     job_fetch_ok: 'Stelle übernommen. Bitte kurz prüfen.', job_fetch_error: 'Konnte die Stelle nicht laden. Bitte Text manuell einfügen.',
-    use_cv_label: 'Meinen hochgeladenen Lebenslauf verwenden', use_cv_hint: 'Stella nutzt deinen Lebenslauf für Erfahrung, Ausbildung und Skills.', no_cv_hint: 'Kein Lebenslauf hochgeladen. Fülle die Felder unten aus oder lade oben einen Lebenslauf hoch.',
+    use_cv_label: 'Meinen hochgeladenen Lebenslauf verwenden', use_cv_hint: 'Stella nutzt deinen Lebenslauf für Erfahrung, Ausbildung und Skills.', no_cv_hint: 'Noch kein Lebenslauf hochgeladen. Klicke unten, um einen hinzuzufügen – oder fülle die Felder manuell aus.',
+    badge_new: 'Neu',
+    cv_upload_btn: 'Lebenslauf hochladen', cv_uploading: 'Lade …', cv_upload_ok: 'Lebenslauf importiert.',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -148,7 +151,9 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Charger une offre par lien', job_url_sub: "Colle l'URL de l'offre (Yousty, jobs.ch, page carrière …). Stella la lit et remplit l'entreprise, le poste et les exigences automatiquement.",
     job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Charger', job_url_loading: "Lecture de l'offre …",
     job_fetch_ok: 'Offre importée. Merci de vérifier.', job_fetch_error: "Impossible de charger l'offre. Colle le texte manuellement.",
-    use_cv_label: 'Utiliser mon CV téléchargé', use_cv_hint: 'Stella utilise ton CV pour expérience, formation et compétences.', no_cv_hint: 'Aucun CV téléchargé. Remplis les champs ci-dessous ou télécharge un CV en haut.',
+    use_cv_label: 'Utiliser mon CV téléchargé', use_cv_hint: 'Stella utilise ton CV pour expérience, formation et compétences.', no_cv_hint: 'Aucun CV téléchargé. Clique ci-dessous pour en ajouter un – ou remplis les champs manuellement.',
+    badge_new: 'Nouveau',
+    cv_upload_btn: 'Téléverser un CV', cv_uploading: 'Chargement …', cv_upload_ok: 'CV importé.',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -191,7 +196,9 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Carica annuncio da link', job_url_sub: "Incolla l'URL dell'annuncio (Yousty, jobs.ch, pagina carriere …). Stella lo legge e compila azienda, posizione e requisiti automaticamente.",
     job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Carica', job_url_loading: "Lettura dell'annuncio …",
     job_fetch_ok: 'Annuncio importato. Verifica per favore.', job_fetch_error: "Impossibile caricare l'annuncio. Incolla il testo manualmente.",
-    use_cv_label: 'Usa il mio CV caricato', use_cv_hint: 'Stella usa il tuo CV per esperienza, formazione e competenze.', no_cv_hint: 'Nessun CV caricato. Compila i campi sotto o carica un CV in alto.',
+    use_cv_label: 'Usa il mio CV caricato', use_cv_hint: 'Stella usa il tuo CV per esperienza, formazione e competenze.', no_cv_hint: 'Nessun CV caricato. Clicca qui sotto per aggiungerne uno – oppure compila i campi manualmente.',
+    badge_new: 'Nuovo',
+    cv_upload_btn: 'Carica CV', cv_uploading: 'Caricamento …', cv_upload_ok: 'CV importato.',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -234,7 +241,9 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Load job from link', job_url_sub: 'Paste the job posting URL (Yousty, jobs.ch, a company careers page …). Stella reads it and fills company, position and requirements automatically.',
     job_url_ph: 'https://www.yousty.ch/...', job_url_btn: 'Load', job_url_loading: 'Reading job …',
     job_fetch_ok: 'Job imported. Please review.', job_fetch_error: 'Could not load the job. Please paste the text manually.',
-    use_cv_label: 'Use my uploaded CV', use_cv_hint: 'Stella uses your CV for experience, education and skills.', no_cv_hint: 'No CV uploaded. Fill in the fields below or upload a CV above.',
+    use_cv_label: 'Use my uploaded CV', use_cv_hint: 'Stella uses your CV for experience, education and skills.', no_cv_hint: 'No CV uploaded yet. Click below to add one – or fill in the fields manually.',
+    badge_new: 'New',
+    cv_upload_btn: 'Upload CV', cv_uploading: 'Uploading …', cv_upload_ok: 'CV imported.',
   },
 };
 
@@ -420,7 +429,7 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, recordUsage, usage }: {
+const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage }: {
   language: string;
   user: { id: string; email?: string } | null;
   profile?: { firstName?: string; email?: string } | null;
@@ -429,6 +438,9 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   onUpgrade: () => void;
   showToast: (msg: string, type?: string) => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
+  /** Called when user picks a CV file inside the generator. Should parse it
+      and hoist the text into the parent's cvContext. */
+  onUploadCv?: (file: File) => Promise<void> | void;
   recordUsage?: (entry: { input: string; result: string }) => Promise<void>;
   usage?: { toolUses: number; dailyToolUses: number; isPro: boolean; isUnlimited: boolean };
 }) => {
@@ -447,9 +459,36 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   const [editingLetter, setEditingLetter] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cvFileInputRef = useRef<HTMLInputElement>(null);
   const [jobUrl, setJobUrl] = useState('');
   const [isFetchingJob, setIsFetchingJob] = useState(false);
   const [useCv, setUseCv] = useState(true);
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
+
+  // Each step starts from the top so the URL importer (and stepper) are
+  // always immediately visible after navigation.
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
+
+  const handleCvFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !onUploadCv) return;
+    setIsUploadingCv(true);
+    try {
+      await onUploadCv(file);
+      setUseCv(true);
+      showToast(s.cv_upload_ok, 'success');
+    } catch (err: any) {
+      showToast(err?.message || s.gen_error, 'error');
+    } finally {
+      setIsUploadingCv(false);
+    }
+  };
+
+  const openCvFilePicker = () => cvFileInputRef.current?.click();
 
   // Prefill the applicant's name + email from the account once, on mount.
   // Only fills empty fields so it never overwrites the user's own edits.
@@ -733,7 +772,14 @@ ${bodyText}
   const steps = [s.step_design, s.step_data, s.step_preview];
 
   return (
-    <div className="flex-1 overflow-y-auto custom-scrollbar bg-[#FDFCFB] dark:bg-[#1A1A18]">
+    <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar bg-[#FDFCFB] dark:bg-[#1A1A18]">
+      <input
+        ref={cvFileInputRef}
+        type="file"
+        accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        className="hidden"
+        onChange={handleCvFileChange}
+      />
       {/* Stepper */}
       <div className="sticky top-0 z-10 bg-[#FDFCFB]/95 dark:bg-[#1A1A18]/95 backdrop-blur-sm border-b border-black/5 dark:border-white/5 px-4 sm:px-8 py-3.5 flex items-center gap-2">
         {steps.map((label, i) => (
@@ -838,8 +884,11 @@ ${bodyText}
             <motion.div key="form" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="max-w-3xl">
               <div className="space-y-8">
                 {/* ── Job URL importer ─────────────────────────────────────── */}
-                <section className="p-5 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06] border border-[#004225]/15 dark:border-[#00A854]/20 rounded-lg">
-                  <div className="flex items-center gap-2 mb-1.5">
+                <section className="relative p-5 bg-gradient-to-br from-[#004225]/[0.06] to-[#00A854]/[0.04] dark:from-[#00A854]/[0.10] dark:to-[#004225]/[0.06] border border-[#004225]/25 dark:border-[#00A854]/30 rounded-lg shadow-sm">
+                  <div className="absolute -top-2.5 left-4 inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold uppercase tracking-[0.18em] rounded-full shadow">
+                    <Sparkles size={10} /> {s.badge_new}
+                  </div>
+                  <div className="flex items-center gap-2 mb-1.5 mt-1">
                     <Link2 size={14} className="text-[#004225] dark:text-[#00A854]" />
                     <p className="text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{s.job_url_title}</p>
                   </div>
@@ -866,20 +915,32 @@ ${bodyText}
                   </div>
                 </section>
 
-                {/* ── Use uploaded CV toggle ───────────────────────────────── */}
+                {/* ── Use uploaded CV toggle + upload-from-here ────────────── */}
                 <section className="flex items-start gap-3 p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg">
                   <button
-                    onClick={() => cvContext && setUseCv(v => !v)}
-                    disabled={!cvContext}
+                    onClick={() => { if (cvContext) setUseCv(v => !v); else openCvFilePicker(); }}
                     role="switch"
                     aria-checked={!!cvContext && useCv}
-                    className={`mt-0.5 shrink-0 w-9 h-5 rounded-full transition-colors relative ${cvContext && useCv ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'} ${!cvContext ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    aria-label={cvContext ? s.use_cv_label : s.cv_upload_btn}
+                    className={`mt-0.5 shrink-0 w-9 h-5 rounded-full transition-colors relative ${cvContext && useCv ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15 hover:bg-black/25 dark:hover:bg-white/25'}`}
                   >
                     <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${cvContext && useCv ? 'left-[18px]' : 'left-0.5'}`} />
                   </button>
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{s.use_cv_label}</p>
                     <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{cvContext ? s.use_cv_hint : s.no_cv_hint}</p>
+                    {!cvContext && (
+                      <button
+                        type="button"
+                        onClick={openCvFilePicker}
+                        disabled={isUploadingCv}
+                        className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#004225]/30 dark:border-[#00A854]/40 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:bg-[#004225]/5 dark:hover:bg-[#00A854]/10 transition-all disabled:opacity-60"
+                      >
+                        {isUploadingCv
+                          ? <><span className="w-3 h-3 border-2 border-[#004225]/40 border-t-[#004225] dark:border-[#00A854]/40 dark:border-t-[#00A854] rounded-full animate-spin" /> {s.cv_uploading}</>
+                          : <><Upload size={11} /> {s.cv_upload_btn}</>}
+                      </button>
+                    )}
                   </div>
                 </section>
 
