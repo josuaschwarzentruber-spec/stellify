@@ -8108,9 +8108,122 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
-      {/* --- TRACKER SHOWCASE --- */}
+      {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
+           showcase below but flipped so the document preview reads left→right). */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          {/* A4 preview of a finished application — what the generator outputs */}
+          <div className="order-2 lg:order-1">
+            <div className="relative mx-auto max-w-[420px]">
+              <div className="absolute -top-3 -left-3 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
+                <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
+                {language === 'FR' ? 'Aperçu' : language === 'IT' ? 'Anteprima' : language === 'EN' ? 'Preview' : 'Vorschau'}
+              </div>
+              <div className="aspect-[1/1.414] bg-white border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-black/40 overflow-hidden">
+                {/* Sidebar layout, brand-green accent — matches the "Modern" design */}
+                <div className="flex h-full text-[#26261F]">
+                  <div className="w-[32%] bg-[#004225] text-white p-4 sm:p-5 flex flex-col">
+                    <p className="font-serif text-[13px] sm:text-[15px] font-bold leading-tight">Anna Müller</p>
+                    <p className="text-[7px] sm:text-[8px] opacity-75 mt-0.5">Marketing Manager</p>
+                    <div className="border-t border-white/25 mt-3 pt-2.5 text-[6.5px] sm:text-[7.5px] leading-[1.8] opacity-90 space-y-0.5">
+                      <p>Bahnhofstrasse 12</p>
+                      <p>8001 Zürich</p>
+                      <p>+41 79 123 45 67</p>
+                      <p className="break-all">anna.mueller@…</p>
+                    </div>
+                    <div className="mt-4 text-[6.5px] sm:text-[7.5px] leading-[1.7] opacity-85">
+                      <p className="font-bold uppercase tracking-[1.5px] text-[6px] sm:text-[7px] opacity-100 mb-1">Skills</p>
+                      <p>Brand Strategy · CRM</p>
+                      <p>Social Media · Analytics</p>
+                      <p>DE · FR · EN</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 p-4 sm:p-5 font-serif">
+                    <p className="text-[7px] sm:text-[8px] text-[#6B6B66]">14. Mai 2026</p>
+                    <p className="text-[8px] sm:text-[9px] font-bold text-[#004225] mt-1.5 sm:mt-2 mb-2">Bewerbung als Marketing Manager · Nestlé</p>
+                    <p className="text-[7.5px] sm:text-[8.5px] mb-1.5">Sehr geehrte Damen und Herren</p>
+                    <div className="space-y-1.5 text-[7px] sm:text-[8px] leading-[1.7]">
+                      <div className="h-1 bg-[#26261F]/85 w-full rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/85 w-[96%] rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/85 w-[92%] rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/85 w-[88%] rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/70 w-[60%] rounded-sm" />
+                      <div className="h-2" />
+                      <div className="h-1 bg-[#26261F]/85 w-[94%] rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/85 w-[90%] rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/85 w-[97%] rounded-sm" />
+                      <div className="h-1 bg-[#26261F]/70 w-[55%] rounded-sm" />
+                    </div>
+                    <p className="text-[7.5px] sm:text-[8.5px] mt-2.5 mb-0.5">Freundliche Grüsse</p>
+                    <p className="text-[7.5px] sm:text-[8.5px] font-bold">Anna Müller</p>
+                  </div>
+                </div>
+              </div>
+              {/* Floating mini "PDF · DOCX" chip */}
+              <div className="absolute -bottom-3 -right-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1A1A18] border border-[#004225]/25 dark:border-[#00A854]/40 text-[#004225] dark:text-[#00A854] text-[9px] font-bold tracking-[0.2em] uppercase shadow-md">
+                <Download size={10} />
+                PDF · Word
+              </div>
+            </div>
+          </div>
+          {/* Right: copy + CTA */}
+          <div className="order-1 lg:order-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
+              <Sparkles size={11} />
+              {language === 'FR' ? 'Outil principal' : language === 'IT' ? 'Strumento principale' : language === 'EN' ? 'Headline tool' : 'Haupt-Tool'}
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
+              {language === 'FR' ? 'Ta candidature complète. En quelques minutes.'
+                : language === 'IT' ? 'La tua candidatura completa. In pochi minuti.'
+                : language === 'EN' ? 'A complete application. In minutes.'
+                : 'Deine ganze Bewerbung. In Minuten.'}
+            </h2>
+            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-6 max-w-lg">
+              {language === 'FR'
+                ? 'Choisis un design, colle l\'URL de l\'offre, Stella écrit la lettre, optimise le CV et prépare l\'entretien. Téléchargeable en PDF et Word.'
+                : language === 'IT'
+                ? 'Scegli un design, incolla l\'URL dell\'annuncio, Stella scrive la lettera, ottimizza il CV e prepara il colloquio. Scaricabile in PDF e Word.'
+                : language === 'EN'
+                ? 'Pick a design, paste the job URL, Stella writes the cover letter, polishes the CV and preps the interview. Export to PDF and Word.'
+                : 'Design wählen, Stellen-URL einfügen, Stella schreibt das Anschreiben, optimiert den Lebenslauf und bereitet das Interview vor. Als PDF und Word exportierbar.'}
+            </p>
+            <ul className="space-y-2.5 mb-8">
+              {[
+                language === 'FR' ? ['6 designs originaux + ton design personnalisé', 'Import par URL · Yousty, jobs.ch, page carrière', 'Réutilise ton CV téléchargé automatiquement', 'Export PDF et Word, prêt à envoyer']
+                : language === 'IT' ? ['6 design originali + il tuo design personalizzato', 'Import via URL · Yousty, jobs.ch, pagina carriere', 'Riusa il tuo CV caricato automaticamente', 'Esporta PDF e Word, pronto da inviare']
+                : language === 'EN' ? ['6 original designs + your own custom design', 'URL import · Yousty, jobs.ch, careers pages', 'Reuses your uploaded CV automatically', 'PDF & Word export, ready to send']
+                : ['6 originale Designs + dein eigenes Custom-Design', 'URL-Import · Yousty, jobs.ch, Karriereseiten', 'Nutzt deinen hochgeladenen Lebenslauf automatisch', 'PDF- und Word-Export, sofort versandbereit']
+              ][0].map((b, i) => (
+                <li key={i} className="flex gap-2.5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light">
+                  <CheckCircle2 size={16} className="shrink-0 text-[#004225] dark:text-[#00A854] mt-0.5" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={() => {
+                if (user) {
+                  const tool = tools.find((tl: any) => tl.id === 'bewerbungs-gen') || null;
+                  if (tool) setActiveTool(tool);
+                } else {
+                  setAuthTab('register');
+                  setIsAuthModalOpen(true);
+                }
+              }}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+            >
+              {language === 'FR' ? 'Ouvrir le générateur' : language === 'IT' ? 'Apri il generatore' : language === 'EN' ? 'Open the generator' : 'Generator öffnen'}
+              <ArrowRight size={14} />
+            </button>
+          </div>
+        </div>
+      </section>
+      )}
+
+      {/* --- TRACKER SHOWCASE --- */}
+      {(!user || activeView === 'dashboard') && (
+      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
