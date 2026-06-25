@@ -8147,19 +8147,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
                 {language === 'FR' ? 'Aperçu' : language === 'IT' ? 'Anteprima' : language === 'EN' ? 'Preview' : 'Vorschau'}
               </div>
-              <div className="aspect-[1/1.414] bg-white border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-black/40 overflow-hidden">
-                {/* Sidebar layout, brand-green accent — matches the "Modern" design.
-                    The masculine generic 'Marketing Manager' (no -in) is the
-                    safer default for an unknown signed-in user — works for
-                    every gender in Swiss formal writing. */}
-                <div className="flex h-full text-[#26261F]">
+              {/* Drop the fixed 1:1.414 A4 ratio — it forced 200-300px of
+                  white space below the cover letter because the green
+                  sidebar (photo + skills + languages) is the tall side. Now
+                  the card height = max(left, right) and the Beilagen footer
+                  on the right is pushed to the bottom via mt-auto, so both
+                  columns end together. */}
+              <div className="bg-white border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-black/40 overflow-hidden">
+                <div className="flex text-[#26261F]">
                   <div className="w-[34%] bg-[#004225] text-white p-4 sm:p-5 flex flex-col">
-                    {/* Photo placeholder. Dashed outline communicates 'drop
-                        your photo here' without forcing visitors to look at a
-                        stranger's face. The actual generator lets users pick
-                        their own. */}
-                    <div className="aspect-[3/4] w-full bg-white/5 border border-dashed border-white/35 rounded-sm flex flex-col items-center justify-center mb-3 text-white/70">
-                      <UserIcon size={28} strokeWidth={1.25} />
+                    <div className="aspect-[4/5] w-full bg-white/5 border border-dashed border-white/35 rounded-sm flex flex-col items-center justify-center mb-3 text-white/70">
+                      <UserIcon size={26} strokeWidth={1.25} />
                       <p className="mt-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-[1.5px]">Foto</p>
                     </div>
                     <p className="font-serif text-[14px] sm:text-[16px] font-bold leading-tight">{previewIdentity.name}</p>
@@ -8186,7 +8184,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <p>FR · C1 · EN · C1</p>
                     </div>
                   </div>
-                  <div className="flex-1 p-4 sm:p-5 font-serif">
+                  <div className="flex-1 p-4 sm:p-5 font-serif flex flex-col">
                     <p className="text-[8px] sm:text-[9.5px] text-[#6B6B66]">14. Mai 2026</p>
                     <p className="text-[10px] sm:text-[11.5px] font-bold text-[#004225] mt-2 mb-2.5 leading-tight">
                       {language === 'FR' ? 'Candidature au poste de Marketing Manager · Nestlé'
@@ -8239,8 +8237,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
                     </p>
                     <p className="text-[9px] sm:text-[10.5px] font-bold">{previewIdentity.name}</p>
-                    {/* Beilagen footer — anchors the dossier idea visually */}
-                    <div className="mt-3 pt-2 border-t border-[#26261F]/10 text-[6.5px] sm:text-[7.5px] text-[#6B6B66] leading-[1.6]">
+                    {/* Beilagen footer — pushed to the bottom so both columns
+                        end at the same line, no dangling whitespace below. */}
+                    <div className="mt-auto pt-3 border-t border-[#26261F]/10 text-[6.5px] sm:text-[7.5px] text-[#6B6B66] leading-[1.6]">
                       <p className="font-bold uppercase tracking-[1.5px] mb-0.5">
                         {language === 'FR' ? 'Annexes' : language === 'IT' ? 'Allegati' : language === 'EN' ? 'Enclosures' : 'Beilagen'}
                       </p>
