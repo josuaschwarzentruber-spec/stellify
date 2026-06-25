@@ -8027,7 +8027,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {language === 'FR' ? 'Candidature : Marketing Manager · UBS'
                     : language === 'IT' ? 'Candidatura: Marketing Manager · UBS'
                     : language === 'EN' ? 'Application: Marketing Manager · UBS'
-                    : 'Bewerbung als Marketing Managerin · UBS'}
+                    : 'Bewerbung als Marketing Manager · UBS'}
                 </p>
                 <p className="text-[12px] text-[#1A1A18] dark:text-[#EBEBEB] mb-3">
                   {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
@@ -8148,39 +8148,56 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {language === 'FR' ? 'Aperçu' : language === 'IT' ? 'Anteprima' : language === 'EN' ? 'Preview' : 'Vorschau'}
               </div>
               <div className="aspect-[1/1.414] bg-white border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-black/40 overflow-hidden">
-                {/* Sidebar layout, brand-green accent — matches the "Modern" design */}
+                {/* Sidebar layout, brand-green accent — matches the "Modern" design.
+                    The masculine generic 'Marketing Manager' (no -in) is the
+                    safer default for an unknown signed-in user — works for
+                    every gender in Swiss formal writing. */}
                 <div className="flex h-full text-[#26261F]">
-                  <div className="w-[32%] bg-[#004225] text-white p-4 sm:p-5 flex flex-col">
-                    <p className="font-serif text-[15px] sm:text-[18px] font-bold leading-tight">{previewIdentity.name}</p>
-                    <p className="text-[8.5px] sm:text-[10px] opacity-75 mt-1">
-                      {language === 'FR' ? 'Marketing Manager' : language === 'IT' ? 'Marketing Manager' : language === 'EN' ? 'Marketing Manager' : 'Marketing Managerin'}
-                    </p>
-                    <div className="border-t border-white/25 mt-3.5 pt-3 text-[8px] sm:text-[9px] leading-[1.8] opacity-90 space-y-0.5">
+                  <div className="w-[34%] bg-[#004225] text-white p-4 sm:p-5 flex flex-col">
+                    {/* Photo placeholder. Dashed outline communicates 'drop
+                        your photo here' without forcing visitors to look at a
+                        stranger's face. The actual generator lets users pick
+                        their own. */}
+                    <div className="aspect-[3/4] w-full bg-white/5 border border-dashed border-white/35 rounded-sm flex flex-col items-center justify-center mb-3 text-white/70">
+                      <UserIcon size={28} strokeWidth={1.25} />
+                      <p className="mt-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-[1.5px]">Foto</p>
+                    </div>
+                    <p className="font-serif text-[14px] sm:text-[16px] font-bold leading-tight">{previewIdentity.name}</p>
+                    <p className="text-[8px] sm:text-[9.5px] opacity-75 mt-0.5">Marketing Manager</p>
+                    <div className="border-t border-white/25 mt-3 pt-2.5 text-[7.5px] sm:text-[9px] leading-[1.8] opacity-90 space-y-0.5">
                       <p>Bahnhofstrasse 12</p>
                       <p>8001 Zürich</p>
                       <p>+41 79 123 45 67</p>
                       <p className="break-all">{previewIdentity.emailMask}</p>
                     </div>
-                    <div className="mt-5 text-[8px] sm:text-[9px] leading-[1.7] opacity-85">
-                      <p className="font-bold uppercase tracking-[1.5px] text-[7.5px] sm:text-[8.5px] opacity-100 mb-1.5">Skills</p>
+                    <div className="mt-3.5 text-[7.5px] sm:text-[9px] leading-[1.7] opacity-85">
+                      <p className="font-bold uppercase tracking-[1.5px] text-[7px] sm:text-[8.5px] opacity-100 mb-1.5">
+                        {language === 'FR' ? 'Compétences' : language === 'IT' ? 'Competenze' : language === 'EN' ? 'Skills' : 'Skills'}
+                      </p>
                       <p>Brand Strategy</p>
                       <p>CRM · Social Media</p>
                       <p>Analytics · A/B-Tests</p>
-                      <p className="mt-2">DE · FR · EN</p>
+                    </div>
+                    <div className="mt-3 text-[7.5px] sm:text-[9px] leading-[1.7] opacity-85">
+                      <p className="font-bold uppercase tracking-[1.5px] text-[7px] sm:text-[8.5px] opacity-100 mb-1.5">
+                        {language === 'FR' ? 'Langues' : language === 'IT' ? 'Lingue' : language === 'EN' ? 'Languages' : 'Sprachen'}
+                      </p>
+                      <p>DE · {language === 'FR' ? 'Langue maternelle' : language === 'IT' ? 'Madrelingua' : language === 'EN' ? 'Native' : 'Muttersprache'}</p>
+                      <p>FR · C1 · EN · C1</p>
                     </div>
                   </div>
-                  <div className="flex-1 p-4 sm:p-6 font-serif">
-                    <p className="text-[8.5px] sm:text-[10px] text-[#6B6B66]">14. Mai 2026</p>
-                    <p className="text-[10.5px] sm:text-[12px] font-bold text-[#004225] mt-2 mb-3 leading-tight">
+                  <div className="flex-1 p-4 sm:p-5 font-serif">
+                    <p className="text-[8px] sm:text-[9.5px] text-[#6B6B66]">14. Mai 2026</p>
+                    <p className="text-[10px] sm:text-[11.5px] font-bold text-[#004225] mt-2 mb-2.5 leading-tight">
                       {language === 'FR' ? 'Candidature au poste de Marketing Manager · Nestlé'
                         : language === 'IT' ? 'Candidatura come Marketing Manager · Nestlé'
                         : language === 'EN' ? 'Application: Marketing Manager · Nestlé'
-                        : 'Bewerbung als Marketing Managerin · Nestlé'}
+                        : 'Bewerbung als Marketing Manager · Nestlé'}
                     </p>
-                    <p className="text-[9.5px] sm:text-[11px] mb-2.5">
+                    <p className="text-[9px] sm:text-[10.5px] mb-2">
                       {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren'}
                     </p>
-                    <div className="text-[8.5px] sm:text-[10px] leading-[1.65] text-[#26261F] space-y-2">
+                    <div className="text-[8px] sm:text-[9.5px] leading-[1.6] text-[#26261F] space-y-1.5">
                       <p>
                         {language === 'FR'
                           ? 'Avec un grand intérêt, je postule pour le poste de Marketing Manager chez Nestlé. Votre approche de durabilité et de marques locales correspond exactement à ce que je veux faire avancer.'
@@ -8188,7 +8205,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           ? "Con grande interesse mi candido per la posizione di Marketing Manager presso Nestlé. Il vostro approccio alla sostenibilità e ai marchi locali è esattamente ciò che voglio promuovere."
                           : language === 'EN'
                           ? 'I am applying with great enthusiasm for the position of Marketing Manager at Nestlé. Your approach to sustainability and local brands is exactly the direction I want to help drive forward.'
-                          : 'Mit grossem Interesse bewerbe ich mich für die Position als Marketing Managerin bei Nestlé. Ihre Strategie für nachhaltige Marken und den Schweizer Markt entspricht exakt dem, was ich vorantreiben möchte.'}
+                          : 'Mit grossem Interesse bewerbe ich mich für die Position als Marketing Manager bei Nestlé. Ihre Strategie für nachhaltige Marken und den Schweizer Markt entspricht exakt dem, was ich vorantreiben möchte.'}
                       </p>
                       <p>
                         {language === 'FR'
@@ -8201,18 +8218,39 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </p>
                       <p>
                         {language === 'FR'
+                          ? "Nestlé m'attire pour la combinaison entre racines suisses et portée internationale : un environnement où les décisions locales déterminent la voix d'une marque mondiale. C'est exactement ce dont je veux assumer la responsabilité."
+                          : language === 'IT'
+                          ? "Nestlé mi attrae per la combinazione tra radici svizzere e portata internazionale: un ambiente in cui le decisioni locali plasmano la voce di un marchio globale. È esattamente ciò di cui voglio assumermi la responsabilità."
+                          : language === 'EN'
+                          ? 'What draws me to Nestlé is the blend of Swiss roots and global reach — an environment where local decisions shape the voice of a worldwide brand. That is exactly the responsibility I want to take on.'
+                          : 'An Nestlé reizt mich die Kombination aus Schweizer Wurzeln und globaler Reichweite – ein Umfeld, in dem lokale Entscheidungen die Stimme einer weltweit gehörten Marke prägen. Genau diese Verantwortung möchte ich übernehmen.'}
+                      </p>
+                      <p>
+                        {language === 'FR'
                           ? "Ma combinaison entre rigueur analytique, trilinguisme (DE/FR/EN) et expérience des campagnes DACH correspond aux exigences de votre offre. Je me réjouis d'en discuter en personne."
                           : language === 'IT'
-                          ? "La mia combinazione di rigore analitico, trilinguismo (DE/FR/EN) ed esperienza nelle campagne DACH corrisponde ai vostri requisiti. Sarei lieta di approfondire in un colloquio personale."
+                          ? "La mia combinazione di rigore analitico, trilinguismo (DE/FR/EN) ed esperienza nelle campagne DACH corrisponde ai vostri requisiti. Sarei lieto di approfondire in un colloquio personale."
                           : language === 'EN'
                           ? 'My mix of analytical rigour, trilingual fluency (DE/FR/EN) and DACH campaign experience fits your requirements. I would welcome the chance to discuss this in person.'
                           : 'Meine Kombination aus analytischer Stärke, Dreisprachigkeit (DE/FR/EN) und Erfahrung mit DACH-Kampagnen passt zu Ihren Anforderungen. Auf ein persönliches Gespräch freue ich mich.'}
                       </p>
                     </div>
-                    <p className="text-[9.5px] sm:text-[11px] mt-3 mb-1">
+                    <p className="text-[9px] sm:text-[10.5px] mt-2.5 mb-0.5">
                       {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
                     </p>
-                    <p className="text-[9.5px] sm:text-[11px] font-bold">{previewIdentity.name}</p>
+                    <p className="text-[9px] sm:text-[10.5px] font-bold">{previewIdentity.name}</p>
+                    {/* Beilagen footer — anchors the dossier idea visually */}
+                    <div className="mt-3 pt-2 border-t border-[#26261F]/10 text-[6.5px] sm:text-[7.5px] text-[#6B6B66] leading-[1.6]">
+                      <p className="font-bold uppercase tracking-[1.5px] mb-0.5">
+                        {language === 'FR' ? 'Annexes' : language === 'IT' ? 'Allegati' : language === 'EN' ? 'Enclosures' : 'Beilagen'}
+                      </p>
+                      <p>
+                        {language === 'FR' ? 'CV · Certificats de travail · Diplômes · Référence'
+                          : language === 'IT' ? 'CV · Certificati di lavoro · Diplomi · Referenze'
+                          : language === 'EN' ? 'CV · References · Diplomas · Recommendation'
+                          : 'Lebenslauf · Arbeitszeugnisse · Diplome · Referenzen'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -8272,6 +8310,53 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {language === 'FR' ? 'Ouvrir le générateur' : language === 'IT' ? 'Apri il generatore' : language === 'EN' ? 'Open the generator' : 'Generator öffnen'}
               <ArrowRight size={14} />
             </button>
+
+            {/* Complete Swiss application-dossier checklist. Pflicht /
+                Häufig verlangt / Optional so visitors know exactly what's
+                covered. Foto is flagged as optional per Swiss best practice. */}
+            {(() => {
+              const groups = language === 'FR' ? [
+                { title: 'Obligatoire', tone: 'primary', items: ['CV (données personnelles, expérience, formation, langues, IT)', 'Lettre de motivation (pourquoi toi, pourquoi cette entreprise)'] },
+                { title: 'Souvent demandé', tone: 'neutral', items: ['Certificats de travail (actuel + précédents)', 'Diplômes & certificats (CFC, études, CAS/MAS)'] },
+                { title: 'Optionnel', tone: 'muted', items: ['Photo professionnelle (peut être insérée librement)', 'Références (2–3 personnes ou « sur demande »)', 'Portfolio (design, IT, marketing, gestion de projet)'] },
+              ] : language === 'IT' ? [
+                { title: 'Obbligatorio', tone: 'primary', items: ['CV (dati personali, esperienza, formazione, lingue, IT)', 'Lettera di motivazione (perché te, perché questa azienda)'] },
+                { title: 'Spesso richiesto', tone: 'neutral', items: ['Certificati di lavoro (attuale + precedenti)', 'Diplomi & certificati (AFC, studi, CAS/MAS)'] },
+                { title: 'Opzionale', tone: 'muted', items: ['Foto professionale (inseribile liberamente)', 'Referenze (2–3 persone o « su richiesta »)', 'Portfolio (design, IT, marketing, project management)'] },
+              ] : language === 'EN' ? [
+                { title: 'Required', tone: 'primary', items: ['CV (personal info, experience, education, languages, IT)', 'Cover letter (why you, why this company)'] },
+                { title: 'Often expected', tone: 'neutral', items: ['Work references (current + previous)', 'Diplomas & certificates (apprenticeship, degree, CAS/MAS)'] },
+                { title: 'Optional', tone: 'muted', items: ['Professional photo (you can drop yours in)', 'Personal references (2–3 contacts or "on request")', 'Portfolio (design, IT, marketing, project management)'] },
+              ] : [
+                { title: 'Pflicht', tone: 'primary', items: ['Lebenslauf (Persönliches, Erfahrung, Ausbildung, Sprachen, IT)', 'Motivationsschreiben (warum du, warum diese Firma)'] },
+                { title: 'Häufig verlangt', tone: 'neutral', items: ['Arbeitszeugnisse (aktuell + frühere)', 'Diplome & Zertifikate (Berufsabschluss, Studium, CAS/MAS)'] },
+                { title: 'Optional', tone: 'muted', items: ['Foto (kannst du ganz einfach selbst einfügen)', 'Referenzen (2–3 Personen oder „auf Anfrage")', 'Portfolio (Design, IT, Marketing, Projektleitung)'] },
+              ];
+              const heading = language === 'FR' ? 'Dossier complet — tout ce que la candidature suisse exige'
+                : language === 'IT' ? 'Dossier completo — tutto ciò che la candidatura svizzera richiede'
+                : language === 'EN' ? 'Complete dossier — everything a Swiss application needs'
+                : 'Komplettes Dossier — alles was eine Schweizer Bewerbung braucht';
+              return (
+                <div className="mt-10 max-w-lg">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854] mb-3">{heading}</p>
+                  <div className="space-y-3.5">
+                    {groups.map((g, i) => (
+                      <div key={i} className="border-l-2 pl-3.5" style={{ borderLeftColor: g.tone === 'primary' ? '#004225' : g.tone === 'neutral' ? 'rgba(0,66,37,0.45)' : 'rgba(0,66,37,0.22)' }}>
+                        <p className={`text-[10px] font-bold uppercase tracking-[0.15em] mb-1 ${g.tone === 'primary' ? 'text-[#004225] dark:text-[#00A854]' : g.tone === 'neutral' ? 'text-[#4A4A45] dark:text-[#9A9A94]' : 'text-[#6B6B66] dark:text-[#7A7A75]'}`}>{g.title}</p>
+                        <ul className="space-y-1">
+                          {g.items.map((it, j) => (
+                            <li key={j} className="flex gap-2 text-[12px] text-[#1A1A18] dark:text-[#EBEBEB] font-light leading-snug">
+                              <CheckCircle2 size={13} className="shrink-0 mt-0.5 text-[#004225] dark:text-[#00A854]" />
+                              <span>{it}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </section>
