@@ -8160,7 +8160,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <UserIcon size={26} strokeWidth={1.25} />
                       <p className="mt-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-[1.5px]">Foto</p>
                     </div>
-                    <p className="font-serif text-[14px] sm:text-[16px] font-bold leading-tight">{previewIdentity.name}</p>
+                    <p className="font-serif text-[13px] sm:text-[15px] font-bold leading-tight break-words hyphens-auto">{previewIdentity.name}</p>
                     <p className="text-[8px] sm:text-[9.5px] opacity-75 mt-0.5">Marketing Manager</p>
                     <div className="border-t border-white/25 mt-3 pt-2.5 text-[7.5px] sm:text-[9px] leading-[1.8] opacity-90 space-y-0.5">
                       <p>Bahnhofstrasse 12</p>
