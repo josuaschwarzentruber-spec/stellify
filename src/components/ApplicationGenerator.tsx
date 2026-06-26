@@ -278,14 +278,15 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
 
   /** Photo helper — rendered as a fixed-width img so html2canvas captures
       it cleanly. Returns null when no photo is set, so the existing
-      layouts keep their photo-less behaviour. */
+      layouts keep their photo-less behaviour. The photo is always a
+      same-origin data: URL, so NO crossOrigin attribute — setting it
+      breaks rendering + html2canvas capture in Safari. */
   const Photo = ({ size = 88, rounded = false, border }: { size?: number; rounded?: boolean; border?: string }) => {
     if (!form.photo) return null;
     return (
       <img
         src={form.photo}
         alt=""
-        crossOrigin="anonymous"
         style={{
           width: size,
           height: Math.round(size * 1.25),
@@ -328,7 +329,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
       <div style={{ display: 'flex', minHeight: '100%', background: '#fff' }}>
         <div style={{ width: '32%', background: a, color: '#fff', padding: '28px 18px' }}>
           {form.photo && <div style={{ marginBottom: 14 }}><Photo size={110} border="1px solid rgba(255,255,255,.2)" /></div>}
-          <p style={{ fontFamily: headFont, fontSize: 17, fontWeight: 700, lineHeight: 1.2, marginBottom: 4 }}>{fullName}</p>
+          <p style={{ fontFamily: headFont, fontSize: 17, fontWeight: 700, lineHeight: 1.2, marginBottom: 4, overflowWrap: 'break-word', hyphens: 'auto' }}>{fullName}</p>
           {form.currentRole && <p style={{ fontSize: 8.5, opacity: 0.75, marginBottom: 16 }}>{form.currentRole}</p>}
           <div style={{ borderTop: '1px solid rgba(255,255,255,.25)', paddingTop: 12, fontSize: 8.5, lineHeight: 1.8, opacity: 0.92 }}>
             {contactBits.map((b, i) => <p key={i}>{b}</p>)}
@@ -581,7 +582,9 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   const loadExample = () => {
     const sample: ApplicationForm = {
       firstName: (form.firstName || profile?.firstName || 'Anna').trim(),
-      lastName: form.lastName || (profile?.firstName ? '' : 'Müller'),
+      // Always a non-empty last name: an empty one would fail canProceed
+      // and lock the user out of re-reaching the preview from step 1.
+      lastName: form.lastName || 'Müller',
       address: form.address || 'Bahnhofstrasse 12, 8001 Zürich',
       phone: form.phone || '+41 79 123 45 67',
       email: form.email || profile?.email || 'anna.mueller@example.ch',
