@@ -47,12 +47,16 @@ export type ApplicationForm = {
   firstName: string; lastName: string; address: string; phone: string; email: string;
   currentRole: string; targetCompany: string; targetPosition: string; jobDescription: string;
   experience: string; education: string; skills: string; motivation: string; tone: string;
+  /** Optional applicant photo as a data URL. Pre-shrunk to ~360px wide
+      to keep payload tiny and PDF export crisp without blowing up size. */
+  photo?: string;
 };
 
 const EMPTY_FORM: ApplicationForm = {
   firstName: '', lastName: '', address: '', phone: '', email: '',
   currentRole: '', targetCompany: '', targetPosition: '', jobDescription: '',
   experience: '', education: '', skills: '', motivation: '', tone: '',
+  photo: '',
 };
 
 export type GeneratedContent = {
@@ -109,6 +113,8 @@ const STR: Record<string, Record<string, string>> = {
     use_cv_label: 'Meinen hochgeladenen Lebenslauf verwenden', use_cv_hint: 'Stella nutzt deinen Lebenslauf für Erfahrung, Ausbildung und Skills.', no_cv_hint: 'Noch kein Lebenslauf hochgeladen. Klicke unten, um einen hinzuzufügen – oder fülle die Felder manuell aus.',
     badge_new: 'Neu',
     cv_upload_btn: 'Lebenslauf hochladen', cv_uploading: 'Lade …', cv_upload_ok: 'Lebenslauf importiert.',
+    photo_title: 'Foto', photo_hint: 'Optional. Quadratisch oder Hochformat, JPG/PNG.', photo_upload: 'Foto hochladen', photo_replace: 'Foto ändern', photo_remove: 'Entfernen',
+    try_example: 'Mit Beispiel ausprobieren', try_example_sub: 'Beispiel-Bewerbung mit realistischen Schweizer Daten — direkt zur Vorschau.',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -154,6 +160,8 @@ const STR: Record<string, Record<string, string>> = {
     use_cv_label: 'Utiliser mon CV téléchargé', use_cv_hint: 'Stella utilise ton CV pour expérience, formation et compétences.', no_cv_hint: 'Aucun CV téléchargé. Clique ci-dessous pour en ajouter un – ou remplis les champs manuellement.',
     badge_new: 'Nouveau',
     cv_upload_btn: 'Téléverser un CV', cv_uploading: 'Chargement …', cv_upload_ok: 'CV importé.',
+    photo_title: 'Photo', photo_hint: 'Optionnel. Carré ou portrait, JPG/PNG.', photo_upload: 'Téléverser une photo', photo_replace: 'Changer la photo', photo_remove: 'Supprimer',
+    try_example: 'Essayer avec un exemple', try_example_sub: 'Candidature exemple avec des données suisses réalistes — directement vers l\'aperçu.',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -199,6 +207,8 @@ const STR: Record<string, Record<string, string>> = {
     use_cv_label: 'Usa il mio CV caricato', use_cv_hint: 'Stella usa il tuo CV per esperienza, formazione e competenze.', no_cv_hint: 'Nessun CV caricato. Clicca qui sotto per aggiungerne uno – oppure compila i campi manualmente.',
     badge_new: 'Nuovo',
     cv_upload_btn: 'Carica CV', cv_uploading: 'Caricamento …', cv_upload_ok: 'CV importato.',
+    photo_title: 'Foto', photo_hint: 'Opzionale. Quadrato o verticale, JPG/PNG.', photo_upload: 'Carica foto', photo_replace: 'Cambia foto', photo_remove: 'Rimuovi',
+    try_example: 'Prova con un esempio', try_example_sub: 'Candidatura di esempio con dati svizzeri realistici — direttamente all\'anteprima.',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -244,6 +254,8 @@ const STR: Record<string, Record<string, string>> = {
     use_cv_label: 'Use my uploaded CV', use_cv_hint: 'Stella uses your CV for experience, education and skills.', no_cv_hint: 'No CV uploaded yet. Click below to add one – or fill in the fields manually.',
     badge_new: 'New',
     cv_upload_btn: 'Upload CV', cv_uploading: 'Uploading …', cv_upload_ok: 'CV imported.',
+    photo_title: 'Photo', photo_hint: 'Optional. Square or portrait, JPG/PNG.', photo_upload: 'Upload photo', photo_replace: 'Replace photo', photo_remove: 'Remove',
+    try_example: 'Try with example', try_example_sub: 'Sample application with realistic Swiss data — straight to the preview.',
   },
 };
 
@@ -263,6 +275,28 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   const contactBits = [form.address, form.phone, form.email].filter(Boolean);
   const bodyText = generatedText || form.motivation || s.motivation_placeholder;
   const today = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  /** Photo helper — rendered as a fixed-width img so html2canvas captures
+      it cleanly. Returns null when no photo is set, so the existing
+      layouts keep their photo-less behaviour. */
+  const Photo = ({ size = 88, rounded = false, border }: { size?: number; rounded?: boolean; border?: string }) => {
+    if (!form.photo) return null;
+    return (
+      <img
+        src={form.photo}
+        alt=""
+        crossOrigin="anonymous"
+        style={{
+          width: size,
+          height: Math.round(size * 1.25),
+          objectFit: 'cover',
+          borderRadius: rounded ? '50%' : 2,
+          border,
+          display: 'block',
+        }}
+      />
+    );
+  };
 
   const Body = () => (
     <div style={{ fontFamily: bodyFont, fontSize: 10.5, lineHeight: 1.75, color: '#26261F' }}>
@@ -293,6 +327,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
     return (
       <div style={{ display: 'flex', minHeight: '100%', background: '#fff' }}>
         <div style={{ width: '32%', background: a, color: '#fff', padding: '28px 18px' }}>
+          {form.photo && <div style={{ marginBottom: 14 }}><Photo size={110} border="1px solid rgba(255,255,255,.2)" /></div>}
           <p style={{ fontFamily: headFont, fontSize: 17, fontWeight: 700, lineHeight: 1.2, marginBottom: 4 }}>{fullName}</p>
           {form.currentRole && <p style={{ fontSize: 8.5, opacity: 0.75, marginBottom: 16 }}>{form.currentRole}</p>}
           <div style={{ borderTop: '1px solid rgba(255,255,255,.25)', paddingTop: 12, fontSize: 8.5, lineHeight: 1.8, opacity: 0.92 }}>
@@ -308,10 +343,13 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   if (design.layout === 'block') {
     return (
       <div style={{ background: '#fff', minHeight: '100%' }}>
-        <div style={{ background: a, color: '#fff', padding: '26px 28px 20px' }}>
-          <p style={{ fontFamily: headFont, fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{fullName}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6, fontSize: 8.5, opacity: 0.85 }}>
-            {contactBits.map((b, i) => <span key={i}>{b}</span>)}
+        <div style={{ background: a, color: '#fff', padding: '26px 28px 20px', display: 'flex', gap: 18, alignItems: 'center' }}>
+          {form.photo && <Photo size={80} rounded border="2px solid rgba(255,255,255,.5)" />}
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: headFont, fontSize: 22, fontWeight: 800, letterSpacing: -0.5 }}>{fullName}</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6, fontSize: 8.5, opacity: 0.85 }}>
+              {contactBits.map((b, i) => <span key={i}>{b}</span>)}
+            </div>
           </div>
         </div>
         <div style={{ height: 5, background: `linear-gradient(90deg, ${a} 0%, ${a}55 60%, transparent 100%)` }} />
@@ -324,9 +362,12 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
     return (
       <div style={{ background: '#fff', minHeight: '100%' }}>
         <div style={{ borderBottom: `3px solid ${a}`, padding: '26px 28px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 12 }}>
-          <div>
-            <p style={{ fontFamily: serif, fontSize: 20, fontWeight: 600, color: a }}>{fullName}</p>
-            {form.currentRole && <p style={{ fontFamily: sans, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: 2, color: '#6B6B66', marginTop: 2 }}>{form.currentRole}</p>}
+          <div style={{ display: 'flex', gap: 14, alignItems: 'flex-end' }}>
+            {form.photo && <Photo size={70} border={`1px solid ${a}33`} />}
+            <div>
+              <p style={{ fontFamily: serif, fontSize: 20, fontWeight: 600, color: a }}>{fullName}</p>
+              {form.currentRole && <p style={{ fontFamily: sans, fontSize: 8.5, textTransform: 'uppercase', letterSpacing: 2, color: '#6B6B66', marginTop: 2 }}>{form.currentRole}</p>}
+            </div>
           </div>
           <div style={{ fontFamily: sans, fontSize: 8, textAlign: 'right', color: '#6B6B66', lineHeight: 1.7 }}>
             {contactBits.map((b, i) => <p key={i}>{b}</p>)}
@@ -341,6 +382,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
     return (
       <div style={{ background: '#fff', minHeight: '100%', padding: '30px 34px' }}>
         <div style={{ textAlign: 'center', marginBottom: 6 }}>
+          {form.photo && <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}><Photo size={72} rounded border={`1px solid ${a}55`} /></div>}
           <p style={{ fontFamily: serif, fontSize: 21, fontStyle: 'italic', color: '#1A1A18' }}>{fullName}</p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12, fontSize: 8, color: '#6B6B66', marginTop: 4, fontFamily: sans }}>
             {contactBits.map((b, i) => <span key={i}>{b}</span>)}
@@ -353,6 +395,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
     );
   }
 
+  /* Minimal layout intentionally omits the photo — minimalism by design. */
   if (design.layout === 'minimal') {
     return (
       <div style={{ background: '#fff', minHeight: '100%', padding: '34px 36px' }}>
@@ -367,6 +410,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   return (
     <div style={{ background: '#fff', minHeight: '100%', padding: '30px 32px' }}>
       <div style={{ textAlign: 'center', borderBottom: `1px solid ${a}33`, paddingBottom: 14, marginBottom: 20 }}>
+        {form.photo && <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 10 }}><Photo size={78} rounded border={`1px solid ${a}33`} /></div>}
         <p style={{ fontFamily: serif, fontSize: 20, fontWeight: 600, color: '#1A1A18' }}>{fullName}</p>
         <p style={{ fontFamily: serif, fontSize: 8.5, color: '#6B6B66', marginTop: 3 }}>{contactBits.join(' · ')}</p>
       </div>
@@ -461,6 +505,7 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   const exportRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const cvFileInputRef = useRef<HTMLInputElement>(null);
+  const photoFileInputRef = useRef<HTMLInputElement>(null);
   const [jobUrl, setJobUrl] = useState('');
   const [isFetchingJob, setIsFetchingJob] = useState(false);
   const [useCv, setUseCv] = useState(true);
@@ -489,6 +534,71 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   };
 
   const openCvFilePicker = () => cvFileInputRef.current?.click();
+
+  /** Reads the picked image, downscales it to max 360 px wide (keeping
+      aspect ratio), encodes as a JPEG data URL and stores in form.photo.
+      Downscaling keeps the form-state payload small and prevents jspdf
+      from choking on 10 MP phone photos. */
+  const handlePhotoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { showToast(s.gen_error, 'error'); return; }
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const i = new Image();
+        i.onload = () => resolve(i);
+        i.onerror = reject;
+        i.src = dataUrl;
+      });
+      const maxW = 360;
+      const scale = Math.min(1, maxW / img.naturalWidth);
+      const w = Math.round(img.naturalWidth * scale);
+      const h = Math.round(img.naturalHeight * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('canvas');
+      ctx.drawImage(img, 0, 0, w, h);
+      const out = canvas.toDataURL('image/jpeg', 0.88);
+      setForm(prev => ({ ...prev, photo: out }));
+    } catch {
+      showToast(s.gen_error, 'error');
+    }
+  };
+  const openPhotoFilePicker = () => photoFileInputRef.current?.click();
+
+  /** Loads a fully filled sample application (Marketing Manager · Nestlé)
+      and jumps straight to the preview step. Lets visitors and new users
+      see what a finished dossier looks like in one click, without typing
+      anything. The current design pick is preserved. */
+  const loadExample = () => {
+    const sample: ApplicationForm = {
+      firstName: (form.firstName || profile?.firstName || 'Anna').trim(),
+      lastName: form.lastName || (profile?.firstName ? '' : 'Müller'),
+      address: form.address || 'Bahnhofstrasse 12, 8001 Zürich',
+      phone: form.phone || '+41 79 123 45 67',
+      email: form.email || profile?.email || 'anna.mueller@example.ch',
+      currentRole: form.currentRole || 'Brand Strategist',
+      targetCompany: 'Nestlé Suisse SA',
+      targetPosition: 'Marketing Manager',
+      jobDescription: 'Marketing Manager (m/w/d), Vevey. Verantwortung für die Markenführung im DACH-Markt, Budget CHF 1–2 Mio., Erfahrung mit nachhaltigen FMCG-Marken erwünscht. Sehr gute Deutsch- und Französischkenntnisse Voraussetzung.',
+      experience: 'Senior Brand Manager bei Schweizer FMCG-Player (2021–heute): Markenführung mit Budget CHF 1,2 Mio., +28% Brand Awareness, zwei Produkt-Launches DACH.\nBrand Manager bei Westschweizer Konsumgüter-Marke (2018–2021): Aufbau Social-Media-Strategie, CRM-Programm mit 80k aktiven Kunden.',
+      education: 'MSc Marketing & International Management, Universität St. Gallen (HSG).\nBSc Betriebswirtschaft, ZHAW Winterthur.\nCAS Digital Marketing, HWZ Zürich.',
+      skills: 'Brand Strategy · CRM · Social Media · Performance Marketing · Analytics · A/B-Testing · Stakeholder Management · Deutsch (Muttersprache) · Französisch (C1) · Englisch (C1) · IT: Excel, Power BI, Salesforce Marketing Cloud, HubSpot, Figma.',
+      motivation: 'Nestlé verbindet Schweizer Wurzeln mit globaler Reichweite. Genau in diesem Umfeld möchte ich Verantwortung für eine starke Marke übernehmen und mit datengetriebenem Marketing nachhaltiges Wachstum schaffen.',
+      tone: 'confident',
+      photo: form.photo || '',
+    };
+    setForm(sample);
+    setStep(2);
+  };
 
   // Prefill the applicant's name + email from the account once, on mount.
   // Only fills empty fields so it never overwrites the user's own edits.
@@ -797,6 +907,13 @@ ${bodyText}
         className="hidden"
         onChange={handleCvFileChange}
       />
+      <input
+        ref={photoFileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={handlePhotoFileChange}
+      />
       {/* Stepper */}
       <div className="sticky top-0 z-10 bg-[#FDFCFB]/95 dark:bg-[#1A1A18]/95 backdrop-blur-sm border-b border-black/5 dark:border-white/5 px-4 sm:px-8 py-3.5 flex items-center gap-2">
         {steps.map((label, i) => (
@@ -888,7 +1005,21 @@ ${bodyText}
                 </button>
               </div>
 
-              <div className="flex justify-end mt-8">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-8">
+                <button
+                  type="button"
+                  onClick={loadExample}
+                  className="group inline-flex items-center gap-3 px-4 py-2.5 border border-[#004225]/25 dark:border-[#00A854]/35 hover:border-[#004225] dark:hover:border-[#00A854] bg-[#004225]/[0.03] dark:bg-[#00A854]/[0.06] hover:bg-[#004225]/[0.07] dark:hover:bg-[#00A854]/[0.10] text-left transition-all rounded"
+                  title={s.try_example_sub}
+                >
+                  <span className="shrink-0 w-7 h-7 rounded-full bg-[#004225] dark:bg-[#00A854] text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Sparkles size={13} />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854]">{s.try_example}</span>
+                    <span className="hidden sm:block text-[10px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{s.try_example_sub}</span>
+                  </span>
+                </button>
                 <button onClick={() => setStep(1)} className="inline-flex items-center gap-2 px-7 py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all">
                   {s.next}<ChevronRight size={14} />
                 </button>
@@ -970,13 +1101,43 @@ ${bodyText}
 
                 <section>
                   <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_person}</p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_firstName} *</label><input className={inputCls} value={form.firstName} onChange={set('firstName')} /></div>
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_lastName} *</label><input className={inputCls} value={form.lastName} onChange={set('lastName')} /></div>
-                    <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_address}</label><input className={inputCls} value={form.address} onChange={set('address')} /></div>
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_phone}</label><input className={inputCls} type="tel" value={form.phone} onChange={set('phone')} /></div>
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_email}</label><input className={inputCls} type="email" value={form.email} onChange={set('email')} /></div>
-                    <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_currentRole}</label><input className={inputCls} value={form.currentRole} onChange={set('currentRole')} /></div>
+                  <div className="grid grid-cols-[auto,1fr] gap-4 sm:gap-5 items-start">
+                    {/* Photo column — fixed width so the form fields keep
+                        their original two-column grid below. */}
+                    <div className="flex flex-col items-center gap-1.5 w-[88px] sm:w-[110px]">
+                      <button
+                        type="button"
+                        onClick={openPhotoFilePicker}
+                        className="relative w-[88px] h-[110px] sm:w-[110px] sm:h-[138px] rounded-sm overflow-hidden bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.08] border-2 border-dashed border-[#004225]/25 dark:border-[#00A854]/30 hover:border-[#004225] dark:hover:border-[#00A854] transition-colors flex flex-col items-center justify-center text-[#004225] dark:text-[#00A854]"
+                        aria-label={form.photo ? s.photo_replace : s.photo_upload}
+                      >
+                        {form.photo ? (
+                          <img src={form.photo} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                        ) : (
+                          <>
+                            <UserSquare size={26} strokeWidth={1.25} />
+                            <span className="mt-1 text-[8.5px] font-bold uppercase tracking-[1.5px]">{s.photo_title}</span>
+                          </>
+                        )}
+                      </button>
+                      {form.photo ? (
+                        <button
+                          type="button"
+                          onClick={() => setForm(prev => ({ ...prev, photo: '' }))}
+                          className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-red-600 transition-colors"
+                        >{s.photo_remove}</button>
+                      ) : (
+                        <p className="text-[9px] text-[#9A9A94] text-center leading-tight">{s.photo_hint}</p>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1.5"><label className={labelCls}>{s.f_firstName} *</label><input className={inputCls} value={form.firstName} onChange={set('firstName')} /></div>
+                      <div className="space-y-1.5"><label className={labelCls}>{s.f_lastName} *</label><input className={inputCls} value={form.lastName} onChange={set('lastName')} /></div>
+                      <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_address}</label><input className={inputCls} value={form.address} onChange={set('address')} /></div>
+                      <div className="space-y-1.5"><label className={labelCls}>{s.f_phone}</label><input className={inputCls} type="tel" value={form.phone} onChange={set('phone')} /></div>
+                      <div className="space-y-1.5"><label className={labelCls}>{s.f_email}</label><input className={inputCls} type="email" value={form.email} onChange={set('email')} /></div>
+                      <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_currentRole}</label><input className={inputCls} value={form.currentRole} onChange={set('currentRole')} /></div>
+                    </div>
                   </div>
                 </section>
 
