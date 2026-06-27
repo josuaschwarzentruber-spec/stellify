@@ -7852,29 +7852,64 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     {t.dashboard_desc}
                   </p>
                 </header>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {tools.map((tool) => (
-                    <motion.div 
-                      key={tool.id}
-                      whileHover={{ y: -5 }}
-                      onClick={() => handleToolClick(tool.id)}
-                      className="p-6 md:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm"
-                    >
-                      <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
-                          <span className="relative z-0 flex items-center justify-center">{tool.icon}</span>
+                {/* Each tool sits next to its own example: left = the tool,
+                    right = a finished result snapshot for that tool. */}
+                <div className="space-y-5">
+                  {tools.map((tool) => {
+                    const ex = getHeaderExample(tool.id);
+                    const [context, ...lines] = ex.L;
+                    return (
+                      <motion.div
+                        key={tool.id}
+                        whileHover={{ y: -3 }}
+                        onClick={() => handleToolClick(tool.id)}
+                        className="grid sm:grid-cols-2 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm overflow-hidden"
+                      >
+                        {/* Left — the tool */}
+                        <div className="p-6 md:p-8 flex flex-col">
+                          <div className="flex justify-between items-start mb-5">
+                            <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all">
+                              {tool.icon}
+                            </div>
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
+                          </div>
+                          <h3 className="text-lg md:text-xl font-medium mb-2 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
+                          <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-5 line-clamp-3">{tool.desc}</p>
+                          <button className="mt-auto text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-2 group/btn">
+                            {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                          </button>
                         </div>
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
+                        {/* Right — that tool's example */}
+                        <div className="p-6 md:p-8 bg-[#FDFCFB] dark:bg-[#1A1A18] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col">
+                          <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] mb-3 inline-flex items-center gap-1.5">
+                            <CheckCircle2 size={11} />
+                            {language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel'}
+                          </p>
+                          <div className="flex items-center gap-3 mb-3">
+                            {ex.score != null ? (
+                              <div className="relative w-12 h-12 shrink-0">
+                                <svg viewBox="0 0 36 36" className="w-12 h-12 -rotate-90">
+                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
+                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${ex.score} 100`} strokeLinecap="round" />
+                                </svg>
+                                <span className="absolute inset-0 flex items-center justify-center text-sm font-serif text-[#004225] dark:text-[#00A854]">{ex.score}</span>
+                              </div>
+                            ) : (
+                              <div className="w-12 h-12 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/12 flex items-center justify-center text-[#004225] dark:text-[#00A854] rounded-full [&>svg]:w-5 [&>svg]:h-5">
+                                {tool.icon}
+                              </div>
+                            )}
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] leading-snug">{context}</p>
+                          </div>
+                          <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                            {lines.map((line, i) => (
+                              <li key={i} className="flex gap-2"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
+                            ))}
+                          </ul>
                         </div>
-                      </div>
-                      <h3 className="text-lg md:text-xl font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
-                      <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-6 line-clamp-3">{tool.desc}</p>
-                      <button className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn">
-                        {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                      </button>
-                    </motion.div>
-                  ))}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </div>
             )}
