@@ -1038,6 +1038,8 @@ function StellifyApp() {
   
   // Tool Modal State
   const [activeTool, setActiveTool] = useState<any | null>(null);
+  // Which tool's example is shown in the Tools-section header preview card.
+  const [headerExampleTool, setHeaderExampleTool] = useState<string>('bewerbungs-gen');
 
   // Browser tab title — "Stellify - <current page>" so the open tab is always
   // identifiable. Localised; the active tool name wins when a tool is open,
@@ -2481,12 +2483,93 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     const tool = tools.find(t => t.id === toolId);
     if (!tool) return;
 
-    setActiveView('dashboard');
+    // Don't force the underlying view to 'dashboard' — the tool opens as a
+    // fixed full-screen overlay, so changing the view only means the user
+    // lands on the dashboard (not where they were) when they close it.
+    // Leaving activeView untouched returns them exactly where they opened it.
     setActiveTool(tool);
     setToolInput({});
     setToolResult(null);
     setToolResultEditable('');
     setIsEditingToolResult(false);
+  };
+
+  /** Compact, per-tool example shown in the Tools-section header preview.
+      `score` drives the progress ring (null = no ring, just a list).
+      `L` holds localized [context-label, ...result-lines]. Kept lean —
+      one example per tool, switches when the user hovers/clicks a chip. */
+  const getHeaderExample = (id: string): { score: number | null; L: string[] } => {
+    const lang = (language === 'FR' || language === 'IT' || language === 'EN') ? language : 'DE';
+    const pick = (de: string[], fr: string[], it: string[], en: string[]) =>
+      lang === 'FR' ? fr : lang === 'IT' ? it : lang === 'EN' ? en : de;
+    const M: Record<string, { score: number | null; L: string[] }> = {
+      'bewerbungs-gen': { score: 92, L: pick(
+        ['ATS-Score · Marketing Manager · Nestlé', 'Anschreiben generiert — 4 Absätze', 'Lebenslauf optimiert · 12 Keywords getroffen', 'Fertig als PDF und Word'],
+        ['Score ATS · Marketing Manager · Nestlé', 'Lettre générée — 4 paragraphes', 'CV optimisé · 12 mots-clés', 'Prêt en PDF et Word'],
+        ['Punteggio ATS · Marketing Manager · Nestlé', 'Lettera generata — 4 paragrafi', 'CV ottimizzato · 12 parole chiave', 'Pronto in PDF e Word'],
+        ['ATS score · Marketing Manager · Nestlé', 'Cover letter generated — 4 paragraphs', 'CV optimised · 12 keywords matched', 'Ready as PDF and Word']) },
+      'cv-gen': { score: 90, L: pick(
+        ['Bewerbung · 60 Sekunden', 'Motivationsschreiben fertig', 'Lebenslauf-Highlights gesetzt', 'Schweizer Hochdeutsch, kein ß'],
+        ['Candidature · 60 secondes', 'Lettre de motivation prête', 'Points forts du CV définis', 'Allemand suisse correct'],
+        ['Candidatura · 60 secondi', 'Lettera di motivazione pronta', 'Punti forti del CV definiti', 'Tedesco svizzero corretto'],
+        ['Application · 60 seconds', 'Cover letter ready', 'CV highlights set', 'Swiss German, no ß']) },
+      'ats-sim': { score: 82, L: pick(
+        ['ATS-Check · gegen Inserat', 'Match auf 7 von 10 Begriffen', 'Format wird von SuccessFactors gelesen', 'Fehlt: SAP S/4HANA, IFRS'],
+        ['Test ATS · contre l\'annonce', 'Correspondance 7 sur 10', 'Format lu par SuccessFactors', 'Manque : SAP S/4HANA, IFRS'],
+        ['Test ATS · contro l\'annuncio', 'Corrispondenza 7 su 10', 'Formato letto da SuccessFactors', 'Manca: SAP S/4HANA, IFRS'],
+        ['ATS check · against the ad', 'Match on 7 of 10 terms', 'Read by SuccessFactors', 'Missing: SAP S/4HANA, IFRS']) },
+      'cv-analysis': { score: 76, L: pick(
+        ['Markt-Score · Banking · Zürich', 'Top-Keywords: KPI · Reporting · Excel', 'Branchen-Fit erkannt', 'Empfehlung: Power BI ergänzen'],
+        ['Score marché · Banking · Zurich', 'Mots-clés : KPI · Reporting · Excel', 'Adéquation secteur détectée', 'Conseil : ajouter Power BI'],
+        ['Punteggio mercato · Banking · Zurigo', 'Parole chiave: KPI · Reporting · Excel', 'Affinità settore rilevata', 'Consiglio: aggiungere Power BI'],
+        ['Market score · Banking · Zurich', 'Keywords: KPI · Reporting · Excel', 'Industry fit detected', 'Tip: add Power BI']) },
+      'cv-optimizer': { score: 91, L: pick(
+        ['Optimiert · Berufserfahrung', 'Aktive Verben statt Passiv', 'Erfolge quantifiziert (+18% Umsatz)', 'ATS-konform formuliert'],
+        ['Optimisé · expérience', 'Verbes actifs', 'Succès quantifiés (+18% CA)', 'Conforme ATS'],
+        ['Ottimizzato · esperienza', 'Verbi attivi', 'Successi quantificati (+18%)', 'Conforme ATS'],
+        ['Optimised · experience', 'Active verbs', 'Quantified wins (+18% revenue)', 'ATS-compliant']) },
+      'cv-premium': { score: 95, L: pick(
+        ['Premium-Rewrite · komplett', 'Layout auf Schweizer Standard', 'Datumsformate angepasst, kein ß', 'Kurzprofil neu geschrieben'],
+        ['Réécriture premium', 'Mise en page standard suisse', 'Dates adaptées', 'Profil réécrit'],
+        ['Riscrittura premium', 'Layout standard svizzero', 'Date adattate', 'Profilo riscritto'],
+        ['Premium rewrite', 'Swiss-standard layout', 'Date formats fixed', 'Summary rewritten']) },
+      'skill-gap': { score: null, L: pick(
+        ['Skill-Gap · Ziel: Senior Data Scientist', 'Power BI · in 64% der Stellen verlangt', 'SQL · Pflicht bei Konzernen', 'Englisch C1 · in 8 von 10 Inseraten'],
+        ['Écart · Senior Data Scientist', 'Power BI · 64% des postes', 'SQL · requis grands groupes', 'Anglais C1 · 8 sur 10'],
+        ['Gap · Senior Data Scientist', 'Power BI · 64% delle posizioni', 'SQL · richiesto nei gruppi', 'Inglese C1 · 8 su 10'],
+        ['Gap · Senior Data Scientist', 'Power BI · 64% of roles', 'SQL · required at large firms', 'English C1 · 8 of 10 ads']) },
+      'career-roadmap': { score: null, L: pick(
+        ['Roadmap · Ziel: Head of IT', '1. ITIL-Zertifizierung', '2. Wechsel in Teamleiter-Rolle', '3. MBA an der HSG in 2 Jahren'],
+        ['Feuille de route · Head of IT', '1. Certification ITIL', '2. Rôle de chef d\'équipe', '3. MBA HSG en 2 ans'],
+        ['Roadmap · Head of IT', '1. Certificazione ITIL', '2. Ruolo team leader', '3. MBA HSG in 2 anni'],
+        ['Roadmap · Head of IT', '1. ITIL certification', '2. Move to team lead', '3. HSG MBA in 2 years']) },
+      'interview': { score: null, L: pick(
+        ['Interview-Coach · 5 Fragen', '„Warum gerade in der Schweiz?"', 'Antwort nach STAR-Methode', 'Bewertung 0–100 mit Tipps'],
+        ['Coach entretien · 5 questions', '« Pourquoi la Suisse ? »', 'Réponse méthode STAR', 'Note 0–100 avec conseils'],
+        ['Coach colloquio · 5 domande', '« Perché la Svizzera? »', 'Risposta metodo STAR', 'Voto 0–100 con consigli'],
+        ['Interview coach · 5 questions', '"Why Switzerland?"', 'Answer via STAR method', 'Score 0–100 with tips']) },
+      'interview-live': { score: null, L: pick(
+        ['Live-Interview · Product Manager', 'Massgeschneiderte Fragen zur Stelle', 'Antwort per Text oder Mikrofon', 'Feedback zu Tonfall & Inhalt'],
+        ['Entretien live · Product Manager', 'Questions sur mesure', 'Réponse texte ou micro', 'Feedback ton & contenu'],
+        ['Colloquio live · Product Manager', 'Domande su misura', 'Risposta testo o microfono', 'Feedback tono & contenuto'],
+        ['Live interview · Product Manager', 'Tailored questions', 'Answer by text or mic', 'Feedback on tone & content']) },
+      'salary-negotiation': { score: null, L: pick(
+        ['Lohnverhandlung · Banking ZH', 'Marktwert: CHF 118\'000', '5 konkrete Argumente', '13. Monatslohn-Strategie'],
+        ['Négociation · Banking ZH', 'Valeur marché : CHF 118\'000', '5 arguments concrets', 'Stratégie 13e salaire'],
+        ['Trattativa · Banking ZH', 'Valore mercato: CHF 118\'000', '5 argomenti concreti', 'Strategia 13ª mensilità'],
+        ['Salary talk · Banking ZH', 'Market value: CHF 118,000', '5 concrete arguments', '13th-salary strategy']) },
+      'matching': { score: null, L: pick(
+        ['Passende Stellen · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance'],
+        ['Postes adaptés · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance'],
+        ['Posizioni adatte · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance'],
+        ['Matching roles · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance']) },
+      'tracker': { score: null, L: pick(
+        ['Bewerbungs-Tracker · live', '20 Bewerbungen im Überblick', 'Interview-Quote: 40%', 'Erfolgsquote: 13%'],
+        ['Suivi candidatures · live', '20 candidatures en vue', 'Taux d\'entretiens : 40%', 'Taux d\'offres : 13%'],
+        ['Tracker candidature · live', '20 candidature in vista', 'Tasso colloqui: 40%', 'Tasso offerte: 13%'],
+        ['Application tracker · live', '20 applications in view', 'Interview rate: 40%', 'Offer rate: 13%']) },
+    };
+    return M[id] || M['bewerbungs-gen'];
   };
 
   const [isSubscribing, setIsSubscribing] = useState(false);
@@ -8088,62 +8171,80 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
                 </div>
               </div>
-              {/* Live tool list — see every tool at a glance, click to open */}
+              {/* Live tool list — hover/focus to preview that tool's example
+                  on the right, click to open it. */}
               <div className="flex flex-wrap gap-2">
-                {tools.map((tool) => (
-                  <button
-                    key={tool.id}
-                    onClick={() => handleToolClick(tool.id)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 hover:border-[#004225]/40 dark:hover:border-[#00A854]/50 text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] transition-all group"
-                  >
-                    <span className="text-[#004225] dark:text-[#00A854] [&>svg]:w-3 [&>svg]:h-3">{tool.icon}</span>
-                    <span className="truncate max-w-[160px]">{tool.title}</span>
-                  </button>
-                ))}
+                {tools.map((tool) => {
+                  const active = headerExampleTool === tool.id;
+                  return (
+                    <button
+                      key={tool.id}
+                      onClick={() => handleToolClick(tool.id)}
+                      onMouseEnter={() => setHeaderExampleTool(tool.id)}
+                      onFocus={() => setHeaderExampleTool(tool.id)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 border text-[11px] font-medium transition-all ${active ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/[0.06] dark:bg-[#00A854]/[0.10] text-[#004225] dark:text-[#00A854]' : 'border-black/8 dark:border-white/8 bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] hover:border-[#004225]/40 dark:hover:border-[#00A854]/50'}`}
+                    >
+                      <span className="text-[#004225] dark:text-[#00A854] [&>svg]:w-3 [&>svg]:h-3">{tool.icon}</span>
+                      <span className="truncate max-w-[160px]">{tool.title}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Perfect example — finished application snapshot */}
-            <div className="relative">
-              <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
-                <CheckCircle2 size={10} />
-                {language === 'FR' ? 'Exemple parfait' : language === 'IT' ? 'Esempio perfetto' : language === 'EN' ? 'Perfect example' : 'Perfektes Beispiel'}
-              </div>
-              <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl p-5 sm:p-6 space-y-4">
-                <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 shrink-0">
-                    <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
-                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
-                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray="92 100" strokeLinecap="round" />
-                    </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">92</span>
+            {/* Per-tool example — reflects whichever tool chip is hovered/focused */}
+            {(() => {
+              const activeToolObj = tools.find((tl: any) => tl.id === headerExampleTool) || tools[0];
+              const ex = getHeaderExample(headerExampleTool);
+              const [context, ...lines] = ex.L;
+              return (
+                <div className="relative">
+                  <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
+                    <CheckCircle2 size={10} />
+                    {language === 'FR' ? 'Exemple parfait' : language === 'IT' ? 'Esempio perfetto' : language === 'EN' ? 'Perfect example' : 'Perfektes Beispiel'}
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{language === 'FR' ? 'Score ATS · Marketing Manager' : language === 'IT' ? 'Punteggio ATS · Marketing Manager' : language === 'EN' ? 'ATS score · Marketing Manager' : 'ATS-Score · Marketing Manager'}</p>
-                    <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Nestlé · Vevey</p>
-                  </div>
+                  <motion.div
+                    key={headerExampleTool}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl p-5 sm:p-6 space-y-4"
+                  >
+                    <div className="flex items-center gap-4">
+                      {ex.score != null ? (
+                        <div className="relative w-16 h-16 shrink-0">
+                          <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${ex.score} 100`} strokeLinecap="round" />
+                          </svg>
+                          <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">{ex.score}</span>
+                        </div>
+                      ) : (
+                        <div className="w-16 h-16 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/12 flex items-center justify-center text-[#004225] dark:text-[#00A854] [&>svg]:w-7 [&>svg]:h-7 rounded-full">
+                          {activeToolObj.icon}
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{context}</p>
+                        <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{activeToolObj.title}</p>
+                      </div>
+                    </div>
+                    <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                      {lines.map((line, i) => (
+                        <li key={i} className="flex gap-2"><CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
+                      ))}
+                    </ul>
+                    <button
+                      onClick={() => handleToolClick(headerExampleTool)}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                    >
+                      {language === 'FR' ? 'Ouvrir cet outil' : language === 'IT' ? 'Apri questo strumento' : language === 'EN' ? 'Open this tool' : 'Dieses Tool öffnen'}
+                      <ArrowRight size={13} />
+                    </button>
+                  </motion.div>
                 </div>
-                <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
-                  {(language === 'FR'
-                    ? ['Lettre de motivation générée — 4 paragraphes', 'CV optimisé · 12 mots-clés correspondants', '10 questions d\'entretien préparées', 'Prêt en PDF et Word']
-                    : language === 'IT'
-                    ? ['Lettera di motivazione generata — 4 paragrafi', 'CV ottimizzato · 12 parole chiave corrispondenti', '10 domande di colloquio preparate', 'Pronto in PDF e Word']
-                    : language === 'EN'
-                    ? ['Cover letter generated — 4 paragraphs', 'CV optimised · 12 matching keywords', '10 interview questions prepped', 'Ready as PDF and Word']
-                    : ['Anschreiben generiert — 4 Absätze', 'Lebenslauf optimiert · 12 Keywords getroffen', '10 Interviewfragen vorbereitet', 'Fertig als PDF und Word']
-                  ).map((line, i) => (
-                    <li key={i} className="flex gap-2"><CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => handleToolClick('bewerbungs-gen')}
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
-                >
-                  {language === 'FR' ? 'Créer le mien' : language === 'IT' ? 'Crea il mio' : language === 'EN' ? 'Create mine' : 'Meine erstellen'}
-                  <ArrowRight size={13} />
-                </button>
-              </div>
-            </div>
+              );
+            })()}
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
