@@ -837,6 +837,13 @@ function StellifyApp() {
   // to re-enable the launcher entry points across the app.
   const STELLA_CHAT_ENABLED = false;
 
+  // Launch promo banner. Flip `active` to false to hide it instantly.
+  // The actual discount is applied by Stripe — either auto (set the Vercel
+  // env STRIPE_LAUNCH_COUPON to a coupon id for 50% off / 3 months) or by
+  // the customer entering `code` at checkout (create a matching promo code
+  // in Stripe). Until one of those exists the banner is just messaging.
+  const LAUNCH_OFFER = { active: true, percent: 50, months: 3, code: 'LAUNCH50' };
+
   // YouTube video IDs — single source of truth for every video shown across
   // the app. Setting a value here flips the matching UI on (▶ button on the
   // landing hero, ▶ Tutorial chip on a tool, Welcome modal after sign-up).
@@ -8952,7 +8959,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               Live Payment System
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
-            
+
+            {LAUNCH_OFFER.active && (
+              <div className="mb-8 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 px-5 py-3 rounded-full bg-gradient-to-r from-[#00A854]/15 via-[#00A854]/10 to-[#00A854]/15 border border-[#00A854]/30 text-white">
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#6FCF97]">
+                  <Sparkles size={12} />
+                  {language === 'FR' ? 'Offre de lancement' : language === 'IT' ? 'Offerta di lancio' : language === 'EN' ? 'Launch offer' : 'Launch-Angebot'}
+                </span>
+                <span className="text-sm font-medium">
+                  {language === 'FR' ? `−${LAUNCH_OFFER.percent}% les ${LAUNCH_OFFER.months} premiers mois`
+                    : language === 'IT' ? `−${LAUNCH_OFFER.percent}% per i primi ${LAUNCH_OFFER.months} mesi`
+                    : language === 'EN' ? `−${LAUNCH_OFFER.percent}% for your first ${LAUNCH_OFFER.months} months`
+                    : `−${LAUNCH_OFFER.percent}% auf die ersten ${LAUNCH_OFFER.months} Monate`}
+                </span>
+                <span className="inline-flex items-center gap-1.5 text-xs text-white/70">
+                  {language === 'FR' ? 'Code' : language === 'IT' ? 'Codice' : language === 'EN' ? 'Code' : 'Code'}
+                  <span className="font-mono font-bold tracking-widest text-[#6FCF97] bg-white/5 border border-white/10 px-2 py-0.5 rounded">{LAUNCH_OFFER.code}</span>
+                </span>
+              </div>
+            )}
+
             {subscriptionError && (
               <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-left flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
