@@ -8076,12 +8076,72 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {(!user || activeView === 'dashboard') && (
       <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
-            <div className="flex items-start gap-5">
-              <span className="text-5xl lg:text-6xl font-serif text-[#004225]/15 dark:text-[#00A854]/20 leading-none select-none">01</span>
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-2">{t.tools_badge}</p>
-                <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
+          {/* Header band: left = intro + live tool list, right = one perfect
+              finished example so visitors see WHAT the tools produce before
+              scrolling the full grid. */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16">
+            <div>
+              <div className="flex items-start gap-5 mb-6">
+                <span className="text-5xl lg:text-6xl font-serif text-[#004225]/15 dark:text-[#00A854]/20 leading-none select-none">01</span>
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-2">{t.tools_badge}</p>
+                  <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
+                </div>
+              </div>
+              {/* Live tool list — see every tool at a glance, click to open */}
+              <div className="flex flex-wrap gap-2">
+                {tools.map((tool) => (
+                  <button
+                    key={tool.id}
+                    onClick={() => handleToolClick(tool.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 hover:border-[#004225]/40 dark:hover:border-[#00A854]/50 text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] transition-all group"
+                  >
+                    <span className="text-[#004225] dark:text-[#00A854] [&>svg]:w-3 [&>svg]:h-3">{tool.icon}</span>
+                    <span className="truncate max-w-[160px]">{tool.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Perfect example — finished application snapshot */}
+            <div className="relative">
+              <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
+                <CheckCircle2 size={10} />
+                {language === 'FR' ? 'Exemple parfait' : language === 'IT' ? 'Esempio perfetto' : language === 'EN' ? 'Perfect example' : 'Perfektes Beispiel'}
+              </div>
+              <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl p-5 sm:p-6 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-16 h-16 shrink-0">
+                    <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray="92 100" strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">92</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{language === 'FR' ? 'Score ATS · Marketing Manager' : language === 'IT' ? 'Punteggio ATS · Marketing Manager' : language === 'EN' ? 'ATS score · Marketing Manager' : 'ATS-Score · Marketing Manager'}</p>
+                    <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Nestlé · Vevey</p>
+                  </div>
+                </div>
+                <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                  {(language === 'FR'
+                    ? ['Lettre de motivation générée — 4 paragraphes', 'CV optimisé · 12 mots-clés correspondants', '10 questions d\'entretien préparées', 'Prêt en PDF et Word']
+                    : language === 'IT'
+                    ? ['Lettera di motivazione generata — 4 paragrafi', 'CV ottimizzato · 12 parole chiave corrispondenti', '10 domande di colloquio preparate', 'Pronto in PDF e Word']
+                    : language === 'EN'
+                    ? ['Cover letter generated — 4 paragraphs', 'CV optimised · 12 matching keywords', '10 interview questions prepped', 'Ready as PDF and Word']
+                    : ['Anschreiben generiert — 4 Absätze', 'Lebenslauf optimiert · 12 Keywords getroffen', '10 Interviewfragen vorbereitet', 'Fertig als PDF und Word']
+                  ).map((line, i) => (
+                    <li key={i} className="flex gap-2"><CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleToolClick('bewerbungs-gen')}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                >
+                  {language === 'FR' ? 'Créer le mien' : language === 'IT' ? 'Crea il mio' : language === 'EN' ? 'Create mine' : 'Meine erstellen'}
+                  <ArrowRight size={13} />
+                </button>
               </div>
             </div>
           </div>

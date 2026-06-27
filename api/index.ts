@@ -1108,6 +1108,13 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   if (!/^https?:$/.test(parsed.protocol)) return res.status(400).json({ error: 'Nur http/https erlaubt' });
   if (isPrivateHost(parsed.hostname)) return res.status(400).json({ error: 'Diese Adresse ist nicht erlaubt' });
 
+  // LinkedIn serves a login wall to non-authenticated server-side fetches
+  // (HTTP 999 or an empty shell). We still try — sometimes the public
+  // /jobs/view/ page renders — but when it fails we return a tailored hint
+  // instead of the generic "page unreachable".
+  const isLinkedIn = /(^|\.)linkedin\.com$/i.test(parsed.hostname);
+  const linkedInHint = 'LinkedIn schützt Stelleninserate teils vor automatischem Laden. Öffne die Anzeige, kopiere den Text und füge ihn unten manuell ein – oder nutze einen Yousty-/jobs.ch-Link.';
+
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12_000);
@@ -1124,14 +1131,20 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
       });
       if (!r.ok) {
         clearTimeout(timer);
-        return res.status(422).json({ error: `Seite nicht erreichbar (${r.status})`, needsManual: true });
+        return res.status(422).json({
+          error: isLinkedIn ? linkedInHint : `Seite nicht erreichbar (${r.status})`,
+          needsManual: true,
+        });
       }
       html = await r.text();
     } finally { clearTimeout(timer); }
 
     const text = htmlToText(html).slice(0, 7000);
     if (text.length < 120) {
-      return res.status(422).json({ error: 'Konnte den Stelleninhalt nicht lesen. Bitte Text manuell einfügen.', needsManual: true });
+      return res.status(422).json({
+        error: isLinkedIn ? linkedInHint : 'Konnte den Stelleninhalt nicht lesen. Bitte Text manuell einfügen.',
+        needsManual: true,
+      });
     }
 
     const { text: aiText } = await generateText({
