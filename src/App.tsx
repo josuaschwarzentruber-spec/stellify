@@ -2579,6 +2579,193 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     return M[id] || M['bewerbungs-gen'];
   };
 
+  // Display order on the Tools page — best / headline tool first, down to
+  // the supporting ones. Anything not listed falls to the end.
+  const TOOL_PRIORITY = [
+    'bewerbungs-gen', 'cv-gen', 'ats-sim', 'cv-analysis', 'cv-optimizer',
+    'cv-premium', 'interview', 'interview-live', 'salary-negotiation',
+    'skill-gap', 'matching', 'career-roadmap', 'tracker',
+  ];
+  /** Rich, practice-near visual example per tool — a miniature of what the
+      tool actually produces, with realistic Swiss data. Falls back to the
+      compact getHeaderExample list for any tool without a bespoke visual. */
+  const renderToolExample = (tool: any): React.ReactNode => {
+    const id = tool.id;
+    const exLabel = language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel';
+    const Ring = ({ score, label, sub }: { score: number; label: string; sub: string }) => (
+      <div className="flex items-center gap-4">
+        <div className="relative w-16 h-16 shrink-0">
+          <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
+            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${score} 100`} strokeLinecap="round" />
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">{score}</span>
+        </div>
+        <div className="min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{label}</p>
+          <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{sub}</p>
+        </div>
+      </div>
+    );
+    const KeyChip = ({ label, ok }: { label: string; ok: boolean }) => (
+      <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded ${ok ? 'bg-[#004225]/8 dark:bg-[#00A854]/12 text-[#004225] dark:text-[#00A854]' : 'bg-red-500/8 text-red-600 dark:text-red-400'}`}>
+        {ok ? <CheckCircle2 size={10} /> : <X size={10} />}{label}
+      </span>
+    );
+    const Bar = ({ label, pct, value }: { label: string; pct: number; value: string }) => (
+      <div>
+        <div className="flex justify-between text-[10px] mb-1"><span className="text-[#4A4A45] dark:text-[#9A9A94] font-medium">{label}</span><span className="text-[#004225] dark:text-[#00A854] font-bold">{value}</span></div>
+        <div className="h-1.5 bg-black/[0.06] dark:bg-white/[0.08] rounded-full overflow-hidden"><div className="h-full bg-[#004225] dark:bg-[#00A854] rounded-full" style={{ width: `${pct}%` }} /></div>
+      </div>
+    );
+
+    if (id === 'bewerbungs-gen' || id === 'cv-gen') {
+      return (
+        <div className="w-full bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
+          <div className="bg-[#004225] px-3 py-2 flex items-center justify-between">
+            <span className="text-white text-[10px] font-serif font-bold">{previewIdentity.name}</span>
+            <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest">Marketing Manager</span>
+          </div>
+          <div className="p-3 space-y-1.5">
+            <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
+            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">Mit grossem Interesse bewerbe ich mich für die Position … +28% Markenbekanntheit, Budget CHF 1,2 Mio., DACH-Launches.</p>
+            <div className="flex gap-1.5 pt-1">
+              <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />PDF</span>
+              <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />Word</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    if (id === 'ats-sim') {
+      return (
+        <div className="w-full space-y-3">
+          <Ring score={82} label={language === 'EN' ? 'ATS score · vs. job ad' : 'ATS-Score · gegen Inserat'} sub="7 / 10 Keywords" />
+          <div className="flex flex-wrap gap-1.5">
+            <KeyChip label="KPI" ok /><KeyChip label="Reporting" ok /><KeyChip label="Stakeholder" ok /><KeyChip label="SAP S/4HANA" ok={false} /><KeyChip label="IFRS" ok={false} />
+          </div>
+        </div>
+      );
+    }
+    if (id === 'cv-analysis') {
+      return (
+        <div className="w-full space-y-3">
+          <Ring score={76} label={language === 'EN' ? 'Market score · Banking · Zurich' : 'Markt-Score · Banking · Zürich'} sub="Business Analyst" />
+          <div className="flex flex-wrap gap-1.5"><KeyChip label="KPI" ok /><KeyChip label="Reporting" ok /><KeyChip label="Excel" ok /><KeyChip label="Power BI fehlt" ok={false} /></div>
+        </div>
+      );
+    }
+    if (id === 'cv-optimizer' || id === 'cv-premium') {
+      return (
+        <div className="w-full space-y-2.5">
+          <Ring score={id === 'cv-premium' ? 95 : 91} label={language === 'EN' ? 'Optimised' : 'Optimiert'} sub={language === 'EN' ? 'Experience section' : 'Berufserfahrung'} />
+          <div className="text-[10px] space-y-1.5">
+            <p className="text-[#9A9A94] line-through">Verantwortlich für Projekte</p>
+            <p className="flex gap-1.5 text-[#004225] dark:text-[#00A854] font-medium"><ArrowRight size={11} className="shrink-0 mt-0.5" />Leitung von 5 Projekten · Budget CHF 500k · +20% Effizienz</p>
+          </div>
+        </div>
+      );
+    }
+    if (id === 'interview' || id === 'interview-live') {
+      return (
+        <div className="w-full bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm p-3.5 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{language === 'EN' ? 'Question 1 / 5' : 'Frage 1 / 5'}</span>
+            {id === 'interview-live' && <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]"><Mic size={9} />Live</span>}
+          </div>
+          <p className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">„Erzählen Sie von einem Projekt mit einer schwierigen Entscheidung."</p>
+          <div className="pt-2 border-t border-black/8 dark:border-white/8">
+            <p className="text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-1">Stella-Tipp</p>
+            <p className="text-[9.5px] italic text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed">STAR: Situation → Aufgabe → Aktion → Resultat. Erfolg beziffern.</p>
+          </div>
+        </div>
+      );
+    }
+    if (id === 'salary-negotiation') {
+      return (
+        <div className="w-full bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm p-3.5 space-y-3">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">Median · Banking · Zürich · 5 J.</p>
+            <p className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">CHF 118'000<span className="text-[10px] text-[#9A9A94]"> /Jahr</span></p>
+          </div>
+          <div>
+            <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1"><span>CHF 95k</span><span>CHF 145k</span></div>
+            <div className="h-2 bg-black/[0.06] dark:bg-white/[0.08] rounded-full relative overflow-hidden"><div className="absolute inset-y-0 left-[15%] right-[20%] bg-[#004225] dark:bg-[#00A854] rounded-full" /></div>
+          </div>
+          <p className="text-[9.5px] text-[#4A4A45] dark:text-[#9A9A94]">+ 13. Monatslohn · 5–10% Bonus realistisch</p>
+        </div>
+      );
+    }
+    if (id === 'skill-gap') {
+      return (
+        <div className="w-full space-y-2.5">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{language === 'EN' ? 'Target: Senior Data Scientist' : 'Ziel: Senior Data Scientist'}</p>
+          <Bar label="Power BI" pct={36} value={language === 'EN' ? 'gap' : 'Lücke'} />
+          <Bar label="SQL" pct={70} value="OK" />
+          <Bar label="English C1" pct={88} value="OK" />
+        </div>
+      );
+    }
+    if (id === 'matching') {
+      return (
+        <div className="w-full space-y-2">
+          {[{ m: 92, t: 'Senior Data Analyst', c: 'UBS · Zürich' }, { m: 87, t: 'BI Lead', c: 'Swiss Re · Zürich' }, { m: 81, t: 'Reporting Manager', c: 'PostFinance · Bern' }].map((x, i) => (
+            <div key={i} className="flex items-center gap-3 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm p-2">
+              <div className="w-9 h-9 shrink-0 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center text-[#004225] dark:text-[#00A854] font-bold text-[11px]">{x.m}%</div>
+              <div className="min-w-0"><p className="text-[11px] font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{x.t}</p><p className="text-[9px] text-[#9A9A94] truncate">{x.c}</p></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    if (id === 'career-roadmap') {
+      return (
+        <div className="w-full space-y-0">
+          {[{ n: 'Heute', t: 'ITIL-Zertifizierung starten' }, { n: '6 Mt.', t: 'Wechsel in Teamleiter-Rolle' }, { n: '2 J.', t: 'MBA an der HSG · Head of IT' }].map((s, i, arr) => (
+            <div key={i} className="flex gap-3">
+              <div className="flex flex-col items-center">
+                <div className="w-6 h-6 shrink-0 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center">{i + 1}</div>
+                {i < arr.length - 1 && <div className="w-px flex-1 bg-[#004225]/25 dark:bg-[#00A854]/30 my-0.5" />}
+              </div>
+              <div className="pb-3"><p className="text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">{s.n}</p><p className="text-[11px] text-[#1A1A18] dark:text-[#FAFAF8]">{s.t}</p></div>
+            </div>
+          ))}
+        </div>
+      );
+    }
+    if (id === 'tracker') {
+      const cols = [
+        { l: language === 'EN' ? 'Applied' : 'Beworben', c: '#9A9A94', items: ['Roche', 'PostFinance'] },
+        { l: 'Interview', c: '#D4A852', items: ['Swisscom'] },
+        { l: language === 'EN' ? 'Offer' : 'Angebot', c: '#004225', items: ['Nestlé'] },
+      ];
+      return (
+        <div className="w-full grid grid-cols-3 gap-2">
+          {cols.map((col, i) => (
+            <div key={i} className="space-y-1.5">
+              <p className="text-[8px] font-bold uppercase tracking-widest" style={{ color: col.c }}>{col.l}</p>
+              {col.items.map((it, j) => (
+                <div key={j} className="bg-white dark:bg-[#2A2A26] border-l-2 px-1.5 py-1 text-[9px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] shadow-sm" style={{ borderLeftColor: col.c }}>{it}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      );
+    }
+
+    // Fallback: compact list from getHeaderExample
+    const ex = getHeaderExample(id); const [context, ...lines] = ex.L;
+    return (
+      <div className="w-full space-y-2">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{context}</p>
+        <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+          {lines.map((line, i) => <li key={i} className="flex gap-2"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>)}
+        </ul>
+        <span className="sr-only">{exLabel}</span>
+      </div>
+    );
+  };
+
   const [isSubscribing, setIsSubscribing] = useState(false);
 
   const handleSubscription = async (plan: 'pro' | 'ultimate') => {
@@ -7852,64 +8039,48 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     {t.dashboard_desc}
                   </p>
                 </header>
-                {/* Each tool sits next to its own example: left = the tool,
-                    right = a finished result snapshot for that tool. */}
+                {/* Each tool sits next to its own rich, practice-near example.
+                    Ordered best/headline tool first (TOOL_PRIORITY). */}
                 <div className="space-y-5">
-                  {tools.map((tool) => {
-                    const ex = getHeaderExample(tool.id);
-                    const [context, ...lines] = ex.L;
-                    return (
-                      <motion.div
-                        key={tool.id}
-                        whileHover={{ y: -3 }}
-                        onClick={() => handleToolClick(tool.id)}
-                        className="grid sm:grid-cols-2 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm overflow-hidden"
-                      >
-                        {/* Left — the tool */}
-                        <div className="p-6 md:p-8 flex flex-col">
-                          <div className="flex justify-between items-start mb-5">
+                  {[...tools].sort((a: any, b: any) => {
+                    const ia = TOOL_PRIORITY.indexOf(a.id); const ib = TOOL_PRIORITY.indexOf(b.id);
+                    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+                  }).map((tool: any, idx: number) => (
+                    <motion.div
+                      key={tool.id}
+                      whileHover={{ y: -3 }}
+                      onClick={() => handleToolClick(tool.id)}
+                      className="grid sm:grid-cols-2 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm overflow-hidden"
+                    >
+                      {/* Left — the tool */}
+                      <div className="p-6 md:p-8 flex flex-col">
+                        <div className="flex justify-between items-start mb-5">
+                          <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all">
                               {tool.icon}
                             </div>
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
-                          </div>
-                          <h3 className="text-lg md:text-xl font-medium mb-2 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
-                          <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-5 line-clamp-3">{tool.desc}</p>
-                          <button className="mt-auto text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-2 group/btn">
-                            {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                          </button>
-                        </div>
-                        {/* Right — that tool's example */}
-                        <div className="p-6 md:p-8 bg-[#FDFCFB] dark:bg-[#1A1A18] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col">
-                          <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] mb-3 inline-flex items-center gap-1.5">
-                            <CheckCircle2 size={11} />
-                            {language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel'}
-                          </p>
-                          <div className="flex items-center gap-3 mb-3">
-                            {ex.score != null ? (
-                              <div className="relative w-12 h-12 shrink-0">
-                                <svg viewBox="0 0 36 36" className="w-12 h-12 -rotate-90">
-                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
-                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${ex.score} 100`} strokeLinecap="round" />
-                                </svg>
-                                <span className="absolute inset-0 flex items-center justify-center text-sm font-serif text-[#004225] dark:text-[#00A854]">{ex.score}</span>
-                              </div>
-                            ) : (
-                              <div className="w-12 h-12 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/12 flex items-center justify-center text-[#004225] dark:text-[#00A854] rounded-full [&>svg]:w-5 [&>svg]:h-5">
-                                {tool.icon}
-                              </div>
+                            {idx === 0 && (
+                              <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-white bg-[#004225] dark:bg-[#00A854] px-1.5 py-0.5 rounded-sm">Top</span>
                             )}
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] leading-snug">{context}</p>
                           </div>
-                          <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
-                            {lines.map((line, i) => (
-                              <li key={i} className="flex gap-2"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
-                            ))}
-                          </ul>
+                          <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
                         </div>
-                      </motion.div>
-                    );
-                  })}
+                        <h3 className="text-lg md:text-xl font-medium mb-2 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
+                        <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-5 line-clamp-3">{tool.desc}</p>
+                        <button className="mt-auto text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-2 group/btn">
+                          {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                      {/* Right — that tool's rich example */}
+                      <div className="p-6 md:p-8 bg-[#FDFCFB] dark:bg-[#1A1A18] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col justify-center">
+                        <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] mb-3 inline-flex items-center gap-1.5">
+                          <CheckCircle2 size={11} />
+                          {language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel'}
+                        </p>
+                        {renderToolExample(tool)}
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               </div>
             )}
