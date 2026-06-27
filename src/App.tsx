@@ -8323,47 +8323,47 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   columns end together. */}
               <div className="bg-white border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-black/40 overflow-hidden">
                 <div className="flex text-[#26261F]">
-                  <div className="w-[34%] bg-[#004225] text-white p-4 sm:p-5 flex flex-col">
-                    <div className="aspect-[4/5] w-full bg-white/5 border border-dashed border-white/35 rounded-sm flex flex-col items-center justify-center mb-3 text-white/70">
-                      <UserIcon size={26} strokeWidth={1.25} />
-                      <p className="mt-1.5 text-[7px] sm:text-[8px] font-bold uppercase tracking-[1.5px]">Foto</p>
+                  <div className="w-[36%] bg-[#004225] text-white p-5 sm:p-6 flex flex-col">
+                    <div className="aspect-[4/5] w-full bg-white/5 border border-dashed border-white/35 rounded-sm flex flex-col items-center justify-center mb-4 text-white/70">
+                      <UserIcon size={30} strokeWidth={1.25} />
+                      <p className="mt-1.5 text-[8px] sm:text-[9px] font-bold uppercase tracking-[1.5px]">Foto</p>
                     </div>
-                    <p className="font-serif text-[13px] sm:text-[15px] font-bold leading-tight break-words hyphens-auto">{previewIdentity.name}</p>
-                    <p className="text-[8px] sm:text-[9.5px] opacity-75 mt-0.5">Marketing Manager</p>
-                    <div className="border-t border-white/25 mt-3 pt-2.5 text-[7.5px] sm:text-[9px] leading-[1.8] opacity-90 space-y-0.5">
+                    <p className="font-serif text-[15px] sm:text-[18px] font-bold leading-tight break-words hyphens-auto">{previewIdentity.name}</p>
+                    <p className="text-[9px] sm:text-[11px] opacity-75 mt-1">Marketing Manager</p>
+                    <div className="border-t border-white/25 mt-4 pt-3 text-[9px] sm:text-[10.5px] leading-[1.9] opacity-90 space-y-0.5">
                       <p>Bahnhofstrasse 12</p>
                       <p>8001 Zürich</p>
                       <p>+41 79 123 45 67</p>
                       <p className="break-all">{previewIdentity.emailMask}</p>
                     </div>
-                    <div className="mt-3.5 text-[7.5px] sm:text-[9px] leading-[1.7] opacity-85">
-                      <p className="font-bold uppercase tracking-[1.5px] text-[7px] sm:text-[8.5px] opacity-100 mb-1.5">
+                    <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
+                      <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
                         {language === 'FR' ? 'Compétences' : language === 'IT' ? 'Competenze' : language === 'EN' ? 'Skills' : 'Skills'}
                       </p>
                       <p>Brand Strategy</p>
                       <p>CRM · Social Media</p>
                       <p>Analytics · A/B-Tests</p>
                     </div>
-                    <div className="mt-3 text-[7.5px] sm:text-[9px] leading-[1.7] opacity-85">
-                      <p className="font-bold uppercase tracking-[1.5px] text-[7px] sm:text-[8.5px] opacity-100 mb-1.5">
+                    <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
+                      <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
                         {language === 'FR' ? 'Langues' : language === 'IT' ? 'Lingue' : language === 'EN' ? 'Languages' : 'Sprachen'}
                       </p>
                       <p>DE · {language === 'FR' ? 'Langue maternelle' : language === 'IT' ? 'Madrelingua' : language === 'EN' ? 'Native' : 'Muttersprache'}</p>
                       <p>FR · C1 · EN · C1</p>
                     </div>
                   </div>
-                  <div className="flex-1 p-4 sm:p-5 font-serif flex flex-col">
-                    <p className="text-[8px] sm:text-[9.5px] text-[#6B6B66]">14. Mai 2026</p>
-                    <p className="text-[10px] sm:text-[11.5px] font-bold text-[#004225] mt-2 mb-2.5 leading-tight">
+                  <div className="flex-1 p-5 sm:p-7 font-serif flex flex-col">
+                    <p className="text-[10px] sm:text-[12px] text-[#6B6B66]">14. Mai 2026</p>
+                    <p className="text-[13px] sm:text-[15px] font-bold text-[#004225] mt-2.5 mb-3 leading-snug">
                       {language === 'FR' ? 'Candidature au poste de Marketing Manager · Nestlé'
                         : language === 'IT' ? 'Candidatura come Marketing Manager · Nestlé'
                         : language === 'EN' ? 'Application: Marketing Manager · Nestlé'
                         : 'Bewerbung als Marketing Manager · Nestlé'}
                     </p>
-                    <p className="text-[9px] sm:text-[10.5px] mb-2">
+                    <p className="text-[11px] sm:text-[13px] mb-2.5">
                       {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren'}
                     </p>
-                    <div className="text-[8px] sm:text-[9.5px] leading-[1.6] text-[#26261F] space-y-1.5">
+                    <div className="text-[11px] sm:text-[13px] leading-[1.75] text-[#26261F] space-y-2.5">
                       <p>
                         {language === 'FR'
                           ? 'Avec un grand intérêt, je postule pour le poste de Marketing Manager chez Nestlé. Votre approche de durabilité et de marques locales correspond exactement à ce que je veux faire avancer.'
@@ -8401,13 +8401,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           : 'Meine Kombination aus analytischer Stärke, Dreisprachigkeit (DE/FR/EN) und Erfahrung mit DACH-Kampagnen passt zu Ihren Anforderungen. Auf ein persönliches Gespräch freue ich mich.'}
                       </p>
                     </div>
-                    <p className="text-[9px] sm:text-[10.5px] mt-2.5 mb-0.5">
+                    <p className="text-[11px] sm:text-[13px] mt-3 mb-0.5">
                       {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
                     </p>
-                    <p className="text-[9px] sm:text-[10.5px] font-bold">{previewIdentity.name}</p>
+                    <p className="text-[11px] sm:text-[13px] font-bold">{previewIdentity.name}</p>
                     {/* Beilagen footer — pushed to the bottom so both columns
                         end at the same line, no dangling whitespace below. */}
-                    <div className="mt-auto pt-3 border-t border-[#26261F]/10 text-[6.5px] sm:text-[7.5px] text-[#6B6B66] leading-[1.6]">
+                    <div className="mt-auto pt-4 border-t border-[#26261F]/10 text-[8px] sm:text-[9.5px] text-[#6B6B66] leading-[1.6]">
                       <p className="font-bold uppercase tracking-[1.5px] mb-0.5">
                         {language === 'FR' ? 'Annexes' : language === 'IT' ? 'Allegati' : language === 'EN' ? 'Enclosures' : 'Beilagen'}
                       </p>
