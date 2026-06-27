@@ -8076,12 +8076,72 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {(!user || activeView === 'dashboard') && (
       <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16">
-            <div className="flex items-start gap-5">
-              <span className="text-5xl lg:text-6xl font-serif text-[#004225]/15 dark:text-[#00A854]/20 leading-none select-none">01</span>
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-2">{t.tools_badge}</p>
-                <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
+          {/* Header band: left = intro + live tool list, right = one perfect
+              finished example so visitors see WHAT the tools produce before
+              scrolling the full grid. */}
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16">
+            <div>
+              <div className="flex items-start gap-5 mb-6">
+                <span className="text-5xl lg:text-6xl font-serif text-[#004225]/15 dark:text-[#00A854]/20 leading-none select-none">01</span>
+                <div>
+                  <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-2">{t.tools_badge}</p>
+                  <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
+                </div>
+              </div>
+              {/* Live tool list — see every tool at a glance, click to open */}
+              <div className="flex flex-wrap gap-2">
+                {tools.map((tool) => (
+                  <button
+                    key={tool.id}
+                    onClick={() => handleToolClick(tool.id)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 hover:border-[#004225]/40 dark:hover:border-[#00A854]/50 text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] transition-all group"
+                  >
+                    <span className="text-[#004225] dark:text-[#00A854] [&>svg]:w-3 [&>svg]:h-3">{tool.icon}</span>
+                    <span className="truncate max-w-[160px]">{tool.title}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Perfect example — finished application snapshot */}
+            <div className="relative">
+              <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
+                <CheckCircle2 size={10} />
+                {language === 'FR' ? 'Exemple parfait' : language === 'IT' ? 'Esempio perfetto' : language === 'EN' ? 'Perfect example' : 'Perfektes Beispiel'}
+              </div>
+              <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl p-5 sm:p-6 space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative w-16 h-16 shrink-0">
+                    <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
+                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray="92 100" strokeLinecap="round" />
+                    </svg>
+                    <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">92</span>
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{language === 'FR' ? 'Score ATS · Marketing Manager' : language === 'IT' ? 'Punteggio ATS · Marketing Manager' : language === 'EN' ? 'ATS score · Marketing Manager' : 'ATS-Score · Marketing Manager'}</p>
+                    <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Nestlé · Vevey</p>
+                  </div>
+                </div>
+                <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                  {(language === 'FR'
+                    ? ['Lettre de motivation générée — 4 paragraphes', 'CV optimisé · 12 mots-clés correspondants', '10 questions d\'entretien préparées', 'Prêt en PDF et Word']
+                    : language === 'IT'
+                    ? ['Lettera di motivazione generata — 4 paragrafi', 'CV ottimizzato · 12 parole chiave corrispondenti', '10 domande di colloquio preparate', 'Pronto in PDF e Word']
+                    : language === 'EN'
+                    ? ['Cover letter generated — 4 paragraphs', 'CV optimised · 12 matching keywords', '10 interview questions prepped', 'Ready as PDF and Word']
+                    : ['Anschreiben generiert — 4 Absätze', 'Lebenslauf optimiert · 12 Keywords getroffen', '10 Interviewfragen vorbereitet', 'Fertig als PDF und Word']
+                  ).map((line, i) => (
+                    <li key={i} className="flex gap-2"><CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleToolClick('bewerbungs-gen')}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                >
+                  {language === 'FR' ? 'Créer le mien' : language === 'IT' ? 'Crea il mio' : language === 'EN' ? 'Create mine' : 'Meine erstellen'}
+                  <ArrowRight size={13} />
+                </button>
               </div>
             </div>
           </div>
@@ -8378,12 +8438,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-8 max-w-lg">
               {language === 'FR'
-                ? 'Une vue d\'ensemble simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes, ne rate plus jamais un suivi. Disponible dans chaque plan. Y compris le plan Gratuit.'
+                ? 'Une vue d\'ensemble simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes — et Stellify calcule en direct ton taux d\'entretiens et de succès. Inclus dans chaque plan, même le Gratuit.'
                 : language === 'IT'
-                ? 'Una panoramica semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note, non perdere mai un follow-up. Disponibile in ogni piano. Anche in quello Gratuito.'
+                ? 'Una panoramica semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note — e Stellify calcola in tempo reale il tuo tasso di colloqui e di successo. Incluso in ogni piano, anche quello Gratuito.'
                 : language === 'EN'
-                ? 'A simple overview: Applied, Interview, Offer. Drag the cards, add notes, never miss a follow-up. Available on every plan. Free plan included.'
-                : 'Eine einfache Übersicht: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen, nie wieder ein Follow-up verpassen. In jedem Plan dabei. Auch im Gratis-Plan.'}
+                ? 'A simple overview: Applied, Interview, Offer. Drag the cards, add notes — and Stellify computes your interview and offer rate live. Included on every plan, Free included.'
+                : 'Eine einfache Übersicht: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen — und Stellify rechnet Interview- und Erfolgsquote live aus. In jedem Plan dabei, auch im Gratis-Plan.'}
             </p>
             <button
               onClick={() => user ? navigate('dashboard') : setIsAuthModalOpen(true)}
@@ -8394,148 +8454,79 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </button>
           </div>
 
-          {/* Mini-Kanban Preview */}
-          <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 p-5 sm:p-6 shadow-sm">
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                {
-                  label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben',
-                  count: 4,
-                  color: '#9A9A94',
-                  cards: [
-                    { company: 'Roche', title: 'Data Analyst' },
-                    { company: 'PostFinance', title: language === 'FR' ? 'UX Designer' : 'UX Designer' },
-                  ]
-                },
-                {
-                  label: language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview',
-                  count: 2,
-                  color: '#D4A852',
-                  cards: [
-                    { company: 'Swisscom', title: language === 'FR' ? 'Product Manager' : language === 'IT' ? 'Product Manager' : 'Product Manager' },
-                  ]
-                },
-                {
-                  label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot',
-                  count: 1,
-                  color: '#004225',
-                  cards: [
-                    { company: 'Nestlé', title: 'Marketing Lead', salary: 'CHF 120k' },
-                  ]
-                },
-              ].map((col, i) => (
-                <div key={i} className="space-y-2">
-                  <div className="flex items-center justify-between mb-2 px-1">
-                    <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: col.color }}>{col.label}</span>
-                    <span className="text-[9px] font-bold text-[#9A9A94]">{col.count}</span>
-                  </div>
-                  {col.cards.map((card, j) => (
-                    <div key={j} className="bg-white dark:bg-[#1A1A18] border-l-2 p-2.5 shadow-sm" style={{ borderLeftColor: col.color }}>
-                      <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate">{card.company}</p>
-                      <p className="text-xs font-medium text-[#1A1A18] dark:text-[#FAFAF8] truncate mt-0.5">{card.title}</p>
-                      {(card as any).salary && (
-                        <p className="text-[10px] text-[#004225] dark:text-[#00A854] font-bold mt-1">{(card as any).salary}</p>
-                      )}
+          {/* Mini-Kanban Preview + live stats strip (folded in from the old
+              standalone pipeline section — one tracker section, not two). */}
+          <div className="space-y-4">
+            <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 p-5 sm:p-6 shadow-sm">
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  {
+                    label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben',
+                    count: 4,
+                    color: '#9A9A94',
+                    cards: [
+                      { company: 'Roche', title: 'Data Analyst' },
+                      { company: 'PostFinance', title: language === 'FR' ? 'UX Designer' : 'UX Designer' },
+                    ]
+                  },
+                  {
+                    label: language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview',
+                    count: 2,
+                    color: '#D4A852',
+                    cards: [
+                      { company: 'Swisscom', title: language === 'FR' ? 'Product Manager' : language === 'IT' ? 'Product Manager' : 'Product Manager' },
+                    ]
+                  },
+                  {
+                    label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot',
+                    count: 1,
+                    color: '#004225',
+                    cards: [
+                      { company: 'Nestlé', title: 'Marketing Lead', salary: 'CHF 120k' },
+                    ]
+                  },
+                ].map((col, i) => (
+                  <div key={i} className="space-y-2">
+                    <div className="flex items-center justify-between mb-2 px-1">
+                      <span className="text-[9px] font-bold uppercase tracking-widest" style={{ color: col.color }}>{col.label}</span>
+                      <span className="text-[9px] font-bold text-[#9A9A94]">{col.count}</span>
                     </div>
-                  ))}
-                  <div className="border border-dashed border-black/10 dark:border-white/10 h-8 flex items-center justify-center">
-                    <span className="text-[#9A9A94] text-base leading-none">+</span>
+                    {col.cards.map((card, j) => (
+                      <div key={j} className="bg-white dark:bg-[#1A1A18] border-l-2 p-2.5 shadow-sm" style={{ borderLeftColor: col.color }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate">{card.company}</p>
+                        <p className="text-xs font-medium text-[#1A1A18] dark:text-[#FAFAF8] truncate mt-0.5">{card.title}</p>
+                        {(card as any).salary && (
+                          <p className="text-[10px] text-[#004225] dark:text-[#00A854] font-bold mt-1">{(card as any).salary}</p>
+                        )}
+                      </div>
+                    ))}
+                    <div className="border border-dashed border-black/10 dark:border-white/10 h-8 flex items-center justify-center">
+                      <span className="text-[#9A9A94] text-base leading-none">+</span>
+                    </div>
                   </div>
+                ))}
+              </div>
+            </div>
+            {/* Live stats strip */}
+            <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-sm grid grid-cols-3 divide-x divide-black/5 dark:divide-white/5">
+              {[
+                { value: '20', color: 'text-[#1A1A18] dark:text-[#FAFAF8]', label: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
+                { value: '40%', color: 'text-[#D4A852]', label: language === 'FR' ? 'Taux d\'entretiens' : language === 'IT' ? 'Tasso colloqui' : language === 'EN' ? 'Interview rate' : 'Interview-Quote' },
+                { value: '13%', color: 'text-[#004225] dark:text-[#00A854]', label: language === 'FR' ? 'Taux d\'offres' : language === 'IT' ? 'Tasso offerte' : language === 'EN' ? 'Offer rate' : 'Erfolgsquote' },
+              ].map((stat, i) => (
+                <div key={i} className="py-4 px-2 text-center">
+                  <p className={`text-2xl sm:text-3xl font-serif leading-none ${stat.color}`}>{stat.value}</p>
+                  <p className="text-[8.5px] font-bold uppercase tracking-widest text-[#9A9A94] mt-1.5">{stat.label}</p>
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-      )}
-      {/* --- PIPELINE PREVIEW (landing-only static demo of the dashboard funnel) --- */}
-      {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
-              {language === 'FR' ? 'Statistiques · Aperçu' : language === 'IT' ? 'Statistiche · Panoramica' : language === 'EN' ? 'Stats · Overview' : 'Statistik · Übersicht'}
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
-              {language === 'FR' ? 'Tu sais en un coup d\'œil, où tu en es.'
-                : language === 'IT' ? 'Capisci a colpo d\'occhio a che punto sei.'
-                : language === 'EN' ? 'See exactly where you stand. At a glance.'
-                : 'Du siehst auf einen Blick, wo du stehst.'}
-            </h2>
-            <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
-              {language === 'FR'
-                ? 'Pipeline, taux d\'entretiens, taux de succès. Stellify calcule en direct, automatiquement.'
-                : language === 'IT'
-                ? 'Pipeline, tasso di colloqui, tasso di successo. Stellify calcola in tempo reale, automaticamente.'
-                : language === 'EN'
-                ? 'Pipeline, interview rate, offer rate. Stellify computes it live, automatically.'
-                : 'Pipeline, Interview-Quote, Erfolgsquote. Stellify rechnet live, automatisch.'}
+            <p className="text-center text-[9px] font-mono uppercase tracking-widest text-[#9A9A94]">
+              {language === 'FR' ? 'Exemple — tes chiffres se calculent automatiquement'
+                : language === 'IT' ? 'Esempio — i tuoi numeri si calcolano automaticamente'
+                : language === 'EN' ? 'Example — your numbers compute automatically'
+                : 'Beispiel — deine Zahlen rechnen sich automatisch'}
             </p>
           </div>
-
-          {(() => {
-            const cols = [
-              { key: 'wishlist',  label: language === 'FR' ? 'Liste de souhaits' : language === 'IT' ? 'Lista desideri' : language === 'EN' ? 'Wishlist' : 'Wunschliste', value: 5, accent: '#9A9A94', tint: 'bg-[#9A9A94]' },
-              { key: 'applied',   label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', value: 8, accent: '#5C5C58', tint: 'bg-[#5C5C58]' },
-              { key: 'interview', label: 'Interview', value: 4, accent: '#D4A852', tint: 'bg-[#D4A852]' },
-              { key: 'offer',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', value: 2, accent: '#004225', tint: 'bg-[#004225] dark:bg-[#00A854]' },
-              { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: 1, accent: '#B91C1C', tint: 'bg-[#B91C1C]' },
-            ];
-            const max = Math.max(...cols.map(c => c.value));
-            const kickerText = language === 'FR' ? 'Aperçu de la pipeline' : language === 'IT' ? 'Panoramica pipeline' : language === 'EN' ? 'Pipeline overview' : 'Pipeline-Überblick';
-            const exampleHint = language === 'FR' ? 'Exemple. tes chiffres apparaîtront automatiquement.' : language === 'IT' ? 'Esempio. i tuoi numeri appariranno automaticamente.' : language === 'EN' ? 'Example. your numbers populate automatically.' : 'Beispiel. deine Zahlen erscheinen automatisch.';
-            return (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.6 }}
-                className="max-w-4xl mx-auto p-6 sm:p-10 bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl"
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">{kickerText}</p>
-                  <span className="text-[9px] font-mono text-[#9A9A94] uppercase tracking-widest">{exampleHint}</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-                  {cols.map((c, i) => {
-                    const pct = Math.round((c.value / max) * 100);
-                    return (
-                      <div key={c.key} className="space-y-2">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <span className="text-[9px] font-bold uppercase tracking-widest truncate" style={{ color: c.accent }}>{c.label}</span>
-                          <span className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: `${pct}%` }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.9, delay: 0.2 + i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
-                            className={`h-full ${c.tint}`}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="mt-8 pt-6 border-t border-black/5 dark:border-white/5 grid sm:grid-cols-3 gap-6 text-center">
-                  <div>
-                    <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">20</p>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mt-2">{language === 'FR' ? 'Total candidatures' : language === 'IT' ? 'Candidature totali' : language === 'EN' ? 'Total applications' : 'Bewerbungen gesamt'}</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-serif text-[#D4A852] leading-none">40%</p>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mt-2">{language === 'FR' ? 'Taux d\'entretiens' : language === 'IT' ? 'Tasso colloqui' : language === 'EN' ? 'Interview rate' : 'Interview-Quote'}</p>
-                  </div>
-                  <div>
-                    <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] leading-none">13%</p>
-                    <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mt-2">{language === 'FR' ? 'Taux d\'offres' : language === 'IT' ? 'Tasso offerte' : language === 'EN' ? 'Offer rate' : 'Erfolgsquote'}</p>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })()}
         </div>
       </section>
       )}
