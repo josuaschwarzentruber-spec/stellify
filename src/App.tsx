@@ -2511,7 +2511,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       lang === 'FR' ? fr : lang === 'IT' ? it : lang === 'EN' ? en : de;
     const M: Record<string, { score: number | null; L: string[] }> = {
       'bewerbungs-gen': { score: 92, L: pick(
-        ['ATS-Score · Marketing Manager · Nestlé', 'Anschreiben generiert — 4 Absätze', 'Lebenslauf optimiert · 12 Keywords getroffen', 'Fertig als PDF und Word'],
+        ['Bewerbungs-Scanner · Marketing Manager · Nestlé', 'Anschreiben geschrieben — 4 Absätze', 'Lebenslauf verbessert · 12 wichtige Wörter getroffen', 'Fertig als PDF und Word'],
         ['Score ATS · Marketing Manager · Nestlé', 'Lettre générée — 4 paragraphes', 'CV optimisé · 12 mots-clés', 'Prêt en PDF et Word'],
         ['Punteggio ATS · Marketing Manager · Nestlé', 'Lettera generata — 4 paragrafi', 'CV ottimizzato · 12 parole chiave', 'Pronto in PDF e Word'],
         ['ATS score · Marketing Manager · Nestlé', 'Cover letter generated — 4 paragraphs', 'CV optimised · 12 keywords matched', 'Ready as PDF and Word']) },
@@ -2521,17 +2521,17 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         ['Candidatura · 60 secondi', 'Lettera di motivazione pronta', 'Punti forti del CV definiti', 'Tedesco svizzero corretto'],
         ['Application · 60 seconds', 'Cover letter ready', 'CV highlights set', 'Swiss German, no ß']) },
       'ats-sim': { score: 82, L: pick(
-        ['ATS-Check · gegen Inserat', 'Match auf 7 von 10 Begriffen', 'Format wird von SuccessFactors gelesen', 'Fehlt: SAP S/4HANA, IFRS'],
+        ['Bewerbungs-Scanner · gegen Inserat', '7 von 10 Wörtern getroffen', 'Wird von der Recruiter-Software gelesen', 'Fehlt noch: SAP S/4HANA, IFRS'],
         ['Test ATS · contre l\'annonce', 'Correspondance 7 sur 10', 'Format lu par SuccessFactors', 'Manque : SAP S/4HANA, IFRS'],
         ['Test ATS · contro l\'annuncio', 'Corrispondenza 7 su 10', 'Formato letto da SuccessFactors', 'Manca: SAP S/4HANA, IFRS'],
         ['ATS check · against the ad', 'Match on 7 of 10 terms', 'Read by SuccessFactors', 'Missing: SAP S/4HANA, IFRS']) },
       'cv-analysis': { score: 76, L: pick(
-        ['Markt-Score · Banking · Zürich', 'Top-Keywords: KPI · Reporting · Excel', 'Branchen-Fit erkannt', 'Empfehlung: Power BI ergänzen'],
+        ['Bewertung · Banking · Zürich', 'Wichtige Wörter: KPI · Reporting · Excel', 'Passt zur Branche', 'Tipp: Power BI ergänzen'],
         ['Score marché · Banking · Zurich', 'Mots-clés : KPI · Reporting · Excel', 'Adéquation secteur détectée', 'Conseil : ajouter Power BI'],
         ['Punteggio mercato · Banking · Zurigo', 'Parole chiave: KPI · Reporting · Excel', 'Affinità settore rilevata', 'Consiglio: aggiungere Power BI'],
         ['Market score · Banking · Zurich', 'Keywords: KPI · Reporting · Excel', 'Industry fit detected', 'Tip: add Power BI']) },
       'cv-optimizer': { score: 91, L: pick(
-        ['Optimiert · Berufserfahrung', 'Aktive Verben statt Passiv', 'Erfolge quantifiziert (+18% Umsatz)', 'ATS-konform formuliert'],
+        ['Verbessert · Berufserfahrung', 'Aktive Sätze statt Passiv', 'Erfolge mit Zahlen (+18% Umsatz)', 'Wird von Recruiter-Software gelesen'],
         ['Optimisé · expérience', 'Verbes actifs', 'Succès quantifiés (+18% CA)', 'Conforme ATS'],
         ['Ottimizzato · esperienza', 'Verbi attivi', 'Successi quantificati (+18%)', 'Conforme ATS'],
         ['Optimised · experience', 'Active verbs', 'Quantified wins (+18% revenue)', 'ATS-compliant']) },
@@ -2640,7 +2640,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (id === 'ats-sim') {
       return (
         <div className="w-full space-y-3">
-          <Ring score={82} label={language === 'EN' ? 'ATS score · vs. job ad' : 'ATS-Score · gegen Inserat'} sub="7 / 10 Keywords" />
+          <Ring score={82} label={language === 'EN' ? 'CV scanner · vs. job ad' : 'Bewerbungs-Scanner · gegen Inserat'} sub={language === 'EN' ? '7 of 10 words found' : '7 von 10 Wörtern gefunden'} />
           <div className="flex flex-wrap gap-1.5">
             <KeyChip label="KPI" ok /><KeyChip label="Reporting" ok /><KeyChip label="Stakeholder" ok /><KeyChip label="SAP S/4HANA" ok={false} /><KeyChip label="IFRS" ok={false} />
           </div>
@@ -2650,7 +2650,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (id === 'cv-analysis') {
       return (
         <div className="w-full space-y-3">
-          <Ring score={76} label={language === 'EN' ? 'Market score · Banking · Zurich' : 'Markt-Score · Banking · Zürich'} sub="Business Analyst" />
+          <Ring score={76} label={language === 'EN' ? 'Rating · Banking · Zurich' : 'Bewertung · Banking · Zürich'} sub="Business Analyst" />
           <div className="flex flex-wrap gap-1.5"><KeyChip label="KPI" ok /><KeyChip label="Reporting" ok /><KeyChip label="Excel" ok /><KeyChip label="Power BI fehlt" ok={false} /></div>
         </div>
       );
@@ -4405,7 +4405,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       value_items: [
         { icon: "Coins", title: "CHF 200 bis 400", desc: "kostet eine einzige Karriereberatung. Stellify deckt das ganze Jahr ab." },
         { icon: "Clock", title: "3 bis 5 Stunden", desc: "weniger Arbeit pro Bewerbung. Mehr Zeit für die Stellen, die zählen." },
-        { icon: "Target", title: "Mehr Einladungen", desc: "Ein optimierter Lebenslauf kommt durch jeden ATS-Filter." },
+        { icon: "Target", title: "Mehr Einladungen", desc: "Ein guter Lebenslauf kommt durch jede Bewerbungs-Software." },
         { icon: "TrendingUp", title: "Schnell amortisiert", desc: "Eine bessere Stelle bezahlt das Abo vielfach zurück." }
       ],
       tools_data: {
@@ -4460,7 +4460,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'cv-analysis': {
           title: 'Lebenslauf-Analyse',
-          desc: 'Tiefgehende Analyse deines Lebenslaufs auf Keywords, Branchen-Fit und Verbesserungspotential.',
+          desc: 'Genaue Prüfung deines Lebenslaufs: wichtige Wörter, Passung zur Branche und was du noch besser machen kannst.',
           tutorial: 'Beispiel: Dein Lebenslauf hat eine Schweiz-Bereitschaft von 75%. Wir empfehlen die Ergänzung deiner Arbeitsbewilligung (C-Bewilligung) und die GERS-Sprachniveaus.'
         },
         'tracker': { 
@@ -6214,7 +6214,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['bewerbungs-gen'].title,
       desc: t.tools_data['bewerbungs-gen'].desc,
       icon: <FileText size={20} />,
-      badge: 'Studio',
+      badge: 'Komplett',
       type: 'gratis',
       inputs: []
     },
@@ -6223,7 +6223,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['interview'].title,
       desc: t.tools_data['interview'].desc,
       icon: <Mic size={20} />,
-      badge: 'Coach',
+      badge: 'Üben',
       type: 'gratis',
       inputs: [
         { key: 'firstName', label: language === 'FR' ? 'Prénom' : language === 'IT' ? 'Nome' : language === 'EN' ? 'First name' : 'Vorname', type: 'text', placeholder: language === 'FR' ? 'ex. Anna' : language === 'IT' ? 'es. Anna' : language === 'EN' ? 'e.g. Anna' : 'z.B. Anna' },
@@ -6239,7 +6239,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['cv-analysis'].title,
       desc: t.tools_data['cv-analysis'].desc,
       icon: <Search size={20} />,
-      badge: 'Deep Scan',
+      badge: 'Prüfung',
       type: 'pro',
       inputs: cvContext ? [] : [{ key: 'cvText', label: t.tool_cv_optional_label, type: 'textarea', placeholder: t.tool_cv_optional_ph }]
     },
@@ -6248,7 +6248,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['cv-optimizer'].title,
       desc: t.tools_data['cv-optimizer'].desc,
       icon: <FileText size={20} />,
-      badge: 'Precision',
+      badge: 'Verbessern',
       type: 'pro',
       inputs: [{ key: 'section', label: t.tools_data['cv-optimizer'].input_label, type: 'text', placeholder: t.tools_data['cv-optimizer'].input_placeholder }]
     },
@@ -6274,7 +6274,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['career-roadmap'].title,
       desc: t.tools_data['career-roadmap'].desc,
       icon: <Compass size={20} />,
-      badge: 'Strategy',
+      badge: 'Plan',
       type: 'ultimate',
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
@@ -6290,8 +6290,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'salary-calc', 
       title: t.tools_data['salary-calc'].title, 
       desc: t.tools_data['salary-calc'].desc, 
-      icon: <Coins size={20} />, 
-      badge: 'Market Data', 
+      icon: <Coins size={20} />,
+      badge: 'Marktlohn',
       type: 'pro',
       inputs: [
         { key: 'jobTitle', label: t.tools_data['salary-calc'].input_job, type: 'text', placeholder: t.tools_data['salary-calc'].input_job_placeholder },
@@ -6305,7 +6305,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['cv-gen'].title,
       desc: t.tools_data['cv-gen'].desc,
       icon: <Sparkles size={20} />,
-      badge: '60s Gen',
+      badge: 'Schnell',
       type: 'gratis',
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
@@ -6321,8 +6321,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'ats-sim', 
       title: t.tools_data['ats-sim'].title, 
       desc: t.tools_data['ats-sim'].desc, 
-      icon: <Cpu size={20} />, 
-      badge: 'Simulator', 
+      icon: <Cpu size={20} />,
+      badge: 'Test',
       type: 'pro',
       inputs: [{ key: 'jobAd', label: t.tools_data['ats-sim'].input_label, type: 'textarea', placeholder: t.tools_data['ats-sim'].input_placeholder }] 
     },
@@ -6330,8 +6330,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'zeugnis', 
       title: t.tools_data['zeugnis'].title, 
       desc: t.tools_data['zeugnis'].desc, 
-      icon: <ShieldCheck size={20} />, 
-      badge: 'Decoder', 
+      icon: <ShieldCheck size={20} />,
+      badge: 'Übersetzen',
       type: 'pro',
       inputs: [{ key: 'certificateText', label: t.tools_data['zeugnis'].input_label, type: 'textarea', placeholder: t.tools_data['zeugnis'].input_placeholder }] 
     },
@@ -6339,8 +6339,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'skill-gap', 
       title: t.tools_data['skill-gap'].title, 
       desc: t.tools_data['skill-gap'].desc, 
-      icon: <Target size={20} />, 
-      badge: 'Analysis', 
+      icon: <Target size={20} />,
+      badge: 'Vergleich',
       type: 'pro',
       inputs: [{ key: 'targetJob', label: t.tools_data['skill-gap'].input_label, type: 'text', placeholder: t.tools_data['skill-gap'].input_placeholder }] 
     },
@@ -6348,8 +6348,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'tracker', 
       title: t.tools_data['tracker'].title, 
       desc: t.tools_data['tracker'].desc, 
-      icon: <Layout size={20} />, 
-      badge: 'Strategy', 
+      icon: <Layout size={20} />,
+      badge: 'Übersicht',
       type: 'pro',
       inputs: [{ key: 'jobTitle', label: t.tools_data['tracker'].input_label, type: 'text', placeholder: t.tools_data['tracker'].input_placeholder }] 
     },
@@ -6358,7 +6358,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['matching'].title,
       desc: t.tools_data['matching'].desc,
       icon: <Search size={20} />,
-      badge: 'Fit-Score',
+      badge: 'Passend',
       type: 'ultimate',
       inputs: cvContext ? [] : [{ key: 'cvText', label: t.tool_cv_optional_label, type: 'textarea', placeholder: t.tool_cv_optional_ph }]
     },
@@ -6366,8 +6366,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'berufseinstieg',
       title: t.tools_data['berufseinstieg'].title, 
       desc: t.tools_data['berufseinstieg'].desc, 
-      icon: <Rocket size={20} />, 
-      badge: 'First Job', 
+      icon: <Rocket size={20} />,
+      badge: 'Erster Job',
       type: 'pro',
       inputs: [{ key: 'education', label: t.tools_data['berufseinstieg'].input_label, type: 'text', placeholder: t.tools_data['berufseinstieg'].input_placeholder }] 
     },
@@ -6375,8 +6375,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'erfahrung-plus', 
       title: t.tools_data['erfahrung-plus'].title, 
       desc: t.tools_data['erfahrung-plus'].desc, 
-      icon: <Award size={20} />, 
-      badge: 'Ü50 Special', 
+      icon: <Award size={20} />,
+      badge: 'Ab 50',
       type: 'pro',
       inputs: [{ key: 'experience', label: t.tools_data['erfahrung-plus'].input_label, type: 'textarea', placeholder: t.tools_data['erfahrung-plus'].input_placeholder }] 
     },
@@ -6384,8 +6384,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'wiedereinstieg', 
       title: t.tools_data['wiedereinstieg'].title, 
       desc: t.tools_data['wiedereinstieg'].desc, 
-      icon: <RefreshCw size={20} />, 
-      badge: 'Comeback', 
+      icon: <RefreshCw size={20} />,
+      badge: 'Zurück in den Job',
       type: 'pro',
       inputs: [{ key: 'reason', label: t.tools_data['wiedereinstieg'].input_label, type: 'text', placeholder: t.tools_data['wiedereinstieg'].input_placeholder }] 
     },
@@ -6393,8 +6393,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       id: 'karriere-checkup', 
       title: t.tools_data['karriere-checkup'].title, 
       desc: t.tools_data['karriere-checkup'].desc, 
-      icon: <TrendingUp size={20} />, 
-      badge: 'Next Level', 
+      icon: <TrendingUp size={20} />,
+      badge: 'Aufstieg',
       type: 'pro',
       inputs: [{ key: 'currentJob', label: t.tools_data['karriere-checkup'].input_label, type: 'text', placeholder: t.tools_data['karriere-checkup'].input_placeholder }] 
     },
@@ -6403,7 +6403,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['linkedin-job'].title,
       desc: t.tools_data['linkedin-job'].desc,
       icon: <Linkedin size={20} />,
-      badge: 'Direct Match',
+      badge: 'Passend',
       type: 'pro',
       inputs: [
         { key: 'firstName', label: 'Vorname', type: 'text', placeholder: 'z.B. Anna' },
@@ -11186,9 +11186,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         );
                         let body: React.ReactNode = null;
-                        if (id === 'ats-sim') body = <ScoreCard score={82} label="ATS-Score" bullets={['Match auf 7 von 10 Schlüsselbegriffen','Format wird von SuccessFactors gelesen','3 Begriffe fehlen: SAP S/4HANA, IFRS, Stakeholder']} />;
-                        else if (id === 'cv-analysis') body = <ScoreCard score={76} label="Markt-Score" bullets={['Branchen-Fit Banking · Zürich','Top-Keywords: KPI · Reporting · Excel','Empfehlung: Skill „Power BI" ergänzen']} />;
-                        else if (id === 'cv-premium' || id === 'cv-optimizer') body = <ScoreCard score={91} label="Optimiert" bullets={['Aktivierte Verben statt Passiv','Quantifizierte Erfolge (z.B. „+ 18% Umsatz")','Schweizer Hochdeutsch · ATS-konform']} />;
+                        if (id === 'ats-sim') body = <ScoreCard score={82} label="Bewerbungs-Scanner" bullets={['7 von 10 wichtigen Wörtern getroffen','Wird von der Recruiter-Software gelesen','Fehlt noch: SAP S/4HANA, IFRS, Stakeholder']} />;
+                        else if (id === 'cv-analysis') body = <ScoreCard score={76} label="Bewertung" bullets={['Passt zur Branche: Banking · Zürich','Wichtige Wörter: KPI · Reporting · Excel','Tipp: „Power BI" ergänzen']} />;
+                        else if (id === 'cv-premium' || id === 'cv-optimizer') body = <ScoreCard score={91} label="Verbessert" bullets={['Aktive Sätze statt Passiv','Erfolge mit Zahlen (z.B. „+ 18% Umsatz")','Schweizer Hochdeutsch, klar formuliert']} />;
                         else if (id === 'skill-gap') body = <ListCard title="Skill-Gap Analyse" numbered={false} items={['Power BI · benötigt für 64% der Stellen','SQL Grundlagen · Pflicht bei Konzernen','Englisch C1 · in 8 von 10 Inseraten verlangt']} />;
                         else if (id === 'career-roadmap') body = <ListCard title="Deine 5-Schritte-Roadmap" numbered={true} items={['Heute: CV auf 1 Seite kürzen','Diese Woche: 5 Bewerbungen versenden','Nächster Monat: 2 Interviews vereinbaren','In 3 Monaten: Power BI Zertifikat','In 6 Monaten: Senior-Position erreichen']} />;
                         else if (id === 'interview' || id === 'interview-live') body = (
