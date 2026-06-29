@@ -709,6 +709,15 @@ async function deepseekChat(opts: {
     });
     if (!r.ok) {
       const body = await r.text().catch(() => '');
+      // Out of credits → privately alert the owner to top up (once/day).
+      if (r.status === 402 || /insufficient\s*balance/i.test(body)) {
+        alertOwnerOncePerDay(
+          'empty_balance',
+          '🔴 Stellify: DeepSeek-Guthaben aufgebraucht – bitte aufladen',
+          `<p>Dein DeepSeek-Guthaben ist <b>leer</b>. Die KI läuft gerade über die Ersatz-Lösung (Google Gemini) weiter, aber bitte lade bald auf:</p>
+           <p><a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
+        ).catch(() => {});
+      }
       throw new Error(`DeepSeek HTTP ${r.status}: ${body.slice(0, 200)}`);
     }
     const data: any = await r.json();
@@ -888,6 +897,14 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
     // Global cap check (last line of defence — protects against bugs/DDoS)
     const ok = await checkGlobalBudget(adminDb);
     if (!ok) {
+      // The daily ceiling for everyone combined was hit — tell the owner
+      // privately (very high usage, or a possible attack worth a look).
+      alertOwnerOncePerDay(
+        'global_cap',
+        '🟠 Stellify: Tageslimit der KI-Anfragen erreicht',
+        `<p>Das gemeinsame Tageslimit von <b>${GLOBAL_DAILY_CALL_CAP}</b> KI-Anfragen wurde heute erreicht.</p>
+         <p>Das ist entweder sehr hohe (gute!) Nutzung – dann kannst du das Limit erhöhen (Vercel: <code>GLOBAL_DAILY_CALL_CAP</code>) und ggf. DeepSeek aufladen – oder ein Hinweis auf ungewöhnliche Nutzung, die du kurz prüfen solltest.</p>`
+      ).catch(() => {});
       return res.status(503).json({
         error: 'Stella legt gerade eine kurze Pause ein. Bitte versuche es in ein paar Stunden erneut – sorry für die Unterbrechung!',
         retryAfter: 3600,
@@ -978,6 +995,75 @@ async function recordAIUsage(req: Request) {
     await incrementGlobalBudget(adminDb);
   } catch (err: any) {
     console.error('[USAGE RECORD]', err.message);
+  }
+  // Cheap, throttled: checks the DeepSeek balance at most once a day and
+  // emails you if it's getting low. Fire-and-forget so it never slows a call.
+  checkDeepSeekBalanceDaily().catch(() => {});
+}
+
+// ── Owner alerts (private — emailed to you, never shown on the website) ───────
+// Set OWNER_ALERT_EMAIL in Vercel to your address. Optional:
+// DEEPSEEK_LOW_BALANCE_USD (default 10) — the balance below which you get a
+// heads-up email so you can top up before it runs out.
+const OWNER_ALERT_EMAIL = process.env.OWNER_ALERT_EMAIL || process.env.EMAIL_REPLY_TO || '';
+const DEEPSEEK_LOW_BALANCE_USD = Number(process.env.DEEPSEEK_LOW_BALANCE_USD) || 10;
+
+// Email the owner at most once per calendar day per `key` (avoids spam).
+async function alertOwnerOncePerDay(key: string, subject: string, html: string) {
+  if (!OWNER_ALERT_EMAIL) return;
+  try {
+    const { adminDb } = getAdminServices();
+    const ref = adminDb.collection('system').doc('alerts');
+    const today = todayKey();
+    const fresh = await adminDb.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const data = snap.data() || {};
+      if (data[`${key}_date`] === today) return false; // already sent today
+      tx.set(ref, { [`${key}_date`]: today }, { merge: true });
+      return true;
+    });
+    if (!fresh) return;
+    await sendEmail({ to: OWNER_ALERT_EMAIL, subject, html });
+    console.log(`[OWNER ALERT] sent "${key}" to ${OWNER_ALERT_EMAIL}`);
+  } catch (err: any) {
+    console.error('[OWNER ALERT]', err.message);
+  }
+}
+
+// Once a day, read the DeepSeek account balance and email you if it's low.
+async function checkDeepSeekBalanceDaily() {
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey || !OWNER_ALERT_EMAIL) return;
+  try {
+    const { adminDb } = getAdminServices();
+    const ref = adminDb.collection('system').doc('alerts');
+    const today = todayKey();
+    const due = await adminDb.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const data = snap.data() || {};
+      if (data.balance_checked_date === today) return false; // checked already today
+      tx.set(ref, { balance_checked_date: today }, { merge: true });
+      return true;
+    });
+    if (!due) return;
+    const base = (process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com').replace(/\/$/, '');
+    const r = await fetch(`${base}/user/balance`, { headers: { Authorization: `Bearer ${apiKey}` } });
+    if (!r.ok) return;
+    const data: any = await r.json();
+    const info = data?.balance_infos?.[0];
+    const total = Number(info?.total_balance ?? NaN);
+    if (!isFinite(total)) return;
+    if (total < DEEPSEEK_LOW_BALANCE_USD) {
+      await alertOwnerOncePerDay(
+        'low_balance',
+        `🟠 Stellify: DeepSeek-Guthaben niedrig (${info.currency || 'USD'} ${total.toFixed(2)})`,
+        `<p>Dein DeepSeek-Guthaben ist auf <b>${info.currency || 'USD'} ${total.toFixed(2)}</b> gesunken.</p>
+         <p>Bitte bald aufladen, damit die KI-Werkzeuge ohne Unterbruch weiterlaufen:</p>
+         <p><a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
+      );
+    }
+  } catch (err: any) {
+    console.error('[BALANCE CHECK]', err.message);
   }
 }
 
