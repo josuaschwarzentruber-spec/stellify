@@ -1047,6 +1047,34 @@ function StellifyApp() {
   const [activeTool, setActiveTool] = useState<any | null>(null);
   // Which tool's example is shown in the Tools-section header preview card.
   const [headerExampleTool, setHeaderExampleTool] = useState<string>('bewerbungs-gen');
+  // Width (px) of the tool modal's left input column — draggable on desktop.
+  const [toolInputW, setToolInputW] = useState<number>(340);
+  const [isDesktopView, setIsDesktopView] = useState<boolean>(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setIsDesktopView(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  const startToolResize = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = toolInputW;
+    const onMove = (ev: MouseEvent) => {
+      const next = Math.min(640, Math.max(260, startW + (ev.clientX - startX)));
+      setToolInputW(next);
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      document.body.style.userSelect = '';
+    };
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
 
   // Browser tab title — "Stellify - <current page>" so the open tab is always
   // identifiable. Localised; the active tool name wins when a tool is open,
@@ -10369,8 +10397,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </Suspense>
                   </div>
                 )}
-                {/* Inputs */}
-                <div className={`w-full lg:w-[340px] lg:shrink-0 p-4 sm:p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/5 transition-colors relative overflow-y-auto max-h-[45vh] lg:max-h-none`}>
+                {/* Inputs — width is draggable on desktop via the handle below */}
+                <div
+                  style={isDesktopView ? { width: toolInputW } : undefined}
+                  className={`w-full lg:shrink-0 p-4 sm:p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/5 transition-colors relative overflow-y-auto max-h-[45vh] lg:max-h-none`}
+                >
                   {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                     (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
                     <div className="absolute inset-0 z-50 bg-white/80 dark:bg-[#1A1A18]/80 backdrop-blur-md flex flex-col items-center justify-start pt-12 p-8 text-center">
@@ -10534,6 +10565,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       )}
                     </div>
                   </div>
+                </div>
+
+                {/* Draggable divider — desktop only. Drag left/right to
+                    resize the input column. */}
+                <div
+                  onMouseDown={startToolResize}
+                  role="separator"
+                  aria-orientation="vertical"
+                  title="Breite ziehen"
+                  className="hidden lg:flex w-2 shrink-0 cursor-col-resize items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-[#004225]/25 dark:hover:bg-[#00A854]/30 active:bg-[#004225]/40 transition-colors group/resize"
+                >
+                  <span className="w-0.5 h-8 rounded-full bg-black/20 dark:bg-white/20 group-hover/resize:bg-[#004225] dark:group-hover/resize:bg-[#00A854]" />
                 </div>
 
                 {/* Results */}
