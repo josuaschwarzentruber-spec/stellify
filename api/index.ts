@@ -824,7 +824,11 @@ const QUOTA = {
   unlimited: { perMin: 30, perDay: 150, perMonth: 150 },
 } as const;
 
-const GLOBAL_DAILY_CALL_CAP = 3000; // safety net against runaway costs (~$45/day worst case)
+// Hard daily ceiling on ALL AI calls — the last line of defence against
+// runaway cost (bug, abuse, DDoS). Configurable via Vercel env so you can
+// cap your worst-case spend without a redeploy. 3000/day ≈ $45/day worst
+// case; lower it (e.g. 800) for a tighter budget while launching.
+const GLOBAL_DAILY_CALL_CAP = Math.max(50, Number(process.env.GLOBAL_DAILY_CALL_CAP) || 3000);
 
 // In-memory per-user minute counters (resets on server restart, fine for short windows)
 const minuteCounters = new Map<string, { count: number; resetAt: number }>();
@@ -1115,6 +1119,15 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   const isLinkedIn = /(^|\.)linkedin\.com$/i.test(parsed.hostname);
   const linkedInHint = 'LinkedIn schützt Stelleninserate teils vor automatischem Laden. Öffne die Anzeige, kopiere den Text und füge ihn unten manuell ein – oder nutze einen Yousty-/jobs.ch-Link.';
 
+  // This endpoint makes a DeepSeek call, so it must respect the same global
+  // daily ceiling as the other AI routes (it isn't behind enforceAIQuota).
+  try {
+    const { adminDb } = getAdminServices();
+    if (!(await checkGlobalBudget(adminDb))) {
+      return res.status(503).json({ error: 'Kurze Pause – bitte in ein paar Stunden erneut versuchen.', needsManual: true });
+    }
+  } catch { /* if budget check fails, fall through — don't block the user */ }
+
   try {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 12_000);
@@ -1153,6 +1166,9 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
       temperature: 0.1,
       maxOutputTokens: 900,
     });
+
+    // Count this AI call toward the global daily ceiling.
+    try { await incrementGlobalBudget(getAdminServices().adminDb); } catch { /* non-fatal */ }
 
     const match = aiText.match(/\{[\s\S]*\}/);
     let data: any = {};
