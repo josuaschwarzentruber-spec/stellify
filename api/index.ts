@@ -824,11 +824,13 @@ const QUOTA = {
   unlimited: { perMin: 30, perDay: 150, perMonth: 150 },
 } as const;
 
-// Hard daily ceiling on ALL AI calls — the last line of defence against
-// runaway cost (bug, abuse, DDoS). Configurable via Vercel env so you can
-// cap your worst-case spend without a redeploy. 3000/day ≈ $45/day worst
-// case; lower it (e.g. 800) for a tighter budget while launching.
-const GLOBAL_DAILY_CALL_CAP = Math.max(50, Number(process.env.GLOBAL_DAILY_CALL_CAP) || 3000);
+// Hard daily ceiling on ALL AI calls combined (across every user) — the
+// last line of defence against runaway cost (bug, abuse, DDoS). This is a
+// TOTAL, not a per-user limit; each user's own plan quota is enforced
+// separately in enforceAIQuota. Default 1500/day ≈ $22/day worst case:
+// high enough that real customers never hit it, low enough to cap an
+// attack. Override with the Vercel env GLOBAL_DAILY_CALL_CAP if needed.
+const GLOBAL_DAILY_CALL_CAP = Math.max(50, Number(process.env.GLOBAL_DAILY_CALL_CAP) || 1500);
 
 // In-memory per-user minute counters (resets on server restart, fine for short windows)
 const minuteCounters = new Map<string, { count: number; resetAt: number }>();
