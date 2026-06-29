@@ -2549,17 +2549,17 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         ['Candidatura · 60 secondi', 'Lettera di motivazione pronta', 'Punti forti del CV definiti', 'Tedesco svizzero corretto'],
         ['Application · 60 seconds', 'Cover letter ready', 'CV highlights set', 'Swiss German, no ß']) },
       'ats-sim': { score: 82, L: pick(
-        ['Bewerbungs-Scanner · gegen Inserat', '7 von 10 Wörtern getroffen', 'Wird von der Recruiter-Software gelesen', 'Fehlt noch: SAP S/4HANA, IFRS'],
+        ['Bewerbungs-Scanner · gegen Inserat', '7 von 10 Wörtern getroffen', 'Wird von der Bewerbungs-Software gelesen', 'Fehlt noch: SAP, Buchhaltung'],
         ['Test ATS · contre l\'annonce', 'Correspondance 7 sur 10', 'Format lu par SuccessFactors', 'Manque : SAP S/4HANA, IFRS'],
         ['Test ATS · contro l\'annuncio', 'Corrispondenza 7 su 10', 'Formato letto da SuccessFactors', 'Manca: SAP S/4HANA, IFRS'],
         ['ATS check · against the ad', 'Match on 7 of 10 terms', 'Read by SuccessFactors', 'Missing: SAP S/4HANA, IFRS']) },
       'cv-analysis': { score: 76, L: pick(
-        ['Bewertung · Banking · Zürich', 'Wichtige Wörter: KPI · Reporting · Excel', 'Passt zur Branche', 'Tipp: Power BI ergänzen'],
+        ['Bewertung · Banking · Zürich', 'Wichtige Wörter: Kennzahlen · Berichte · Excel', 'Passt zur Branche', 'Tipp: Power BI ergänzen'],
         ['Score marché · Banking · Zurich', 'Mots-clés : KPI · Reporting · Excel', 'Adéquation secteur détectée', 'Conseil : ajouter Power BI'],
         ['Punteggio mercato · Banking · Zurigo', 'Parole chiave: KPI · Reporting · Excel', 'Affinità settore rilevata', 'Consiglio: aggiungere Power BI'],
         ['Market score · Banking · Zurich', 'Keywords: KPI · Reporting · Excel', 'Industry fit detected', 'Tip: add Power BI']) },
       'cv-optimizer': { score: 91, L: pick(
-        ['Verbessert · Berufserfahrung', 'Aktive Sätze statt Passiv', 'Erfolge mit Zahlen (+18% Umsatz)', 'Wird von Recruiter-Software gelesen'],
+        ['Verbessert · Berufserfahrung', 'Aktive Sätze statt Passiv', 'Erfolge mit Zahlen (+18% Umsatz)', 'Wird von Bewerbungs-Software gelesen'],
         ['Optimisé · expérience', 'Verbes actifs', 'Succès quantifiés (+18% CA)', 'Conforme ATS'],
         ['Ottimizzato · esperienza', 'Verbi attivi', 'Successi quantificati (+18%)', 'Conforme ATS'],
         ['Optimised · experience', 'Active verbs', 'Quantified wins (+18% revenue)', 'ATS-compliant']) },
@@ -2594,10 +2594,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         ['Trattativa · Banking ZH', 'Valore mercato: CHF 118\'000', '5 argomenti concreti', 'Strategia 13ª mensilità'],
         ['Salary talk · Banking ZH', 'Market value: CHF 118,000', '5 concrete arguments', '13th-salary strategy']) },
       'matching': { score: null, L: pick(
-        ['Passende Stellen · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance'],
-        ['Postes adaptés · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance'],
-        ['Posizioni adatte · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance'],
-        ['Matching roles · Top 3', '92% · Senior Data Analyst · UBS', '87% · BI Lead · Swiss Re', '81% · Reporting Manager · PostFinance']) },
+        ['Passende Stellen · Top 3', '92% · Datenanalyst/in · UBS', '87% · Leiter Datenanalyse · Swiss Re', '81% · Leiter Berichtswesen · PostFinance'],
+        ['Postes adaptés · Top 3', '92% · Datenanalyst/in · UBS', '87% · Leiter Datenanalyse · Swiss Re', '81% · Leiter Berichtswesen · PostFinance'],
+        ['Posizioni adatte · Top 3', '92% · Datenanalyst/in · UBS', '87% · Leiter Datenanalyse · Swiss Re', '81% · Leiter Berichtswesen · PostFinance'],
+        ['Matching roles · Top 3', '92% · Datenanalyst/in · UBS', '87% · Leiter Datenanalyse · Swiss Re', '81% · Leiter Berichtswesen · PostFinance']) },
       'tracker': { score: null, L: pick(
         ['Bewerbungs-Tracker · live', '20 Bewerbungen im Überblick', 'Interview-Quote: 40%', 'Erfolgsquote: 13%'],
         ['Suivi candidatures · live', '20 candidatures en vue', 'Taux d\'entretiens : 40%', 'Taux d\'offres : 13%'],
@@ -2670,7 +2670,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         <div className="w-full space-y-3">
           <Ring score={82} label={language === 'EN' ? 'CV scanner · vs. job ad' : 'Bewerbungs-Scanner · gegen Inserat'} sub={language === 'EN' ? '7 of 10 words found' : '7 von 10 Wörtern gefunden'} />
           <div className="flex flex-wrap gap-1.5">
-            <KeyChip label="KPI" ok /><KeyChip label="Reporting" ok /><KeyChip label="Stakeholder" ok /><KeyChip label="SAP S/4HANA" ok={false} /><KeyChip label="IFRS" ok={false} />
+            <KeyChip label="Kennzahlen" ok /><KeyChip label="Berichte" ok /><KeyChip label="Teamführung" ok /><KeyChip label="SAP fehlt" ok={false} /><KeyChip label="Buchhaltung" ok={false} />
           </div>
         </div>
       );
@@ -2679,7 +2679,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       return (
         <div className="w-full space-y-3">
           <Ring score={76} label={language === 'EN' ? 'Rating · Banking · Zurich' : 'Bewertung · Banking · Zürich'} sub="Business Analyst" />
-          <div className="flex flex-wrap gap-1.5"><KeyChip label="KPI" ok /><KeyChip label="Reporting" ok /><KeyChip label="Excel" ok /><KeyChip label="Power BI fehlt" ok={false} /></div>
+          <div className="flex flex-wrap gap-1.5"><KeyChip label="Kennzahlen" ok /><KeyChip label="Berichte" ok /><KeyChip label="Excel" ok /><KeyChip label="Power BI fehlt" ok={false} /></div>
         </div>
       );
     }
@@ -2737,7 +2737,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (id === 'matching') {
       return (
         <div className="w-full space-y-2">
-          {[{ m: 92, t: 'Senior Data Analyst', c: 'UBS · Zürich' }, { m: 87, t: 'BI Lead', c: 'Swiss Re · Zürich' }, { m: 81, t: 'Reporting Manager', c: 'PostFinance · Bern' }].map((x, i) => (
+          {[{ m: 92, t: 'Datenanalyst/in', c: 'UBS · Zürich' }, { m: 87, t: 'Leiter Datenanalyse', c: 'Swiss Re · Zürich' }, { m: 81, t: 'Leiter Berichtswesen', c: 'PostFinance · Bern' }].map((x, i) => (
             <div key={i} className="flex items-center gap-3 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm p-2">
               <div className="w-9 h-9 shrink-0 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center text-[#004225] dark:text-[#00A854] font-bold text-[11px]">{x.m}%</div>
               <div className="min-w-0"><p className="text-[11px] font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{x.t}</p><p className="text-[9px] text-[#9A9A94] truncate">{x.c}</p></div>
@@ -4467,7 +4467,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'ats-sim': { 
           title: 'Bewerbungs-Scanner-Test',
-          desc: 'Prüft, ob dein Lebenslauf durch automatische Recruiter-Software kommt. Mit Bewertung & Tipps.',
+          desc: 'Prüft, ob dein Lebenslauf durch die automatische Bewerbungs-Software der Firmen kommt. Mit Bewertung & Tipps.',
           input_label: 'Stelleninserat (optional)',
           input_placeholder: 'Kopiere das Inserat für eine Übereinstimmungs-Prüfung...',
           tutorial: 'Beispiel: Prüfung deines Lebenslaufs gegen ein Inserat von Roche. Die Analyse zeigt, dass Schlagworte wie "GMP-Compliance" oder "Stakeholder Management" fehlen.'
@@ -8572,11 +8572,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                     <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
                       <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
-                        {language === 'FR' ? 'Compétences' : language === 'IT' ? 'Competenze' : language === 'EN' ? 'Skills' : 'Skills'}
+                        {language === 'FR' ? 'Compétences' : language === 'IT' ? 'Competenze' : language === 'EN' ? 'Skills' : 'Fähigkeiten'}
                       </p>
-                      <p>Brand Strategy</p>
-                      <p>CRM · Social Media</p>
-                      <p>Analytics · A/B-Tests</p>
+                      <p>Markenstrategie</p>
+                      <p>Kundenbetreuung · Soziale Medien</p>
+                      <p>Auswertung · Werbung</p>
                     </div>
                     <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
                       <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
@@ -11229,8 +11229,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         );
                         let body: React.ReactNode = null;
-                        if (id === 'ats-sim') body = <ScoreCard score={82} label="Bewerbungs-Scanner" bullets={['7 von 10 wichtigen Wörtern getroffen','Wird von der Recruiter-Software gelesen','Fehlt noch: SAP S/4HANA, IFRS, Stakeholder']} />;
-                        else if (id === 'cv-analysis') body = <ScoreCard score={76} label="Bewertung" bullets={['Passt zur Branche: Banking · Zürich','Wichtige Wörter: KPI · Reporting · Excel','Tipp: „Power BI" ergänzen']} />;
+                        if (id === 'ats-sim') body = <ScoreCard score={82} label="Bewerbungs-Scanner" bullets={['7 von 10 wichtigen Wörtern getroffen','Wird von der Bewerbungs-Software gelesen','Fehlt noch: SAP, Buchhaltung, Teamführung']} />;
+                        else if (id === 'cv-analysis') body = <ScoreCard score={76} label="Bewertung" bullets={['Passt zur Branche: Banking · Zürich','Wichtige Wörter: Kennzahlen · Berichte · Excel','Tipp: „Power BI" ergänzen']} />;
                         else if (id === 'cv-premium' || id === 'cv-optimizer') body = <ScoreCard score={91} label="Verbessert" bullets={['Aktive Sätze statt Passiv','Erfolge mit Zahlen (z.B. „+ 18% Umsatz")','Schweizer Hochdeutsch, klar formuliert']} />;
                         else if (id === 'skill-gap') body = <ListCard title="Skill-Gap Analyse" numbered={false} items={['Power BI · benötigt für 64% der Stellen','SQL Grundlagen · Pflicht bei Konzernen','Englisch C1 · in 8 von 10 Inseraten verlangt']} />;
                         else if (id === 'career-roadmap') body = <ListCard title="Deine 5-Schritte-Roadmap" numbered={true} items={['Heute: CV auf 1 Seite kürzen','Diese Woche: 5 Bewerbungen versenden','Nächster Monat: 2 Interviews vereinbaren','In 3 Monaten: Power BI Zertifikat','In 6 Monaten: Senior-Position erreichen']} />;
@@ -11263,9 +11263,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         else if (id === 'matching') body = (
                           <div className="w-full space-y-2.5">
                             {[
-                              { match: 92, title: 'Senior Data Analyst', co: 'UBS · Zürich' },
+                              { match: 92, title: 'Datenanalyst/in', co: 'UBS · Zürich' },
                               { match: 87, title: 'Business Intelligence Lead', co: 'Swiss Re · Zürich' },
-                              { match: 81, title: 'Reporting Manager', co: 'PostFinance · Bern' },
+                              { match: 81, title: 'Leiter Berichtswesen', co: 'PostFinance · Bern' },
                             ].map((m, i) => (
                               <div key={i} className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg flex items-center gap-4">
                                 <div className="w-12 h-12 shrink-0 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center text-[#004225] dark:text-[#00A854] font-bold text-sm">{m.match}%</div>
