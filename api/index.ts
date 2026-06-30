@@ -1005,7 +1005,7 @@ async function recordAIUsage(req: Request) {
 // Set OWNER_ALERT_EMAIL in Vercel to your address. Optional:
 // DEEPSEEK_LOW_BALANCE_USD (default 10) — the balance below which you get a
 // heads-up email so you can top up before it runs out.
-const OWNER_ALERT_EMAIL = process.env.OWNER_ALERT_EMAIL || process.env.EMAIL_REPLY_TO || '';
+const OWNER_ALERT_EMAIL = process.env.OWNER_ALERT_EMAIL || 'weare2bc@gmail.com';
 const DEEPSEEK_LOW_BALANCE_USD = Number(process.env.DEEPSEEK_LOW_BALANCE_USD) || 10;
 
 // Email the owner at most once per calendar day per `key` (avoids spam).
