@@ -1767,7 +1767,14 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         text = `Inhalt von ${file.name}`;
         setUploadProgress(100);
       }
-      
+
+      // Scanned/image-only PDFs extract to (near-)empty text. Storing that
+      // silently would make every tool behave as if a CV existed while the
+      // AI has nothing to work with — tell the user honestly instead.
+      if (file.type === 'application/pdf' && text.trim().length < 40) {
+        throw new Error('scanned-pdf');
+      }
+
       setCvContext(text);
 
       // Trigger AI Analysis (frontend, no auth needed for basic analysis)
@@ -1779,8 +1786,19 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         // Store actual file in Supabase Storage via backend
         (async () => {
           try {
+            // Skip storage for oversized files — text extraction above already
+            // succeeded, so the product keeps working in text-only mode.
+            if (file.size > 8 * 1024 * 1024) { console.warn('CV > 8 MB — storing text only.'); return; }
             const arrayBuffer = await file.arrayBuffer();
-            const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+            // Chunked conversion: spreading a whole PDF into String.fromCharCode
+            // blows the call stack for files > ~64 KB (i.e. every real CV).
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = '';
+            const CHUNK = 0x8000;
+            for (let i = 0; i < bytes.length; i += CHUNK) {
+              binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK) as unknown as number[]);
+            }
+            const base64 = btoa(binary);
             await fetch('/api/upload-cv', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
@@ -2799,11 +2817,12 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     setSubscriptionError('');
     
     try {
-      const res = await fetch('/api/create-checkout-session', {
+      // authFetch attaches the Firebase token — the server derives the user
+      // from it (the account to upgrade must never come from the body).
+      const res = await authFetch('/api/create-checkout-session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user.id,
           planId: plan,
           billingCycle,
           successUrl: window.location.origin + '/pricing?payment=success&session_id={CHECKOUT_SESSION_ID}',
