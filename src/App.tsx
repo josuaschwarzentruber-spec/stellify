@@ -9740,19 +9740,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{t.features}</h4>
               <ul className="space-y-4 text-sm font-light">
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'cv-optimizer') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Lebenslauf-Optimierer' : 'CV Optimizer'}</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'ats-sim') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Lebenslauf-Check' : 'CV Check'}</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'salary-calc') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Gehaltsrechner' : language === 'FR' ? 'Calculateur salaire' : language === 'IT' ? 'Calcolo stipendio' : 'Salary Check'}</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'interview') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Interview-Coach' : language === 'FR' ? 'Coach entretien' : language === 'IT' ? 'Coach colloquio' : 'Interview Coach'}</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'zeugnis') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Zeugnis-Decoder' : language === 'FR' ? 'Décodeur certificat' : language === 'IT' ? 'Decoder certificato' : 'Certificate Decoder'}</button></li>
-                <li><button onClick={() => { if (user) { setActiveTool(tools.find((t:any) => t.id === 'career-roadmap') || null); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Karriere-Roadmap' : language === 'FR' ? 'Feuille de route carrière' : language === 'IT' ? 'Roadmap carriera' : 'Career Roadmap'}</button></li>
+                <li><button onClick={() => handleToolClick('bewerbungs-gen')} className="hover:text-white transition-colors text-left">{t.tools_data['bewerbungs-gen'].title}</button></li>
+                <li><button onClick={() => handleToolClick('tracker')} className="hover:text-white transition-colors text-left">{t.tools_data['tracker'].title}</button></li>
+                <li><button onClick={() => navigate('pricing')} className="hover:text-white transition-colors text-left">{t.nav_pricing || (language === 'FR' ? 'Prix' : language === 'IT' ? 'Prezzi' : language === 'EN' ? 'Pricing' : 'Preise')}</button></li>
               </ul>
             </div>
             <div>
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{language === 'DE' ? 'Unternehmen' : language === 'FR' ? 'Entreprise' : language === 'IT' ? 'Azienda' : 'Company'}</h4>
               <ul className="space-y-4 text-sm font-light">
                 <li><button onClick={() => navigate('about')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
-                <li><a href="#success" className="hover:text-white transition-colors">{t.success_stories}</a></li>
                 <li><button onClick={() => navigate('pricing')} className="hover:text-white transition-colors text-left">{t.pricing}</button></li>
                 <li><a href={`mailto:support@stellify.ch?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
                   {language === 'DE' ? 'Kooperationen' : language === 'FR' ? 'Partenariats' : language === 'IT' ? 'Collaborazioni' : 'Partnerships'}
@@ -9851,30 +9847,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.welcome_modal_quickstart}
                 </p>
                 <div className="space-y-2">
-                  {(user.role === 'unlimited'
-                    ? [
-                        { id: 'career-roadmap', icon: <Compass size={16} />, badge: 'Karriere+' },
-                        { id: 'cv-premium', icon: <Sparkles size={16} />, badge: 'Karriere+' },
-                        { id: 'matching', icon: <Search size={16} />, badge: 'Karriere+' },
-                      ]
-                    : user.role === 'pro'
-                    ? [
-                        { id: 'cv-analysis', icon: <Search size={16} />, badge: 'Pro' },
-                        { id: 'matching', icon: <Search size={16} />, badge: 'Pro' },
-                        { id: 'skill-gap', icon: <Target size={16} />, badge: 'Pro' },
-                      ]
-                    : user.cvContext
-                    ? [
-                        { id: 'cv-analysis', icon: <Search size={16} />, badge: 'Pro' },
-                        { id: 'interview', icon: <Mic size={16} />, badge: 'Gratis' },
-                        { id: 'matching', icon: <Search size={16} />, badge: 'Pro' },
-                      ]
-                    : [
-                        { id: 'cv-gen', icon: <Sparkles size={16} />, badge: 'Gratis' },
-                        { id: 'interview', icon: <Mic size={16} />, badge: 'Gratis' },
-                        { id: 'matching', icon: <Search size={16} />, badge: 'Pro' },
-                      ]
-                  ).map((item) => {
+                  {([
+                        { id: 'bewerbungs-gen', icon: <FileText size={16} />, badge: 'Gratis' },
+                        { id: 'tracker', icon: <Layout size={16} />, badge: 'Gratis' },
+                  ]).map((item) => {
                     const tool = tools.find(tl => tl.id === item.id);
                     if (!tool) return null;
                     return (
@@ -10016,10 +9992,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_quick}</h5>
                     <div className="grid grid-cols-2 gap-3">
                       {[
-                        { id: 'cv-gen', title: t.tools_data['cv-gen'].title, icon: <Sparkles size={14} />, badge: 'Gratis' },
-                        { id: 'cv-optimizer', title: t.tools_data['cv-optimizer'].title, icon: <FileText size={14} />, badge: 'Pro' },
-                        { id: 'interview', title: t.tools_data['interview'].title, icon: <Mic size={14} />, badge: 'Gratis' },
-                        { id: 'matching', title: t.tools_data['matching'].title, icon: <Search size={14} />, badge: 'Karriere+' }
+                        { id: 'bewerbungs-gen', title: t.tools_data['bewerbungs-gen'].title, icon: <FileText size={14} />, badge: 'Gratis' },
+                        { id: 'tracker', title: t.tools_data['tracker'].title, icon: <Layout size={14} />, badge: 'Gratis' },
                       ].map(action => (
                         <button
                           key={action.id}
