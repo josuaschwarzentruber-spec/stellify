@@ -720,19 +720,29 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-      const match = (data.text || '').match(/\{[\s\S]*\}/);
-      if (!match) throw new Error('no json');
-      const parsed = JSON.parse(match[0]);
+      const rawText = String(data.text || '').trim();
+      // The server has already counted this generation. If the model ignored
+      // the JSON instruction (returns prose/markdown) we must NOT throw the
+      // result away — that would burn the user's quota for nothing. Parse
+      // JSON when possible; otherwise salvage the raw text as the letter.
+      let parsed: any = null;
+      const match = rawText.match(/\{[\s\S]*\}/);
+      if (match) { try { parsed = JSON.parse(match[0]); } catch { /* fall through to salvage */ } }
+      const salvage = !parsed || !String(parsed.coverLetter || '').trim();
+      const coverLetter = salvage
+        ? rawText.replace(/```[a-z]*\n?|```/g, '').trim()
+        : String(parsed.coverLetter);
+      if (!coverLetter) throw new Error('empty response');
       setGen({
-        coverLetter: String(parsed.coverLetter || ''),
-        cvSummary: String(parsed.cvSummary || ''),
-        skills: Array.isArray(parsed.skills) ? parsed.skills.map(String) : [],
-        interview: Array.isArray(parsed.interview) ? parsed.interview.filter((x: any) => x?.q).map((x: any) => ({ q: String(x.q), a: String(x.a || '') })) : [],
+        coverLetter,
+        cvSummary: salvage ? '' : String(parsed.cvSummary || ''),
+        skills: !salvage && Array.isArray(parsed.skills) ? parsed.skills.map(String) : [],
+        interview: !salvage && Array.isArray(parsed.interview) ? parsed.interview.filter((x: any) => x?.q).map((x: any) => ({ q: String(x.q), a: String(x.a || '') })) : [],
       });
       // Mirror the standard tool bookkeeping: history entry + visible usage counters
       recordUsage?.({
         input: `${form.targetPosition} · ${form.targetCompany}`,
-        result: String(parsed.coverLetter || ''),
+        result: coverLetter,
       }).catch(() => {});
     } catch (e: any) {
       console.error('[BEWERBUNGS-GEN]', e);
@@ -755,12 +765,15 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
       const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
       const pageW = 210, pageH = 297;
       const imgH = (canvas.height * pageW) / canvas.width;
+      // Encode ONCE — re-encoding the full canvas per page wasted CPU/memory
+      // on long documents for identical bytes.
+      const imgData = canvas.toDataURL('image/jpeg', 0.92);
       let rendered = 0, page = 0;
       while (rendered < imgH) {
         if (page > 0) pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, -rendered, pageW, imgH);
+        pdf.addImage(imgData, 'JPEG', 0, -rendered, pageW, imgH);
         rendered += pageH; page++;
-        if (page > 6) break; // safety
+        if (page >= 12) break; // safety net far above any real dossier
       }
       pdf.save(`bewerbung-${(form.targetCompany || 'stellify').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`);
     } catch (e: any) {
@@ -772,14 +785,19 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
   const exportWord = () => {
     /* Word renders HTML: same letter, design approximated (accent colour,
        font pairing, simplified layout. sidebar becomes a table). */
+    // Escape EVERY user-entered value before interpolating into the Word
+    // HTML — an '&', '<' or '"' in a name/company would otherwise corrupt
+    // the document or break inline styles.
+    const esc = (v: string) => v
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     const a = design.accent;
     const serif = "Georgia, 'Times New Roman', serif";
     const sans = "Helvetica, Arial, sans-serif";
     const bodyFont = design.font === 'serif' ? serif : sans;
     const headFont = design.font === 'sans' ? sans : serif;
-    const fullName = `${form.firstName} ${form.lastName}`.trim();
-    const contact = [form.address, form.phone, form.email].filter(Boolean).join(' · ');
-    const bodyText = (gen?.coverLetter || form.motivation || '').split('\n').map(p => `<p>${p.replace(/</g, '&lt;')}</p>`).join('');
+    const fullName = esc(`${form.firstName} ${form.lastName}`.trim());
+    const contact = esc([form.address, form.phone, form.email].filter(Boolean).join(' · '));
+    const bodyText = (gen?.coverLetter || form.motivation || '').split('\n').map(p => `<p>${esc(p)}</p>`).join('');
     const today = new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
     const headerHtml = design.layout === 'sidebar' || design.layout === 'block'
       ? `<table width="100%" cellpadding="0" cellspacing="0" style="background:${a};color:#fff"><tr><td style="padding:18pt 22pt"><div style="font-family:${headFont};font-size:18pt;font-weight:bold">${fullName}</div><div style="font-size:8pt;margin-top:4pt;opacity:.85">${contact}</div></td></tr></table>`
@@ -787,12 +805,12 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
     const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><style>@page{size:A4;margin:2cm 2.2cm}body{font-family:${bodyFont};font-size:10.5pt;line-height:1.65;color:#26261F}p{margin:0 0 8pt 0}</style></head><body>
 ${headerHtml}
 <p style="color:#6B6B66;margin-top:14pt">${today}</p>
-<p style="font-weight:bold;color:${a};margin-top:10pt">${s.subject} ${form.targetPosition}${form.targetCompany ? ` · ${form.targetCompany}` : ''}</p>
-<p style="margin-top:10pt">${s.greeting}</p>
+<p style="font-weight:bold;color:${a};margin-top:10pt">${esc(s.subject)} ${esc(form.targetPosition)}${form.targetCompany ? ` · ${esc(form.targetCompany)}` : ''}</p>
+<p style="margin-top:10pt">${esc(s.greeting)}</p>
 ${bodyText}
-<p style="margin-top:10pt">${s.closing}</p>
+<p style="margin-top:10pt">${esc(s.closing)}</p>
 <p style="font-weight:bold">${fullName}</p>
-<p style="font-size:8pt;color:#9A9A94;margin-top:12pt">${s.attachment_note}</p>
+<p style="font-size:8pt;color:#9A9A94;margin-top:12pt">${esc(s.attachment_note)}</p>
 </body></html>`;
     const aEl = document.createElement('a');
     aEl.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);

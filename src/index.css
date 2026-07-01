@@ -15,6 +15,38 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ── Premium interaction polish ─────────────────────────────────────────────
+   The invisible details that make the product feel engineered:
+   no grey tap flash on mobile, branded text selection, a clean keyboard
+   focus ring, smooth anchor scrolling, and subtle press feedback on touch. */
+
+/* Kill the grey/blue tap flash on iOS/Android — feels cheap. */
+html { -webkit-tap-highlight-color: transparent; }
+
+/* Smooth in-page anchor scrolling (nav → #tools/#pricing), unless the
+   user prefers reduced motion. */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Branded text selection instead of default blue. */
+::selection { background: rgba(0, 66, 37, 0.90); color: #FAFAF8; }
+.dark ::selection { background: rgba(0, 168, 84, 0.85); color: #06130c; }
+
+/* Visible, branded focus ring for keyboard users only (not on mouse click). */
+:focus-visible {
+  outline: 2px solid #00A854;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Subtle press feedback on touch devices — buttons feel physical.
+   (framer-motion buttons override transform inline, so no conflict.) */
+@media (hover: none) and (pointer: coarse) {
+  button:not([disabled]):active { transform: scale(0.98); transition: transform 0.08s ease-out; }
+}
+
 @layer base {
   .markdown-body {
     @apply text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed;

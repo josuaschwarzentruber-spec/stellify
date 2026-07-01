@@ -528,11 +528,20 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
       const users = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       if (users?.length) {
         const u = users[0] as any;
-        await adminDb.collection('users').doc(u.id).update({ role: 'client' });
-        console.log(`[WEBHOOK] Downgraded ${u.id} to free after subscription deletion`);
-        if (u.email) {
-          const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
-          await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, 0, u.language || 'DE').catch(console.error);
+        // Plan changes (Pro→Ultimate) replace the subscription: Stripe fires
+        // a 'deleted' for the OLD sub while the NEW one is active. Blindly
+        // downgrading here would strip a paying customer of access. Only
+        // downgrade when no paid period is still running.
+        const expiresAt = u.subscription_expires_at ? new Date(u.subscription_expires_at).getTime() : 0;
+        if (expiresAt > Date.now()) {
+          console.log(`[WEBHOOK] subscription.deleted for ${u.id} ignored — paid period active until ${u.subscription_expires_at} (likely plan change)`);
+        } else {
+          await adminDb.collection('users').doc(u.id).update({ role: 'client' });
+          console.log(`[WEBHOOK] Downgraded ${u.id} to free after subscription deletion`);
+          if (u.email) {
+            const planType = u.subscription_interval === 'annual' ? 'annual' : 'monthly';
+            await sendRenewalReminder(u.email, u.first_name || 'Nutzer', planType, 0, u.language || 'DE').catch(console.error);
+          }
         }
       }
     } catch (err) {
@@ -1207,14 +1216,30 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   const isLinkedIn = /(^|\.)linkedin\.com$/i.test(parsed.hostname);
   const linkedInHint = 'LinkedIn schützt Stelleninserate teils vor automatischem Laden. Öffne die Anzeige, kopiere den Text und füge ihn unten manuell ein – oder nutze einen Yousty-/jobs.ch-Link.';
 
-  // This endpoint makes a DeepSeek call, so it must respect the same global
-  // daily ceiling as the other AI routes (it isn't behind enforceAIQuota).
+  // This endpoint makes a DeepSeek call. It deliberately does NOT consume a
+  // generation from the user's plan (importing a job is a helper step, not
+  // the product), but it must not be a free unlimited AI hole either:
+  //  1. global daily ceiling (same as every AI route)
+  //  2. per-user daily cap of 15 imports — plenty for real use, ends abuse.
   try {
     const { adminDb } = getAdminServices();
     if (!(await checkGlobalBudget(adminDb))) {
       return res.status(503).json({ error: 'Kurze Pause – bitte in ein paar Stunden erneut versuchen.', needsManual: true });
     }
-  } catch { /* if budget check fails, fall through — don't block the user */ }
+    const uid = (req as any).uid as string;
+    const userRef = adminDb.collection('users').doc(uid);
+    const snap = await userRef.get();
+    const u = snap.data() || {};
+    const today = todayKey();
+    const used = u.fetchjob_today_date === today ? (u.fetchjob_today || 0) : 0;
+    if (used >= 15) {
+      return res.status(429).json({
+        error: 'Tageslimit für Stellen-Importe erreicht (15). Füge den Text der Anzeige unten manuell ein.',
+        needsManual: true,
+      });
+    }
+    await userRef.set({ fetchjob_today: used + 1, fetchjob_today_date: today }, { merge: true });
+  } catch { /* if the guard itself fails, fall through — don't block the user */ }
 
   try {
     const ctrl = new AbortController();
@@ -1572,14 +1597,18 @@ app.get("/api/health", (_req, res) => {
 
 
 // ── Stripe Checkout ───────────────────────────────────────────────────────────
-app.post("/api/create-checkout-session", express.json(), async (req, res) => {
+app.post("/api/create-checkout-session", express.json(), requireAuth, async (req, res) => {
   const stripeKey = process.env.STRIPE_SECRET_KEY || '';
   const mode = stripeKey.startsWith('sk_live_') ? 'LIVE' : 'TEST';
   try {
-    const { planId, billingCycle, userId, successUrl, cancelUrl } = req.body || {};
+    const { planId, billingCycle, successUrl, cancelUrl } = req.body || {};
+    // Derive the user from the verified Firebase token — never from the body.
+    // (client_reference_id decides which account the webhook upgrades, so a
+    // body-supplied id would let a caller attach a payment to any account.)
+    const userId = (req as any).uid as string;
 
     if (!planId || !userId || !billingCycle) {
-      res.status(400).json({ error: "Fehlende Parameter: planId, userId oder billingCycle" });
+      res.status(400).json({ error: "Fehlende Parameter: planId oder billingCycle" });
       return;
     }
     if (!stripeKey) {
