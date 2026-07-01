@@ -4145,9 +4145,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Plan upgraden",
       plan_reset_info: "Limits werden automatisch zurückgesetzt, täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen. Upgrade jederzeit möglich.",
-      plan_free_f1: "Alle Tools zum Testen", plan_free_f2: "3 Generierungen lebenslang", plan_free_f3: "Bewerbung, Lebenslauf & Interview testen", plan_free_f4: "Bewerbungs-Tracker", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
-      plan_pro_f1: "50 Generierungen pro Monat", plan_pro_f2: "Bewerbung & Motivationsschreiben", plan_pro_f3: "Lebenslauf optimieren & Stellenanalyse", plan_pro_f4: "Interview Coach", plan_pro_f5: "Dokumentenspeicherung + prioritärer Support",
-      plan_unlim_f1: "150 Generierungen pro Monat", plan_unlim_f2: "ATS Premium-Analyse & Skill-Gap", plan_unlim_f3: "Erweiterter Interview Coach & Karriereanalyse", plan_unlim_f4: "Premium-Vorlagen & priorisierte KI-Verarbeitung", plan_unlim_f5: "Früher Zugang zu neuen Funktionen + VIP-Support",
+      plan_free_f1: "3 Bewerbungen zum Ausprobieren", plan_free_f2: "Bewerbungs-Übersicht & Status", plan_free_f3: "Bewerbungen speichern & bearbeiten", plan_free_f4: "PDF-Export", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
+      plan_pro_f1: "50 Bewerbungen pro Monat", plan_pro_f2: "Massgeschneiderte Bewerbungen mit KI", plan_pro_f3: "Stelle per Link laden & Lebenslauf nutzen", plan_pro_f4: "Alle Standard-Designs", plan_pro_f5: "PDF- & Word-Export",
+      plan_unlim_f1: "Unbegrenzte Bewerbungen (faire Nutzung)", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Bevorzugter Support", plan_unlim_f5: "Früher Zugang zu neuen Funktionen",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Anfragen",
       dashboard_daily_usage: "Tageslimit",
@@ -4414,9 +4414,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
         { title: "Datenschutz aus der Schweiz", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["3 Generierungen (lebenslang)", "Bewerbung, Lebenslauf & Interview testen", "Alle Funktionen zum Ausprobieren", "Keine Kreditkarte nötig"],
-      pricing_pro_f: ["50 Generierungen pro Monat", "Bewerbung & Motivationsschreiben", "Lebenslauf optimieren & Stellenanalyse", "Interview Coach", "Dokumentenspeicherung"],
-      pricing_ultimate_f: ["Alles aus Pro, plus:", "150 Generierungen pro Monat", "ATS Premium-Analyse & Skill-Gap", "Erweiterter Interview Coach & Karriereanalyse", "Premium-Vorlagen & priorisierte KI", "Früher Zugang zu neuen Funktionen"],
+      pricing_free_f: ["3 Bewerbungen zum Ausprobieren", "Bewerbungs-Übersicht & Status", "Speichern & bearbeiten", "Keine Kreditkarte nötig"],
+      pricing_pro_f: ["50 Bewerbungen pro Monat", "Massgeschneiderte Bewerbungen mit KI", "Stelle per Link laden & Lebenslauf nutzen", "Alle Standard-Designs", "PDF- & Word-Export"],
+      pricing_ultimate_f: ["Alles aus Pro, plus:", "Unbegrenzte Bewerbungen (faire Nutzung)", "Alle exklusiven Premium-Designs", "Bevorzugter Support", "Früher Zugang zu neuen Funktionen"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Karriere+ wählen",
@@ -4797,9 +4797,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Améliorer mon plan",
       plan_reset_info: "Limites réinitialisées automatiquement, chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie. Upgrade possible à tout moment.",
-      plan_free_f1: "Tous les outils à essayer", plan_free_f2: "3 générations à vie", plan_free_f3: "Tester candidature, CV & entretien", plan_free_f4: "Suivi des candidatures", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
-      plan_pro_f1: "50 générations par mois", plan_pro_f2: "Candidature & lettre de motivation", plan_pro_f3: "Optimisation du CV & analyse d'offre", plan_pro_f4: "Coach d'entretien", plan_pro_f5: "Stockage des documents + support prioritaire",
-      plan_unlim_f1: "150 générations par mois", plan_unlim_f2: "Analyse ATS Premium & Skill-Gap", plan_unlim_f3: "Coach d'entretien avancé & analyse carrière", plan_unlim_f4: "Modèles Premium & traitement IA prioritaire", plan_unlim_f5: "Accès anticipé aux nouveautés + support VIP",
+      plan_free_f1: "3 candidatures à essayer", plan_free_f2: "Aperçu & statut des candidatures", plan_free_f3: "Enregistrer & modifier les candidatures", plan_free_f4: "Export PDF", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
+      plan_pro_f1: "50 candidatures par mois", plan_pro_f2: "Candidatures sur mesure avec l'IA", plan_pro_f3: "Charger l'offre par lien & utiliser le CV", plan_pro_f4: "Tous les designs standard", plan_pro_f5: "Export PDF & Word",
+      plan_unlim_f1: "Candidatures illimitées (usage équitable)", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support prioritaire", plan_unlim_f5: "Accès anticipé aux nouveautés",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Requêtes Stella",
       dashboard_daily_usage: "Limite quotidienne",
@@ -5066,9 +5066,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
         { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
       ],
-      pricing_free_f: ["3 générations (à vie)", "Tester candidature, CV & entretien", "Toutes les fonctions pour essayer", "Sans carte de crédit"],
-      pricing_pro_f: ["50 générations par mois", "Candidature & lettre de motivation", "Optimisation du CV & analyse d'offre", "Coach d'entretien", "Stockage des documents"],
-      pricing_ultimate_f: ["Tout de Pro, plus :", "150 générations par mois", "Analyse ATS Premium & Skill-Gap", "Coach d'entretien avancé & analyse carrière", "Modèles Premium & IA prioritaire", "Accès anticipé aux nouveautés"],
+      pricing_free_f: ["3 candidatures à essayer", "Aperçu & statut des candidatures", "Enregistrer & modifier", "Sans carte de crédit"],
+      pricing_pro_f: ["50 candidatures par mois", "Candidatures sur mesure avec l'IA", "Charger l'offre par lien & utiliser le CV", "Tous les designs standard", "Export PDF & Word"],
+      pricing_ultimate_f: ["Tout de Pro, plus :", "Candidatures illimitées (usage équitable)", "Tous les designs Premium exclusifs", "Support prioritaire", "Accès anticipé aux nouveautés"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Karriere+",
@@ -5343,9 +5343,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Aggiorna piano",
       plan_reset_info: "Limiti reimpostati automaticamente, ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita. Upgrade possibile in qualsiasi momento.",
-      plan_free_f1: "Tutti gli strumenti da provare", plan_free_f2: "3 generazioni a vita", plan_free_f3: "Prova candidatura, CV e colloquio", plan_free_f4: "Tracker candidature", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
-      plan_pro_f1: "50 generazioni al mese", plan_pro_f2: "Candidatura & lettera di motivazione", plan_pro_f3: "Ottimizzazione CV & analisi annuncio", plan_pro_f4: "Coach per colloqui", plan_pro_f5: "Archiviazione documenti + supporto prioritario",
-      plan_unlim_f1: "150 generazioni al mese", plan_unlim_f2: "Analisi ATS Premium & Skill-Gap", plan_unlim_f3: "Coach colloqui avanzato & analisi carriera", plan_unlim_f4: "Modelli Premium & elaborazione IA prioritaria", plan_unlim_f5: "Accesso anticipato alle novità + supporto VIP",
+      plan_free_f1: "3 candidature da provare", plan_free_f2: "Panoramica & stato delle candidature", plan_free_f3: "Salva & modifica le candidature", plan_free_f4: "Esportazione PDF", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
+      plan_pro_f1: "50 candidature al mese", plan_pro_f2: "Candidature su misura con l'IA", plan_pro_f3: "Carica l'annuncio da link & usa il CV", plan_pro_f4: "Tutti i design standard", plan_pro_f5: "Esportazione PDF & Word",
+      plan_unlim_f1: "Candidature illimitate (uso corretto)", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto prioritario", plan_unlim_f5: "Accesso anticipato alle novità",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Richieste Stella",
       dashboard_daily_usage: "Limite giornaliero",
@@ -5612,9 +5612,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
         { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
       ],
-      pricing_free_f: ["3 generazioni (a vita)", "Prova candidatura, CV e colloquio", "Tutte le funzioni da provare", "Nessuna carta di credito"],
-      pricing_pro_f: ["50 generazioni al mese", "Candidatura & lettera di motivazione", "Ottimizzazione CV & analisi annuncio", "Coach per colloqui", "Archiviazione documenti"],
-      pricing_ultimate_f: ["Tutto di Pro, più:", "150 generazioni al mese", "Analisi ATS Premium & Skill-Gap", "Coach colloqui avanzato & analisi carriera", "Modelli Premium & IA prioritaria", "Accesso anticipato alle novità"],
+      pricing_free_f: ["3 candidature da provare", "Panoramica & stato delle candidature", "Salva & modifica", "Nessuna carta di credito"],
+      pricing_pro_f: ["50 candidature al mese", "Candidature su misura con l'IA", "Carica l'annuncio da link & usa il CV", "Tutti i design standard", "Esportazione PDF & Word"],
+      pricing_ultimate_f: ["Tutto di Pro, più:", "Candidature illimitate (uso corretto)", "Tutti i design Premium esclusivi", "Supporto prioritario", "Accesso anticipato alle novità"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Karriere+",
@@ -5889,9 +5889,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_upgrade_cta: "Upgrade plan",
       plan_reset_info: "Limits reset automatically, daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits. Upgrade anytime.",
-      plan_free_f1: "All tools to try", plan_free_f2: "3 lifetime generations", plan_free_f3: "Try application, CV & interview", plan_free_f4: "Application tracker", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
-      plan_pro_f1: "50 generations per month", plan_pro_f2: "Application & cover letter", plan_pro_f3: "CV optimisation & job analysis", plan_pro_f4: "Interview Coach", plan_pro_f5: "Document storage + priority support",
-      plan_unlim_f1: "150 generations per month", plan_unlim_f2: "ATS Premium analysis & Skill-Gap", plan_unlim_f3: "Advanced Interview Coach & career analysis", plan_unlim_f4: "Premium templates & prioritised AI processing", plan_unlim_f5: "Early access to new features + VIP support",
+      plan_free_f1: "3 applications to try", plan_free_f2: "Application overview & status", plan_free_f3: "Save & edit applications", plan_free_f4: "PDF export", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
+      plan_pro_f1: "50 applications per month", plan_pro_f2: "Tailored applications with AI", plan_pro_f3: "Load job by link & use your CV", plan_pro_f4: "All standard designs", plan_pro_f5: "PDF & Word export",
+      plan_unlim_f1: "Unlimited applications (fair use)", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Priority support", plan_unlim_f5: "Early access to new features",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella requests",
       dashboard_daily_usage: "Daily Limit",
@@ -6158,9 +6158,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Salary Transparency", desc: "Get precise salary forecasts based on Swiss market data for your specific region and industry.", icon: "Coins" },
         { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
       ],
-      pricing_free_f: ["3 generations (lifetime)", "Try application, CV & interview", "All features to explore", "No credit card required"],
-      pricing_pro_f: ["50 generations per month", "Application & cover letter", "CV optimisation & job analysis", "Interview Coach", "Document storage"],
-      pricing_ultimate_f: ["Everything in Pro, plus:", "150 generations per month", "ATS Premium analysis & Skill-Gap", "Advanced Interview Coach & career analysis", "Premium templates & prioritised AI", "Early access to new features"],
+      pricing_free_f: ["3 applications to try", "Application overview & status", "Save & edit", "No credit card required"],
+      pricing_pro_f: ["50 applications per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
+      pricing_ultimate_f: ["Everything in Pro, plus:", "Unlimited applications (fair use)", "All exclusive Premium designs", "Priority support", "Early access to new features"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Karriere+",
@@ -9180,22 +9180,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
 
-            {/* Trust strip — replaces the old launch-offer banner. Premium,
-                reassuring, no discount atmosphere. */}
-            <div className="mb-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5">
-              {[
-                language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro con Stripe' : language === 'EN' ? 'Secure payment via Stripe' : 'Sichere Zahlung über Stripe',
-                language === 'FR' ? 'Protection des données suisse' : language === 'IT' ? 'Protezione dati svizzera' : language === 'EN' ? 'Swiss data protection' : 'Datenschutz nach Schweizer Standard',
-                language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione crittografata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung',
-                language === 'FR' ? 'Résiliable à tout moment' : language === 'IT' ? 'Disdicibile in ogni momento' : language === 'EN' ? 'Cancel anytime' : 'Jederzeit kündbar',
-              ].map((item, i) => (
-                <span key={i} className="inline-flex items-center gap-2 text-[13px] text-white/75">
-                  <CheckCircle2 size={15} className="text-[#6FCF97] shrink-0" />
-                  {item}
-                </span>
-              ))}
-            </div>
-
             {subscriptionError && (
               <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-left flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3 min-w-0">
@@ -9247,10 +9231,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 mb-8 sm:mb-10"
           >
             {[
-              { icon: <Shield size={13} className="text-white/40" />, label: language === 'DE' ? '7-Tage Geld-zurück-Garantie' : language === 'FR' ? 'Garantie 7 jours' : language === 'IT' ? 'Garanzia 7 giorni' : '7-day money-back guarantee' },
-              { icon: <Lock size={13} className="text-white/40" />, label: 'SSL-gesichert · 256-bit' },
+              { icon: <ShieldCheck size={13} className="text-white/40" />, label: language === 'FR' ? 'Protection des données suisse' : language === 'IT' ? 'Protezione dati svizzera' : language === 'EN' ? 'Swiss data protection' : 'Datenschutz nach Schweizer Standard' },
+              { icon: <Lock size={13} className="text-white/40" />, label: language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione crittografata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung' },
               { icon: <CreditCard size={13} className="text-white/40" />, label: language === 'DE' ? 'Sichere Zahlung via Stripe' : language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro via Stripe' : 'Secure payment via Stripe' },
-              { icon: <CheckCircle2 size={13} className="text-white/40" />, label: language === 'DE' ? 'Keine automatische Verlängerung' : language === 'FR' ? 'Pas de renouvellement automatique' : language === 'IT' ? 'Nessun rinnovo automatico' : 'No automatic renewal' },
+              { icon: <CheckCircle2 size={13} className="text-white/40" />, label: language === 'FR' ? 'Résiliable à tout moment' : language === 'IT' ? 'Disdicibile in ogni momento' : language === 'EN' ? 'Cancel anytime' : 'Jederzeit kündbar' },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -11987,7 +11971,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       ? [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f4, t.plan_pro_f5]
                       : [t.plan_free_f1, t.plan_free_f2, t.plan_free_f3, t.plan_free_f4, t.plan_free_f5];
                     const upgradeFeatures: string[] | null = isUnlim ? null
-                      : isProPlan ? [t.plan_unlim_f2, t.plan_unlim_f3, t.plan_unlim_f4, t.plan_unlim_f5]
+                      : isProPlan ? [t.plan_unlim_f1, t.plan_unlim_f2, t.plan_unlim_f4, t.plan_unlim_f5]
                       : [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f5];
                     return (
                       <div className="p-5 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-5">
