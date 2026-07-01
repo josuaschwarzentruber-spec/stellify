@@ -837,13 +837,6 @@ function StellifyApp() {
   // to re-enable the launcher entry points across the app.
   const STELLA_CHAT_ENABLED = false;
 
-  // Launch promo banner. Flip `active` to false to hide it instantly.
-  // The actual discount is applied by Stripe — either auto (set the Vercel
-  // env STRIPE_LAUNCH_COUPON to a coupon id for 50% off / 3 months) or by
-  // the customer entering `code` at checkout (create a matching promo code
-  // in Stripe). Until one of those exists the banner is just messaging.
-  const LAUNCH_OFFER = { active: true, percent: 50, months: 3, code: 'LAUNCH50' };
-
   // YouTube video IDs — single source of truth for every video shown across
   // the app. Setting a value here flips the matching UI on (▶ button on the
   // landing hero, ▶ Tutorial chip on a tool, Welcome modal after sign-up).
@@ -6471,12 +6464,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     },
   ];
 
-  // Strategy-aligned toolset. Tools not named in the launch strategy are kept
-  // in code above (reversible) but hidden by filtering them out here.
+  // V1 LAUNCH FOCUS — one core job: professional, job-tailored AI
+  // applications (bewerbungs-gen). The free application tracker stays.
+  // Every other tool is kept in code above (reversible) but hidden so the
+  // product stays focused. Re-add ids here to bring a tool back later.
   const ENABLED_TOOL_IDS = new Set([
-    'bewerbungs-gen', 'cv-gen', 'cv-optimizer', 'cv-analysis', 'cv-premium',
-    'matching', 'interview', 'interview-live', 'salary-negotiation',
-    'ats-sim', 'career-roadmap', 'skill-gap', 'tracker',
+    'bewerbungs-gen', 'tracker',
   ]);
   const tools = allTools.filter(tl => ENABLED_TOOL_IDS.has(tl.id));
 
@@ -8913,34 +8906,27 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ))}
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-6 sm:gap-8">
-            <div className="p-6 sm:p-8 border border-red-100 dark:border-red-900/20 bg-red-50/30 dark:bg-red-900/5">
-              <h3 className="text-lg font-medium text-red-900 dark:text-red-400 mb-6 flex items-center gap-2">
-                <X size={20} className="text-red-500" />
-                {t.comparison_bad_title}
-              </h3>
-              <ul className="space-y-4">
-                {t.comparison_bad_items.map((item: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-red-800/70 dark:text-red-400/70 font-light">
-                    <X size={14} className="text-red-400 shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="p-8 border border-[#004225]/10 dark:border-[#FAFAF8]/10 bg-[#004225]/5 dark:bg-[#FDFCFB]/5">
-              <h3 className="text-lg font-medium text-[#004225] dark:text-[#FAFAF8] mb-6 flex items-center gap-2">
-                <CheckCircle2 size={20} className="text-[#004225] dark:text-[#FAFAF8]" />
-                {t.comparison_good_title}
-              </h3>
-              <ul className="space-y-4">
-                {t.comparison_good_items.map((item: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm text-[#004225]/70 dark:text-[#FAFAF8]/70 font-light">
-                    <CheckCircle2 size={14} className="text-[#004225] dark:text-[#FAFAF8] shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+          {/* Clean 4-step flow — everything on one platform. Replaces the
+              old vs-others comparison for a calmer, premium feel. */}
+          <div className="border-t border-black/8 dark:border-white/8 pt-16">
+            <p className="text-center text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">
+              {language === 'FR' ? 'Tout sur une seule plateforme' : language === 'IT' ? 'Tutto su un\'unica piattaforma' : language === 'EN' ? 'Everything on one platform' : 'Alles auf einer Plattform'}
+            </p>
+            <h3 className="text-center text-2xl sm:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-12">
+              {language === 'FR' ? 'Simple. Rapide. Professionnel.' : language === 'IT' ? 'Semplice. Veloce. Professionale.' : language === 'EN' ? 'Simple. Fast. Professional.' : 'Einfach. Schnell. Professionell.'}
+            </h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                language === 'FR' ? ['Téléverse ton CV ou saisis tes données', 'Colle le lien de l\'offre', 'Modifie la candidature en ligne', 'Télécharge un PDF professionnel']
+                : language === 'IT' ? ['Carica il CV o inserisci i dati', 'Incolla il link dell\'annuncio', 'Modifica la candidatura online', 'Scarica un PDF professionale']
+                : language === 'EN' ? ['Upload your CV or enter your details', 'Paste the job posting link', 'Edit the application online', 'Download a professional PDF']
+                : ['Lebenslauf hochladen oder Daten eingeben', 'Link zur Stellenausschreibung einfügen', 'Bewerbung direkt online bearbeiten', 'Als professionelles PDF herunterladen']
+              ][0].map((step, i) => (
+                <div key={i} className="p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-[#004225] dark:bg-[#00A854] text-white font-serif text-base mb-4">{i + 1}</span>
+                  <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] leading-relaxed">{step}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -9194,24 +9180,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
 
-            {LAUNCH_OFFER.active && (
-              <div className="mb-8 inline-flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 px-5 py-3 rounded-full bg-gradient-to-r from-[#00A854]/15 via-[#00A854]/10 to-[#00A854]/15 border border-[#00A854]/30 text-white">
-                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#6FCF97]">
-                  <Sparkles size={12} />
-                  {language === 'FR' ? 'Offre de lancement' : language === 'IT' ? 'Offerta di lancio' : language === 'EN' ? 'Launch offer' : 'Launch-Angebot'}
+            {/* Trust strip — replaces the old launch-offer banner. Premium,
+                reassuring, no discount atmosphere. */}
+            <div className="mb-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5">
+              {[
+                language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro con Stripe' : language === 'EN' ? 'Secure payment via Stripe' : 'Sichere Zahlung über Stripe',
+                language === 'FR' ? 'Protection des données suisse' : language === 'IT' ? 'Protezione dati svizzera' : language === 'EN' ? 'Swiss data protection' : 'Datenschutz nach Schweizer Standard',
+                language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione crittografata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung',
+                language === 'FR' ? 'Résiliable à tout moment' : language === 'IT' ? 'Disdicibile in ogni momento' : language === 'EN' ? 'Cancel anytime' : 'Jederzeit kündbar',
+              ].map((item, i) => (
+                <span key={i} className="inline-flex items-center gap-2 text-[13px] text-white/75">
+                  <CheckCircle2 size={15} className="text-[#6FCF97] shrink-0" />
+                  {item}
                 </span>
-                <span className="text-sm font-medium">
-                  {language === 'FR' ? `−${LAUNCH_OFFER.percent}% les ${LAUNCH_OFFER.months} premiers mois`
-                    : language === 'IT' ? `−${LAUNCH_OFFER.percent}% per i primi ${LAUNCH_OFFER.months} mesi`
-                    : language === 'EN' ? `−${LAUNCH_OFFER.percent}% for your first ${LAUNCH_OFFER.months} months`
-                    : `−${LAUNCH_OFFER.percent}% auf die ersten ${LAUNCH_OFFER.months} Monate`}
-                </span>
-                <span className="inline-flex items-center gap-1.5 text-xs text-white/70">
-                  {language === 'FR' ? 'Code' : language === 'IT' ? 'Codice' : language === 'EN' ? 'Code' : 'Code'}
-                  <span className="font-mono font-bold tracking-widest text-[#6FCF97] bg-white/5 border border-white/10 px-2 py-0.5 rounded">{LAUNCH_OFFER.code}</span>
-                </span>
-              </div>
-            )}
+              ))}
+            </div>
 
             {subscriptionError && (
               <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-left flex items-start justify-between gap-4">

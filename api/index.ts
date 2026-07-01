@@ -1604,16 +1604,11 @@ app.post("/api/create-checkout-session", express.json(), async (req, res) => {
     const isAnnual = billingCycle === 'yearly';
     const origin = String(req.headers.origin || process.env.SITE_URL || 'https://stellify.ch');
 
-    // Launch promo support:
-    //  • STRIPE_LAUNCH_COUPON set  → auto-apply that coupon (e.g. 50% off,
-    //    3 months). The customer sees the discount without typing anything.
-    //  • not set                   → just enable the promo-code field so a
-    //    coupon the user creates later still works. (Stripe forbids using
-    //    both `discounts` and `allow_promotion_codes` at once.)
+    // Premium positioning: no discount / promo-code field at checkout.
+    // (An optional STRIPE_LAUNCH_COUPON can still auto-apply a coupon if
+    // ever set, but nothing is shown to the customer by default.)
     const launchCoupon = (process.env.STRIPE_LAUNCH_COUPON || '').trim();
-    const promoConfig = launchCoupon
-      ? { discounts: [{ coupon: launchCoupon }] }
-      : { allow_promotion_codes: true };
+    const promoConfig = launchCoupon ? { discounts: [{ coupon: launchCoupon }] } : {};
 
     const session = await stripeClient.checkout.sessions.create({
       line_items: [{ price: priceId, quantity: 1 }],
