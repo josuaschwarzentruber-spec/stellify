@@ -8264,7 +8264,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView="visible"
                 viewport={{ once: true, margin: '-50px' }}
                 variants={{ visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } } }}
-                className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[11px] sm:text-[9px] font-bold uppercase tracking-widest"
+                className="hidden sm:flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5 text-[11px] sm:text-[9px] font-bold uppercase tracking-widest"
               >
                 <motion.span
                   variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
@@ -8356,9 +8356,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative"
+            className="relative hidden lg:block"
           >
-            {/* Application document preview — the core product in action */}
+            {/* Application document preview — the core product in action.
+                Hidden on mobile: the big showcase right below carries the
+                proof there, and three letter mocks on one phone screen
+                overwhelmed the page. */}
             <div className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl relative z-10 transition-colors overflow-hidden">
               {/* Branded header band */}
               <div className="bg-[#004225] px-6 py-3.5 flex items-center justify-between">
@@ -8437,7 +8440,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right). */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* A4 preview of a finished application — what the generator outputs.
               Real paragraph text (not gray skeleton lines) so visitors can
@@ -8470,7 +8473,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <p>+41 79 123 45 67</p>
                       <p className="break-all">{previewIdentity.emailMask}</p>
                     </div>
-                    <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
+                    <div className="hidden sm:block mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
                       <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
                         {language === 'FR' ? 'Compétences' : language === 'IT' ? 'Competenze' : language === 'EN' ? 'Skills' : 'Fähigkeiten'}
                       </p>
@@ -8492,7 +8495,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <p>Auswertung · Werbung</p>
                       </>)}
                     </div>
-                    <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
+                    <div className="hidden sm:block mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
                       <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
                         {language === 'FR' ? 'Langues' : language === 'IT' ? 'Lingue' : language === 'EN' ? 'Languages' : 'Sprachen'}
                       </p>
@@ -8530,7 +8533,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           ? 'For three years I have led the brand strategy of a major Swiss consumer goods player. I grew brand awareness by 28% on a CHF 1.2 m budget and launched two new products across the DACH markets.'
                           : 'Seit drei Jahren verantworte ich die Markenstrategie eines führenden Schweizer Konsumgüterherstellers. Mit einem Budget von CHF 1,2 Mio. steigerte ich die Markenbekanntheit um 28% und lancierte zwei Neuprodukte in der DACH-Region.'}
                       </p>
-                      <p>
+                      <p className="hidden sm:block">
                         {language === 'FR'
                           ? "Nestlé m'attire pour la combinaison entre racines suisses et portée internationale : un environnement où les décisions locales déterminent la voix d'une marque mondiale. C'est exactement ce dont je veux assumer la responsabilité."
                           : language === 'IT'
@@ -8539,7 +8542,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           ? 'What draws me to Nestlé is the blend of Swiss roots and global reach, an environment where local decisions shape the voice of a worldwide brand. That is exactly the responsibility I want to take on.'
                           : 'An Nestlé reizt mich die Kombination aus Schweizer Wurzeln und globaler Reichweite, ein Umfeld, in dem lokale Entscheidungen die Stimme einer weltweit gehörten Marke prägen. Genau diese Verantwortung möchte ich übernehmen.'}
                       </p>
-                      <p>
+                      <p className="hidden sm:block">
                         {language === 'FR'
                           ? "Ma combinaison entre rigueur analytique, trilinguisme (DE/FR/EN) et expérience des campagnes DACH correspond aux exigences de votre offre. Je me réjouis d'en discuter en personne."
                           : language === 'IT'
@@ -8652,7 +8655,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 : language === 'EN' ? 'Complete dossier, everything a Swiss application needs'
                 : 'Komplettes Dossier, alles was eine Schweizer Bewerbung braucht';
               return (
-                <div className="mt-10 max-w-lg">
+                <div className="hidden lg:block mt-10 max-w-lg">
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854] mb-3">{heading}</p>
                   <div className="space-y-3.5">
                     {groups.map((g, i) => (
@@ -8679,7 +8682,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- TRACKER SHOWCASE --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
@@ -8790,7 +8793,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            readable example inside a mini app window. Replaces the old thin
            multi-tool grid; sits after both showcases as the action step. */}
       {(!user || activeView === 'dashboard') && (
-      <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section id="tools" className="px-6 lg:px-12 py-14 lg:py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{t.tools_badge}</p>
@@ -8916,7 +8919,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
       {/* --- WHY STELLIFY SECTION --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
+      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
@@ -8929,7 +8932,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
 
           {/* Sales Arguments Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 mb-14 sm:mb-24">
             {t.why_stellify_points.map((point: any, i: number) => (
               <motion.div 
                 key={i}
@@ -8937,7 +8940,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#FAFAF8]/20 transition-all group"
+                className={`p-6 sm:p-8 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#FAFAF8]/20 transition-all group ${i >= 3 ? 'hidden sm:block' : ''}`}
               >
                 <div className="w-12 h-12 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 flex items-center justify-center text-[#004225] dark:text-[#FAFAF8] mb-6 group-hover:scale-110 transition-transform">
                   {point.icon === 'Target' && <Target size={24} />}
@@ -8964,7 +8967,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <h3 className="text-center text-2xl sm:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-12">
               {language === 'FR' ? 'Simple. Rapide. Professionnel.' : language === 'IT' ? 'Semplice. Veloce. Professionale.' : language === 'EN' ? 'Simple. Fast. Professional.' : 'Einfach. Schnell. Professionell.'}
             </h3>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {[
                 language === 'FR' ? ['Téléverse ton CV ou saisis tes données', 'Colle le lien de l\'offre', 'Modifie la candidature en ligne', 'Télécharge un PDF professionnel']
                 : language === 'IT' ? ['Carica il CV o inserisci i dati', 'Incolla il link dell\'annuncio', 'Modifica la candidatura online', 'Scarica un PDF professionale']
@@ -8988,7 +8991,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            positioned cyan nodes + connecting lines on a dot-grid canvas
            already convey the country, modern SaaS style. */}
       {(!user || activeView === 'dashboard') && (
-      <section id="schweiz" className="px-6 lg:px-12 py-24 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
+      <section id="schweiz" className="px-6 lg:px-12 py-14 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
         <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
              style={{ background: 'radial-gradient(ellipse at center, rgba(0,168,84,0.10) 0%, transparent 60%)' }} />
 
@@ -9141,7 +9144,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- PRICING SECTION --- */}
-      <section id="pricing" className="px-6 lg:px-12 py-24 bg-[#0a1410] text-white relative overflow-hidden">
+      <section id="pricing" className="px-6 lg:px-12 py-14 lg:py-24 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a1d12] via-[#0a1410] to-[#030806]" />
