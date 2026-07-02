@@ -703,6 +703,16 @@
       resizeCanvas();
       initStars();
 
+      /* Failsafe: no visitor may ever be stuck behind the splash. If the
+         app has not signalled ready after 15s (crash, blocked script,
+         ancient device), remove the overlay regardless. */
+      setTimeout(() => {
+        if (!stopped) {
+          try { window.stellifyReady && window.stellifyReady(); } catch (e) {}
+          removeSplash();
+        }
+      }, 15000);
+
       if (reducedMotion) {
         starAlpha = 1;
         state = 'running';

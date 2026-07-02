@@ -1786,9 +1786,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         // Store actual file in Supabase Storage via backend
         (async () => {
           try {
-            // Skip storage for oversized files — text extraction above already
-            // succeeded, so the product keeps working in text-only mode.
-            if (file.size > 8 * 1024 * 1024) { console.warn('CV > 8 MB, storing text only.'); return; }
+            // Skip storage for oversized files: base64 grows ~4/3 and Vercel
+            // rejects request bodies over ~4.5 MB, so 3 MB is the safe file
+            // ceiling. Text extraction above already succeeded, so the
+            // product keeps working in text-only mode.
+            if (file.size > 3 * 1024 * 1024) { console.warn('CV > 3 MB, storing text only.'); return; }
             const arrayBuffer = await file.arrayBuffer();
             // Chunked conversion: spreading a whole PDF into String.fromCharCode
             // blows the call stack for files > ~64 KB (i.e. every real CV).
