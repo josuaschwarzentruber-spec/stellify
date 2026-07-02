@@ -83,7 +83,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Weitergabe an Dritte">
                 <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (Google LLC)', 'Zweck: KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
+                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Zweck: Primäre KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: China. Es werden nur die für die jeweilige Anfrage nötigen Inhalte übermittelt; keine Kontodaten, keine Zahlungsdaten.'],['KI-Dienst (Google LLC, Gemini)', 'Zweck: KI-Verarbeitung als Ausweichdienst. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -138,7 +138,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Transfert à des tiers">
                 <p>Nous ne transmettons vos données qu'aux sous-traitants suivants :</p>
                 <div className="mt-3 space-y-4">
-                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (Google LLC)', 'Finalité : traitement IA des requêtes et du contenu du CV. Siège : USA. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
+                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Finalité : traitement IA principal des requêtes et du contenu du CV. Siège : Chine. Seuls les contenus nécessaires à la requête sont transmis; ni données de compte ni données de paiement.'],['Service IA (Google LLC, Gemini)', 'Finalité : traitement IA de secours. Siège : USA. Protection : clauses contractuelles types UE. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -189,7 +189,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Trasferimento a terzi">
                 <p>Trasferiamo i dati solo ai seguenti responsabili del trattamento:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (Google LLC)', 'Finalità: elaborazione IA delle richieste e del contenuto del CV. Sede: USA. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
+                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Finalità: elaborazione IA principale delle richieste e del contenuto del CV. Sede: Cina. Vengono trasmessi solo i contenuti necessari alla richiesta; nessun dato del conto né di pagamento.'],['Servizio IA (Google LLC, Gemini)', 'Finalità: elaborazione IA di riserva. Sede: USA. Strumento: clausole contrattuali tipo UE. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -240,7 +240,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="5. Third-Party Data Sharing">
                 <p>We only share data with the following processors:</p>
                 <div className="mt-3 space-y-4">
-                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (Google LLC)', 'Purpose: AI processing of user requests and CV content. Location: USA. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
+                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Purpose: Primary AI processing of user requests and CV content. Location: China. Only the content required for the request is transmitted; no account or payment data.'],['AI Service (Google LLC, Gemini)', 'Purpose: AI processing as fallback. Location: USA. Safeguard: EU Standard Contractual Clauses. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
                     <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
                   ))}
                 </div>
@@ -331,7 +331,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3 Generierungen lebenslang','Zugang zu allen Karriere-Tools','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Bewerbung & Motivationsschreiben','Lebenslauf optimieren & Stellenanalyse','Interview Coach','Dokumentenspeicherung','Prioritärer Support']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','ATS Premium-Analyse & Skill-Gap-Analyse','Erweiterter Interview Coach & Karriereanalyse','Premium-Vorlagen & priorisierte KI','24/7 VIP-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3 KI-Generierungen','Bewerbungs-Generator & Bewerbungs-Übersicht','PDF-Export','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -339,11 +339,11 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="4. Zahlung und Abrechnung"><p>Zahlung ausschliesslich via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Abrechnung im Voraus, monatlich oder jährlich.</p></Section>
               <Section title="5. Widerrufsrecht"><p>Stellify bietet eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer. Anfragen an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Laufzeit und Verlängerung">
+              <Section title="6. Laufzeit, Verlängerung und Kündigung">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monatliches Abo:</strong> Gilt genau 1 Monat ab Kaufdatum. Es erfolgt <em>keine</em> automatische Verlängerung. Nach Ablauf wird das Konto automatisch auf den Gratis-Plan zurückgestuft. Drei Tage vor Ablauf erhält der Nutzer eine Erinnerungs-E-Mail mit der Möglichkeit zur Verlängerung.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Jährliches Abo:</strong> Gilt genau 12 Monate ab Kaufdatum. Es erfolgt <em>keine</em> automatische Verlängerung. Nach Ablauf wird das Konto automatisch auf den Gratis-Plan zurückgestuft. 14 Tage vor Ablauf erhält der Nutzer eine Erinnerungs-E-Mail.</li>
-                  <li>Die Verlängerung erfolgt durch erneuten Kauf im Bereich Preise & Pläne.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monatliches Abo:</strong> Läuft 1 Monat ab Kaufdatum und verlängert sich automatisch um jeweils einen weiteren Monat, sofern es nicht gekündigt wird.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Jährliches Abo:</strong> Läuft 12 Monate ab Kaufdatum und verlängert sich automatisch um jeweils ein weiteres Jahr, sofern es nicht gekündigt wird.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Kündigung:</strong> Jederzeit möglich, direkt in den Kontoeinstellungen unter «Abo verwalten & kündigen». Die Kündigung wirkt auf das Ende der laufenden Abrechnungsperiode; bis dahin bleibt der volle Zugriff bestehen. Danach wird das Konto automatisch auf den Gratis-Plan zurückgestuft.</li>
                 </ul>
               </Section>
               <Section title="7. Nutzungsbeschränkungen"><ul className="list-disc pl-5 space-y-2"><li>Keine illegale Nutzung oder Täuschung Dritter</li><li>Kein Scraping / Bots</li><li>Keine Weitergabe von Zugangsdaten</li><li>Nutzer ist für die Richtigkeit von KI-Inhalten selbst verantwortlich</li></ul></Section>
@@ -384,7 +384,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3 générations à vie','Accès à tous les outils carrière','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidature & lettre de motivation','Optimisation du CV & analyse d\'offre','Coach d\'entretien','Stockage des documents','Support prioritaire']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Analyse ATS Premium & Skill-Gap','Coach d\'entretien avancé & analyse carrière','Modèles Premium & IA prioritaire','Support VIP 24/7']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3 générations IA','Générateur de candidatures & aperçu des candidatures','Export PDF','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -392,11 +392,11 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="4. Paiement"><p>Paiement exclusivement via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Facturation en avance, mensuelle ou annuelle.</p></Section>
               <Section title="5. Droit de rétractation"><p>Stellify offre une <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">garantie de remboursement de 7 jours</strong> pour les premiers acheteurs. Demandes à <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Durée et renouvellement">
+              <Section title="6. Durée, renouvellement et résiliation">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement mensuel :</strong> Valable exactement 1 mois à compter de la date d'achat. Aucun renouvellement automatique. À expiration, le compte revient automatiquement au plan gratuit. Un e-mail de rappel est envoyé 3 jours avant l'expiration.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement annuel :</strong> Valable exactement 12 mois à compter de la date d'achat. Aucun renouvellement automatique. À expiration, le compte revient automatiquement au plan gratuit. Un e-mail de rappel est envoyé 14 jours avant l'expiration.</li>
-                  <li>Le renouvellement s'effectue par un nouvel achat dans la section Tarifs & Plans.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement mensuel :</strong> Court 1 mois à compter de la date d'achat et se renouvelle automatiquement d'un mois à la fois, sauf résiliation.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement annuel :</strong> Court 12 mois à compter de la date d'achat et se renouvelle automatiquement d'une année à la fois, sauf résiliation.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Résiliation :</strong> Possible à tout moment, directement dans les paramètres du compte sous «Gérer et résilier l'abonnement». Elle prend effet à la fin de la période de facturation en cours; l'accès complet reste garanti jusque-là. Le compte passe ensuite automatiquement au plan gratuit.</li>
                 </ul>
               </Section>
               <Section title="7. Restrictions d'utilisation"><ul className="list-disc pl-5 space-y-2"><li>Pas d'utilisation illégale ni de tromperie de tiers</li><li>Pas de scraping / bots</li><li>Pas de partage d'identifiants</li><li>L'utilisateur est responsable de l'exactitude des contenus IA</li></ul></Section>
@@ -437,7 +437,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3 generazioni a vita','Accesso a tutti gli strumenti carriera','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidatura & lettera di motivazione','Ottimizzazione CV & analisi annuncio','Coach per colloqui','Archiviazione documenti','Supporto prioritario']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Analisi ATS Premium & Skill-Gap','Coach colloqui avanzato & analisi carriera','Modelli Premium & IA prioritaria','Supporto VIP 24/7']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3 generazioni IA','Generatore di candidature & panoramica candidature','Esportazione PDF','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -445,11 +445,11 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="4. Pagamento"><p>Pagamento esclusivamente tramite <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Fatturazione anticipata, mensile o annuale.</p></Section>
               <Section title="5. Diritto di recesso"><p>Stellify offre una <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">garanzia di rimborso di 7 giorni</strong> per i nuovi acquirenti. Richieste a <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Durata e rinnovo">
+              <Section title="6. Durata, rinnovo e disdetta">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento mensile:</strong> Valido esattamente 1 mese dalla data di acquisto. Nessun rinnovo automatico. Alla scadenza, l'account torna automaticamente al piano gratuito. Un'e-mail di promemoria viene inviata 3 giorni prima della scadenza.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento annuale:</strong> Valido esattamente 12 mesi dalla data di acquisto. Nessun rinnovo automatico. Alla scadenza, l'account torna automaticamente al piano gratuito. Un'e-mail di promemoria viene inviata 14 giorni prima della scadenza.</li>
-                  <li>Il rinnovo avviene tramite un nuovo acquisto nella sezione Prezzi & Piani.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento mensile:</strong> Dura 1 mese dalla data di acquisto e si rinnova automaticamente di un mese alla volta, salvo disdetta.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento annuale:</strong> Dura 12 mesi dalla data di acquisto e si rinnova automaticamente di un anno alla volta, salvo disdetta.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Disdetta:</strong> Possibile in qualsiasi momento, direttamente nelle impostazioni del conto sotto «Gestisci e disdici l'abbonamento». Ha effetto alla fine del periodo di fatturazione in corso; fino ad allora l'accesso completo resta garantito. Poi l'account passa automaticamente al piano gratuito.</li>
                 </ul>
               </Section>
               <Section title="7. Restrizioni d'uso"><ul className="list-disc pl-5 space-y-2"><li>Nessun utilizzo illegale né inganno di terzi</li><li>Nessun scraping / bot</li><li>Nessuna condivisione di credenziali</li><li>L'utente è responsabile dell'accuratezza dei contenuti IA</li></ul></Section>
@@ -490,7 +490,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3 lifetime generations','Access to all career tools','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Application & cover letter','CV optimisation & job analysis','Interview Coach','Document storage','Priority support']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','ATS Premium analysis & Skill-Gap','Advanced Interview Coach & career analysis','Premium templates & prioritised AI','24/7 VIP Support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3 AI generations','Application generator & application overview','PDF export','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -498,11 +498,11 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="4. Payment"><p>Payment exclusively via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Billed in advance, monthly or annually.</p></Section>
               <Section title="5. Right of Withdrawal"><p>Stellify offers a <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-day money-back guarantee</strong> for first-time buyers. Requests to <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
-              <Section title="6. Duration and Renewal">
+              <Section title="6. Duration, Renewal and Cancellation">
                 <ul className="list-disc pl-5 space-y-2">
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monthly subscription:</strong> Valid for exactly 1 month from purchase date. No automatic renewal. After expiry, the account automatically reverts to the Free Plan. A reminder email is sent 3 days before expiry.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Annual subscription:</strong> Valid for exactly 12 months from purchase date. No automatic renewal. After expiry, the account automatically reverts to the Free Plan. A reminder email is sent 14 days before expiry.</li>
-                  <li>To renew, simply purchase again in the Pricing &amp; Plans section.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monthly subscription:</strong> Runs for 1 month from purchase date and renews automatically one month at a time unless cancelled.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Annual subscription:</strong> Runs for 12 months from purchase date and renews automatically one year at a time unless cancelled.</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Cancellation:</strong> Possible at any time, directly in the account settings under "Manage &amp; cancel subscription". It takes effect at the end of the current billing period; full access remains until then. The account then automatically reverts to the Free Plan.</li>
                 </ul>
               </Section>
               <Section title="7. Usage Restrictions"><ul className="list-disc pl-5 space-y-2"><li>No illegal use or deception of third parties</li><li>No automated scraping or bots</li><li>No sharing of login credentials</li><li>Users are responsible for verifying the accuracy of AI-generated content</li></ul></Section>
