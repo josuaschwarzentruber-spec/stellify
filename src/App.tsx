@@ -421,10 +421,10 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           <option value="Rejected">{t.tracker_rejected}</option>
         </select>
       </td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '–'}</td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '–'}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '-'}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '-'}</td>
       <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
-        {app.updated_at ? new Date(app.updated_at).toLocaleDateString('de-CH') : (app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '–')}
+        {app.updated_at ? new Date(app.updated_at).toLocaleDateString('de-CH') : (app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '-')}
       </td>
       <td className="px-4 py-3">
         <div className="flex gap-1 justify-end">
@@ -1788,7 +1788,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           try {
             // Skip storage for oversized files — text extraction above already
             // succeeded, so the product keeps working in text-only mode.
-            if (file.size > 8 * 1024 * 1024) { console.warn('CV > 8 MB — storing text only.'); return; }
+            if (file.size > 8 * 1024 * 1024) { console.warn('CV > 8 MB, storing text only.'); return; }
             const arrayBuffer = await file.arrayBuffer();
             // Chunked conversion: spreading a whole PDF into String.fromCharCode
             // blows the call stack for files > ~64 KB (i.e. every real CV).
@@ -2481,10 +2481,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       console.error("Stella Chat Error:", err);
       const isOverloaded = err.message?.includes('overloaded') || err.message?.includes('503') || err.message?.includes('UNAVAILABLE') || err.message?.includes('high demand');
       let errorMsg = isOverloaded
-        ? (language === 'DE' ? 'Stella ist gerade sehr gefragt, bitte warte kurz und versuche es in 1–2 Minuten erneut.'
-          : language === 'FR' ? 'Stella est très demandée en ce moment, réessaie dans 1–2 minutes.'
-          : language === 'IT' ? 'Stella è molto richiesta in questo momento, riprova tra 1–2 minuti.'
-          : 'Stella is very busy right now, please try again in 1–2 minutes.')
+        ? (language === 'DE' ? 'Stella ist gerade sehr gefragt, bitte warte kurz und versuche es in 1 bis 2 Minuten erneut.'
+          : language === 'FR' ? 'Stella est très demandée en ce moment, réessaie dans 1 à 2 minutes.'
+          : language === 'IT' ? 'Stella è molto richiesta in questo momento, riprova tra 1 a 2 minuti.'
+          : 'Stella is very busy right now, please try again in 1 to 2 minutes.')
         : (language === 'DE' ? 'Stella hat gerade ein technisches Problem. Bitte versuche es später noch einmal.'
           : language === 'FR' ? 'Stella rencontre un problème technique. Veuillez réessayer plus tard.'
           : language === 'IT' ? 'Stella ha un problema tecnico. Si prega di riprovare più tardi.'
@@ -2542,7 +2542,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
   /** Compact, per-tool example shown in the Tools-section header preview.
       `score` drives the progress ring (null = no ring, just a list).
-      `L` holds localized [context-label, ...result-lines]. Kept lean —
+      `L` holds localized [context-label, ...result-lines]. Kept lean , 
       one example per tool, switches when the user hovers/clicks a chip. */
   const getHeaderExample = (id: string): { score: number | null; L: string[] } => {
     const lang = (language === 'FR' || language === 'IT' || language === 'EN') ? language : 'DE';
@@ -2550,10 +2550,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       lang === 'FR' ? fr : lang === 'IT' ? it : lang === 'EN' ? en : de;
     const M: Record<string, { score: number | null; L: string[] }> = {
       'bewerbungs-gen': { score: 92, L: pick(
-        ['Bewerbungs-Scanner · Marketing Manager · Nestlé', 'Anschreiben geschrieben — 4 Absätze', 'Lebenslauf verbessert · 12 wichtige Wörter getroffen', 'Fertig als PDF und Word'],
-        ['Score ATS · Marketing Manager · Nestlé', 'Lettre générée — 4 paragraphes', 'CV optimisé · 12 mots-clés', 'Prêt en PDF et Word'],
-        ['Punteggio ATS · Marketing Manager · Nestlé', 'Lettera generata — 4 paragrafi', 'CV ottimizzato · 12 parole chiave', 'Pronto in PDF e Word'],
-        ['ATS score · Marketing Manager · Nestlé', 'Cover letter generated — 4 paragraphs', 'CV optimised · 12 keywords matched', 'Ready as PDF and Word']) },
+        ['Bewerbungs-Scanner · Marketing Manager · Nestlé', 'Anschreiben geschrieben, 4 Absätze', 'Lebenslauf verbessert · 12 wichtige Wörter getroffen', 'Fertig als PDF und Word'],
+        ['Score ATS · Marketing Manager · Nestlé', 'Lettre générée, 4 paragraphes', 'CV optimisé · 12 mots-clés', 'Prêt en PDF et Word'],
+        ['Punteggio ATS · Marketing Manager · Nestlé', 'Lettera generata, 4 paragrafi', 'CV ottimizzato · 12 parole chiave', 'Pronto in PDF e Word'],
+        ['ATS score · Marketing Manager · Nestlé', 'Cover letter generated, 4 paragraphs', 'CV optimised · 12 keywords matched', 'Ready as PDF and Word']) },
       'cv-gen': { score: 90, L: pick(
         ['Bewerbung · 60 Sekunden', 'Motivationsschreiben fertig', 'Lebenslauf-Highlights gesetzt', 'Schweizer Hochdeutsch, kein ß'],
         ['Candidature · 60 secondes', 'Lettre de motivation prête', 'Points forts du CV définis', 'Allemand suisse correct'],
@@ -2590,10 +2590,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         ['Roadmap · Head of IT', '1. Certificazione ITIL', '2. Ruolo team leader', '3. MBA HSG in 2 anni'],
         ['Roadmap · Head of IT', '1. ITIL certification', '2. Move to team lead', '3. HSG MBA in 2 years']) },
       'interview': { score: null, L: pick(
-        ['Interview-Coach · 5 Fragen', '„Warum gerade in der Schweiz?"', 'Antwort nach STAR-Methode', 'Bewertung 0–100 mit Tipps'],
-        ['Coach entretien · 5 questions', '« Pourquoi la Suisse ? »', 'Réponse méthode STAR', 'Note 0–100 avec conseils'],
-        ['Coach colloquio · 5 domande', '« Perché la Svizzera? »', 'Risposta metodo STAR', 'Voto 0–100 con consigli'],
-        ['Interview coach · 5 questions', '"Why Switzerland?"', 'Answer via STAR method', 'Score 0–100 with tips']) },
+        ['Interview-Coach · 5 Fragen', '„Warum gerade in der Schweiz?"', 'Antwort nach STAR-Methode', 'Bewertung 0 bis 100 mit Tipps'],
+        ['Coach entretien · 5 questions', '« Pourquoi la Suisse ? »', 'Réponse méthode STAR', 'Note 0 à 100 avec conseils'],
+        ['Coach colloquio · 5 domande', '« Perché la Svizzera? »', 'Risposta metodo STAR', 'Voto 0 a 100 con consigli'],
+        ['Interview coach · 5 questions', '"Why Switzerland?"', 'Answer via STAR method', 'Score 0 to 100 with tips']) },
       'interview-live': { score: null, L: pick(
         ['Live-Interview · Product Manager', 'Massgeschneiderte Fragen zur Stelle', 'Antwort per Text oder Mikrofon', 'Feedback zu Tonfall & Inhalt'],
         ['Entretien live · Product Manager', 'Questions sur mesure', 'Réponse texte ou micro', 'Feedback ton & contenu'],
@@ -2731,7 +2731,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             <div className="flex justify-between text-[8px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1"><span>CHF 95k</span><span>CHF 145k</span></div>
             <div className="h-2 bg-black/[0.06] dark:bg-white/[0.08] rounded-full relative overflow-hidden"><div className="absolute inset-y-0 left-[15%] right-[20%] bg-[#004225] dark:bg-[#00A854] rounded-full" /></div>
           </div>
-          <p className="text-[9.5px] text-[#4A4A45] dark:text-[#9A9A94]">+ 13. Monatslohn · 5–10% Bonus realistisch</p>
+          <p className="text-[9.5px] text-[#4A4A45] dark:text-[#9A9A94]">+ 13. Monatslohn · 5 bis 10% Bonus realistisch</p>
         </div>
       );
     }
@@ -2860,7 +2860,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
    */
   const TOOL_EXAMPLES: Record<string, Record<string, string>> = {
     'cv-optimizer':       { section: 'Berufserfahrung als Projektleiter' },
-    'cv-analysis':        { cvText: 'Anna Müller, 32 Jahre, Zürich.\nBerufserfahrung: Senior Business Analyst bei UBS (2020–heute), Business Analyst bei Credit Suisse (2017–2020).\nAusbildung: BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG.\nSprachen: Deutsch (Muttersprache), Englisch (C1), Französisch (B2).\nSkills: SQL, Excel, Power BI, Tableau, Stakeholder Management, agile Projektleitung.' },
+    'cv-analysis':        { cvText: 'Anna Müller, 32 Jahre, Zürich.\nBerufserfahrung: Senior Business Analyst bei UBS (2020 bis heute), Business Analyst bei Credit Suisse (2017 bis 2020).\nAusbildung: BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG.\nSprachen: Deutsch (Muttersprache), Englisch (C1), Französisch (B2).\nSkills: SQL, Excel, Power BI, Tableau, Stakeholder Management, agile Projektleitung.' },
     'cv-premium':         { firstName: 'Anna', lastName: 'Müller', applicationType: 'Bewerbung / Vorstellung', duration: '5 Jahre', qualifications: 'BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG, SQL, Power BI', cvText: 'Anna Müller, 32, Zürich. 5 Jahre Erfahrung als Business Analyst im Banking.', description: 'Vollständige Optimierung auf Schweizer Premium-Standard.' },
     'cv-gen':             { firstName: 'Anna', lastName: 'Müller', applicationType: 'Bewerbung / Vorstellung', duration: '5 Jahre', qualifications: 'BSc Wirtschaftsinformatik HSLU, CAS Data Analytics HSG, SQL, Power BI', jobAd: 'Senior Business Analyst (m/w/d), Zürich, Banking. Wir suchen eine analytische Persönlichkeit mit SQL- und BI-Erfahrung für ein Datenstrategie-Team.', description: 'Motiviertes, knappes Anschreiben mit Fokus auf Schweizer Banking-Erfahrung.' },
     'ats-sim':            { jobAd: 'Senior Business Analyst (m/w/d), Zürich, Banking. Anforderungen: 5+ Jahre Erfahrung im Banking, exzellente SQL- und Power-BI-Kenntnisse, Erfahrung mit Stakeholder Management und agilen Methoden, Deutsch verhandlungssicher, Englisch C1.' },
@@ -3024,7 +3024,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'cv-optimizer':
           prompt = `
             HANDLUNGSANWEISUNG: Optimiere die CV-Sektion: ${toolInput.section}.
-            KONTEXT: CV des Nutzers: ${cvContext || 'Kein Lebenslauf hochgeladen – arbeite ausschliesslich mit dem oben angegebenen Abschnitt und allgemeinen Schweizer CV-Standards.'}.
+            KONTEXT: CV des Nutzers: ${cvContext || 'Kein Lebenslauf hochgeladen, arbeite ausschliesslich mit dem oben angegebenen Abschnitt und allgemeinen Schweizer CV-Standards.'}.
             
             DEINE ROLLE: Du bist ein Senior Recruiter für den Schweizer Markt (Zürich/Genf/Basel/Zug).
             
@@ -3126,7 +3126,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         case 'ats-sim':
           prompt = `
             HANDLUNGSANWEISUNG: Führe eine tiefgehende "Premium ATS-Simulation" (Applicant Tracking System) durch.
-            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen – bewerte nur das Inserat und gib allgemeine ATS-Optimierungen nach Schweizer Standard.'}. Inserat: ${toolInput.jobAd}.
+            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen, bewerte nur das Inserat und gib allgemeine ATS-Optimierungen nach Schweizer Standard.'}. Inserat: ${toolInput.jobAd}.
             DEINE ROLLE: Du bist ein technischer Recruiter für einen Schweizer Grosskonzern.
             
             ANALYSE-FOKUS (SCHWEIZER STANDARD):
@@ -3158,7 +3158,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             NEGATIV-CODES: "bemüht" = kaum Erfolg; "erledigt" ohne Zusatz = Minimalleistung; "ruhiges Wesen" = passiv; "kollegiales Umfeld geschätzt" = soziale Schwierigkeiten; fehlendes "wir bedauern" = kein Bedauern; fehlendes "jederzeit" = eingeschränkte Empfehlung
 
             ANALYSE-STRUKTUR:
-            1. GESAMTNOTE (1.0–6.0): Bewertung mit Begründung basierend auf dem Zeugnis-Code.
+            1. GESAMTNOTE (1.0 bis 6.0): Bewertung mit Begründung basierend auf dem Zeugnis-Code.
             2. SATZ-FÜR-SATZ DECODER: Jeder relevante Satz im Klartext, was bedeutet er wirklich?
             3. VERSTECKTE BOTSCHAFTEN: Auslassungen, negative Codes, unübliche Reihenfolgen, fehlende Standardformeln.
             4. KRITISCHE PUNKTE: Was bemerkt ein neuer Schweizer Arbeitgeber sofort?
@@ -3177,7 +3177,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           const scoringGrid = interviewTier === 'unlimited'
             ? `
 BEWERTUNGSRASTER (100%, Unlimited):
-Bewerte den Kandidaten nach dem Interview in 8 Kategorien (je 0–100%):
+Bewerte den Kandidaten nach dem Interview in 8 Kategorien (je 0 bis 100%):
 1. Erstkontakt & Auftreten (10%)
 2. Fachliche Kompetenz (20%)
 3. Kommunikation & Klarheit (15%)
@@ -3190,7 +3190,7 @@ Bewerte den Kandidaten nach dem Interview in 8 Kategorien (je 0–100%):
             : interviewTier === 'pro'
             ? `
 BEWERTUNGSRASTER (Pro, 5 Kategorien):
-Bewerte in 5 Kategorien (je 0–100%):
+Bewerte in 5 Kategorien (je 0 bis 100%):
 1. Fachliche Kompetenz (25%)
 2. Kommunikation & Auftreten (25%)
 3. Motivation & Vorbereitung (20%)
@@ -3199,7 +3199,7 @@ Bewerte in 5 Kategorien (je 0–100%):
 → Gesamtscore + Kernempfehlungen pro Kategorie.`
             : `
 BEWERTUNGSRASTER (Basis):
-Bewerte in 3 Kategorien (je 0–100%):
+Bewerte in 3 Kategorien (je 0 bis 100%):
 1. Auftreten & Kommunikation (40%)
 2. Fachliche Eignung (40%)
 3. Motivation (20%)
@@ -3211,7 +3211,7 @@ Bewerte in 3 Kategorien (je 0–100%):
             ART DER BEWERBUNG: ${toolInput.applicationType || 'Allgemeine Bewerbung'}.
             QUALIFIKATIONEN: ${toolInput.qualifications || 'Keine angegeben'}.
             FOKUS/WÜNSCHE: ${toolInput.description || 'Allgemeines Interview-Training'}.
-            CV: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards'}.
+            CV: ${cvContext || 'Kein CV hochgeladen, nutze allgemeine Schweizer Standards'}.
             SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
 
             AUFGABE: Erstelle eine massgeschneiderte Interview-Vorbereitung für Schweizer Unternehmen.
@@ -3270,7 +3270,7 @@ Bewerte in 3 Kategorien (je 0–100%):
           prompt = `
             HANDLUNGSANWEISUNG: Strategie für den Wiedereinstieg nach einer Pause.
             GRUND: ${toolInput.reason || 'Nicht spezifiziert'}.
-            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen – arbeite mit dem angegebenen Grund und allgemeinen Schweizer Wiedereinstiegs-Strategien.'}.
+            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen, arbeite mit dem angegebenen Grund und allgemeinen Schweizer Wiedereinstiegs-Strategien.'}.
             INHALT:
             - Wie man die Lücke im CV positiv umformuliert.
             - Argumente für die aktuelle Motivation und Einsatzbereitschaft.
@@ -3291,7 +3291,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'matching':
           prompt = `
             HANDLUNGSANWEISUNG: Job-Matching Analyse.
-            KONTEXT: CV: ${toolInput.cvText || cvContext || 'Kein Lebenslauf vorhanden – bitte den Nutzer höflich, seinen Lebenslauf hochzuladen oder einzufügen, und gib solange allgemeine Schweizer Job-Profile.'}.
+            KONTEXT: CV: ${toolInput.cvText || cvContext || 'Kein Lebenslauf vorhanden, bitte den Nutzer höflich, seinen Lebenslauf hochzuladen oder einzufügen, und gib solange allgemeine Schweizer Job-Profile.'}.
             AUFGABE: Basierend auf dem CV, welche 5 Job-Profile in der Schweiz passen am besten?
             Gib für jedes Profil einen Fit-Score (0-100%) und eine kurze Begründung an.
           `;
@@ -3299,7 +3299,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'cv-analysis':
           prompt = `
             HANDLUNGSANWEISUNG: Führe eine tiefgehende "Premium-Analyse" des Lebenslaufs für den Schweizer Arbeitsmarkt durch.
-            KONTEXT: CV: ${toolInput.cvText || cvContext || 'Kein Lebenslauf vorhanden – bitte den Nutzer höflich, seinen Lebenslauf hochzuladen oder einzufügen.'}.
+            KONTEXT: CV: ${toolInput.cvText || cvContext || 'Kein Lebenslauf vorhanden, bitte den Nutzer höflich, seinen Lebenslauf hochzuladen oder einzufügen.'}.
             DEINE ROLLE: Du bist ein Elite Career Consultant für den Schweizer Markt (Zürich, Genf, Basel, Zug).
             
             ANALYSE-PUNKTE (SCHWEIZER PREMIUM-STANDARD):
@@ -3338,7 +3338,7 @@ Bewerte in 3 Kategorien (je 0–100%):
         case 'tracker':
           prompt = `
             HANDLUNGSANWEISUNG: Bewerbungs-Strategie für: ${toolInput.jobTitle}.
-            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen – nutze den angegebenen Jobtitel und allgemeine Schweizer Bewerbungsstrategien.'}.
+            KONTEXT: CV: ${cvContext || 'Kein Lebenslauf hochgeladen, nutze den angegebenen Jobtitel und allgemeine Schweizer Bewerbungsstrategien.'}.
             AUFGABE: Erstelle einen konkreten Schlachtplan für diese Bewerbung.
             - Recherche-Tipps zum Unternehmen.
             - Wer könnte der Hiring Manager sein?
@@ -3349,8 +3349,8 @@ Bewerte in 3 Kategorien (je 0–100%):
           prompt = `
             HANDLUNGSANWEISUNG: Generiere 5 massgeschneiderte Interview-Fragen als JSON-Objekt.
             STELLE: ${toolInput.jobTitle}${toolInput.company ? ` bei ${toolInput.company}` : ' bei einem Schweizer Unternehmen'}.
-            STELLENBESCHREIBUNG: ${toolInput.jobDesc || 'Keine Details angegeben – nutze branchenübliche Anforderungen.'}.
-            CV: ${cvContext || 'Kein CV hochgeladen – nutze allgemeine Schweizer Standards.'}.
+            STELLENBESCHREIBUNG: ${toolInput.jobDesc || 'Keine Details angegeben, nutze branchenübliche Anforderungen.'}.
+            CV: ${cvContext || 'Kein CV hochgeladen, nutze allgemeine Schweizer Standards.'}.
             SPRACHE: Schweizer Hochdeutsch (kein ß, verwende ss).
 
             AUSGABE-FORMAT (NUR JSON, absolut kein Text davor oder danach):
@@ -3358,7 +3358,7 @@ Bewerte in 3 Kategorien (je 0–100%):
               "jobContext": "${toolInput.jobTitle}${toolInput.company ? ` bei ${toolInput.company}` : ''}",
               "questions": [
                 {
-                  "q": "Frage 1 – präzise und realistisch, wie sie bei Schweizer Unternehmen gestellt wird",
+                  "q": "Frage 1, präzise und realistisch, wie sie bei Schweizer Unternehmen gestellt wird",
                   "tip": "Was der Interviewer wirklich wissen will (1-2 Sätze)",
                   "model": "Optimale Antwort-Strategie (STAR wenn sinnvoll, konkret und kurz)",
                   "mistakes": "Häufige Fehler bei dieser Frage (1 Satz)"
@@ -3393,7 +3393,7 @@ Bewerte in 3 Kategorien (je 0–100%):
             Für jedes Argument: Argument + genaue Formulierung auf Schweizer Hochdeutsch
             1. Nachweisbare Leistung (Zahlen, Resultate aus CV)
             2. Marktgerechter Lohn (Salarium-Referenz)
-            3. 13. Monatslohn: "Ich rechne den 13. Monatslohn im Jahresgehalt ein – das entspricht CHF [X]/Monat."
+            3. 13. Monatslohn: "Ich rechne den 13. Monatslohn im Jahresgehalt ein, das entspricht CHF [X]/Monat."
             4. Spezifische Kompetenz / Marktknappheit
             5. Langfristige Wertschöpfung für das Unternehmen
 
@@ -3408,7 +3408,7 @@ Bewerte in 3 Kategorien (je 0–100%):
             ## 🇨🇭 Schweizer Besonderheiten
             - 13. Monatslohn: Branchenstandard CH, im Jahresgehalt einrechnen (Bruttogehalt × 13/12 = Monatslohn)
             - Quellensteuer: Bei B/L-Ausweis kann Verhandlungsspielraum eingeschränkt sein
-            - Kultureller Code: Direkt, sachlich, faktenbasiert – keine amerikanische Überschwänglichkeit
+            - Kultureller Code: Direkt, sachlich, faktenbasiert, keine amerikanische Überschwänglichkeit
             - DO: Zahlen nennen, ruhig bleiben, Gegenvorschlag machen
             - DON'T: Druck machen, emotionale Argumente, Vergleiche mit Kollegen
 
@@ -3427,6 +3427,13 @@ Bewerte in 3 Kategorien (je 0–100%):
       });
       const toolData = await toolRes.json();
       if (toolRes.status === 429) throw new Error(toolData.error || 'rate limit');
+      // Free quota used up: show the server's clear message in the result
+      // panel instead of a generic failure, so the user knows what to do.
+      if (toolRes.status === 402) {
+        setToolResult(toolData.error || t.tool_limit_free);
+        setIsProcessingTool(false);
+        return;
+      }
       if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
 
       let resultText = toolData.text;
@@ -3699,10 +3706,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             : language === 'IT' ? '⚠️ Hai inviato troppe richieste. Attendi un minuto e riprova.'
             : '⚠️ Too many requests. Please wait a minute and try again.')
           : isOverloaded
-          ? (language === 'DE' ? '⚠️ Die KI ist gerade sehr ausgelastet. Bitte warte 1–2 Minuten und versuche es erneut.'
-            : language === 'FR' ? '⚠️ L\'IA est très sollicitée. Veuillez attendre 1–2 minutes et réessayer.'
-            : language === 'IT' ? '⚠️ L\'IA è molto occupata. Attendi 1–2 minuti e riprova.'
-            : '⚠️ AI is very busy right now. Please wait 1–2 minutes and try again.')
+          ? (language === 'DE' ? '⚠️ Die KI ist gerade sehr ausgelastet. Bitte warte 1 bis 2 Minuten und versuche es erneut.'
+            : language === 'FR' ? '⚠️ L\'IA est très sollicitée. Veuillez attendre 1 à 2 minutes et réessayer.'
+            : language === 'IT' ? '⚠️ L\'IA è molto occupata. Attendi 1 a 2 minuti e riprova.'
+            : '⚠️ AI is very busy right now. Please wait 1 to 2 minutes and try again.')
           : (language === 'DE' ? '⚠️ Ein Fehler ist aufgetreten. Bitte versuche es erneut.'
             : language === 'FR' ? '⚠️ Une erreur est survenue. Veuillez réessayer.'
             : language === 'IT' ? '⚠️ Si è verificato un errore. Riprova.'
@@ -4234,7 +4241,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Ø Gehalt",
       stat_rate: "Quote",
       stat_based_on: "von",
-      stat_no_data: "–",
+      stat_no_data: "-",
       tracker_reminder: "Erinnerung am",
       tracker_reminder_due: "Heute fällig",
       tracker_reminder_overdue: "überfällig",
@@ -4297,7 +4304,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_maybe_later: "Vielleicht später",
       tool_inputs: "Eingaben",
       tool_cv_optional_label: "Lebenslauf (optional, falls keiner hochgeladen)",
-      tool_cv_optional_ph: "Füge deinen Lebenslauf hier ein oder lade eine Datei – oder lass es leer für allgemeine Tipps.",
+      tool_cv_optional_ph: "Füge deinen Lebenslauf hier ein oder lade eine Datei, oder lass es leer für allgemeine Tipps.",
       tool_load_file: "Datei laden",
       salary_security_notice: "Deine Daten sind sicher: Stellify speichert keine persönlichen Gehaltsdaten. Die Berechnung erfolgt anonymisiert nach Schweizer Datenschutzstandards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
@@ -4886,7 +4893,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Salaire moy.",
       stat_rate: "Taux",
       stat_based_on: "sur",
-      stat_no_data: "–",
+      stat_no_data: "-",
       tracker_reminder: "Relance le",
       tracker_reminder_due: "À faire aujourd'hui",
       tracker_reminder_overdue: "en retard",
@@ -4949,7 +4956,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_maybe_later: "Peut-être plus tard",
       tool_inputs: "Paramètres",
       tool_cv_optional_label: "CV (optionnel, si aucun n'est téléchargé)",
-      tool_cv_optional_ph: "Colle ton CV ici ou télécharge un fichier – ou laisse vide pour des conseils généraux.",
+      tool_cv_optional_ph: "Colle ton CV ici ou télécharge un fichier, ou laisse vide pour des conseils généraux.",
       tool_load_file: "Charger fichier",
       salary_security_notice: "Vos données sont en sécurité : Stellify ne stocke aucune donnée salariale personnelle. Le calcul est effectué de manière anonyme selon les normes suisses de protection des données.",
       swiss_standard_notice_title: "Excellence de Carrière Suisse",
@@ -5432,7 +5439,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Stipendio medio",
       stat_rate: "Tasso",
       stat_based_on: "su",
-      stat_no_data: "–",
+      stat_no_data: "-",
       tracker_reminder: "Ricontatta il",
       tracker_reminder_due: "Da fare oggi",
       tracker_reminder_overdue: "scaduto",
@@ -5495,7 +5502,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_maybe_later: "Forse più tardi",
       tool_inputs: "Parametri",
       tool_cv_optional_label: "CV (opzionale, se non caricato)",
-      tool_cv_optional_ph: "Incolla il tuo CV qui o carica un file – o lascia vuoto per consigli generali.",
+      tool_cv_optional_ph: "Incolla il tuo CV qui o carica un file, o lascia vuoto per consigli generali.",
       tool_load_file: "Carica file",
       salary_security_notice: "I tuoi dati sono al sicuro: Stellify non memorizza alcun dato salariale personale. Il calcolo viene eseguito in modo anonimo secondo gli standard svizzeri di protezione dei dati.",
       swiss_standard_notice_title: "Eccellenza della Carriera Svizzera",
@@ -5978,7 +5985,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stat_avg_salary: "Avg. salary",
       stat_rate: "rate",
       stat_based_on: "of",
-      stat_no_data: "–",
+      stat_no_data: "-",
       tracker_reminder: "Follow up on",
       tracker_reminder_due: "Due today",
       tracker_reminder_overdue: "overdue",
@@ -6041,7 +6048,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_maybe_later: "Maybe later",
       tool_inputs: "Inputs",
       tool_cv_optional_label: "CV (optional, if none uploaded)",
-      tool_cv_optional_ph: "Paste your CV here or upload a file – or leave empty for general tips.",
+      tool_cv_optional_ph: "Paste your CV here or upload a file, or leave empty for general tips.",
       tool_load_file: "Load file",
       salary_security_notice: "Your data is safe: Stellify does not store any personal salary data. The calculation is performed anonymously according to Swiss data protection standards.",
       swiss_standard_notice_title: "Swiss Career Excellence",
@@ -6512,9 +6519,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   /* ── Demo identity for landing/empty-state previews ─────────────────────
      When the visitor is logged in we use their own first name (and try to
      pluck a last name from the email if it's the classic firstname.lastname
-     format — same conservative heuristic the Bewerbungs-Generator uses).
+     format, same conservative heuristic the Bewerbungs-Generator uses).
      Falls back to a Swiss sample name. The tracker preview deliberately
-     keeps company names ("Roche", "Nestlé") — those aren't applicant names. */
+     keeps company names ("Roche", "Nestlé"), those aren't applicant names. */
   const previewIdentity = (() => {
     const firstName = user?.firstName?.trim();
     if (!firstName) return { name: 'Anna Müller', emailMask: 'anna.mueller@…' };
@@ -7911,7 +7918,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
-                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '–'}</p>
+                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '-'}</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
@@ -8586,9 +8593,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
                         {language === 'FR' ? 'Compétences' : language === 'IT' ? 'Competenze' : language === 'EN' ? 'Skills' : 'Fähigkeiten'}
                       </p>
-                      <p>Markenstrategie</p>
-                      <p>Kundenbetreuung · Soziale Medien</p>
-                      <p>Auswertung · Werbung</p>
+                      {language === 'FR' ? (<>
+                        <p>Stratégie de marque</p>
+                        <p>Relation client · Réseaux sociaux</p>
+                        <p>Analyse · Publicité</p>
+                      </>) : language === 'IT' ? (<>
+                        <p>Strategia di marca</p>
+                        <p>Assistenza clienti · Social media</p>
+                        <p>Analisi · Pubblicità</p>
+                      </>) : language === 'EN' ? (<>
+                        <p>Brand strategy</p>
+                        <p>Client relations · Social media</p>
+                        <p>Analytics · Advertising</p>
+                      </>) : (<>
+                        <p>Markenstrategie</p>
+                        <p>Kundenbetreuung · Soziale Medien</p>
+                        <p>Auswertung · Werbung</p>
+                      </>)}
                     </div>
                     <div className="mt-4 text-[9px] sm:text-[10.5px] leading-[1.8] opacity-85">
                       <p className="font-bold uppercase tracking-[1.5px] text-[8.5px] sm:text-[10px] opacity-100 mb-1.5">
@@ -8634,8 +8655,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           : language === 'IT'
                           ? "Nestlé mi attrae per la combinazione tra radici svizzere e portata internazionale: un ambiente in cui le decisioni locali plasmano la voce di un marchio globale. È esattamente ciò di cui voglio assumermi la responsabilità."
                           : language === 'EN'
-                          ? 'What draws me to Nestlé is the blend of Swiss roots and global reach — an environment where local decisions shape the voice of a worldwide brand. That is exactly the responsibility I want to take on.'
-                          : 'An Nestlé reizt mich die Kombination aus Schweizer Wurzeln und globaler Reichweite – ein Umfeld, in dem lokale Entscheidungen die Stimme einer weltweit gehörten Marke prägen. Genau diese Verantwortung möchte ich übernehmen.'}
+                          ? 'What draws me to Nestlé is the blend of Swiss roots and global reach, an environment where local decisions shape the voice of a worldwide brand. That is exactly the responsibility I want to take on.'
+                          : 'An Nestlé reizt mich die Kombination aus Schweizer Wurzeln und globaler Reichweite, ein Umfeld, in dem lokale Entscheidungen die Stimme einer weltweit gehörten Marke prägen. Genau diese Verantwortung möchte ich übernehmen.'}
                       </p>
                       <p>
                         {language === 'FR'
@@ -8731,24 +8752,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               const groups = language === 'FR' ? [
                 { title: 'Obligatoire', tone: 'primary', items: ['CV (données personnelles, expérience, formation, langues, IT)', 'Lettre de motivation (pourquoi toi, pourquoi cette entreprise)'] },
                 { title: 'Souvent demandé', tone: 'neutral', items: ['Certificats de travail (actuel + précédents)', 'Diplômes & certificats (CFC, études, CAS/MAS)'] },
-                { title: 'Optionnel', tone: 'muted', items: ['Photo professionnelle (peut être insérée librement)', 'Références (2–3 personnes ou « sur demande »)', 'Portfolio (design, IT, marketing, gestion de projet)'] },
+                { title: 'Optionnel', tone: 'muted', items: ['Photo professionnelle (peut être insérée librement)', 'Références (2 à 3 personnes ou « sur demande »)', 'Portfolio (design, IT, marketing, gestion de projet)'] },
               ] : language === 'IT' ? [
                 { title: 'Obbligatorio', tone: 'primary', items: ['CV (dati personali, esperienza, formazione, lingue, IT)', 'Lettera di motivazione (perché te, perché questa azienda)'] },
                 { title: 'Spesso richiesto', tone: 'neutral', items: ['Certificati di lavoro (attuale + precedenti)', 'Diplomi & certificati (AFC, studi, CAS/MAS)'] },
-                { title: 'Opzionale', tone: 'muted', items: ['Foto professionale (inseribile liberamente)', 'Referenze (2–3 persone o « su richiesta »)', 'Portfolio (design, IT, marketing, project management)'] },
+                { title: 'Opzionale', tone: 'muted', items: ['Foto professionale (inseribile liberamente)', 'Referenze (2 a 3 persone o « su richiesta »)', 'Portfolio (design, IT, marketing, project management)'] },
               ] : language === 'EN' ? [
                 { title: 'Required', tone: 'primary', items: ['CV (personal info, experience, education, languages, IT)', 'Cover letter (why you, why this company)'] },
                 { title: 'Often expected', tone: 'neutral', items: ['Work references (current + previous)', 'Diplomas & certificates (apprenticeship, degree, CAS/MAS)'] },
-                { title: 'Optional', tone: 'muted', items: ['Professional photo (you can drop yours in)', 'Personal references (2–3 contacts or "on request")', 'Portfolio (design, IT, marketing, project management)'] },
+                { title: 'Optional', tone: 'muted', items: ['Professional photo (you can drop yours in)', 'Personal references (2 to 3 contacts or "on request")', 'Portfolio (design, IT, marketing, project management)'] },
               ] : [
                 { title: 'Pflicht', tone: 'primary', items: ['Lebenslauf (Persönliches, Erfahrung, Ausbildung, Sprachen, IT)', 'Motivationsschreiben (warum du, warum diese Firma)'] },
                 { title: 'Häufig verlangt', tone: 'neutral', items: ['Arbeitszeugnisse (aktuell + frühere)', 'Diplome & Zertifikate (Berufsabschluss, Studium, CAS/MAS)'] },
-                { title: 'Optional', tone: 'muted', items: ['Foto (kannst du ganz einfach selbst einfügen)', 'Referenzen (2–3 Personen oder „auf Anfrage")', 'Portfolio (Design, IT, Marketing, Projektleitung)'] },
+                { title: 'Optional', tone: 'muted', items: ['Foto (kannst du ganz einfach selbst einfügen)', 'Referenzen (2 bis 3 Personen oder „auf Anfrage")', 'Portfolio (Design, IT, Marketing, Projektleitung)'] },
               ];
-              const heading = language === 'FR' ? 'Dossier complet — tout ce que la candidature suisse exige'
-                : language === 'IT' ? 'Dossier completo — tutto ciò che la candidatura svizzera richiede'
-                : language === 'EN' ? 'Complete dossier — everything a Swiss application needs'
-                : 'Komplettes Dossier — alles was eine Schweizer Bewerbung braucht';
+              const heading = language === 'FR' ? 'Dossier complet, tout ce que la candidature suisse exige'
+                : language === 'IT' ? 'Dossier completo, tutto ciò che la candidatura svizzera richiede'
+                : language === 'EN' ? 'Complete dossier, everything a Swiss application needs'
+                : 'Komplettes Dossier, alles was eine Schweizer Bewerbung braucht';
               return (
                 <div className="mt-10 max-w-lg">
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854] mb-3">{heading}</p>
@@ -8792,12 +8813,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-8 max-w-lg">
               {language === 'FR'
-                ? 'Une vue d\'ensemble simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes — et Stellify calcule en direct ton taux d\'entretiens et de succès. Inclus dans chaque plan, même le Gratuit.'
+                ? 'Une vue d\'ensemble simple : Postulé, Entretien, Offre. Glisse les cartes, ajoute des notes, et Stellify calcule en direct ton taux d\'entretiens et de succès. Inclus dans chaque plan, même le Gratuit.'
                 : language === 'IT'
-                ? 'Una panoramica semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note — e Stellify calcola in tempo reale il tuo tasso di colloqui e di successo. Incluso in ogni piano, anche quello Gratuito.'
+                ? 'Una panoramica semplice: Inviato, Colloquio, Offerta. Trascina le carte, aggiungi note, e Stellify calcola in tempo reale il tuo tasso di colloqui e di successo. Incluso in ogni piano, anche quello Gratuito.'
                 : language === 'EN'
-                ? 'A simple overview: Applied, Interview, Offer. Drag the cards, add notes — and Stellify computes your interview and offer rate live. Included on every plan, Free included.'
-                : 'Eine einfache Übersicht: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen — und Stellify rechnet Interview- und Erfolgsquote live aus. In jedem Plan dabei, auch im Gratis-Plan.'}
+                ? 'A simple overview: Applied, Interview, Offer. Drag the cards, add notes, and Stellify computes your interview and offer rate live. Included on every plan, Free included.'
+                : 'Eine einfache Übersicht: Beworben, Interview, Angebot. Karten verschieben, Notizen hinzufügen, und Stellify rechnet Interview- und Erfolgsquote live aus. In jedem Plan dabei, auch im Gratis-Plan.'}
             </p>
             <button
               onClick={() => user ? navigate('dashboard') : setIsAuthModalOpen(true)}
@@ -8809,7 +8830,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
 
           {/* Mini-Kanban Preview + live stats strip (folded in from the old
-              standalone pipeline section — one tracker section, not two). */}
+              standalone pipeline section, one tracker section, not two). */}
           <div className="space-y-4">
             <div className="bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 p-5 sm:p-6 shadow-sm">
               <div className="grid grid-cols-3 gap-3">
@@ -8875,10 +8896,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               ))}
             </div>
             <p className="text-center text-[9px] font-mono uppercase tracking-widest text-[#9A9A94]">
-              {language === 'FR' ? 'Exemple — tes chiffres se calculent automatiquement'
-                : language === 'IT' ? 'Esempio — i tuoi numeri si calcolano automaticamente'
-                : language === 'EN' ? 'Example — your numbers compute automatically'
-                : 'Beispiel — deine Zahlen rechnen sich automatisch'}
+              {language === 'FR' ? 'Exemple, tes chiffres se calculent automatiquement'
+                : language === 'IT' ? 'Esempio, i tuoi numeri si calcolano automaticamente'
+                : language === 'EN' ? 'Example, your numbers compute automatically'
+                : 'Beispiel, deine Zahlen rechnen sich automatisch'}
             </p>
           </div>
         </div>
@@ -10881,10 +10902,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 {[
                                   { n: parsedInterviewResult.stats.questions, l: language === 'EN' ? 'Questions' : language === 'FR' ? 'Questions' : language === 'IT' ? 'Domande' : 'Fragen' },
                                   { n: parsedInterviewResult.stats.topics, l: language === 'EN' ? 'Key topics' : language === 'FR' ? 'Thèmes clés' : language === 'IT' ? 'Temi chiave' : 'Kernthemen' },
-                                  { n: parsedInterviewResult.stats.match != null ? `${parsedInterviewResult.stats.match}%` : '–', l: language === 'EN' ? 'Match' : language === 'IT' ? 'Affinità' : language === 'FR' ? 'Affinité' : 'Match', accent: true },
+                                  { n: parsedInterviewResult.stats.match != null ? `${parsedInterviewResult.stats.match}%` : '-', l: language === 'EN' ? 'Match' : language === 'IT' ? 'Affinità' : language === 'FR' ? 'Affinité' : 'Match', accent: true },
                                 ].map((s, i) => (
                                   <div key={i} className="bg-white dark:bg-[#1A1A18] py-3.5 text-center">
-                                    <div className={`text-xl font-semibold leading-none ${s.accent ? 'text-[#2a7a4a] dark:text-[#6FCF97]' : 'text-[#004225] dark:text-[#FAFAF8]'}`}>{s.n ?? '–'}</div>
+                                    <div className={`text-xl font-semibold leading-none ${s.accent ? 'text-[#2a7a4a] dark:text-[#6FCF97]' : 'text-[#004225] dark:text-[#FAFAF8]'}`}>{s.n ?? '-'}</div>
                                     <div className="text-[10px] text-[#8a9e8d] dark:text-[#9A9A94] mt-1 uppercase tracking-wide">{s.l}</div>
                                   </div>
                                 ))}
@@ -11216,7 +11237,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             </div>
                             <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
                               <li>+ 13. Monatsgehalt üblich</li>
-                              <li>+ 5–10% Bonus realistisch</li>
+                              <li>+ 5 bis 10% Bonus realistisch</li>
                             </ul>
                           </div>
                         );

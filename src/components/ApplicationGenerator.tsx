@@ -110,11 +110,11 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Stelle per Link laden', job_url_sub: 'Füge die URL der Stellenanzeige ein (Yousty, jobs.ch, LinkedIn, Firmen-Karriereseite …). Stella liest sie aus und füllt Firma, Position und Anforderungen automatisch.',
     job_url_ph: 'https://www.yousty.ch/... oder linkedin.com/jobs/...', job_url_btn: 'Laden', job_url_loading: 'Lese Stelle …',
     job_fetch_ok: 'Stelle übernommen. Bitte kurz prüfen.', job_fetch_error: 'Konnte die Stelle nicht laden. Bitte Text manuell einfügen.',
-    use_cv_label: 'Meinen hochgeladenen Lebenslauf verwenden', use_cv_hint: 'Stella nutzt deinen Lebenslauf für Erfahrung, Ausbildung und Skills.', no_cv_hint: 'Noch kein Lebenslauf hochgeladen. Klicke unten, um einen hinzuzufügen – oder fülle die Felder manuell aus.',
+    use_cv_label: 'Meinen hochgeladenen Lebenslauf verwenden', use_cv_hint: 'Stella nutzt deinen Lebenslauf für Erfahrung, Ausbildung und Skills.', no_cv_hint: 'Noch kein Lebenslauf hochgeladen. Klicke unten, um einen hinzuzufügen, oder fülle die Felder manuell aus.',
     badge_new: 'Neu',
     cv_upload_btn: 'Lebenslauf hochladen', cv_uploading: 'Lade …', cv_upload_ok: 'Lebenslauf importiert.',
     photo_title: 'Foto', photo_hint: 'Optional. Quadratisch oder Hochformat, JPG/PNG.', photo_upload: 'Foto hochladen', photo_replace: 'Foto ändern', photo_remove: 'Entfernen',
-    try_example: 'Mit Beispiel ausprobieren', try_example_sub: 'Beispiel-Bewerbung mit realistischen Schweizer Daten — direkt zur Vorschau.',
+    try_example: 'Mit Beispiel ausprobieren', try_example_sub: 'Beispiel-Bewerbung mit realistischen Schweizer Daten, direkt zur Vorschau.',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -157,11 +157,11 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Charger une offre par lien', job_url_sub: "Colle l'URL de l'offre (Yousty, jobs.ch, LinkedIn, page carrière …). Stella la lit et remplit l'entreprise, le poste et les exigences automatiquement.",
     job_url_ph: 'https://www.yousty.ch/... ou linkedin.com/jobs/...', job_url_btn: 'Charger', job_url_loading: "Lecture de l'offre …",
     job_fetch_ok: 'Offre importée. Merci de vérifier.', job_fetch_error: "Impossible de charger l'offre. Colle le texte manuellement.",
-    use_cv_label: 'Utiliser mon CV téléchargé', use_cv_hint: 'Stella utilise ton CV pour expérience, formation et compétences.', no_cv_hint: 'Aucun CV téléchargé. Clique ci-dessous pour en ajouter un – ou remplis les champs manuellement.',
+    use_cv_label: 'Utiliser mon CV téléchargé', use_cv_hint: 'Stella utilise ton CV pour expérience, formation et compétences.', no_cv_hint: 'Aucun CV téléchargé. Clique ci-dessous pour en ajouter un, ou remplis les champs manuellement.',
     badge_new: 'Nouveau',
     cv_upload_btn: 'Téléverser un CV', cv_uploading: 'Chargement …', cv_upload_ok: 'CV importé.',
     photo_title: 'Photo', photo_hint: 'Optionnel. Carré ou portrait, JPG/PNG.', photo_upload: 'Téléverser une photo', photo_replace: 'Changer la photo', photo_remove: 'Supprimer',
-    try_example: 'Essayer avec un exemple', try_example_sub: 'Candidature exemple avec des données suisses réalistes — directement vers l\'aperçu.',
+    try_example: 'Essayer avec un exemple', try_example_sub: 'Candidature exemple avec des données suisses réalistes, directement vers l\'aperçu.',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -204,11 +204,11 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Carica annuncio da link', job_url_sub: "Incolla l'URL dell'annuncio (Yousty, jobs.ch, LinkedIn, pagina carriere …). Stella lo legge e compila azienda, posizione e requisiti automaticamente.",
     job_url_ph: 'https://www.yousty.ch/... o linkedin.com/jobs/...', job_url_btn: 'Carica', job_url_loading: "Lettura dell'annuncio …",
     job_fetch_ok: 'Annuncio importato. Verifica per favore.', job_fetch_error: "Impossibile caricare l'annuncio. Incolla il testo manualmente.",
-    use_cv_label: 'Usa il mio CV caricato', use_cv_hint: 'Stella usa il tuo CV per esperienza, formazione e competenze.', no_cv_hint: 'Nessun CV caricato. Clicca qui sotto per aggiungerne uno – oppure compila i campi manualmente.',
+    use_cv_label: 'Usa il mio CV caricato', use_cv_hint: 'Stella usa il tuo CV per esperienza, formazione e competenze.', no_cv_hint: 'Nessun CV caricato. Clicca qui sotto per aggiungerne uno, oppure compila i campi manualmente.',
     badge_new: 'Nuovo',
     cv_upload_btn: 'Carica CV', cv_uploading: 'Caricamento …', cv_upload_ok: 'CV importato.',
     photo_title: 'Foto', photo_hint: 'Opzionale. Quadrato o verticale, JPG/PNG.', photo_upload: 'Carica foto', photo_replace: 'Cambia foto', photo_remove: 'Rimuovi',
-    try_example: 'Prova con un esempio', try_example_sub: 'Candidatura di esempio con dati svizzeri realistici — direttamente all\'anteprima.',
+    try_example: 'Prova con un esempio', try_example_sub: 'Candidatura di esempio con dati svizzeri realistici, direttamente all\'anteprima.',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -251,11 +251,11 @@ const STR: Record<string, Record<string, string>> = {
     job_url_title: 'Load job from link', job_url_sub: 'Paste the job posting URL (Yousty, jobs.ch, LinkedIn, a company careers page …). Stella reads it and fills company, position and requirements automatically.',
     job_url_ph: 'https://www.yousty.ch/... or linkedin.com/jobs/...', job_url_btn: 'Load', job_url_loading: 'Reading job …',
     job_fetch_ok: 'Job imported. Please review.', job_fetch_error: 'Could not load the job. Please paste the text manually.',
-    use_cv_label: 'Use my uploaded CV', use_cv_hint: 'Stella uses your CV for experience, education and skills.', no_cv_hint: 'No CV uploaded yet. Click below to add one – or fill in the fields manually.',
+    use_cv_label: 'Use my uploaded CV', use_cv_hint: 'Stella uses your CV for experience, education and skills.', no_cv_hint: 'No CV uploaded yet. Click below to add one, or fill in the fields manually.',
     badge_new: 'New',
     cv_upload_btn: 'Upload CV', cv_uploading: 'Uploading …', cv_upload_ok: 'CV imported.',
     photo_title: 'Photo', photo_hint: 'Optional. Square or portrait, JPG/PNG.', photo_upload: 'Upload photo', photo_replace: 'Replace photo', photo_remove: 'Remove',
-    try_example: 'Try with example', try_example_sub: 'Sample application with realistic Swiss data — straight to the preview.',
+    try_example: 'Try with example', try_example_sub: 'Sample application with realistic Swiss data, straight to the preview.',
   },
 };
 
@@ -271,7 +271,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   const headFont = design.font === 'sans' ? sans : serif;
   const bodyFont = design.font === 'serif' ? serif : sans;
   const a = design.accent;
-  const fullName = [form.firstName, form.lastName].filter(Boolean).join(' ') || '–';
+  const fullName = [form.firstName, form.lastName].filter(Boolean).join(' ') || '-';
   const contactBits = [form.address, form.phone, form.email].filter(Boolean);
   const bodyText = generatedText || form.motivation || s.motivation_placeholder;
   const today = new Date().toLocaleDateString('de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -279,7 +279,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   /** Photo helper — rendered as a fixed-width img so html2canvas captures
       it cleanly. Returns null when no photo is set, so the existing
       layouts keep their photo-less behaviour. The photo is always a
-      same-origin data: URL, so NO crossOrigin attribute — setting it
+      same-origin data: URL, so NO crossOrigin attribute, setting it
       breaks rendering + html2canvas capture in Safari. */
   const Photo = ({ size = 88, rounded = false, border }: { size?: number; rounded?: boolean; border?: string }) => {
     if (!form.photo) return null;
@@ -591,8 +591,8 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
       currentRole: form.currentRole || 'Brand Strategist',
       targetCompany: 'Nestlé Suisse SA',
       targetPosition: 'Marketing Manager',
-      jobDescription: 'Marketing Manager (m/w/d), Vevey. Verantwortung für die Markenführung im DACH-Markt, Budget CHF 1–2 Mio., Erfahrung mit nachhaltigen FMCG-Marken erwünscht. Sehr gute Deutsch- und Französischkenntnisse Voraussetzung.',
-      experience: 'Senior Brand Manager bei Schweizer FMCG-Player (2021–heute): Markenführung mit Budget CHF 1,2 Mio., +28% Brand Awareness, zwei Produkt-Launches DACH.\nBrand Manager bei Westschweizer Konsumgüter-Marke (2018–2021): Aufbau Social-Media-Strategie, CRM-Programm mit 80k aktiven Kunden.',
+      jobDescription: 'Marketing Manager (m/w/d), Vevey. Verantwortung für die Markenführung im DACH-Markt, Budget CHF 1 bis 2 Mio., Erfahrung mit nachhaltigen FMCG-Marken erwünscht. Sehr gute Deutsch- und Französischkenntnisse Voraussetzung.',
+      experience: 'Senior Brand Manager bei Schweizer FMCG-Player (2021 bis heute): Markenführung mit Budget CHF 1,2 Mio., +28% Brand Awareness, zwei Produkt-Launches DACH.\nBrand Manager bei Westschweizer Konsumgüter-Marke (2018 bis 2021): Aufbau Social-Media-Strategie, CRM-Programm mit 80k aktiven Kunden.',
       education: 'MSc Marketing & International Management, Universität St. Gallen (HSG).\nBSc Betriebswirtschaft, ZHAW Winterthur.\nCAS Digital Marketing, HWZ Zürich.',
       skills: 'Brand Strategy · CRM · Social Media · Performance Marketing · Analytics · A/B-Testing · Stakeholder Management · Deutsch (Muttersprache) · Französisch (C1) · Englisch (C1) · IT: Excel, Power BI, Salesforce Marketing Cloud, HubSpot, Figma.',
       motivation: 'Nestlé verbindet Schweizer Wurzeln mit globaler Reichweite. Genau in diesem Umfeld möchte ich Verantwortung für eine starke Marke übernehmen und mit datengetriebenem Marketing nachhaltiges Wachstum schaffen.',
@@ -719,7 +719,22 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
         body: JSON.stringify({ prompt, language }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+      if (!res.ok) {
+        // Quota reached (402) or rate limited (429): show the server's own
+        // clear message instead of a generic "failed", and route quota
+        // cases straight to the plans page. Nothing was generated, nothing
+        // was counted against the user in these cases.
+        if (res.status === 402) {
+          showToast(data.error || s.quota_free_done, 'error');
+          onUpgrade();
+          return;
+        }
+        if (res.status === 429 || res.status === 503) {
+          showToast(data.error || s.gen_error, 'error');
+          return;
+        }
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
       const rawText = String(data.text || '').trim();
       // The server has already counted this generation. If the model ignored
       // the JSON instruction (returns prose/markdown) we must NOT throw the
@@ -864,7 +879,7 @@ ${bodyText}
     setIsSaving(true);
     const payload = {
       user_id: user.id,
-      title: `${form.targetPosition || '–'} · ${form.targetCompany || '–'}`,
+      title: `${form.targetPosition || '-'} · ${form.targetCompany || '-'}`,
       design,
       form,
       generated: gen,
@@ -1181,7 +1196,7 @@ ${bodyText}
                     <div className="space-y-1.5">
                       <label className={labelCls}>{s.f_tone}</label>
                       <select className={inputCls} value={form.tone} onChange={set('tone')}>
-                        <option value="">–</option>
+                        <option value="">-</option>
                         <option value="professional">{s.tone_prof}</option>
                         <option value="confident">{s.tone_conf}</option>
                         <option value="friendly">{s.tone_warm}</option>
