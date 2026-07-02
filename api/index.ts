@@ -1660,6 +1660,30 @@ app.post("/api/create-checkout-session", express.json(), requireAuth, async (req
   }
 });
 
+// ── Stripe Billing Portal ─────────────────────────────────────────────────────
+// Lets a subscriber manage or cancel their subscription themselves. This is
+// what makes the "Jederzeit kündbar" promise on the pricing page true.
+app.post("/api/create-portal-session", express.json(), requireAuth, async (req, res) => {
+  try {
+    const uid = (req as any).uid as string;
+    const { adminDb } = getAdminServices();
+    const snap = await adminDb.collection('users').doc(uid).get();
+    const customerId = (snap.data() || {}).stripe_customer_id as string | undefined;
+    if (!customerId) {
+      return res.status(404).json({ error: 'Kein aktives Abo gefunden.' });
+    }
+    const origin = String(req.headers.origin || process.env.SITE_URL || 'https://stellify.ch');
+    const stripeClient = getStripe();
+    const session = await stripeClient.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: origin,
+    });
+    res.json({ success: true, url: session.url });
+  } catch (err: any) {
+    console.error('[STRIPE PORTAL]', err.message);
+    res.status(500).json({ error: 'Abo-Verwaltung konnte nicht geöffnet werden. Bitte kontaktiere den Support.' });
+  }
+});
 
 // ── CV Analysis (DeepSeek primär, Gemini Fallback) ───────────────────────────
 app.post("/api/analyze-cv", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {

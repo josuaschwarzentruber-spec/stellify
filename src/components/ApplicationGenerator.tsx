@@ -798,6 +798,9 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
   };
 
   const exportWord = () => {
+    // Word export is a Pro feature per the pricing page (Free plan lists
+    // PDF only) — route free users to the plans instead of over-delivering.
+    if (usage && !usage.isPro) { onUpgrade(); return; }
     /* Word renders HTML: same letter, design approximated (accent colour,
        font pairing, simplified layout. sidebar becomes a table). */
     // Escape EVERY user-entered value before interpolating into the Word

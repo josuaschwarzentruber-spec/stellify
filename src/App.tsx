@@ -40,7 +40,7 @@ import {
   Plus, Trash2, Edit2, MoreVertical, Briefcase, MapPin, DollarSign, Calendar, Compass,
   Upload, FileUp, Copy, Eye, EyeOff, Lightbulb, Wrench, HelpCircle, Command, Activity,
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon,
-  Pause, Volume2, VolumeX,
+  Pause, Volume2, VolumeX, Link2,
   Archive, ArchiveRestore, LayoutGrid, List as ListIcon,
   Clock
 } from 'lucide-react';
@@ -165,7 +165,7 @@ class ErrorBoundary extends React.Component<any, any> {
               </a>
             </div>
             <a
-              href="mailto:support@stellify.ch?subject=Stellify%20Error"
+              href="mailto:support.stellify@gmail.com?subject=Stellify%20Error"
               className="block text-xs text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mt-4"
             >
               {supportLabel} →
@@ -1432,13 +1432,7 @@ function StellifyApp() {
     'cv-optimizer': ['optimieren', 'optimize', 'verbessern', 'improve', 'abschnitt', 'section', 'lebenslauf optimieren'],
     'cv-premium': ['premium', 'professionell', 'professional', 'design cv', 'rewrite'],
     'matching': ['stellen', 'jobs', 'stelle', 'arbeit', 'matching', 'passend', 'stellenanalyse', 'stellenanzeige', 'offene stellen', 'job analyse', 'stellenangebot'],
-    'interview': ['interview', 'vorstellungsgespräch', 'vorbereitung', 'training', 'coaching', 'gespräch', 'fragen'],
-    'interview-live': ['live interview', 'live coach', 'simulation', 'echtes interview', 'interview üben', 'mock interview'],
-    'salary-negotiation': ['lohn', 'gehalt', 'salary', 'verhandeln', 'gehaltsverhandlung', 'gehaltsgespräch', 'negotiation', 'vergütung', 'lohnverhandlung'],
-    'ats-sim': ['ats', 'bewerbungssystem', 'keywords', 'algorithmus', 'tracking system', 'ats analyse'],
-    'skill-gap': ['skills', 'fähigkeiten', 'gap', 'lücke', 'kompetenzen', 'qualifikationen', 'weiterbildung', 'skill gap'],
-    'career-roadmap': ['karriere', 'career', 'roadmap', 'plan', 'strategie', 'ziel', 'goal', 'zukunft', 'karriereanalyse'],
-    'tracker': ['tracker', 'status', 'verfolgen', 'übersicht', 'bewerbungen verwalten', 'kanban'],
+    'tracker': ['tracker', 'status', 'verfolgen', 'übersicht', 'bewerbungen verwalten', 'kanban', 'strategie', 'plan', 'schlachtplan'],
   };
 
   useEffect(() => {
@@ -4065,7 +4059,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_title: "Einfache Preise. Volle Power.",
       pricing_monthly: "Monatlich",
       pricing_yearly: "Jährlich",
-      pricing_save: "2 Monate gratis",
+      pricing_save: "bis zu 3 Monate gratis",
       plan_free_subtitle: "Zum Kennenlernen. Ohne Verpflichtung.",
       plan_pro_subtitle: "Für Studierende, Berufseinsteiger und Gelegenheitsbewerber",
       plan_ultimate_subtitle: "Für aktive Stellensuchende und Karrierewechsler",
@@ -4120,7 +4114,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       settings_email: "E-Mail",
       settings_status: "Status: Aktiv",
       settings_change_plan: "Plan ändern",
-      settings_privacy_desc: "Deine Daten werden sicher in der Schweiz gespeichert. Du kannst jederzeit eine Kopie deiner Daten anfordern oder dein Konto löschen.",
+      settings_manage_sub: "Abo verwalten & kündigen",
+      settings_privacy_desc: "Deine Daten werden nach Schweizer Datenschutzgesetz (DSG) und DSGVO verarbeitet. Du kannst jederzeit eine Kopie deiner Daten anfordern oder dein Konto löschen.",
       edit: "Bearbeiten",
       save: "Speichern",
       cancel: "Abbrechen",
@@ -4130,11 +4125,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       promo_desc: "In einem Markt, in dem jedes Detail zählt, ist Stellify dein unfairer Vorteil. Der erste KI-Karriere-Copilot, der für den Schweizer Standard entwickelt wurde.",
       promo_journey: "Starte deine Reise",
       faq_1_q: "Wie sicher sind meine Daten?",
-      faq_1_a: "Deine Daten werden ausschliesslich auf Schweizer Servern verarbeitet und nach modernsten Standards verschlüsselt.",
+      faq_1_a: "Deine Daten werden nach Schweizer Datenschutzgesetz (DSG) und DSGVO verarbeitet und verschlüsselt übertragen. Du kannst dein Konto und alle Daten jederzeit selbst löschen. Details zu allen Dienstleistern findest du in der Datenschutzerklärung.",
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
-      faq_2_a: "Bei Stellify gibt es keine automatische Verlängerung und keine Kündigung. Du behältst jederzeit die volle Kontrolle. Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff für genau diesen Zeitraum. Läuft das Abo ab, kehrt dein Konto automatisch zum kostenlosen Plan zurück, ganz ohne weiteres Zutun. Möchtest du weiter profitieren, schliesse einfach ein neues Abo ab. Dein Zugang verlängert sich dann nahtlos um einen weiteren Monat bzw. ein weiteres Jahr. Damit du rechtzeitig Bescheid weisst, schicken wir dir automatisch eine Erinnerungs-E-Mail vor Ablauf: Beim Monatsabo erhältst du diese E-Mail drei Tage vor dem Ablaufdatum, beim Jahresabo zwei Wochen vorher. Einen Planwechsel, etwa von Pro auf Karriere+, kannst du jederzeit nach Ablauf deines aktuellen Plans vornehmen. Dein genaues Ablaufdatum ist jederzeit in deinen Kontoeinstellungen sichtbar.",
+      faq_2_a: "Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff. Das Abo verlängert sich automatisch, damit dein Zugang nie unterbrochen wird. Du kannst es aber jederzeit mit einem Klick kündigen: in den Kontoeinstellungen unter Abo verwalten. Nach der Kündigung behältst du den vollen Zugriff bis zum Ende der bezahlten Laufzeit, danach wechselt dein Konto automatisch zum Gratis-Plan. Ein Upgrade, etwa von Pro auf Karriere+, ist jederzeit sofort möglich.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Eine Generierung entspricht einer Tool-Nutzung. also einer erstellten Bewerbung, einem Motivationsschreiben, einer Lebenslaufanalyse, einer Stellenanalyse oder einem Interviewtraining. Der Gratis-Plan beinhaltet 3 Generierungen lebenslang, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 50 Generierungen pro Monat mit allen Kern-Funktionen. Karriere+ erweitert das auf 150 Generierungen pro Monat und schaltet zusätzlich ATS Premium-Analyse, erweiterten Interview Coach, Karriere- und Skill-Gap-Analyse, Premium-Vorlagen und priorisierte KI-Verarbeitung frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
+      faq_3_a: "Eine Generierung entspricht einer erstellten Bewerbung mit KI. Der Gratis-Plan beinhaltet 3 Generierungen, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 50 Generierungen pro Monat, den Stellen-Import per Link und alle Standard-Designs. Karriere+ erweitert das auf 150 Generierungen pro Monat und schaltet zusätzlich die exklusiven Premium-Designs frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -4166,16 +4161,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Willkommen zurück,",
       dashboard_stat_plan: "Dein Plan",
       dashboard_usage_limit: "{used} von {total} Nutzungen",
-      dashboard_usage_unlimited: "Premium-Nutzung ohne tägliche Limits",
+      dashboard_usage_unlimited: "Premium-Nutzung mit 150 Generierungen pro Monat",
       plan_overview_title: "Dein Plan im Überblick",
       plan_what_included: "In deinem Plan enthalten",
       plan_what_upgrade: "Mit Upgrade bekommst du",
       plan_upgrade_cta: "Plan upgraden",
       plan_reset_info: "Limits werden automatisch zurückgesetzt, täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen. Upgrade jederzeit möglich.",
-      plan_free_f1: "3 Bewerbungen zum Ausprobieren", plan_free_f2: "Bewerbungs-Übersicht & Status", plan_free_f3: "Bewerbungen speichern & bearbeiten", plan_free_f4: "PDF-Export", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
+      plan_free_f1: "3 KI-Generierungen zum Ausprobieren", plan_free_f2: "Bewerbungs-Übersicht & Status", plan_free_f3: "Bewerbungen speichern & bearbeiten", plan_free_f4: "PDF-Export", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
       plan_pro_f1: "50 Bewerbungen pro Monat", plan_pro_f2: "Massgeschneiderte Bewerbungen mit KI", plan_pro_f3: "Stelle per Link laden & Lebenslauf nutzen", plan_pro_f4: "Alle Standard-Designs", plan_pro_f5: "PDF- & Word-Export",
-      plan_unlim_f1: "Unbegrenzte Bewerbungen (faire Nutzung)", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Bevorzugter Support", plan_unlim_f5: "Früher Zugang zu neuen Funktionen",
+      plan_unlim_f1: "150 Bewerbungen pro Monat", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Persönlicher E-Mail-Support", plan_unlim_f5: "Für Vielbewerber und Berufswechsel",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Anfragen",
       dashboard_daily_usage: "Tageslimit",
@@ -4440,11 +4435,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Vier Sprachen", desc: "Bewirb dich auf Deutsch, Englisch, Französisch oder Italienisch. Perfekt für den mehrsprachigen Schweizer Markt.", icon: "Globe" },
         { title: "Bewerbungs-Scanner-Optimierung", desc: "Unsere KI ist auf die Systeme grosser Schweizer Arbeitgeber trainiert, damit dein Lebenslauf garantiert gelesen wird.", icon: "Cpu" },
         { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
-        { title: "Datenschutz aus der Schweiz", desc: "Deine sensiblen Daten verlassen die Schweiz nicht. Wir garantieren höchste Sicherheit nach Schweizer Standards.", icon: "Lock" }
+        { title: "Datenschutz nach Schweizer Recht", desc: "Deine Daten werden nach Schweizer Datenschutzgesetz und DSGVO verarbeitet, verschlüsselt übertragen und sind jederzeit von dir löschbar.", icon: "Lock" }
       ],
       pricing_free_f: ["3 Bewerbungen zum Ausprobieren", "Bewerbungs-Übersicht & Status", "Speichern & bearbeiten", "Keine Kreditkarte nötig"],
       pricing_pro_f: ["50 Bewerbungen pro Monat", "Massgeschneiderte Bewerbungen mit KI", "Stelle per Link laden & Lebenslauf nutzen", "Alle Standard-Designs", "PDF- & Word-Export"],
-      pricing_ultimate_f: ["Alles aus Pro, plus:", "Unbegrenzte Bewerbungen (faire Nutzung)", "Alle exklusiven Premium-Designs", "Bevorzugter Support", "Früher Zugang zu neuen Funktionen"],
+      pricing_ultimate_f: ["Alles aus Pro, plus:", "150 Bewerbungen pro Monat", "Alle exklusiven Premium-Designs", "Persönlicher E-Mail-Support", "Für Vielbewerber und Berufswechsel"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Karriere+ wählen",
@@ -4725,7 +4720,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Le standard pour les candidats ambitieux.",
       pricing_ultimate_desc: "Puissance maximale pour votre carrière.",
       faq_title: "Foire aux questions",
-      footer_desc: "Stellify est l'IA de candidature pour la Suisse. Candidatures professionnelles en 5 minutes, plus 20 outils carrière.",
+      footer_desc: "Stellify est l'IA de candidature pour la Suisse. Des candidatures professionnelles en quelques minutes.",
       footer_legal: "Mentions légales",
       footer_contact: "Contact",
       auth_login: "Se connecter",
@@ -4772,7 +4767,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       settings_email: "E-mail",
       settings_status: "Statut : Actif",
       settings_change_plan: "Changer de forfait",
-      settings_privacy_desc: "Vos données sont stockées en toute sécurité en Suisse. Vous pouvez demander une copie de vos données ou supprimer votre compte à tout moment.",
+      settings_manage_sub: "Gérer et résilier l'abonnement",
+      settings_privacy_desc: "Vos données sont traitées conformément à la loi suisse sur la protection des données (LPD) et au RGPD. Vous pouvez demander une copie de vos données ou supprimer votre compte à tout moment.",
       edit: "Modifier",
       save: "Enregistrer",
       cancel: "Annuler",
@@ -4782,11 +4778,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       promo_desc: "Dans un marché où chaque détail compte, Stellify est votre avantage injuste. Le premier copilote de carrière IA conçu pour le standard suisse.",
       promo_journey: "Commencez votre voyage",
       faq_1_q: "Mes données sont-elles en sécurité ?",
-      faq_1_a: "Vos données sont traitées exclusivement sur des serveurs suisses et cryptées selon les normes les plus modernes.",
+      faq_1_a: "Vos données sont traitées conformément à la loi suisse sur la protection des données (LPD) et au RGPD, avec transmission chiffrée. Vous pouvez supprimer votre compte et toutes vos données à tout moment. Les détails sur tous les prestataires figurent dans la déclaration de confidentialité.",
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
-      faq_2_a: "Chez Stellify, il n'y a ni renouvellement automatique ni résiliation à effectuer : vous gardez le contrôle total à tout moment. Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet pour la durée exacte choisie. À l'expiration de l'abonnement, votre compte revient automatiquement au plan gratuit, sans aucune démarche de votre part. Si vous souhaitez continuer à profiter de Stellify, il vous suffit de souscrire un nouvel abonnement. Votre accès sera prolongé d'un mois ou d'un an supplémentaire de manière transparente. Pour vous assurer de ne rien manquer, nous vous envoyons automatiquement un e-mail de rappel avant l'expiration : pour un abonnement mensuel, cet e-mail vous parviendra trois jours avant la date d'expiration ; pour un abonnement annuel, deux semaines avant. Un changement de plan, par exemple de Pro à Karriere+, est possible à tout moment après l'expiration de votre abonnement en cours. Votre date d'expiration exacte est toujours visible dans les paramètres de votre compte.",
+      faq_2_a: "Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet. L'abonnement se renouvelle automatiquement pour que votre accès ne soit jamais interrompu. Vous pouvez toutefois le résilier à tout moment en un clic, dans les paramètres du compte sous Gérer l'abonnement. Après la résiliation, vous conservez l'accès complet jusqu'à la fin de la période payée, puis votre compte passe automatiquement au plan gratuit. Un upgrade, par exemple de Pro à Karriere+, est possible immédiatement à tout moment.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Une génération correspond à une utilisation d'outil. une candidature, une lettre de motivation, une analyse de CV, une analyse d'offre ou un entraînement d'entretien. Le plan Gratuit comprend 3 générations à vie, idéal pour découvrir sans engagement. Le plan Pro offre 50 générations par mois avec toutes les fonctions essentielles. Karriere+ étend cela à 150 générations par mois et débloque en plus l'analyse ATS Premium, le coach d'entretien avancé, l'analyse de carrière et Skill-Gap, les modèles Premium et le traitement IA prioritaire. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
+      faq_3_a: "Une génération correspond à une candidature créée avec l'IA. Le plan Gratuit comprend 3 générations, idéal pour découvrir sans engagement. Le plan Pro offre 50 générations par mois, l'import d'offres par lien et tous les designs standard. Karriere+ étend cela à 150 générations par mois et débloque en plus les designs Premium exclusifs. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -4818,16 +4814,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Bon retour,",
       dashboard_stat_plan: "Votre Plan",
       dashboard_usage_limit: "{used} sur {total} utilisations",
-      dashboard_usage_unlimited: "Utilisation Premium sans limites quotidiennes",
+      dashboard_usage_unlimited: "Utilisation Premium avec 150 générations par mois",
       plan_overview_title: "Aperçu de ton plan",
       plan_what_included: "Inclus dans ton plan",
       plan_what_upgrade: "Avec un upgrade, tu obtiens",
       plan_upgrade_cta: "Améliorer mon plan",
       plan_reset_info: "Limites réinitialisées automatiquement, chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie. Upgrade possible à tout moment.",
-      plan_free_f1: "3 candidatures à essayer", plan_free_f2: "Aperçu & statut des candidatures", plan_free_f3: "Enregistrer & modifier les candidatures", plan_free_f4: "Export PDF", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
+      plan_free_f1: "3 générations IA pour essayer", plan_free_f2: "Aperçu & statut des candidatures", plan_free_f3: "Enregistrer & modifier les candidatures", plan_free_f4: "Export PDF", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
       plan_pro_f1: "50 candidatures par mois", plan_pro_f2: "Candidatures sur mesure avec l'IA", plan_pro_f3: "Charger l'offre par lien & utiliser le CV", plan_pro_f4: "Tous les designs standard", plan_pro_f5: "Export PDF & Word",
-      plan_unlim_f1: "Candidatures illimitées (usage équitable)", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support prioritaire", plan_unlim_f5: "Accès anticipé aux nouveautés",
+      plan_unlim_f1: "150 candidatures par mois", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support e-mail personnel", plan_unlim_f5: "Pour candidatures fréquentes et reconversions",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Requêtes Stella",
       dashboard_daily_usage: "Limite quotidienne",
@@ -5092,11 +5088,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Multilinguisme", desc: "Postulez sans transition en allemand, anglais, français ou italien, parfait pour le marché suisse multilingue.", icon: "Globe" },
         { title: "Optimisation ATS", desc: "Notre IA est formée aux systèmes des grands employeurs suisses, garantissant que votre CV soit lu.", icon: "Cpu" },
         { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
-        { title: "Protection des données 'Made in CH'", desc: "Vos données sensibles ne quittent pas la Suisse. Nous garantissons une sécurité maximale selon les normes suisses.", icon: "Lock" }
+        { title: "Protection des données selon le droit suisse", desc: "Vos données sont traitées selon la LPD suisse et le RGPD, transmises de manière chiffrée et supprimables par vous à tout moment.", icon: "Lock" }
       ],
       pricing_free_f: ["3 candidatures à essayer", "Aperçu & statut des candidatures", "Enregistrer & modifier", "Sans carte de crédit"],
       pricing_pro_f: ["50 candidatures par mois", "Candidatures sur mesure avec l'IA", "Charger l'offre par lien & utiliser le CV", "Tous les designs standard", "Export PDF & Word"],
-      pricing_ultimate_f: ["Tout de Pro, plus :", "Candidatures illimitées (usage équitable)", "Tous les designs Premium exclusifs", "Support prioritaire", "Accès anticipé aux nouveautés"],
+      pricing_ultimate_f: ["Tout de Pro, plus :", "150 candidatures par mois", "Tous les designs Premium exclusifs", "Support e-mail personnel", "Pour candidatures fréquentes et reconversions"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Karriere+",
@@ -5271,7 +5267,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Lo standard per i candidati ambiziosi.",
       pricing_ultimate_desc: "Massima potenza per la tua carriera.",
       faq_title: "Domande frequenti",
-      footer_desc: "Stellify è l'IA per le candidature in Svizzera. Candidature professionali in 5 minuti, più 20 strumenti carriera.",
+      footer_desc: "Stellify è l'IA per le candidature in Svizzera. Candidature professionali in pochi minuti.",
       footer_legal: "Note legali",
       footer_contact: "Contatto",
       auth_login: "Accedi",
@@ -5318,7 +5314,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       settings_email: "E-mail",
       settings_status: "Stato: Attivo",
       settings_change_plan: "Cambia piano",
-      settings_privacy_desc: "I tuoi dati sono archiviati in modo sicuro in Svizzera. Puoi richiedere una copia dei tuoi dati o eliminare il tuo account in qualsiasi momento.",
+      settings_manage_sub: "Gestisci e disdici l'abbonamento",
+      settings_privacy_desc: "I tuoi dati sono trattati secondo la legge svizzera sulla protezione dei dati (LPD) e il GDPR. Puoi richiedere una copia dei tuoi dati o eliminare il tuo account in qualsiasi momento.",
       edit: "Modifica",
       save: "Salva",
       cancel: "Annulla",
@@ -5328,11 +5325,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       promo_desc: "In un mercato dove ogni dettaglio conta, Stellify è il tuo vantaggio sleale. Il primo copilota di carriera AI costruito per lo standard svizzero.",
       promo_journey: "Inizia il tuo viaggio",
       faq_1_q: "Quanto sono sicuri i miei dati?",
-      faq_1_a: "I tuoi dati sono elaborati esclusivamente su server svizzeri e crittografati secondo i più moderni standard.",
+      faq_1_a: "I tuoi dati sono trattati secondo la legge svizzera sulla protezione dei dati (LPD) e il GDPR, con trasmissione crittografata. Puoi eliminare il tuo account e tutti i dati in qualsiasi momento. I dettagli su tutti i fornitori sono nella dichiarazione sulla privacy.",
       faq_2_q: "Come funziona l'abbonamento Stellify?",
-      faq_2_a: "Su Stellify non esistono né rinnovi automatici né disdette da effettuare: hai sempre il pieno controllo. Scegli un piano mensile o annuale e ottieni immediatamente l'accesso completo per esattamente quel periodo. Alla scadenza dell'abbonamento, il tuo account torna automaticamente al piano gratuito, senza alcuna azione da parte tua. Se desideri continuare a usufruire di Stellify, ti basta sottoscrivere un nuovo abbonamento. Il tuo accesso verrà esteso senza interruzioni di un ulteriore mese o anno. Per farti trovare sempre preparato, ti inviamo automaticamente un'e-mail di promemoria prima della scadenza: per un abbonamento mensile, questa e-mail ti arriva tre giorni prima della data di scadenza; per un abbonamento annuale, due settimane prima. Un cambio di piano, ad esempio da Pro a Karriere+, è possibile in qualsiasi momento dopo la scadenza del tuo abbonamento attuale. La data di scadenza esatta è sempre visibile nelle impostazioni del tuo account.",
+      faq_2_a: "Scegli un piano mensile o annuale e ottieni subito l'accesso completo. L'abbonamento si rinnova automaticamente, così il tuo accesso non si interrompe mai. Puoi però disdirlo in qualsiasi momento con un clic, nelle impostazioni del conto sotto Gestisci abbonamento. Dopo la disdetta mantieni l'accesso completo fino alla fine del periodo pagato, poi il tuo account passa automaticamente al piano gratuito. Un upgrade, ad esempio da Pro a Karriere+, è possibile subito in qualsiasi momento.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Una generazione corrisponde a un utilizzo di strumento. una candidatura, una lettera di motivazione, un'analisi del CV, un'analisi dell'annuncio o un allenamento al colloquio. Il piano Gratuito include 3 generazioni a vita, ideale per provare senza impegno. Il piano Pro offre 50 generazioni al mese con tutte le funzioni essenziali. Karriere+ estende a 150 generazioni al mese e sblocca inoltre l'analisi ATS Premium, il coach colloqui avanzato, l'analisi di carriera e Skill-Gap, i modelli Premium e l'elaborazione IA prioritaria. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
+      faq_3_a: "Una generazione corrisponde a una candidatura creata con l'IA. Il piano Gratuito include 3 generazioni, ideale per provare senza impegno. Il piano Pro offre 50 generazioni al mese, l'import di annunci da link e tutti i design standard. Karriere+ estende a 150 generazioni al mese e sblocca inoltre i design Premium esclusivi. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -5364,16 +5361,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Bentornato,",
       dashboard_stat_plan: "Il tuo Piano",
       dashboard_usage_limit: "{used} di {total} utilizzi",
-      dashboard_usage_unlimited: "Utilizzo Premium senza limiti quotidiani",
+      dashboard_usage_unlimited: "Utilizzo Premium con 150 generazioni al mese",
       plan_overview_title: "Il tuo piano in sintesi",
       plan_what_included: "Incluso nel tuo piano",
       plan_what_upgrade: "Con un upgrade ottieni",
       plan_upgrade_cta: "Aggiorna piano",
       plan_reset_info: "Limiti reimpostati automaticamente, ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita. Upgrade possibile in qualsiasi momento.",
-      plan_free_f1: "3 candidature da provare", plan_free_f2: "Panoramica & stato delle candidature", plan_free_f3: "Salva & modifica le candidature", plan_free_f4: "Esportazione PDF", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
+      plan_free_f1: "3 generazioni IA da provare", plan_free_f2: "Panoramica & stato delle candidature", plan_free_f3: "Salva & modifica le candidature", plan_free_f4: "Esportazione PDF", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
       plan_pro_f1: "50 candidature al mese", plan_pro_f2: "Candidature su misura con l'IA", plan_pro_f3: "Carica l'annuncio da link & usa il CV", plan_pro_f4: "Tutti i design standard", plan_pro_f5: "Esportazione PDF & Word",
-      plan_unlim_f1: "Candidature illimitate (uso corretto)", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto prioritario", plan_unlim_f5: "Accesso anticipato alle novità",
+      plan_unlim_f1: "150 candidature al mese", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto e-mail personale", plan_unlim_f5: "Per chi si candida spesso o cambia carriera",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Richieste Stella",
       dashboard_daily_usage: "Limite giornaliero",
@@ -5638,11 +5635,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Multilinguismo", desc: "Candidati senza problemi in tedesco, inglese, francese e italiano, perfetto per il mercato svizzero multilingue.", icon: "Globe" },
         { title: "Ottimizzazione ATS", desc: "La nostra IA è addestrata sui sistemi dei grandi datori di lavoro svizzeri, garantendo che il tuo CV venga letto.", icon: "Cpu" },
         { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
-        { title: "Protezione dei dati 'Made in CH'", desc: "I tuoi dati sensibili non lasciano la Svizzera. Garantiamo la massima sicurezza secondo gli standard svizzeri.", icon: "Lock" }
+        { title: "Protezione dei dati secondo il diritto svizzero", desc: "I tuoi dati sono trattati secondo la LPD svizzera e il GDPR, trasmessi in modo crittografato ed eliminabili da te in qualsiasi momento.", icon: "Lock" }
       ],
       pricing_free_f: ["3 candidature da provare", "Panoramica & stato delle candidature", "Salva & modifica", "Nessuna carta di credito"],
       pricing_pro_f: ["50 candidature al mese", "Candidature su misura con l'IA", "Carica l'annuncio da link & usa il CV", "Tutti i design standard", "Esportazione PDF & Word"],
-      pricing_ultimate_f: ["Tutto di Pro, più:", "Candidature illimitate (uso corretto)", "Tutti i design Premium esclusivi", "Supporto prioritario", "Accesso anticipato alle novità"],
+      pricing_ultimate_f: ["Tutto di Pro, più:", "150 candidature al mese", "Tutti i design Premium esclusivi", "Supporto e-mail personale", "Per chi si candida spesso o cambia carriera"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Karriere+",
@@ -5864,7 +5861,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       settings_email: "Email",
       settings_status: "Status: Active",
       settings_change_plan: "Change Plan",
-      settings_privacy_desc: "Your data is securely stored in Switzerland. You can request a copy of your data or delete your account at any time.",
+      settings_manage_sub: "Manage & cancel subscription",
+      settings_privacy_desc: "Your data is processed in accordance with the Swiss Data Protection Act (DPA) and GDPR. You can request a copy of your data or delete your account at any time.",
       edit: "Edit",
       save: "Save",
       cancel: "Cancel",
@@ -5874,11 +5872,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       promo_desc: "In a market where every detail counts, Stellify is your unfair advantage. The first AI career copilot built for the Swiss standard.",
       promo_journey: "Start Your Journey",
       faq_1_q: "How secure is my data?",
-      faq_1_a: "Your data is processed exclusively on Swiss servers and encrypted according to the latest standards.",
+      faq_1_a: "Your data is processed in accordance with the Swiss Data Protection Act (DPA) and GDPR, with encrypted transmission. You can delete your account and all data yourself at any time. Details on all providers are in the privacy policy.",
       faq_2_q: "How does the Stellify subscription work?",
-      faq_2_a: "At Stellify, there is no automatic renewal and no cancellation required: you retain full control at all times. You choose a monthly or annual plan and immediately gain full access for exactly that period. When your subscription expires, your account automatically reverts to the Free plan with no action needed on your part. If you'd like to keep enjoying Stellify, simply subscribe again. Your access will seamlessly extend by another month or year. To make sure you're always informed in good time, we automatically send you a reminder email before your subscription ends: for a monthly subscription, this email arrives three days before the expiry date; for an annual subscription, two weeks before. A plan upgrade, for example from Pro to Karriere+, is available at any time once your current subscription has expired. Your exact expiry date is always visible in your account settings.",
+      faq_2_a: "You choose a monthly or annual plan and get full access immediately. The subscription renews automatically so your access is never interrupted. You can cancel at any time with one click, in your account settings under Manage subscription. After cancelling you keep full access until the end of the paid period, then your account switches to the Free plan automatically. An upgrade, for example from Pro to Karriere+, is possible immediately at any time.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "One generation equals one tool use. a created application, a cover letter, a CV analysis, a job analysis or an interview training. The Free plan includes 3 lifetime generations, ideal to explore with no commitment. The Pro plan offers 50 generations per month with all core features. Karriere+ extends this to 150 generations per month and additionally unlocks ATS Premium analysis, the advanced Interview Coach, career and Skill-Gap analysis, Premium templates and prioritised AI processing. The exact limits are shown transparently on the Pricing page and in our Terms.",
+      faq_3_a: "One generation equals one application created with AI. The Free plan includes 3 generations, ideal to explore with no commitment. The Pro plan offers 50 generations per month, job import by link and all standard designs. Karriere+ extends this to 150 generations per month and additionally unlocks the exclusive Premium designs. The exact limits are shown transparently on the Pricing page and in our Terms.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -5910,16 +5908,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Welcome back,",
       dashboard_stat_plan: "Your Plan",
       dashboard_usage_limit: "{used} of {total} uses",
-      dashboard_usage_unlimited: "Premium usage without everyday limits",
+      dashboard_usage_unlimited: "Premium usage with 150 generations per month",
       plan_overview_title: "Your plan at a glance",
       plan_what_included: "Included in your plan",
       plan_what_upgrade: "Upgrade and unlock",
       plan_upgrade_cta: "Upgrade plan",
       plan_reset_info: "Limits reset automatically, daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits. Upgrade anytime.",
-      plan_free_f1: "3 applications to try", plan_free_f2: "Application overview & status", plan_free_f3: "Save & edit applications", plan_free_f4: "PDF export", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
+      plan_free_f1: "3 AI generations to try", plan_free_f2: "Application overview & status", plan_free_f3: "Save & edit applications", plan_free_f4: "PDF export", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
       plan_pro_f1: "50 applications per month", plan_pro_f2: "Tailored applications with AI", plan_pro_f3: "Load job by link & use your CV", plan_pro_f4: "All standard designs", plan_pro_f5: "PDF & Word export",
-      plan_unlim_f1: "Unlimited applications (fair use)", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Priority support", plan_unlim_f5: "Early access to new features",
+      plan_unlim_f1: "150 applications per month", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Personal email support", plan_unlim_f5: "For frequent applicants and career changers",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella requests",
       dashboard_daily_usage: "Daily Limit",
@@ -6188,7 +6186,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       pricing_free_f: ["3 applications to try", "Application overview & status", "Save & edit", "No credit card required"],
       pricing_pro_f: ["50 applications per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
-      pricing_ultimate_f: ["Everything in Pro, plus:", "Unlimited applications (fair use)", "All exclusive Premium designs", "Priority support", "Early access to new features"],
+      pricing_ultimate_f: ["Everything in Pro, plus:", "150 applications per month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Karriere+",
@@ -6263,7 +6261,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['bewerbungs-gen'].title,
       desc: t.tools_data['bewerbungs-gen'].desc,
       icon: <FileText size={20} />,
-      badge: 'Komplett',
+      badge: language === 'FR' ? 'Complet' : language === 'IT' ? 'Completo' : language === 'EN' ? 'Complete' : 'Komplett',
       type: 'gratis',
       inputs: []
     },
@@ -6398,9 +6396,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       title: t.tools_data['tracker'].title, 
       desc: t.tools_data['tracker'].desc, 
       icon: <Layout size={20} />,
-      badge: 'Übersicht',
-      type: 'pro',
-      inputs: [{ key: 'jobTitle', label: t.tools_data['tracker'].input_label, type: 'text', placeholder: t.tools_data['tracker'].input_placeholder }] 
+      badge: 'Plan',
+      // gratis: matches the "Gratis" badge in the welcome modal, and free
+      // usage is already bounded by the 3-generation lifetime quota anyway.
+      type: 'gratis',
+      inputs: [{ key: 'jobTitle', label: t.tools_data['tracker'].input_label, type: 'text', placeholder: t.tools_data['tracker'].input_placeholder }]
     },
     { 
       id: 'matching',
@@ -7401,11 +7401,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       )}
                       {stat.label === t.dashboard_stat_cv_status && cvContext && (
                         <button
-                          onClick={() => handleToolClick('cv-premium')}
+                          onClick={() => handleToolClick('bewerbungs-gen')}
                           className="mt-3 w-full py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
                         >
                           <Sparkles size={12} />
-                          {t.dashboard_cv_optimize}
+                          {t.tools_data['bewerbungs-gen']?.title || 'Bewerbung erstellen'}
                         </button>
                       )}
                       {stat.label === t.dashboard_stat_cv_status && !cvContext && (
@@ -7775,26 +7775,32 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
 
-                {/* Interview Live CTA Banner */}
+                {/* Headline-tool CTA banner: the Bewerbungs-Generator with
+                    the job-URL import (the actual new feature). */}
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5, duration: 0.4 }}
-                  onClick={() => handleToolClick('interview-live')}
+                  onClick={() => handleToolClick('bewerbungs-gen')}
                   className="relative overflow-hidden p-6 bg-[#004225] text-white cursor-pointer group hover:bg-[#00331d] transition-colors"
                 >
                   <div className="absolute inset-0 opacity-5" style={{backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)', backgroundSize: '12px 12px'}} />
                   <div className="relative flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-white/10 flex items-center justify-center shrink-0">
-                        <Headphones size={22} />
+                        <Link2 size={22} />
                       </div>
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-[8px] font-bold uppercase tracking-widest bg-white/20 px-2 py-0.5">{t.badge_new}</span>
                         </div>
-                        <h3 className="text-base font-serif">{t.tools_data['interview-live']?.title || 'Live Interview Coach'}</h3>
-                        <p className="text-xs text-white/60 font-light mt-0.5">{t.interview_live_promo}</p>
+                        <h3 className="text-base font-serif">{t.tools_data['bewerbungs-gen']?.title || 'Bewerbungs-Generator'}</h3>
+                        <p className="text-xs text-white/60 font-light mt-0.5">
+                          {language === 'FR' ? "Colle le lien de l'offre, Stella remplit tout automatiquement."
+                            : language === 'IT' ? "Incolla il link dell'annuncio, Stella compila tutto automaticamente."
+                            : language === 'EN' ? 'Paste the job link and Stella fills in everything automatically.'
+                            : 'Stellenlink einfügen, Stella füllt alles automatisch aus.'}
+                        </p>
                       </div>
                     </div>
                     <ArrowRight size={18} className="shrink-0 group-hover:translate-x-1 transition-transform" />
@@ -8050,7 +8056,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         : 'Deine Stellen erscheinen genau dort, wo Kandidaten ihre Bewerbung mit KI erstellen. Sie bewerben sich mit einem Klick bei dir. Melde dich, um zu den ersten Arbeitgebern zu gehören.'}
                     </p>
                     <a
-                      href={`mailto:support@stellify.ch?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise. publier des postes sur Stellify' : language === 'IT' ? 'Azienda. pubblicare posizioni su Stellify' : language === 'EN' ? 'Company. list roles on Stellify' : 'Unternehmen. Stellen auf Stellify ausschreiben')}`}
+                      href={`mailto:support.stellify@gmail.com?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise. publier des postes sur Stellify' : language === 'IT' ? 'Azienda. pubblicare posizioni su Stellify' : language === 'EN' ? 'Company. list roles on Stellify' : 'Unternehmen. Stellen auf Stellify ausschreiben')}`}
                       className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#004225] text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#FAFAF8] transition-all"
                     >
                       {language === 'FR' ? 'Nous contacter' : language === 'IT' ? 'Contattaci' : language === 'EN' ? 'Get in touch' : 'Kontakt aufnehmen'}
@@ -8120,13 +8126,22 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
                         </button>
                       </div>
-                      {/* Right — that tool's rich example */}
-                      <div className="p-6 md:p-8 bg-[#FDFCFB] dark:bg-[#1A1A18] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col justify-center">
-                        <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] mb-3 inline-flex items-center gap-1.5">
-                          <CheckCircle2 size={11} />
-                          {language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel'}
-                        </p>
-                        {renderToolExample(tool)}
+                      {/* Right — that tool's rich example, framed as a mini
+                          app window so every example reads as a real result. */}
+                      <div className="p-5 md:p-7 bg-[#F4F3F0] dark:bg-[#161613] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col justify-center">
+                        <div className="rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 bg-[#FDFCFB] dark:bg-[#1F1F1C]">
+                          <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
+                            <span className="w-2 h-2 rounded-full bg-[#E8837B]" />
+                            <span className="w-2 h-2 rounded-full bg-[#E8C57B]" />
+                            <span className="w-2 h-2 rounded-full bg-[#7BC98F]" />
+                            <span className="ml-2 text-[8.5px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">
+                              {tool.title} · {language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel'}
+                            </span>
+                          </div>
+                          <div className="p-4 sm:p-5">
+                            {renderToolExample(tool)}
+                          </div>
+                        </div>
                       </div>
                     </motion.div>
                   ))}
@@ -8319,18 +8334,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span>{t.upload_done}</span>
               </div>
             )}
+            {/* Honest, verifiable facts only. Invented success percentages
+                would expose us the moment anyone asks for the source. */}
             <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-12">
               <div>
                 <span className="block text-3xl font-serif text-[#004225] dark:text-[#00A854]">CH</span>
                 <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Swiss Made</span>
               </div>
               <div>
-                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">89%</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.hero_success_rate}</span>
+                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">4</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Langues' : language === 'IT' ? 'Lingue' : language === 'EN' ? 'Languages' : 'Sprachen'}</span>
               </div>
               <div>
-                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">3×</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{t.hero_more_interviews}</span>
+                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">26</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Cantons' : language === 'IT' ? 'Cantoni' : language === 'EN' ? 'Cantons' : 'Kantone'}</span>
               </div>
             </div>
           </motion.div>
@@ -8470,8 +8487,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl p-5 sm:p-6 space-y-4"
+                    className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl rounded-lg overflow-hidden"
                   >
+                    {/* Mini window chrome so the example reads as a real result */}
+                    <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#F4F3F0] dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
+                      <span className="w-2 h-2 rounded-full bg-[#E8837B]" />
+                      <span className="w-2 h-2 rounded-full bg-[#E8C57B]" />
+                      <span className="w-2 h-2 rounded-full bg-[#7BC98F]" />
+                      <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">{activeToolObj.title}</span>
+                    </div>
+                    <div className="p-5 sm:p-6 space-y-4">
                     <div className="flex items-center gap-4">
                       {ex.score != null ? (
                         <div className="relative w-16 h-16 shrink-0">
@@ -8503,6 +8528,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {language === 'FR' ? 'Ouvrir cet outil' : language === 'IT' ? 'Apri questo strumento' : language === 'EN' ? 'Open this tool' : 'Dieses Tool öffnen'}
                       <ArrowRight size={13} />
                     </button>
+                    </div>
                   </motion.div>
                 </div>
               );
@@ -9019,119 +9045,71 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
           </div>
 
-          {/* Map canvas */}
+          {/* Coverage panel. No drawn map (every silhouette attempt read
+              wrong); instead Swiss precision as typography: three large
+              stats and all 26 canton codes. Nothing here can look off. */}
           {(() => {
-            const cities: { key: string; x: number; y: number; r: number; lbl: string; lx?: number; ly?: number; anchor?: 'start'|'middle'|'end'; hub?: boolean }[] = [
-              { key: 'genf',     x: 80,  y: 360, r: 5.5,  lbl: language==='FR'?'Genève':language==='IT'?'Ginevra':language==='EN'?'Geneva':'Genf', lx: 80, ly: 382, anchor: 'middle' },
-              { key: 'lausanne', x: 160, y: 305, r: 5.5,  lbl: 'Lausanne', lx: 160, ly: 327, anchor: 'middle' },
-              { key: 'bern',     x: 275, y: 220, r: 5.5,  lbl: language==='FR'?'Berne':language==='IT'?'Berna':'Bern', lx: 275, ly: 242, anchor: 'middle' },
-              { key: 'basel',    x: 320, y: 95,  r: 5.5,  lbl: language==='FR'?'Bâle':language==='IT'?'Basilea':'Basel', lx: 320, ly: 80, anchor: 'middle' },
-              { key: 'luzern',   x: 385, y: 220, r: 5.5,  lbl: language==='FR'?'Lucerne':language==='IT'?'Lucerna':'Luzern', lx: 385, ly: 242, anchor: 'middle' },
-              { key: 'zurich',   x: 455, y: 150, r: 9,    lbl: language==='FR'?'Zurich':language==='IT'?'Zurigo':'Zürich', lx: 470, ly: 138, anchor: 'start', hub: true },
-              { key: 'stgallen', x: 575, y: 170, r: 5.5,  lbl: language==='FR'?'Saint-Gall':language==='IT'?'San Gallo':'St. Gallen', lx: 588, ly: 168, anchor: 'start' },
-              { key: 'lugano',   x: 495, y: 410, r: 5.5,  lbl: 'Lugano', lx: 515, ly: 414, anchor: 'start' },
+            const cantons = [
+              'ZH','BE','LU','UR','SZ','OW','NW','GL','ZG','FR','SO','BS','BL',
+              'SH','AR','AI','SG','GR','AG','TG','TI','VD','VS','NE','GE','JU',
             ];
-            const cityById = Object.fromEntries(cities.map(c => [c.key, c]));
-            const edges: [string, string][] = [
-              ['zurich','basel'],   ['zurich','stgallen'], ['zurich','luzern'],
-              ['zurich','bern'],    ['zurich','lugano'],
-              ['bern','lausanne'],  ['lausanne','genf'],   ['bern','luzern'],
-              ['basel','bern'],     ['stgallen','luzern'], ['luzern','lugano'],
-            ];
+            const stats = language === 'FR'
+              ? [['26', 'cantons'], ['4', 'langues'], ['1', 'standard']]
+              : language === 'IT'
+              ? [['26', 'cantoni'], ['4', 'lingue'], ['1', 'standard']]
+              : language === 'EN'
+              ? [['26', 'cantons'], ['4', 'languages'], ['1', 'standard']]
+              : [['26', 'Kantone'], ['4', 'Sprachen'], ['1', 'Standard']];
             return (
               <motion.div
                 initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-80px' }}
                 transition={{ duration: 0.8 }}
-                className="relative border border-white/10 rounded-2xl bg-white/[0.015] backdrop-blur-sm overflow-hidden"
+                className="relative border border-white/10 rounded-2xl bg-white/[0.02] backdrop-blur-sm overflow-hidden"
               >
-                <svg viewBox="0 0 700 480" className="w-full h-auto block" aria-label="Stellify in der ganzen Schweiz">
-                  <defs>
-                    <pattern id="bgDots" width="22" height="22" patternUnits="userSpaceOnUse">
-                      <circle cx="2" cy="2" r="1" fill="rgba(0,168,84,0.13)" />
-                    </pattern>
-                    <radialGradient id="canvasGlow" cx="0.55" cy="0.45" r="0.6">
-                      <stop offset="0%"  stopColor="#00A854" stopOpacity="0.08" />
-                      <stop offset="100%" stopColor="#00A854" stopOpacity="0" />
-                    </radialGradient>
-                    <filter id="cyanGlow3" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur stdDeviation="2.5" result="b" />
-                      <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-                    </filter>
-                    <filter id="cyanGlowBig3" x="-60%" y="-60%" width="220%" height="220%">
-                      <feGaussianBlur stdDeviation="4.5" result="b" />
-                      <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-                    </filter>
-                    <radialGradient id="nodeGlow3" cx="0.5" cy="0.5" r="0.5">
-                      <stop offset="0%"  stopColor="#00A854" stopOpacity="0.7" />
-                      <stop offset="55%" stopColor="#00A854" stopOpacity="0.12" />
-                      <stop offset="100%" stopColor="#00A854" stopOpacity="0" />
-                    </radialGradient>
-                  </defs>
+                {/* Soft glow + fine dot texture */}
+                <div aria-hidden="true" className="absolute inset-0 pointer-events-none"
+                     style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 35%, rgba(0,168,84,0.10) 0%, transparent 70%)' }} />
+                <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-[0.05]"
+                     style={{ backgroundImage: 'radial-gradient(circle, #00A854 1px, transparent 1px)', backgroundSize: '26px 26px' }} />
 
-                  {/* Dot-grid canvas + soft central glow */}
-                  <rect width="700" height="480" fill="url(#bgDots)" />
-                  <rect width="700" height="480" fill="url(#canvasGlow)" />
-
-                  {/* Edges */}
-                  <g filter="url(#cyanGlow3)">
-                    {edges.map(([a, b], i) => {
-                      const ca = cityById[a]; const cb = cityById[b];
-                      if (!ca || !cb) return null;
-                      return (
-                        <motion.line
-                          key={a+'-'+b}
-                          x1={ca.x} y1={ca.y} x2={cb.x} y2={cb.y}
-                          stroke="#00A854"
-                          strokeWidth="1.2"
-                          strokeOpacity="0.65"
-                          initial={{ pathLength: 0, opacity: 0 }}
-                          whileInView={{ pathLength: 1, opacity: 1 }}
-                          viewport={{ once: true }}
-                          transition={{ duration: 0.9, delay: 0.5 + i * 0.07, ease: 'easeOut' }}
-                        />
-                      );
-                    })}
-                  </g>
-
-                  {/* Nodes + labels */}
-                  {cities.map((c, i) => (
-                    <g key={c.key}>
-                      <circle cx={c.x} cy={c.y} r={c.r * 4.5} fill="url(#nodeGlow3)" />
-                      <motion.circle
-                        cx={c.x} cy={c.y} r={c.r}
-                        fill="#00A854"
-                        filter="url(#cyanGlowBig3)"
-                        initial={{ scale: 0, opacity: 0 }}
-                        whileInView={{ scale: 1, opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.4 + i * 0.07, type: 'spring', stiffness: 260, damping: 18 }}
-                        animate={{ opacity: c.hub ? [0.9, 1, 0.9] : [0.7, 1, 0.7] }}
-                      />
-                      {c.hub && (
-                        <motion.circle
-                          cx={c.x} cy={c.y} r={c.r + 5}
-                          fill="none" stroke="#00A854" strokeOpacity="0.5"
-                          animate={{ scale: [0.8, 1.6, 0.8], opacity: [0.5, 0, 0.5] }}
-                          transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-                        />
-                      )}
-                      <motion.text
-                        x={c.lx ?? c.x} y={c.ly ?? c.y + 18}
-                        textAnchor={c.anchor ?? 'middle'}
-                        fill="rgba(255,255,255,0.92)"
-                        style={{ fontSize: '12px', fontWeight: 500, letterSpacing: '0.01em' }}
-                        initial={{ opacity: 0, y: 6 }}
+                <div className="relative px-6 sm:px-12 pt-12 pb-4">
+                  {/* Big stats row */}
+                  <div className="grid grid-cols-3 divide-x divide-white/10 text-center max-w-2xl mx-auto">
+                    {stats.map(([n, label], i) => (
+                      <motion.div
+                        key={label}
+                        initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ delay: 0.9 + i * 0.06, duration: 0.4 }}
+                        transition={{ delay: 0.15 + i * 0.12, duration: 0.5 }}
+                        className="px-2"
                       >
-                        {c.lbl}
-                      </motion.text>
-                    </g>
-                  ))}
-                </svg>
+                        <p className="font-serif text-5xl sm:text-6xl text-[#00A854] leading-none">{n}</p>
+                        <p className="mt-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.3em] text-white/50">{label}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* All 26 canton codes, equal weight: in jedem Kanton */}
+                <div className="relative px-6 sm:px-12 pb-12 pt-8">
+                  <div className="flex flex-wrap justify-center gap-2 sm:gap-2.5 max-w-3xl mx-auto">
+                    {cantons.map((c, i) => (
+                      <motion.span
+                        key={c}
+                        initial={{ opacity: 0, scale: 0.85 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 + i * 0.025, duration: 0.3 }}
+                        className="inline-flex items-center justify-center w-11 h-9 sm:w-12 sm:h-10 rounded-md border border-white/12 bg-white/[0.03] text-[11px] sm:text-xs font-bold tracking-widest text-white/80 hover:border-[#00A854]/60 hover:text-[#00A854] hover:bg-[#00A854]/[0.08] transition-colors cursor-default select-none"
+                      >
+                        {c}
+                      </motion.span>
+                    ))}
+                  </div>
+                </div>
               </motion.div>
             );
           })()}
@@ -9229,7 +9207,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="min-w-0">
                     <p className="text-red-300 text-sm font-semibold">Zahlung konnte nicht verarbeitet werden</p>
                     <p className="text-red-400/80 text-xs mt-1 break-words">{subscriptionError}</p>
-                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support@stellify.ch&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support@stellify.ch</a></p>
+                    <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support.stellify@gmail.com&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
                   </div>
                 </div>
                 <button onClick={() => setSubscriptionError('')} className="text-red-400/60 hover:text-red-400 shrink-0 mt-0.5">
@@ -9252,13 +9230,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 >
                   {t.pricing_yearly}
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${billingCycle === 'yearly' ? 'bg-black/10 text-black' : 'bg-white/15 text-white'}`}>
-                    bis −25%
+                    bis −27%
                   </span>
                 </button>
               </div>
               <p className="text-[11px] text-white/40 font-light">
                 {billingCycle === 'monthly'
-                  ? (language === 'DE' ? '→ Jährlich wählen und 2 Monate gratis sparen' : language === 'FR' ? '→ Choisir annuel et économiser 2 mois' : language === 'IT' ? '→ Scegli annuale e risparmia 2 mesi' : '→ Choose yearly and save 2 months')
+                  ? (language === 'DE' ? '→ Jährlich wählen und bis zu 3 Monate gratis sparen' : language === 'FR' ? '→ Choisir annuel et économiser jusqu\'à 3 mois' : language === 'IT' ? '→ Scegli annuale e risparmia fino a 3 mesi' : '→ Choose yearly and save up to 3 months')
                   : (language === 'DE' ? '✓ Jahresabo aktiv, du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel, vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale, risparmi 2 mesi' : '✓ Annual plan active, you save 2 months')}
               </p>
             </div>
@@ -9538,7 +9516,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
           <div className="text-center mt-12">
             <p className="text-sm text-[#9A9A94] font-light">
-              {t.faq_contact} <a href="mailto:support@stellify.ch" className="text-[#004225] font-medium border-b border-[#004225]/20">support@stellify.ch</a>
+              {t.faq_contact} <a href="mailto:support.stellify@gmail.com" className="text-[#004225] font-medium border-b border-[#004225]/20">support.stellify@gmail.com</a>
             </p>
           </div>
         </div>
@@ -9776,10 +9754,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <ul className="space-y-4 text-sm font-light">
                 <li><button onClick={() => navigate('about')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
                 <li><button onClick={() => navigate('pricing')} className="hover:text-white transition-colors text-left">{t.pricing}</button></li>
-                <li><a href={`mailto:support@stellify.ch?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
+                <li><a href={`mailto:support.stellify@gmail.com?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
                   {language === 'DE' ? 'Kooperationen' : language === 'FR' ? 'Partenariats' : language === 'IT' ? 'Collaborazioni' : 'Partnerships'}
                 </a></li>
-                <li><a href="mailto:support@stellify.ch" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
+                <li><a href="mailto:support.stellify@gmail.com" className="hover:text-white transition-colors">{t.footer_contact}</a></li>
               </ul>
             </div>
             <div>
@@ -11994,12 +11972,29 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
                       )}
                     </div>
-                    <button
-                      onClick={() => { setIsSettingsOpen(false); navigate('pricing'); }}
-                      className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border border-[#004225]/20 px-3 py-1.5 hover:bg-[#004225] hover:text-white transition-all"
-                    >
-                      {t.settings_change_plan}
-                    </button>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <button
+                        onClick={() => { setIsSettingsOpen(false); navigate('pricing'); }}
+                        className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border border-[#004225]/20 px-3 py-1.5 hover:bg-[#004225] hover:text-white transition-all"
+                      >
+                        {t.settings_change_plan}
+                      </button>
+                      {(user?.role === 'pro' || user?.role === 'unlimited') && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              const r = await authFetch('/api/create-portal-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+                              const d = await r.json();
+                              if (d.url) window.location.href = d.url;
+                              else showToast(d.error || 'Fehler', 'error');
+                            } catch { showToast('Verbindung fehlgeschlagen', 'error'); }
+                          }}
+                          className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] border border-black/10 dark:border-white/10 px-3 py-1.5 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                        >
+                          {t.settings_manage_sub}
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Plan overview — visible to every plan, lists what's
