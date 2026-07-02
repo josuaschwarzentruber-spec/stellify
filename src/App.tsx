@@ -27,6 +27,7 @@ import {
   X,
   ArrowRight,
   ArrowLeft,
+  ArrowUp,
   ChevronRight,
   CheckCircle2,
   Star,
@@ -11328,9 +11329,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         </div>
                       )}
 
-                      <div className="pt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                      {/* Direction hint matches the actual layout: fields sit
+                          ABOVE on phones/tablets (stacked), LEFT on laptops. */}
+                      <div className="pt-4 hidden lg:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
                         <ArrowLeft size={12} />
                         <span>{t.tool_fill_fields}</span>
+                      </div>
+                      <div className="pt-4 flex lg:hidden items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                        <ArrowUp size={12} />
+                        <span>{language === 'FR' ? 'Remplis les champs ci-dessus' : language === 'IT' ? 'Compila i campi qui sopra' : language === 'EN' ? 'Fill in the fields above' : 'Fülle die Felder oben aus'}</span>
                       </div>
                     </div>
                   )}
