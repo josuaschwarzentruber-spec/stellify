@@ -8434,153 +8434,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            (focused app views) and on legal + about pages. */}
       {(!user || activeView === 'dashboard' || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
-      {/* --- TOOLS GRID --- */}
-      {(!user || activeView === 'dashboard') && (
-      <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto">
-          {/* Header band: left = intro + live tool list, right = one perfect
-              finished example so visitors see WHAT the tools produce before
-              scrolling the full grid. */}
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center mb-16">
-            <div>
-              <div className="flex items-start gap-5 mb-6">
-                <span className="text-5xl lg:text-6xl font-serif text-[#004225]/15 dark:text-[#00A854]/20 leading-none select-none">01</span>
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-2">{t.tools_badge}</p>
-                  <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
-                </div>
-              </div>
-              {/* Live tool list — hover/focus to preview that tool's example
-                  on the right, click to open it. */}
-              <div className="flex flex-wrap gap-2">
-                {tools.map((tool) => {
-                  const active = headerExampleTool === tool.id;
-                  return (
-                    <button
-                      key={tool.id}
-                      onClick={() => handleToolClick(tool.id)}
-                      onMouseEnter={() => setHeaderExampleTool(tool.id)}
-                      onFocus={() => setHeaderExampleTool(tool.id)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 border text-[11px] font-medium transition-all ${active ? 'border-[#004225] dark:border-[#00A854] bg-[#004225]/[0.06] dark:bg-[#00A854]/[0.10] text-[#004225] dark:text-[#00A854]' : 'border-black/8 dark:border-white/8 bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8] hover:border-[#004225]/40 dark:hover:border-[#00A854]/50'}`}
-                    >
-                      <span className="text-[#004225] dark:text-[#00A854] [&>svg]:w-3 [&>svg]:h-3">{tool.icon}</span>
-                      <span className="truncate max-w-[160px]">{tool.title}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Per-tool example — reflects whichever tool chip is hovered/focused */}
-            {(() => {
-              const activeToolObj = tools.find((tl: any) => tl.id === headerExampleTool) || tools[0];
-              const ex = getHeaderExample(headerExampleTool);
-              const [context, ...lines] = ex.L;
-              return (
-                <div className="relative">
-                  <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
-                    <CheckCircle2 size={10} />
-                    {language === 'FR' ? 'Exemple parfait' : language === 'IT' ? 'Esempio perfetto' : language === 'EN' ? 'Perfect example' : 'Perfektes Beispiel'}
-                  </div>
-                  <motion.div
-                    key={headerExampleTool}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-xl rounded-lg overflow-hidden"
-                  >
-                    {/* Mini window chrome so the example reads as a real result */}
-                    <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#F4F3F0] dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
-                      <span className="w-2 h-2 rounded-full bg-[#E8837B]" />
-                      <span className="w-2 h-2 rounded-full bg-[#E8C57B]" />
-                      <span className="w-2 h-2 rounded-full bg-[#7BC98F]" />
-                      <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">{activeToolObj.title}</span>
-                    </div>
-                    <div className="p-5 sm:p-6 space-y-4">
-                    <div className="flex items-center gap-4">
-                      {ex.score != null ? (
-                        <div className="relative w-16 h-16 shrink-0">
-                          <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${ex.score} 100`} strokeLinecap="round" />
-                          </svg>
-                          <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">{ex.score}</span>
-                        </div>
-                      ) : (
-                        <div className="w-16 h-16 shrink-0 bg-[#004225]/8 dark:bg-[#00A854]/12 flex items-center justify-center text-[#004225] dark:text-[#00A854] [&>svg]:w-7 [&>svg]:h-7 rounded-full">
-                          {activeToolObj.icon}
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{context}</p>
-                        <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{activeToolObj.title}</p>
-                      </div>
-                    </div>
-                    <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
-                      {lines.map((line, i) => (
-                        <li key={i} className="flex gap-2"><CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{line}</li>
-                      ))}
-                    </ul>
-                    <button
-                      onClick={() => handleToolClick(headerExampleTool)}
-                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
-                    >
-                      {language === 'FR' ? 'Ouvrir cet outil' : language === 'IT' ? 'Apri questo strumento' : language === 'EN' ? 'Open this tool' : 'Dieses Tool öffnen'}
-                      <ArrowRight size={13} />
-                    </button>
-                    </div>
-                  </motion.div>
-                </div>
-              );
-            })()}
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {tools.map((tool) => (
-              <motion.div 
-                key={tool.id}
-                whileHover={{ y: -5 }}
-                onClick={() => handleToolClick(tool.id)}
-                className="p-6 md:p-8 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#004225]/40 transition-all group cursor-pointer shadow-sm"
-              >
-                <div className="flex justify-between items-start mb-6">
-                  <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all relative z-0">
-                    <span className="relative z-0 flex items-center justify-center">{tool.icon}</span>
-                    {((tool.type === 'pro' && (!user?.role || user.role === 'client')) || 
-                      (tool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/10 flex items-center justify-center text-[#004225] dark:text-[#00A854] shadow-sm z-10">
-                        <Lock size={10} />
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
-                    {tool.type === 'ultimate' && (
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-amber-600 bg-amber-50 px-1.5 py-0.5 border border-amber-100">Ultimate</span>
-                    )}
-                    {tool.type === 'pro' && (
-                      <span className="text-[8px] font-bold uppercase tracking-widest text-blue-600 bg-blue-50 px-1.5 py-0.5 border border-blue-100">Pro</span>
-                    )}
-                  </div>
-                </div>
-                <h3 className="text-lg md:text-xl font-medium mb-3 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
-                <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-6 line-clamp-3">{tool.desc}</p>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleToolClick(tool.id);
-                  }}
-                  className="text-xs font-bold uppercase tracking-widest text-[#004225] flex items-center gap-2 group/btn"
-                >
-                  {isGeneratingApp && tool.id === 'cv-gen' ? (language === 'DE' ? 'Wird generiert...' : language === 'FR' ? 'En cours...' : language === 'IT' ? 'Generazione...' : 'Generating...') : t.tool_open}
-                  <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
-                </button>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-      )}
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right). */}
       {(!user || activeView === 'dashboard') && (
@@ -8929,6 +8782,134 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 : language === 'EN' ? 'Example, your numbers compute automatically'
                 : 'Beispiel, deine Zahlen rechnen sich automatisch'}
             </p>
+          </div>
+        </div>
+      </section>
+      )}
+      {/* --- TOOLS QUICK START --- Two large product cards, each with a big
+           readable example inside a mini app window. Replaces the old thin
+           multi-tool grid; sits after both showcases as the action step. */}
+      {(!user || activeView === 'dashboard') && (
+      <section id="tools" className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{t.tools_badge}</p>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
+            <p className="mt-4 text-[#5C5C58] dark:text-[#9A9A94] font-light">
+              {language === 'FR' ? 'Deux outils, un objectif: ton prochain poste. Choisis et commence directement.'
+                : language === 'IT' ? 'Due strumenti, un obiettivo: il tuo prossimo posto. Scegli e inizia subito.'
+                : language === 'EN' ? 'Two tools, one goal: your next job. Pick one and start right away.'
+                : 'Zwei Werkzeuge, ein Ziel: deine nächste Stelle. Wähle eines und leg direkt los.'}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-8 items-stretch">
+            {tools.map((tool: any) => (
+              <motion.div
+                key={tool.id}
+                whileHover={{ y: -4 }}
+                onClick={() => handleToolClick(tool.id)}
+                className="group cursor-pointer bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/25 dark:hover:border-[#00A854]/40 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col"
+              >
+                {/* Card head */}
+                <div className="p-7 md:p-8 pb-5 flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-4 min-w-0">
+                    <div className="w-12 h-12 shrink-0 bg-[#FDFCFB] dark:bg-[#2A2A26] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all">
+                      {tool.icon}
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="text-xl md:text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
+                      <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light mt-1 leading-relaxed">{tool.desc}</p>
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
+                </div>
+
+                {/* Big example in a mini app window */}
+                <div className="px-7 md:px-8">
+                  <div className="rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-md bg-[#FDFCFB] dark:bg-[#1F1F1C]">
+                    <div className="flex items-center gap-1.5 px-3.5 py-2.5 bg-[#F4F3F0] dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
+                      <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">
+                        {tool.title} · {language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel'}
+                      </span>
+                    </div>
+                    <div className="p-5 md:p-6">
+                      {tool.id === 'bewerbungs-gen' ? (
+                        <div className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
+                          <div className="bg-[#004225] px-4 py-3 flex items-center justify-between gap-3">
+                            <span className="text-white text-sm font-serif font-bold truncate">{previewIdentity.name}</span>
+                            <span className="text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
+                          </div>
+                          <div className="p-4 md:p-5 space-y-2.5">
+                            <p className="text-[13px] font-bold text-[#004225] dark:text-[#00A854]">
+                              {language === 'FR' ? 'Candidature: Marketing Manager · Nestlé' : language === 'IT' ? 'Candidatura: Marketing Manager · Nestlé' : language === 'EN' ? 'Application: Marketing Manager · Nestlé' : 'Bewerbung als Marketing Manager · Nestlé'}
+                            </p>
+                            <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF] leading-relaxed">
+                              {language === 'FR' ? "Avec grand intérêt, je postule au poste de Marketing Manager. Depuis trois ans, je dirige la stratégie de marque d'un acteur suisse, +28% de notoriété avec un budget de CHF 1,2 mio."
+                                : language === 'IT' ? "Con grande interesse mi candido come Marketing Manager. Da tre anni guido la strategia di marca di un'azienda svizzera, +28% di notorietà con un budget di CHF 1,2 mio."
+                                : language === 'EN' ? 'I am applying with great interest for the Marketing Manager role. For three years I have led brand strategy at a Swiss company, growing awareness by 28% on a CHF 1.2m budget.'
+                                : 'Mit grossem Interesse bewerbe ich mich als Marketing Manager. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens, +28% Bekanntheit mit CHF 1,2 Mio. Budget.'}
+                            </p>
+                            <div className="flex items-center gap-2 pt-1.5">
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1 rounded"><Download size={11} />PDF</span>
+                              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1 rounded"><Download size={11} />Word</span>
+                              <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854]" />{language === 'FR' ? 'Prêt' : language === 'IT' ? 'Pronto' : language === 'EN' ? 'Ready' : 'Fertig'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3.5">
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                            {language === 'FR' ? 'Plan de bataille · Roche, Bâle' : language === 'IT' ? 'Piano di battaglia · Roche, Basilea' : language === 'EN' ? 'Battle plan · Roche, Basel' : 'Schlachtplan · Roche, Basel'}
+                          </p>
+                          {(language === 'FR' ? [
+                            'Adapter le CV à «Gestion de projet Pharma»',
+                            'Contacter le département via LinkedIn',
+                            'Préparer les 3 questions les plus fréquentes',
+                          ] : language === 'IT' ? [
+                            'Adattare il CV a «Gestione progetti Pharma»',
+                            'Contattare il reparto via LinkedIn',
+                            'Preparare le 3 domande più frequenti',
+                          ] : language === 'EN' ? [
+                            'Sharpen the CV for "Pharma project lead"',
+                            'Reach the department via LinkedIn',
+                            'Prepare the 3 most common questions',
+                          ] : [
+                            'Lebenslauf auf «Projektleitung Pharma» zuspitzen',
+                            'Kontakt zur Fachabteilung über LinkedIn',
+                            'Antworten auf die 3 häufigsten Fragen vorbereiten',
+                          ]).map((step, i) => (
+                            <div key={i} className="flex items-start gap-3 bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm p-3.5">
+                              <span className="shrink-0 w-7 h-7 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[12px] font-bold flex items-center justify-center">{i + 1}</span>
+                              <p className="text-[13px] text-[#1A1A18] dark:text-[#EBEBEB] leading-snug pt-1">{step}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA row */}
+                <div className="p-7 md:p-8 pt-6 mt-auto flex items-center justify-between gap-4">
+                  <div className="flex flex-wrap gap-1.5">
+                    {(tool.id === 'bewerbungs-gen'
+                      ? (language === 'FR' ? ['Import par lien', 'Photo', 'PDF & Word'] : language === 'IT' ? ['Import da link', 'Foto', 'PDF & Word'] : language === 'EN' ? ['Link import', 'Photo', 'PDF & Word'] : ['Link-Import', 'Foto', 'PDF & Word'])
+                      : (language === 'FR' ? ['3 étapes claires', 'Sur mesure'] : language === 'IT' ? ['3 passi chiari', 'Su misura'] : language === 'EN' ? ['3 clear steps', 'Tailored'] : ['3 klare Schritte', 'Auf die Firma zugeschnitten'])
+                    ).map((chip: string) => (
+                      <span key={chip} className="text-[10px] font-medium text-[#5C5C58] dark:text-[#9A9A94] bg-black/[0.04] dark:bg-white/[0.06] px-2 py-1 rounded">{chip}</span>
+                    ))}
+                  </div>
+                  <span className="shrink-0 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+                    {t.tool_open}
+                    <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
