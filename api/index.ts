@@ -657,7 +657,10 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
   res.json({ received: true });
 });
 
-app.use(express.json());
+// Body limit raised from the 100 KB default: CV/photo uploads arrive as
+// base64 JSON (a 3 MB PDF is ~4 MB encoded). Vercel caps request bodies at
+// ~4.5 MB anyway, so 4.5mb is the practical ceiling, not a DoS risk.
+app.use(express.json({ limit: '4.5mb' }));
 
 // ── Gemini retry helper ───────────────────────────────────────────────────────
 // Order matters: models with the highest FREE-tier quota come first so the app
