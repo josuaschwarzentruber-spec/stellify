@@ -59,7 +59,44 @@ import { searchData, SearchItem } from './data/searchData';
 
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import FounderPortrait from './components/FounderPortrait';
+/** Typewriter effect: the text writes itself character by character with a
+    blinking caret when it first scrolls into view — watching the AI write,
+    live. Restarts on language change, respects reduced motion. */
+const TypeText = ({ text, speed = 14 }: { text: string; speed?: number }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [n, setN] = useState(0);
+  const [started, setStarted] = useState(false);
+  useEffect(() => {
+    setN(0);
+    setStarted(false);
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setN(text.length);
+      setStarted(true);
+      return;
+    }
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      setStarted(true);
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [text]);
+  useEffect(() => {
+    if (!started || n >= text.length) return;
+    const id = setTimeout(() => setN(v => v + 1), speed);
+    return () => clearTimeout(id);
+  }, [started, n, text, speed]);
+  const done = n >= text.length;
+  return (
+    <span ref={ref}>
+      {text.slice(0, n)}
+      {started && !done && <span aria-hidden="true" className="inline-block w-[2px] h-[1em] align-middle bg-[#00A854] animate-pulse ml-0.5" />}
+    </span>
+  );
+};
 
 /** Animated count-up for stat numbers. Counts from 0 to the target the
     first time it scrolls into view — the small "alive" touch that makes
@@ -8887,11 +8924,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <p className="text-[13px] font-bold text-[#004225] dark:text-[#00A854]">
                               {language === 'FR' ? 'Candidature: Marketing Manager · Nestlé' : language === 'IT' ? 'Candidatura: Marketing Manager · Nestlé' : language === 'EN' ? 'Application: Marketing Manager · Nestlé' : 'Bewerbung als Marketing Manager · Nestlé'}
                             </p>
-                            <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF] leading-relaxed">
-                              {language === 'FR' ? "Avec grand intérêt, je postule au poste de Marketing Manager. Depuis trois ans, je dirige la stratégie de marque d'un acteur suisse, +28% de notoriété avec un budget de CHF 1,2 mio."
-                                : language === 'IT' ? "Con grande interesse mi candido come Marketing Manager. Da tre anni guido la strategia di marca di un'azienda svizzera, +28% di notorietà con un budget di CHF 1,2 mio."
-                                : language === 'EN' ? 'I am applying with great interest for the Marketing Manager role. For three years I have led brand strategy at a Swiss company, growing awareness by 28% on a CHF 1.2m budget.'
-                                : 'Mit grossem Interesse bewerbe ich mich als Marketing Manager. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens, +28% Bekanntheit mit CHF 1,2 Mio. Budget.'}
+                            <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF] leading-relaxed min-h-[4.5em]">
+                              <TypeText
+                                speed={16}
+                                text={language === 'FR' ? "Avec grand intérêt, je postule au poste de Marketing Manager. Depuis trois ans, je dirige la stratégie de marque d'un acteur suisse, +28% de notoriété avec un budget de CHF 1,2 mio."
+                                  : language === 'IT' ? "Con grande interesse mi candido come Marketing Manager. Da tre anni guido la strategia di marca di un'azienda svizzera, +28% di notorietà con un budget di CHF 1,2 mio."
+                                  : language === 'EN' ? 'I am applying with great interest for the Marketing Manager role. For three years I have led brand strategy at a Swiss company, growing awareness by 28% on a CHF 1.2m budget.'
+                                  : 'Mit grossem Interesse bewerbe ich mich als Marketing Manager. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens, +28% Bekanntheit mit CHF 1,2 Mio. Budget.'}
+                              />
                             </p>
                             <div className="flex items-center gap-2 pt-1.5">
                               <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1 rounded"><Download size={11} />PDF</span>
@@ -9487,17 +9527,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
             </div>
 
-            {/* Right — founder portrait + quote + CTA */}
+            {/* Right — founder quote, pure typography. No portrait by design:
+                the words carry the weight, the star signs them. */}
             <div className="lg:col-span-7">
-              <div className="flex flex-col sm:flex-row gap-10 sm:gap-12 items-start mb-10">
-                <FounderPortrait language={language} />
-                <div className="border-l-2 border-[#004225]/25 dark:border-[#00A854]/40 pl-8 lg:pl-10 flex-1 min-w-0">
-                  <blockquote className="font-serif italic text-2xl md:text-3xl text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">
-                    «{language === 'FR' ? "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse."
-                      : language === 'IT' ? 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.'
-                      : language === 'EN' ? "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market."
-                      : 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.'}»
-                  </blockquote>
+              <div className="relative mb-10 pl-2 sm:pl-6">
+                {/* Oversized decorative quote mark behind the text */}
+                <span aria-hidden="true" className="absolute -top-10 -left-2 sm:-left-4 font-serif text-[140px] sm:text-[180px] leading-none text-[#004225]/[0.07] dark:text-[#00A854]/[0.09] select-none pointer-events-none">«</span>
+                <blockquote className="relative font-serif italic text-2xl md:text-[2.1rem] text-[#1A1A18] dark:text-[#FAFAF8] leading-snug max-w-2xl">
+                  {language === 'FR' ? "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse."
+                    : language === 'IT' ? 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.'
+                    : language === 'EN' ? "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market."
+                    : 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.'}
+                </blockquote>
+                {/* Signature row: star, rule, attribution */}
+                <div className="relative mt-7 flex items-center gap-4">
+                  <svg width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                    <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
+                  </svg>
+                  <span className="h-px w-12 bg-[#004225]/25 dark:bg-[#00A854]/40" />
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#1A1A18] dark:text-[#FAFAF8]">
+                      {language === 'FR' ? 'Le fondateur' : language === 'IT' ? 'Il fondatore' : language === 'EN' ? 'The Founder' : 'Der Gründer'}
+                    </p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mt-0.5">Stellify · Schweiz</p>
+                  </div>
                 </div>
               </div>
 
