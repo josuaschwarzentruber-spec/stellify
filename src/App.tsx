@@ -62,7 +62,7 @@ import remarkGfm from 'remark-gfm';
 /** Typewriter effect: the text writes itself character by character with a
     blinking caret when it first scrolls into view — watching the AI write,
     live. Restarts on language change, respects reduced motion. */
-const TypeText = ({ text, speed = 14 }: { text: string; speed?: number }) => {
+const TypeText = ({ text, speed = 14, startDelay = 0 }: { text: string; speed?: number; startDelay?: number }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const [n, setN] = useState(0);
   const [started, setStarted] = useState(false);
@@ -76,14 +76,15 @@ const TypeText = ({ text, speed = 14 }: { text: string; speed?: number }) => {
       setStarted(true);
       return;
     }
+    let timer: ReturnType<typeof setTimeout> | undefined;
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      setStarted(true);
+      timer = setTimeout(() => setStarted(true), startDelay);
     }, { threshold: 0.4 });
     io.observe(el);
-    return () => io.disconnect();
-  }, [text]);
+    return () => { io.disconnect(); if (timer) clearTimeout(timer); };
+  }, [text, startDelay]);
   useEffect(() => {
     if (!started || n >= text.length) return;
     const id = setTimeout(() => setN(v => v + 1), speed);
@@ -2733,7 +2734,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           </div>
           <div className="p-3 space-y-1.5">
             <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
-            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">Mit grossem Interesse bewerbe ich mich für die Position … +28% Markenbekanntheit, Budget CHF 1,2 Mio., DACH-Launches.</p>
+            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="Mit grossem Interesse bewerbe ich mich für die Position … +28% Markenbekanntheit, Budget CHF 1,2 Mio., DACH-Launches." speed={18} /></p>
             <div className="flex gap-1.5 pt-1">
               <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />PDF</span>
               <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />Word</span>
@@ -2778,10 +2779,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
             <span className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{language === 'EN' ? 'Question 1 / 5' : 'Frage 1 / 5'}</span>
             {id === 'interview-live' && <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]"><Mic size={9} />Live</span>}
           </div>
-          <p className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">„Erzählen Sie von einem Projekt mit einer schwierigen Entscheidung."</p>
+          <p className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug min-h-[2.4em]"><TypeText text="„Erzählen Sie von einem Projekt mit einer schwierigen Entscheidung." speed={18} /></p>
           <div className="pt-2 border-t border-black/8 dark:border-white/8">
             <p className="text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] mb-1">Stella-Tipp</p>
-            <p className="text-[9.5px] italic text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed">STAR: Situation → Aufgabe → Aktion → Resultat. Erfolg beziffern.</p>
+            <p className="text-[9.5px] italic text-[#5C5C58] dark:text-[#9A9A94] leading-relaxed min-h-[1.4em]"><TypeText text="STAR: Situation, Aufgabe, Aktion, Resultat. Erfolg beziffern." speed={18} startDelay={1400} /></p>
           </div>
         </div>
       );
@@ -2832,7 +2833,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
                 <div className="w-6 h-6 shrink-0 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center">{i + 1}</div>
                 {i < arr.length - 1 && <div className="w-px flex-1 bg-[#004225]/25 dark:bg-[#00A854]/30 my-0.5" />}
               </div>
-              <div className="pb-3"><p className="text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">{s.n}</p><p className="text-[11px] text-[#1A1A18] dark:text-[#FAFAF8]">{s.t}</p></div>
+              <div className="pb-3"><p className="text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">{s.n}</p><p className="text-[11px] text-[#1A1A18] dark:text-[#FAFAF8] min-h-[1.3em]"><TypeText text={s.t} speed={18} startDelay={i * 900} /></p></div>
             </div>
           ))}
         </div>
@@ -8964,7 +8965,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           ]).map((step, i) => (
                             <div key={i} className="flex items-start gap-3 bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm p-3.5">
                               <span className="shrink-0 w-7 h-7 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[12px] font-bold flex items-center justify-center">{i + 1}</span>
-                              <p className="text-[13px] text-[#1A1A18] dark:text-[#EBEBEB] leading-snug pt-1">{step}</p>
+                              <p className="text-[13px] text-[#1A1A18] dark:text-[#EBEBEB] leading-snug pt-1 min-h-[1.4em]">
+                                <TypeText text={step} speed={16} startDelay={i * 1100} />
+                              </p>
                             </div>
                           ))}
                         </div>
