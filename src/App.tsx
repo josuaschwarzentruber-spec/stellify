@@ -60,6 +60,38 @@ import { searchData, SearchItem } from './data/searchData';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import FounderPortrait from './components/FounderPortrait';
+
+/** Animated count-up for stat numbers. Counts from 0 to the target the
+    first time it scrolls into view — the small "alive" touch that makes
+    static facts feel engineered. Respects reduced motion. */
+const CountUp = ({ to, duration = 1400 }: { to: number; duration?: number }) => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setVal(to);
+      return;
+    }
+    let raf = 0;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const t0 = performance.now();
+      const tick = (t: number) => {
+        const p = Math.min(1, (t - t0) / duration);
+        const eased = 1 - Math.pow(1 - p, 3);
+        setVal(Math.round(to * eased));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }, { threshold: 0.5 });
+    io.observe(el);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [to, duration]);
+  return <span ref={ref}>{val}</span>;
+};
 const ApplicationGenerator = lazy(() => import('./components/ApplicationGenerator'));
 
 // --- LAZY-LOADED HEAVY COMPONENTS ---
@@ -8343,11 +8375,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Swiss Made</span>
               </div>
               <div>
-                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">4</span>
+                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]"><CountUp to={4} duration={1000} /></span>
                 <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Langues' : language === 'IT' ? 'Lingue' : language === 'EN' ? 'Languages' : 'Sprachen'}</span>
               </div>
               <div>
-                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">26</span>
+                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]"><CountUp to={26} duration={1400} /></span>
                 <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Cantons' : language === 'IT' ? 'Cantoni' : language === 'EN' ? 'Cantons' : 'Kantone'}</span>
               </div>
             </div>
@@ -8813,8 +8845,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 key={tool.id}
                 whileHover={{ y: -4 }}
                 onClick={() => handleToolClick(tool.id)}
-                className="group cursor-pointer bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/25 dark:hover:border-[#00A854]/40 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col"
+                className="group relative cursor-pointer bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/25 dark:hover:border-[#00A854]/40 shadow-sm hover:shadow-xl transition-all overflow-hidden flex flex-col"
               >
+                {/* Light sweep across the card on hover — quiet, premium */}
+                <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+                  <span className="absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/30 dark:via-white/10 to-transparent -translate-x-full group-hover:translate-x-[500%] transition-transform duration-1000 ease-out" />
+                </span>
                 {/* Card head */}
                 <div className="p-7 md:p-8 pb-5 flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 min-w-0">
@@ -9071,7 +9107,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         transition={{ delay: 0.15 + i * 0.12, duration: 0.5 }}
                         className="px-2"
                       >
-                        <p className="font-serif text-5xl sm:text-6xl text-[#00A854] leading-none">{n}</p>
+                        <p className="font-serif text-5xl sm:text-6xl text-[#00A854] leading-none"><CountUp to={Number(n)} /></p>
                         <p className="mt-2 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.3em] text-white/50">{label}</p>
                       </motion.div>
                     ))}

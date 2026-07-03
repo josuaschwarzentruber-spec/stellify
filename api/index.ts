@@ -926,7 +926,22 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
     const userRef = adminDb.collection('users').doc(uid);
     const userSnap = await userRef.get();
     const u = userSnap.data() || {};
-    const role = (u.role as string) || 'client';
+    let role = (u.role as string) || 'client';
+
+    // Authoritative expiry check on EVERY AI request. Webhooks can be
+    // missed (and the plan-change guard in subscription.deleted can skip a
+    // legitimate downgrade), so the server must never honour a paid role
+    // whose paid period is over. 24h grace absorbs renewal webhooks that
+    // are still in flight at the period boundary, so a paying customer is
+    // never blocked by clock skew.
+    if ((role === 'pro' || role === 'unlimited') && u.subscription_expires_at) {
+      const exp = new Date(u.subscription_expires_at).getTime();
+      if (isFinite(exp) && exp + 24 * 3600 * 1000 < Date.now()) {
+        role = 'client';
+        userRef.update({ role: 'client' }).catch(() => {});
+        console.log(`[QUOTA] ${uid} paid period expired ${u.subscription_expires_at} — treated as free`);
+      }
+    }
 
     if (role === 'client') {
       const used = u.ai_calls_lifetime || 0;
