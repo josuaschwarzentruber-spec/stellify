@@ -51,7 +51,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             {isDE ? <>
               <Section title="1. Verantwortliche Person">
                 <p>Verantwortlich für die Datenbearbeitung im Sinne des Schweizer Datenschutzgesetzes (DSG) und der Europäischen Datenschutz-Grundverordnung (DSGVO) ist:</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Einzelinhaber, handelnd unter der Marke «Stellify»</p><p>Postfach, 6300 Zug, Schweiz</p><p>E-Mail: support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Betreiber der Plattform Stellify</p><p>Schweiz</p><p>E-Mail: support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Erhobene Personendaten">
                 <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
@@ -108,7 +108,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </> : isFR ? <>
               <Section title="1. Responsable du traitement">
                 <p>Le responsable du traitement des données au sens de la loi suisse sur la protection des données (LPD) et du RGPD est :</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Exploitant individuel, agissant sous la marque «Stellify»</p><p>Case postale, 6300 Zoug, Suisse</p><p>E-mail : support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Exploitant de la plateforme Stellify</p><p>Suisse</p><p>E-mail : support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Données collectées">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -159,7 +159,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </> : isIT ? <>
               <Section title="1. Titolare del trattamento">
                 <p>Il titolare del trattamento ai sensi della legge svizzera sulla protezione dei dati (LPD) e del GDPR è:</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Titolare individuale, operante con il marchio «Stellify»</p><p>Casella postale, 6300 Zugo, Svizzera</p><p>E-mail: support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Gestore della piattaforma Stellify</p><p>Svizzera</p><p>E-mail: support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Dati raccolti">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -210,7 +210,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </> : <>
               <Section title="1. Data Controller">
                 <p>The controller responsible for data processing under Swiss data protection law (FADP) and the EU General Data Protection Regulation (GDPR) is:</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Sole operator, trading as "Stellify"</p><p>P.O. Box, 6300 Zug, Switzerland</p><p>Email: support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Operator of the Stellify platform</p><p>Switzerland</p><p>Email: support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Personal Data Collected">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -278,9 +278,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             <Section title={isDE ? 'Betreiber und Verantwortlicher' : isFR ? 'Exploitant et responsable' : isIT ? 'Gestore e responsabile' : 'Operator & Controller'}>
               <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 font-mono text-xs">
                 <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stellify</p>
-                <p>{isDE ? 'Inhaber: Josua Schwarzentruber' : isFR ? 'Titulaire : Josua Schwarzentruber' : isIT ? 'Titolare: Josua Schwarzentruber' : 'Owner: Josua Schwarzentruber'}</p>
-                <p>{isDE ? 'Postfach' : isFR ? 'Case postale' : isIT ? 'Casella postale' : 'P.O. Box'}</p>
-                <p>6300 Zug</p>
+                <p>{isDE ? 'Betreiber: JTSP' : isFR ? 'Exploitant : JTSP' : isIT ? 'Gestore: JTSP' : 'Operator: JTSP'}</p>
                 <p>{isDE ? 'Schweiz' : isFR ? 'Suisse' : isIT ? 'Svizzera' : 'Switzerland'}</p>
               </div>
             </Section>
@@ -317,13 +315,13 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 {isDE ? 'Allgemeine Geschäftsbedingungen (AGB)' : isFR ? 'Conditions générales d\'utilisation (CGU)' : isIT ? 'Condizioni generali di utilizzo (CGU)' : 'Terms and Conditions'}
               </h1>
               <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">
-                {isDE ? `Stand: ${today} · Anbieter: Josua Schwarzentruber, Zug, Schweiz` : isFR ? `Mis à jour : ${today} · Fournisseur : Josua Schwarzentruber, Zoug, Suisse` : isIT ? `Aggiornato: ${today} · Fornitore: Josua Schwarzentruber, Zugo, Svizzera` : `Last updated: ${today} · Provider: Josua Schwarzentruber, Zug, Switzerland`}
+                {isDE ? `Stand: ${today} · Anbieter: JTSP, Schweiz` : isFR ? `Mis à jour : ${today} · Fournisseur : JTSP, Suisse` : isIT ? `Aggiornato: ${today} · Fornitore: JTSP, Svizzera` : `Last updated: ${today} · Provider: JTSP, Switzerland`}
               </p>
             </header>
 
             {isDE ? <>
               <Section title="1. Vertragsgegenstand und Geltungsbereich">
-                <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter Josua Schwarzentruber, handelnd unter der Marke «Stellify» (nachfolgend „Stellify") und registrierten Nutzern der Plattform stellify.ch.</p>
+                <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter JTSP, Betreiber der Plattform Stellify (nachfolgend „Stellify") und registrierten Nutzern der Plattform stellify.ch.</p>
                 <p className="mt-2">Stellify bietet eine KI-gestützte Karriereplattform mit Tools zur Lebenslaufoptimierung, Interview-Vorbereitung, Gehaltsanalyse und weiteren Karriere-Diensten an.</p>
               </Section>
               <Section title="2. Vertragsschluss und Kontoregistrierung">
@@ -378,7 +376,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="12. Anwendbares Recht"><p>Ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>. Gerichtsstand: Zug, Schweiz.</p></Section>
               <Section title="13. Streitbeilegung"><p>Kontakt: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU-Schlichtung: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isFR ? <>
-              <Section title="1. Objet et champ d'application"><p>Les présentes CGU régissent tous les contrats d'utilisation entre le fournisseur Josua Schwarzentruber, agissant sous la marque «Stellify» (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de carrière assistée par IA.</p></Section>
+              <Section title="1. Objet et champ d'application"><p>Les présentes CGU régissent tous les contrats d'utilisation entre le fournisseur JTSP, exploitant de la plateforme Stellify (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de carrière assistée par IA.</p></Section>
               <Section title="2. Conclusion du contrat">
                 <p>Le contrat est conclu par l'utilisation de la plateforme ou la souscription d'un abonnement. En s'inscrivant ou en souscrivant un abonnement, l'utilisateur accepte implicitement les présentes CGU et la politique de confidentialité.</p>
                 <p className="mt-2">L'utilisation est autorisée dès l'âge de <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 ans</strong>. Les personnes mineures (moins de 18 ans) doivent obtenir le consentement d'un représentant légal pour souscrire un abonnement payant.</p>
@@ -431,7 +429,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="12. Droit applicable"><p>Le <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">droit suisse</strong> s'applique exclusivement. For juridique : Zoug, Suisse.</p></Section>
               <Section title="13. Règlement des litiges"><p>Contact : <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Plateforme de médiation UE : <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isIT ? <>
-              <Section title="1. Oggetto e ambito di applicazione"><p>Le presenti CGU disciplinano tutti i contratti d'uso tra il fornitore Josua Schwarzentruber, operante con il marchio «Stellify» (di seguito «Stellify») e gli utenti registrati della piattaforma stellify.ch.</p></Section>
+              <Section title="1. Oggetto e ambito di applicazione"><p>Le presenti CGU disciplinano tutti i contratti d'uso tra il fornitore JTSP, gestore della piattaforma Stellify (di seguito «Stellify») e gli utenti registrati della piattaforma stellify.ch.</p></Section>
               <Section title="2. Conclusione del contratto">
                 <p>Il contratto si conclude con l'utilizzo della piattaforma o la sottoscrizione di un abbonamento. Registrandosi o sottoscrivendo un abbonamento, l'utente accetta implicitamente le presenti CGU e l'informativa sulla privacy.</p>
                 <p className="mt-2">L'utilizzo è consentito a partire dai <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 anni</strong>. I minorenni (sotto i 18 anni) necessitano del consenso di un rappresentante legale per sottoscrivere un abbonamento a pagamento.</p>
@@ -484,7 +482,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="12. Diritto applicabile"><p>Si applica esclusivamente il <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">diritto svizzero</strong>. Foro competente: Zugo, Svizzera.</p></Section>
               <Section title="13. Risoluzione delle controversie"><p>Contatto: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Piattaforma di mediazione UE: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : <>
-              <Section title="1. Subject Matter and Scope"><p>These Terms govern all usage agreements between the provider Josua Schwarzentruber, trading as "Stellify" (hereinafter "Stellify") and registered users of stellify.ch. Stellify offers an AI-powered career platform with CV optimisation, interview preparation, salary analysis and other career services.</p></Section>
+              <Section title="1. Subject Matter and Scope"><p>These Terms govern all usage agreements between the provider JTSP, operator of the Stellify platform (hereinafter "Stellify") and registered users of stellify.ch. Stellify offers an AI-powered career platform with CV optimisation, interview preparation, salary analysis and other career services.</p></Section>
               <Section title="2. Contract Formation">
                 <p>The contract is formed upon using the platform or subscribing to a plan. By registering or subscribing, users implicitly accept these Terms and the Privacy Policy.</p>
                 <p className="mt-2">Use is permitted from the age of <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 years</strong>. Users under 18 require parental or guardian consent to subscribe to a paid plan. (Legal basis: Swiss CO Art. 19; the minimum age of 14 reflects typical apprenticeship entry age in Switzerland.)</p>
