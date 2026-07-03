@@ -99,6 +99,141 @@ const TypeText = ({ text, speed = 14, startDelay = 0 }: { text: string; speed?: 
   );
 };
 
+/** Self-playing product demo: a scripted mini app window in which the
+    Bewerbungs-Generator visibly does its job — the job URL types itself,
+    the button clicks, the fields fill, the letter writes, the PDF pops.
+    Driven by one clock, loops forever, pauses off-screen, and shows the
+    finished state for reduced-motion users. Sharper than any video,
+    loads instantly, speaks all four languages. */
+const LiveDemo = ({ language }: { language: string }) => {
+  const L = (de: string, fr: string, it: string, en: string) =>
+    language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
+  const URL_TEXT = 'https://www.jobs.ch/stellen/marketing-manager-nestle';
+  const LETTER = L(
+    'Mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens und steigerte die Bekanntheit um 28 Prozent.',
+    "Avec grand intérêt, je postule comme Marketing Manager chez Nestlé. Depuis trois ans, je dirige la stratégie de marque d'une entreprise suisse et j'ai augmenté la notoriété de 28 pour cent.",
+    "Con grande interesse mi candido come Marketing Manager presso Nestlé. Da tre anni guido la strategia di marca di un'azienda svizzera e ho aumentato la notorietà del 28 per cento.",
+    'I am applying with great interest as Marketing Manager at Nestlé. For three years I have led the brand strategy of a Swiss company and grew awareness by 28 percent.'
+  );
+  const CYCLE = 15000;
+  const ref = useRef<HTMLDivElement>(null);
+  const [t, setT] = useState(0);
+  const [reduced] = useState(() => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(() => {
+    if (reduced) { setT(CYCLE - 1); return; }
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0; let last = 0; let running = false;
+    const loop = (now: number) => {
+      if (!running) return;
+      if (last) setT(prev => (prev + (now - last)) % CYCLE);
+      last = now;
+      raf = requestAnimationFrame(loop);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !running) { running = true; last = 0; raf = requestAnimationFrame(loop); }
+      else if (!e.isIntersecting && running) { running = false; cancelAnimationFrame(raf); }
+    }, { threshold: 0.35 });
+    io.observe(el);
+    return () => { running = false; cancelAnimationFrame(raf); io.disconnect(); };
+  }, [reduced]);
+
+  // Timeline (ms): url types 600-3200 · click 3400 · reading 3600-5000 ·
+  // fields 5200/5600/6000 · letter 6600-11400 · done 11800 · hold to 15000
+  const urlChars = Math.max(0, Math.min(URL_TEXT.length, Math.floor((t - 600) / 26)));
+  const clicked = t > 3400;
+  const reading = t > 3600 && t < 5000;
+  const fieldOn = (i: number) => t > 5200 + i * 400;
+  const letterChars = Math.max(0, Math.min(LETTER.length, Math.floor((t - 6600) / 24)));
+  const done = t > 11800;
+  const caret = <span aria-hidden="true" className="inline-block w-[2px] h-[1em] align-middle bg-[#00A854] animate-pulse ml-0.5" />;
+
+  const fields = [
+    [L('Firma', 'Entreprise', 'Azienda', 'Company'), 'Nestlé Suisse SA'],
+    ['Position', 'Marketing Manager'],
+    [L('Ort', 'Lieu', 'Luogo', 'Location'), 'Vevey VD'],
+  ] as [string, string][];
+
+  return (
+    <div ref={ref} className="relative max-w-3xl mx-auto">
+      <div className="rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/10 dark:shadow-black/40 bg-white dark:bg-[#1F1F1C]">
+        {/* Window chrome */}
+        <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#F4F3F0] dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
+          <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94]">
+            {L('Bewerbungs-Generator · Live', 'Générateur · Live', 'Generatore · Live', 'Application Builder · Live')}
+          </span>
+          <span className="ml-auto inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#00A854]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00A854] animate-pulse" />
+            Demo
+          </span>
+        </div>
+
+        <div className="p-5 sm:p-7 space-y-4">
+          {/* 1 · URL import row */}
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] mb-1.5">
+              {L('Stelle per Link laden', "Charger l'offre par lien", 'Carica annuncio da link', 'Load job by link')}
+            </p>
+            <div className="flex gap-2">
+              <div className="flex-1 px-3 py-2.5 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-[11px] sm:text-xs font-mono text-[#1A1A18] dark:text-[#EBEBEB] truncate">
+                {URL_TEXT.slice(0, urlChars)}{urlChars > 0 && urlChars < URL_TEXT.length && caret}
+              </div>
+              <div className={`shrink-0 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white transition-all ${clicked ? 'bg-[#00331d] scale-95' : 'bg-[#004225]'}`}>
+                {reading
+                  ? <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />{L('Liest …', 'Lit …', 'Legge …', 'Reading …')}</span>
+                  : L('Laden', 'Charger', 'Carica', 'Load')}
+              </div>
+            </div>
+          </div>
+
+          {/* 2 · Extracted fields */}
+          <div className="grid grid-cols-3 gap-2">
+            {fields.map(([label, value], i) => (
+              <div key={label} className={`px-3 py-2 bg-[#FDFCFB] dark:bg-[#1A1A18] border transition-all duration-500 ${fieldOn(i) ? 'border-[#00A854]/50 opacity-100 translate-y-0' : 'border-black/10 dark:border-white/10 opacity-40 translate-y-1'}`}>
+                <p className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{label}</p>
+                <p className="text-[10.5px] sm:text-[11.5px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] truncate min-h-[1.2em]">{fieldOn(i) ? value : ''}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* 3 · Letter writes itself */}
+          <div className="bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94]">
+                {L('Anschreiben', 'Lettre de motivation', 'Lettera di motivazione', 'Cover letter')}
+              </p>
+              {t > 6200 && !done && (
+                <span className="text-[9px] font-bold uppercase tracking-widest text-[#00A854] inline-flex items-center gap-1.5">
+                  <Sparkles size={10} />
+                  {L('Stella schreibt …', 'Stella écrit …', 'Stella scrive …', 'Stella is writing …')}
+                </span>
+              )}
+            </div>
+            <p className="font-serif text-[12px] sm:text-[13px] leading-relaxed text-[#26261F] dark:text-[#D5D5CF] min-h-[5.2em] sm:min-h-[4em]">
+              {LETTER.slice(0, letterChars)}{letterChars > 0 && letterChars < LETTER.length && caret}
+            </p>
+          </div>
+
+          {/* 4 · Done row */}
+          <div className={`flex items-center justify-between transition-all duration-500 ${done ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+            <div className="flex gap-2">
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1.5 rounded"><Download size={11} />PDF</span>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1.5 rounded"><Download size={11} />Word</span>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00A854]">
+              <CheckCircle2 size={13} />
+              {L('Fertig. Bereit zum Versand.', 'Terminé. Prêt à envoyer.', 'Fatto. Pronto da inviare.', 'Done. Ready to send.')}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /** Animated count-up for stat numbers. Counts from 0 to the target the
     first time it scrolls into view — the small "alive" touch that makes
     static facts feel engineered. Respects reduced motion. */
@@ -1109,6 +1244,8 @@ function StellifyApp() {
   
   // Tool Modal State
   const [activeTool, setActiveTool] = useState<any | null>(null);
+  // "So funktioniert's" explainer inside the tool modal (question mark).
+  const [showToolHelp, setShowToolHelp] = useState(false);
   // Which tool's example is shown in the Tools-section header preview card.
   const [headerExampleTool, setHeaderExampleTool] = useState<string>('bewerbungs-gen');
   // Width (px) of the tool modal's left input column — draggable on desktop.
@@ -2601,6 +2738,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     // lands on the dashboard (not where they were) when they close it.
     // Leaving activeView untouched returns them exactly where they opened it.
     setActiveTool(tool);
+    setShowToolHelp(false);
     setToolInput({});
     setToolResult(null);
     setToolResultEditable('');
@@ -4502,10 +4640,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       why_stellify_points: [
         { title: "Schweizer Präzision", desc: "Wir kennen den Schweizer Arbeitsmarkt im Detail. Von der korrekten Rechtschreibung bis zu kantonalen Besonderheiten.", icon: "Target" },
-        { title: "Arbeitszeugnis verstehen", desc: "Verstehe endlich, was wirklich in deinen Arbeitszeugnissen steht. Stella erkennt versteckte Botschaften sofort.", icon: "ShieldCheck" },
+        { title: "Stelle per Link laden", desc: "Füge den Link der Stellenanzeige ein und Stella füllt Firma, Position und Anforderungen automatisch aus.", icon: "Cpu" },
         { title: "Vier Sprachen", desc: "Bewirb dich auf Deutsch, Englisch, Französisch oder Italienisch. Perfekt für den mehrsprachigen Schweizer Markt.", icon: "Globe" },
-        { title: "Bewerbungs-Scanner-Optimierung", desc: "Unsere KI ist auf die Systeme grosser Schweizer Arbeitgeber trainiert, damit dein Lebenslauf garantiert gelesen wird.", icon: "Cpu" },
-        { title: "Lohn-Transparenz", desc: "Erhalte präzise Gehaltsprognosen basierend auf Schweizer Marktdaten für deine spezifische Region und Branche.", icon: "Coins" },
+        { title: "Dein Lebenslauf, automatisch genutzt", desc: "Einmal hochladen, und Stella verwendet deinen Lebenslauf in jeder Bewerbung. Kein doppeltes Eintippen.", icon: "ShieldCheck" },
+        { title: "Sechs Designs plus dein eigenes", desc: "Professionelle Layouts nach Schweizer Standard, als PDF und Word. Bereit zum Versand in Minuten.", icon: "Coins" },
         { title: "Datenschutz nach Schweizer Recht", desc: "Deine Daten werden nach Schweizer Datenschutzgesetz und DSGVO verarbeitet, verschlüsselt übertragen und sind jederzeit von dir löschbar.", icon: "Lock" }
       ],
       pricing_free_f: ["3 Bewerbungen zum Ausprobieren", "Bewerbungs-Übersicht & Status", "Speichern & bearbeiten", "Keine Kreditkarte nötig"],
@@ -5154,11 +5292,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Tout sur une seule plateforme, parfaitement coordonné"
       ],
       why_stellify_points: [
-        { title: "Précision suisse", desc: "Nous connaissons le marché du travail suisse dans le détail. De l'orthographe correcte aux particularités cantonales.", icon: "Target" },
-        { title: "Code des certificats décodé", desc: "Comprenez enfin ce qui est réellement écrit dans vos certificats de travail. Stella détecte immédiatement les messages cachés.", icon: "ShieldCheck" },
-        { title: "Multilinguisme", desc: "Postulez sans transition en allemand, anglais, français ou italien, parfait pour le marché suisse multilingue.", icon: "Globe" },
-        { title: "Optimisation ATS", desc: "Notre IA est formée aux systèmes des grands employeurs suisses, garantissant que votre CV soit lu.", icon: "Cpu" },
-        { title: "Transparence salariale", desc: "Obtenez des prévisions salariales précises basées sur les données du marché suisse pour votre région et secteur spécifiques.", icon: "Coins" },
+        { title: "Précision suisse", desc: "Nous connaissons le marché du travail suisse en détail. De l'orthographe correcte aux spécificités cantonales.", icon: "Target" },
+        { title: "Charger l'offre par lien", desc: "Colle le lien de l'annonce et Stella remplit automatiquement l'entreprise, le poste et les exigences.", icon: "Cpu" },
+        { title: "Quatre langues", desc: "Postule en allemand, anglais, français ou italien. Parfait pour le marché suisse multilingue.", icon: "Globe" },
+        { title: "Ton CV, utilisé automatiquement", desc: "Télécharge-le une fois et Stella l'utilise dans chaque candidature. Plus de double saisie.", icon: "ShieldCheck" },
+        { title: "Six designs plus le tien", desc: "Des mises en page professionnelles au standard suisse, en PDF et Word. Prêt à envoyer en quelques minutes.", icon: "Coins" },
         { title: "Protection des données selon le droit suisse", desc: "Vos données sont traitées selon la LPD suisse et le RGPD, transmises de manière chiffrée et supprimables par vous à tout moment.", icon: "Lock" }
       ],
       pricing_free_f: ["3 candidatures à essayer", "Aperçu & statut des candidatures", "Enregistrer & modifier", "Sans carte de crédit"],
@@ -5701,11 +5839,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         "Tutto in un'unica piattaforma, perfettamente coordinato"
       ],
       why_stellify_points: [
-        { title: "Precisione svizzera", desc: "Conosciamo il mercato del lavoro svizzero nei dettagli. Dall'ortografia corretta alle particolarità cantonali.", icon: "Target" },
-        { title: "Codice dei certificati decodificato", desc: "Capisci finalmente cosa c'è scritto veramente nei tuoi certificati di lavoro. Stella rileva immediatamente i messaggi nascosti.", icon: "ShieldCheck" },
-        { title: "Multilinguismo", desc: "Candidati senza problemi in tedesco, inglese, francese e italiano, perfetto per il mercato svizzero multilingue.", icon: "Globe" },
-        { title: "Ottimizzazione ATS", desc: "La nostra IA è addestrata sui sistemi dei grandi datori di lavoro svizzeri, garantendo che il tuo CV venga letto.", icon: "Cpu" },
-        { title: "Trasparenza salariale", desc: "Ottieni previsioni salariali precise basate sui dati del mercato svizzero per la tua regione e il tuo settore specifici.", icon: "Coins" },
+        { title: "Precisione svizzera", desc: "Conosciamo il mercato del lavoro svizzero nel dettaglio. Dall'ortografia corretta alle particolarità cantonali.", icon: "Target" },
+        { title: "Carica l'annuncio da link", desc: "Incolla il link dell'annuncio e Stella compila automaticamente azienda, posizione e requisiti.", icon: "Cpu" },
+        { title: "Quattro lingue", desc: "Candidati in tedesco, inglese, francese o italiano. Perfetto per il mercato svizzero multilingue.", icon: "Globe" },
+        { title: "Il tuo CV, usato automaticamente", desc: "Caricalo una volta e Stella lo usa in ogni candidatura. Niente doppi inserimenti.", icon: "ShieldCheck" },
+        { title: "Sei design più il tuo", desc: "Layout professionali secondo lo standard svizzero, in PDF e Word. Pronto da inviare in pochi minuti.", icon: "Coins" },
         { title: "Protezione dei dati secondo il diritto svizzero", desc: "I tuoi dati sono trattati secondo la LPD svizzera e il GDPR, trasmessi in modo crittografato ed eliminabili da te in qualsiasi momento.", icon: "Lock" }
       ],
       pricing_free_f: ["3 candidature da provare", "Panoramica & stato delle candidature", "Salva & modifica", "Nessuna carta di credito"],
@@ -6249,11 +6387,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       why_stellify_points: [
         { title: "Swiss Precision", desc: "We know the Swiss job market in detail. From correct spelling to cantonal specifics.", icon: "Target" },
-        { title: "Certificate Code Decoded", desc: "Finally understand what is really written in your work certificates. Stella detects hidden messages immediately.", icon: "ShieldCheck" },
-        { title: "Multilingualism", desc: "Apply seamlessly in German, English, French or Italian, perfect for the multilingual Swiss market.", icon: "Globe" },
-        { title: "ATS Optimization", desc: "Our AI is trained on the systems of major Swiss employers, ensuring your CV is guaranteed to be read.", icon: "Cpu" },
-        { title: "Salary Transparency", desc: "Get precise salary forecasts based on Swiss market data for your specific region and industry.", icon: "Coins" },
-        { title: "Data Protection 'Made in CH'", desc: "Your sensitive data does not leave Switzerland. We guarantee maximum security according to Swiss standards.", icon: "Lock" }
+        { title: "Load the job by link", desc: "Paste the job posting link and Stella fills in the company, position and requirements automatically.", icon: "Cpu" },
+        { title: "Four languages", desc: "Apply in German, English, French or Italian. Perfect for the multilingual Swiss market.", icon: "Globe" },
+        { title: "Your CV, used automatically", desc: "Upload it once and Stella uses it in every application. No more double typing.", icon: "ShieldCheck" },
+        { title: "Six designs plus your own", desc: "Professional layouts to the Swiss standard, as PDF and Word. Ready to send in minutes.", icon: "Coins" },
+        { title: "Data protection under Swiss law", desc: "Your data is processed under the Swiss DPA and GDPR, transmitted encrypted and deletable by you at any time.", icon: "Lock" }
       ],
       pricing_free_f: ["3 applications to try", "Application overview & status", "Save & edit", "No credit card required"],
       pricing_pro_f: ["50 applications per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
@@ -9047,19 +9185,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <h3 className="text-center text-2xl sm:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-12">
               {language === 'FR' ? 'Simple. Rapide. Professionnel.' : language === 'IT' ? 'Semplice. Veloce. Professionale.' : language === 'EN' ? 'Simple. Fast. Professional.' : 'Einfach. Schnell. Professionell.'}
             </h3>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-              {[
-                language === 'FR' ? ['Téléverse ton CV ou saisis tes données', 'Colle le lien de l\'offre', 'Modifie la candidature en ligne', 'Télécharge un PDF professionnel']
-                : language === 'IT' ? ['Carica il CV o inserisci i dati', 'Incolla il link dell\'annuncio', 'Modifica la candidatura online', 'Scarica un PDF professionale']
-                : language === 'EN' ? ['Upload your CV or enter your details', 'Paste the job posting link', 'Edit the application online', 'Download a professional PDF']
-                : ['Lebenslauf hochladen oder Daten eingeben', 'Link zur Stellenausschreibung einfügen', 'Bewerbung direkt online bearbeiten', 'Als professionelles PDF herunterladen']
-              ][0].map((step, i) => (
-                <div key={i} className="p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
-                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-[#004225] dark:bg-[#00A854] text-white font-serif text-base mb-4">{i + 1}</span>
-                  <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] leading-relaxed">{step}</p>
-                </div>
-              ))}
-            </div>
+            {/* Self-playing product demo replaces the four static step
+                cards: visitors WATCH the tool work instead of reading
+                about it. */}
+            <LiveDemo language={language} />
           </div>
         </div>
       </section>
@@ -10386,9 +10515,90 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest font-bold mt-0.5 opacity-80">{activeTool.badge}</p>
                   </div>
                 </div>
-                <button onClick={() => { setActiveTool(null); setParsedSalaryResult(null); setParsedInterviewResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 shrink-0 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
-                  <X size={20} />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  {/* How-does-it-work: opens a small explainer with the live
+                      demo (generator) or the three steps for this tool. */}
+                  <button
+                    onClick={() => setShowToolHelp(true)}
+                    aria-label={language === 'FR' ? 'Comment ça marche' : language === 'IT' ? 'Come funziona' : language === 'EN' ? 'How it works' : 'So funktioniert es'}
+                    title={language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
+                    className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#004225] dark:text-[#00A854]"
+                  >
+                    <HelpCircle size={20} />
+                  </button>
+                  <button onClick={() => { setActiveTool(null); setShowToolHelp(false); setParsedSalaryResult(null); setParsedInterviewResult(null); setInterviewSession(null); setInterviewAnswer(''); }} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]">
+                    <X size={20} />
+                  </button>
+                </div>
+
+                {/* Help overlay: So funktioniert's */}
+                <AnimatePresence>
+                  {showToolHelp && (
+                    <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-black/45 backdrop-blur-sm" onClick={() => setShowToolHelp(false)}>
+                      <motion.div
+                        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 24, scale: 0.98 }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="bg-[#FDFCFB] dark:bg-[#1A1A18] w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-black/10 dark:border-white/10 rounded-xl"
+                      >
+                        <div className="p-5 border-b border-black/8 dark:border-white/8 flex items-center justify-between sticky top-0 bg-[#FDFCFB] dark:bg-[#1A1A18] z-10">
+                          <div className="flex items-center gap-2.5">
+                            <HelpCircle size={16} className="text-[#004225] dark:text-[#00A854]" />
+                            <h4 className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8]">
+                              {language === 'FR' ? 'Comment ça marche' : language === 'IT' ? 'Come funziona' : language === 'EN' ? 'How it works' : 'So funktioniert es'}
+                            </h4>
+                          </div>
+                          <button onClick={() => setShowToolHelp(false)} className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-full text-[#9A9A94]"><X size={16} /></button>
+                        </div>
+                        <div className="p-5 sm:p-6 space-y-6">
+                          {activeTool.id === 'bewerbungs-gen' ? (
+                            <LiveDemo language={language} />
+                          ) : (
+                            <div className="space-y-3">
+                              {(language === 'FR' ? [
+                                'Saisis le poste ou l\'entreprise qui t\'intéresse.',
+                                'Clique sur Générer. Stella crée ton plan personnel.',
+                                'Suis les étapes et adapte-les à ta situation.',
+                              ] : language === 'IT' ? [
+                                'Inserisci la posizione o l\'azienda che ti interessa.',
+                                'Clicca su Genera. Stella crea il tuo piano personale.',
+                                'Segui i passi e adattali alla tua situazione.',
+                              ] : language === 'EN' ? [
+                                'Enter the role or company you are aiming for.',
+                                'Click Generate. Stella creates your personal plan.',
+                                'Follow the steps and adapt them to your situation.',
+                              ] : [
+                                'Gib die Stelle oder Firma ein, die dich interessiert.',
+                                'Klicke auf Generieren. Stella erstellt deinen persönlichen Plan.',
+                                'Folge den Schritten und passe sie an deine Situation an.',
+                              ]).map((step, i) => (
+                                <div key={i} className="flex items-start gap-3 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg p-4">
+                                  <span className="shrink-0 w-7 h-7 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[12px] font-bold flex items-center justify-center">{i + 1}</span>
+                                  <p className="text-sm text-[#1A1A18] dark:text-[#EBEBEB] leading-relaxed pt-0.5">{step}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {t.tools_data[activeTool.id]?.tutorial && (
+                            <div className="p-4 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06] border-l-2 border-[#004225] dark:border-[#00A854] rounded-r-lg">
+                              <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854] mb-1.5"><Award size={11} />{t.tool_pro_example}</p>
+                              <p className="text-[13px] text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed">
+                                {String(t.tools_data[activeTool.id].tutorial).replace(/^(Beispiel|Exemple|Esempio|Example)\s*[:：]\s*/i, '').replace(/^["„«»“”']+|["„«»“”']+$/g, '').trim()}
+                              </p>
+                            </div>
+                          )}
+                          <button
+                            onClick={() => setShowToolHelp(false)}
+                            className="w-full py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                          >
+                            {language === 'FR' ? 'Compris, c\'est parti' : language === 'IT' ? 'Capito, iniziamo' : language === 'EN' ? 'Got it, let\'s go' : 'Verstanden, los geht\'s'}
+                          </button>
+                        </div>
+                      </motion.div>
+                    </div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
