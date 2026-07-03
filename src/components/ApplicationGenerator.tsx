@@ -938,7 +938,7 @@ ${bodyText}
   const steps = [s.step_design, s.step_data, s.step_preview];
 
   return (
-    <div ref={scrollRef} className="flex-1 overflow-y-auto custom-scrollbar bg-[#FDFCFB] dark:bg-[#1A1A18]">
+    <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto custom-scrollbar ios-scroll bg-[#FDFCFB] dark:bg-[#1A1A18]">
       <input
         ref={cvFileInputRef}
         type="file"

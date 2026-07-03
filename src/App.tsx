@@ -234,6 +234,108 @@ const LiveDemo = ({ language }: { language: string }) => {
   );
 };
 
+/** Self-playing demo for the strategy tool: the target role types itself,
+    Generieren clicks, and the three-step battle plan writes in sequence.
+    Same clock pattern as LiveDemo: loops, pauses off-screen, reduced-motion
+    shows the finished state. */
+const StrategyDemo = ({ language }: { language: string }) => {
+  const L = (de: string, fr: string, it: string, en: string) =>
+    language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
+  const INPUT = L('Projektleiter bei Roche, Basel', 'Chef de projet chez Roche, Bâle', 'Project manager presso Roche, Basilea', 'Project lead at Roche, Basel');
+  const STEPS = [
+    L('Lebenslauf auf «Projektleitung Pharma» zuspitzen', 'Adapter le CV à «Gestion de projet Pharma»', 'Adattare il CV a «Gestione progetti Pharma»', 'Sharpen the CV for "Pharma project lead"'),
+    L('Kontakt zur Fachabteilung über LinkedIn aufbauen', 'Créer le contact avec le département via LinkedIn', 'Creare il contatto con il reparto via LinkedIn', 'Build contact with the department via LinkedIn'),
+    L('Antworten auf die 3 häufigsten Fragen vorbereiten', 'Préparer les réponses aux 3 questions les plus fréquentes', 'Preparare le risposte alle 3 domande più frequenti', 'Prepare answers to the 3 most common questions'),
+  ];
+  const CYCLE = 14000;
+  const ref = useRef<HTMLDivElement>(null);
+  const [t, setT] = useState(0);
+  const [reduced] = useState(() => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(() => {
+    if (reduced) { setT(CYCLE - 1); return; }
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0; let last = 0; let running = false;
+    const loop = (now: number) => {
+      if (!running) return;
+      if (last) setT(prev => (prev + (now - last)) % CYCLE);
+      last = now;
+      raf = requestAnimationFrame(loop);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !running) { running = true; last = 0; raf = requestAnimationFrame(loop); }
+      else if (!e.isIntersecting && running) { running = false; cancelAnimationFrame(raf); }
+    }, { threshold: 0.35 });
+    io.observe(el);
+    return () => { running = false; cancelAnimationFrame(raf); io.disconnect(); };
+  }, [reduced]);
+
+  // Timeline: input types 500-2600 · click 2800 · planning 3000-4200 ·
+  // steps type 4400/6600/8800 (2s each) · done 11200 · hold to 14000
+  const inChars = Math.max(0, Math.min(INPUT.length, Math.floor((t - 500) / 34)));
+  const clicked = t > 2800;
+  const planning = t > 3000 && t < 4200;
+  const stepChars = (i: number) => Math.max(0, Math.min(STEPS[i].length, Math.floor((t - (4400 + i * 2200)) / 22)));
+  const done = t > 11200;
+  const caret = <span aria-hidden="true" className="inline-block w-[2px] h-[1em] align-middle bg-[#00A854] animate-pulse ml-0.5" />;
+
+  return (
+    <div ref={ref} className="relative max-w-3xl mx-auto">
+      <div className="rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/10 dark:shadow-black/40 bg-white dark:bg-[#1F1F1C]">
+        <div className="flex items-center gap-1.5 px-4 py-2.5 bg-[#F4F3F0] dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
+          <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
+          <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94]">
+            {L('Bewerbungs-Strategie · Live', 'Stratégie · Live', 'Strategia · Live', 'Strategy · Live')}
+          </span>
+          <span className="ml-auto inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#00A854]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00A854] animate-pulse" />
+            Demo
+          </span>
+        </div>
+        <div className="p-5 sm:p-7 space-y-4">
+          <div>
+            <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] mb-1.5">
+              {L('Jobtitel / Firma', 'Poste / Entreprise', 'Posizione / Azienda', 'Job title / Company')}
+            </p>
+            <div className="flex gap-2">
+              <div className="flex-1 px-3 py-2.5 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-[11px] sm:text-xs text-[#1A1A18] dark:text-[#EBEBEB] truncate">
+                {INPUT.slice(0, inChars)}{inChars > 0 && inChars < INPUT.length && caret}
+              </div>
+              <div className={`shrink-0 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white transition-all ${clicked ? 'bg-[#00331d] scale-95' : 'bg-[#004225]'}`}>
+                {planning
+                  ? <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 border-2 border-white/40 border-t-white rounded-full animate-spin" />{L('Plant …', 'Planifie …', 'Pianifica …', 'Planning …')}</span>
+                  : L('Generieren', 'Générer', 'Genera', 'Generate')}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2.5">
+            {STEPS.map((step, i) => {
+              const chars = stepChars(i);
+              const active = chars > 0;
+              return (
+                <div key={i} className={`flex items-start gap-3 bg-[#FDFCFB] dark:bg-[#1A1A18] border rounded-sm p-3.5 transition-all duration-500 ${active ? 'border-[#00A854]/40 opacity-100' : 'border-black/10 dark:border-white/10 opacity-45'}`}>
+                  <span className={`shrink-0 w-7 h-7 rounded-full text-white text-[12px] font-bold flex items-center justify-center transition-colors ${active ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/20 dark:bg-white/20'}`}>{i + 1}</span>
+                  <p className="text-[12px] sm:text-[13px] text-[#1A1A18] dark:text-[#EBEBEB] leading-snug pt-1 min-h-[1.4em]">
+                    {step.slice(0, chars)}{chars > 0 && chars < step.length && caret}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          <div className={`flex items-center justify-end transition-all duration-500 ${done ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}>
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#00A854]">
+              <CheckCircle2 size={13} />
+              {L('Dein Plan steht.', 'Ton plan est prêt.', 'Il tuo piano è pronto.', 'Your plan is ready.')}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /** Animated count-up for stat numbers. Counts from 0 to the target the
     first time it scrolls into view — the small "alive" touch that makes
     static facts feel engineered. Respects reduced motion. */
@@ -1246,6 +1348,16 @@ function StellifyApp() {
   const [activeTool, setActiveTool] = useState<any | null>(null);
   // "So funktioniert's" explainer inside the tool modal (question mark).
   const [showToolHelp, setShowToolHelp] = useState(false);
+
+  // Lock the page behind while a tool is open. Without this, iOS Safari
+  // often scrolls the BACKGROUND instead of the modal content.
+  useEffect(() => {
+    if (activeTool) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [activeTool]);
   // Which tool's example is shown in the Tools-section header preview card.
   const [headerExampleTool, setHeaderExampleTool] = useState<string>('bewerbungs-gen');
   // Width (px) of the tool modal's left input column — draggable on desktop.
@@ -10555,6 +10667,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {activeTool.id === 'bewerbungs-gen' ? (
                             <LiveDemo language={language} />
                           ) : (
+                            <>
+                            <StrategyDemo language={language} />
                             <div className="space-y-3">
                               {(language === 'FR' ? [
                                 'Saisis le poste ou l\'entreprise qui t\'intéresse.',
@@ -10579,6 +10693,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 </div>
                               ))}
                             </div>
+                            </>
                           )}
                           {t.tools_data[activeTool.id]?.tutorial && (
                             <div className="p-4 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06] border-l-2 border-[#004225] dark:border-[#00A854] rounded-r-lg">
@@ -10601,7 +10716,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </AnimatePresence>
               </div>
 
-              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row relative">
+              <div className="flex-1 min-h-0 overflow-y-auto lg:overflow-hidden ios-scroll flex flex-col lg:flex-row relative">
                 {/* Bewerbungs-Generator: full-custom flow overlays the generic two-panel UI */}
                 {activeTool.id === 'bewerbungs-gen' && (
                   <div className="absolute inset-0 z-40 flex flex-col bg-[#FDFCFB] dark:bg-[#1A1A18]">
@@ -10648,7 +10763,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Inputs — width is draggable on desktop via the handle below */}
                 <div
                   style={isDesktopView ? { width: toolInputW } : undefined}
-                  className={`w-full lg:shrink-0 p-4 sm:p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/5 transition-colors relative overflow-y-auto max-h-[45vh] lg:max-h-none`}
+                  className={`w-full lg:shrink-0 p-4 sm:p-6 bg-[#FDFCFB] dark:bg-[#2A2A26] border-b lg:border-b-0 lg:border-r border-black/5 dark:border-white/5 transition-colors relative lg:min-h-0 lg:overflow-y-auto ios-scroll`}
                 >
                   {((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) || 
                     (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) && (
@@ -10828,7 +10943,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
 
                 {/* Results */}
-                <div className="flex-1 p-4 sm:p-6 bg-white dark:bg-[#1A1A18] relative transition-colors overflow-y-auto custom-scrollbar min-h-[200px]">
+                <div className="flex-1 p-4 sm:p-6 bg-white dark:bg-[#1A1A18] relative transition-colors lg:min-h-0 lg:overflow-y-auto custom-scrollbar ios-scroll min-h-[200px]">
                   {/* INTERACTIVE INTERVIEW SESSION */}
                   {activeTool.id === 'interview-live' && interviewSession && !isProcessingTool ? (
                     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col gap-6">
@@ -11437,164 +11552,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-start pt-4 pb-12 space-y-6 max-w-2xl mx-auto w-full">
-                      {/* Visual example preview — shows what the tool produces */}
-                      {(() => {
-                        const id = activeTool.id;
-                        const beispiel = language === 'FR' ? 'Exemple' : language === 'IT' ? 'Esempio' : language === 'EN' ? 'Example' : 'Beispiel';
-                        const ScoreCard = ({ score, label, bullets }: any) => (
-                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
-                            <div className="flex items-center gap-4">
-                              <div className="relative w-16 h-16 shrink-0">
-                                <svg viewBox="0 0 36 36" className="w-16 h-16 -rotate-90">
-                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.10)" strokeWidth="3" />
-                                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="#004225" strokeWidth="3" strokeDasharray={`${score} 100`} strokeLinecap="round" />
-                                </svg>
-                                <span className="absolute inset-0 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854]">{score}</span>
-                              </div>
-                              <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{label}</p>
-                                <p className="text-base font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{score}/100</p>
-                              </div>
-                            </div>
-                            <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
-                              {bullets.map((b: string, i: number) => (
-                                <li key={i} className="flex gap-2"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />{b}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        );
-                        const ListCard = ({ title, items, numbered }: any) => (
-                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">{title}</p>
-                            <div className="space-y-2.5">
-                              {items.map((it: string, i: number) => (
-                                <div key={i} className="flex gap-3 items-start">
-                                  <span className="shrink-0 w-6 h-6 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854] flex items-center justify-center text-[10px] font-bold">{numbered ? i+1 : '·'}</span>
-                                  <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">{it}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        );
-                        let body: React.ReactNode = null;
-                        if (id === 'ats-sim') body = <ScoreCard score={82} label="Bewerbungs-Scanner" bullets={['7 von 10 wichtigen Wörtern getroffen','Wird von der Bewerbungs-Software gelesen','Fehlt noch: SAP, Buchhaltung, Teamführung']} />;
-                        else if (id === 'cv-analysis') body = <ScoreCard score={76} label="Bewertung" bullets={['Passt zur Branche: Banking · Zürich','Wichtige Wörter: Kennzahlen · Berichte · Excel','Tipp: „Power BI" ergänzen']} />;
-                        else if (id === 'cv-premium' || id === 'cv-optimizer') body = <ScoreCard score={91} label="Verbessert" bullets={['Aktive Sätze statt Passiv','Erfolge mit Zahlen (z.B. „+ 18% Umsatz")','Schweizer Hochdeutsch, klar formuliert']} />;
-                        else if (id === 'skill-gap') body = <ListCard title="Skill-Gap Analyse" numbered={false} items={['Power BI · benötigt für 64% der Stellen','SQL Grundlagen · Pflicht bei Konzernen','Englisch C1 · in 8 von 10 Inseraten verlangt']} />;
-                        else if (id === 'career-roadmap') body = <ListCard title="Deine 5-Schritte-Roadmap" numbered={true} items={['Heute: CV auf 1 Seite kürzen','Diese Woche: 5 Bewerbungen versenden','Nächster Monat: 2 Interviews vereinbaren','In 3 Monaten: Power BI Zertifikat','In 6 Monaten: Senior-Position erreichen']} />;
-                        else if (id === 'interview' || id === 'interview-live') body = (
-                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">Frage 1 / 5</p>
-                            <p className="text-base font-medium text-[#1A1A18] dark:text-[#FAFAF8]">„Erzählen Sie uns von einem Projekt, bei dem Sie eine schwierige Entscheidung treffen mussten."</p>
-                            <div className="pt-3 border-t border-black/8 dark:border-white/8 space-y-2">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">Stella-Tipp</p>
-                              <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] italic leading-relaxed">„STAR-Methode: Situation → Aufgabe → Aktion → Resultat. Beziffere den Erfolg konkret."</p>
-                            </div>
-                          </div>
-                        );
-                        else if (id === 'salary-negotiation') body = (
-                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-4">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">Median-Lohn · Banking · Zürich · 5 J. Erfahrung</p>
-                            <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">CHF 118'000<span className="text-sm text-[#9A9A94]"> /Jahr</span></p>
-                            <div className="space-y-2">
-                              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]"><span>CHF 95k</span><span>CHF 145k</span></div>
-                              <div className="h-2 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden relative">
-                                <div className="absolute inset-y-0 left-[15%] right-[20%] bg-[#004225] dark:bg-[#00A854] rounded-full" />
-                              </div>
-                            </div>
-                            <ul className="space-y-1.5 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
-                              <li>+ 13. Monatsgehalt üblich</li>
-                              <li>+ 5 bis 10% Bonus realistisch</li>
-                            </ul>
-                          </div>
-                        );
-                        else if (id === 'matching') body = (
-                          <div className="w-full space-y-2.5">
-                            {[
-                              { match: 92, title: 'Datenanalyst/in', co: 'UBS · Zürich' },
-                              { match: 87, title: 'Business Intelligence Lead', co: 'Swiss Re · Zürich' },
-                              { match: 81, title: 'Leiter Berichtswesen', co: 'PostFinance · Bern' },
-                            ].map((m, i) => (
-                              <div key={i} className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg flex items-center gap-4">
-                                <div className="w-12 h-12 shrink-0 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center text-[#004225] dark:text-[#00A854] font-bold text-sm">{m.match}%</div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8] truncate">{m.title}</p>
-                                  <p className="text-xs text-[#9A9A94] truncate">{m.co}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        );
-                        else if (id === 'cv-gen' || id === 'bewerbungs-gen') body = (
-                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-3">
-                            <div className="h-2 w-1/2 bg-[#1A1A18]/80 dark:bg-[#FAFAF8]/80 rounded" />
-                            <div className="h-1.5 w-2/3 bg-black/15 dark:bg-white/15 rounded" />
-                            <div className="space-y-1.5 pt-3">
-                              {[90, 75, 95, 60, 85, 70].map((w, i) => (
-                                <div key={i} className="h-1.5 bg-black/10 dark:bg-white/10 rounded" style={{ width: `${w}%` }} />
-                              ))}
-                            </div>
-                          </div>
-                        );
-                        else body = (
-                          <div className="w-full p-6 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-lg space-y-2.5">
-                            {[90, 70, 85, 60].map((w, i) => (
-                              <div key={i} className="h-2 bg-black/10 dark:bg-white/10 rounded" style={{ width: `${w}%` }} />
-                            ))}
-                          </div>
-                        );
-                        const videoId = getToolVideo(id);
-                        return (
-                          <div className="w-full relative">
-                            <div className="absolute -top-3 left-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#004225] text-white text-[9px] font-bold tracking-[0.25em] uppercase shadow-md">
-                              <span className="w-1 h-1 rounded-full bg-white animate-pulse" />
-                              {beispiel}
-                            </div>
-                            {videoId && (
-                              <button
-                                onClick={() => setVideoModal({ id: videoId, title: activeTool.title })}
-                                className="absolute -top-3 right-4 z-10 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white dark:bg-[#1A1A18] border border-[#004225]/30 text-[#004225] dark:text-[#00A854] text-[9px] font-bold tracking-[0.25em] uppercase shadow-md hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-colors"
-                              >
-                                <Play size={9} className="fill-current" />
-                                {language === 'FR' ? 'Tutoriel' : language === 'IT' ? 'Tutorial' : language === 'EN' ? 'Tutorial' : 'Tutorial'}
-                              </button>
-                            )}
-                            <div className="relative">
-                              {body}
-                            </div>
-                          </div>
-                        );
-                      })()}
-
-                      <div className="text-center space-y-3 max-w-md">
-                        <h4 className="text-base font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.tool_how_to_use}</h4>
-                        <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">
-                          {activeTool.desc}
-                        </p>
+                      {/* Compact intro: the tool speaks for itself; the full
+                          explanation with the animated demo lives behind the
+                          question mark (top right) and the button below. */}
+                      <div className="text-center space-y-4 max-w-md pt-6">
+                        <div className="mx-auto w-14 h-14 bg-[#004225]/8 dark:bg-[#00A854]/12 rounded-full flex items-center justify-center text-[#004225] dark:text-[#00A854]">
+                          {activeTool.icon}
+                        </div>
+                        <h4 className="text-lg font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{activeTool.title}</h4>
+                        <p className="text-xs text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed">{activeTool.desc}</p>
+                        <button
+                          onClick={() => setShowToolHelp(true)}
+                          className="inline-flex items-center gap-2 px-4 py-2 border border-[#004225]/25 dark:border-[#00A854]/40 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:bg-[#004225]/5 dark:hover:bg-[#00A854]/10 transition-all rounded-full"
+                        >
+                          <HelpCircle size={13} />
+                          {language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
+                        </button>
                       </div>
-
-                      {t.tools_data[activeTool.id]?.tutorial && (() => {
-                        // The DB-side tutorials are conversational ("Beispiel: ...",
-                        // "Exemple : ...", "Esempio: ...", "Example: ..."). The card
-                        // header already labels this as PROFI-BEISPIEL, so strip the
-                        // redundant prefix and any wrapping quotes for a cleaner read.
-                        const raw = t.tools_data[activeTool.id].tutorial as string;
-                        const cleaned = raw
-                          .replace(/^(Beispiel|Exemple|Esempio|Example)\s*[:：]\s*/i, '')
-                          .replace(/^["„«»“”']+|["„«»“”']+$/g, '')
-                          .trim();
-                        return (
-                          <div className="w-full p-5 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06] border-l-2 border-[#004225] dark:border-[#00A854] rounded-r-lg space-y-2.5 text-left">
-                            <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[#004225] dark:text-[#00A854]">
-                              <Award size={12} />
-                              <span>{t.tool_pro_example}</span>
-                            </div>
-                            <p className="text-[13px] text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed">
-                              {cleaned}
-                            </p>
-                          </div>
-                        );
-                      })()}
 
                       {hasExampleFor(activeTool.id) && !isProcessingTool && (
                         <button
