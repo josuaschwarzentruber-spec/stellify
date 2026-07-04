@@ -110,9 +110,9 @@ const LiveDemo = ({ language }: { language: string }) => {
     language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
   const URL_TEXT = 'https://www.jobs.ch/stellen/marketing-manager-nestle';
   const LETTER = L(
-    'Mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens und steigerte die Bekanntheit um 28 Prozent.',
-    "Avec grand intérêt, je postule comme Marketing Manager chez Nestlé. Depuis trois ans, je dirige la stratégie de marque d'une entreprise suisse et j'ai augmenté la notoriété de 28 pour cent.",
-    "Con grande interesse mi candido come Marketing Manager presso Nestlé. Da tre anni guido la strategia di marca di un'azienda svizzera e ho aumentato la notorietà del 28 per cento.",
+    'mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens und habe die Bekanntheit um 28 Prozent gesteigert.',
+    "C'est avec grand intérêt que je postule comme Marketing Manager chez Nestlé. Depuis trois ans, je dirige la stratégie de marque d'une entreprise suisse et j'ai augmenté la notoriété de 28 pour cent.",
+    "con grande interesse mi candido come Marketing Manager presso Nestlé. Da tre anni guido la strategia di marca di un'azienda svizzera e ho aumentato la notorietà del 28 per cento.",
     'I am applying with great interest as Marketing Manager at Nestlé. For three years I have led the brand strategy of a Swiss company and grew awareness by 28 percent.'
   );
   const CYCLE = 15000;
@@ -212,6 +212,9 @@ const LiveDemo = ({ language }: { language: string }) => {
                 </span>
               )}
             </div>
+            <p className="font-serif text-[12px] sm:text-[13px] leading-relaxed text-[#26261F] dark:text-[#D5D5CF] min-h-[1.4em]">
+              {letterChars > 0 ? L('Sehr geehrte Damen und Herren,', 'Madame, Monsieur,', 'Gentili Signore e Signori,', 'Dear Sir or Madam,') : ''}
+            </p>
             <p className="font-serif text-[12px] sm:text-[13px] leading-relaxed text-[#26261F] dark:text-[#D5D5CF] min-h-[5.2em] sm:min-h-[4em]">
               {LETTER.slice(0, letterChars)}{letterChars > 0 && letterChars < LETTER.length && caret}
             </p>
@@ -2984,7 +2987,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           </div>
           <div className="p-3 space-y-1.5">
             <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
-            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="Mit grossem Interesse bewerbe ich mich für die Position … +28% Markenbekanntheit, Budget CHF 1,2 Mio., DACH-Launches." speed={18} /></p>
+            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Sehr geehrte Damen und Herren,</p>
+            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Konsumgüterherstellers und habe die Markenbekanntheit um 28 Prozent gesteigert." speed={18} /></p>
             <div className="flex gap-1.5 pt-1">
               <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />PDF</span>
               <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />Word</span>
@@ -8718,11 +8722,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <p className="text-[12px] text-[#1A1A18] dark:text-[#EBEBEB] mb-3">
                   {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
                 </p>
-                {/* Letter body — typeset text lines */}
-                <div className="space-y-1.5 mb-4">
-                  {['97%','100%','94%','99%','88%'].map((w, i) => (
-                    <div key={i} style={{ width: w }} className="h-[7px] rounded-sm bg-[#1A1A18]/[0.08] dark:bg-white/[0.08]" />
-                  ))}
+                {/* Letter body — real readable paragraphs, exactly like the
+                    finished export. Grey skeleton bars looked like a draft,
+                    not like the end result. */}
+                <div className="space-y-2 mb-4 text-[10.5px] text-[#26261F] dark:text-[#D5D5CF] leading-[1.7]">
+                  <p>
+                    {language === 'FR'
+                      ? "C'est avec grand intérêt que je postule au poste de Marketing Manager chez UBS. Ces trois dernières années, j'ai dirigé la stratégie de marque d'un prestataire financier suisse et renforcé la fidélité des clients de manière mesurable."
+                      : language === 'IT'
+                      ? 'Con grande interesse mi candido come Marketing Manager presso UBS. Negli ultimi tre anni ho guidato la strategia di marca di un fornitore di servizi finanziari svizzero, rafforzando in modo misurabile la fedeltà dei clienti.'
+                      : language === 'EN'
+                      ? 'I am applying with great interest for the Marketing Manager position at UBS. Over the past three years I have led the brand strategy of a Swiss financial services provider and measurably strengthened client loyalty.'
+                      : 'mit grossem Interesse bewerbe ich mich als Marketing Manager bei der UBS. In den letzten drei Jahren habe ich die Markenstrategie eines Schweizer Finanzdienstleisters geführt und die Kundenbindung messbar gestärkt.'}
+                  </p>
+                  <p>
+                    {language === 'FR'
+                      ? "L'alliance de précision suisse et d'envergure internationale m'attire particulièrement. Je me réjouis de vous convaincre lors d'un entretien personnel."
+                      : language === 'IT'
+                      ? 'La combinazione di precisione svizzera e respiro internazionale mi attrae particolarmente. Sarei felice di presentarmi in un colloquio personale.'
+                      : language === 'EN'
+                      ? 'The blend of Swiss precision and international reach appeals to me greatly. I would be delighted to tell you more in a personal interview.'
+                      : 'Die Verbindung von Schweizer Präzision und internationaler Ausrichtung reizt mich besonders. Gerne überzeuge ich Sie in einem persönlichen Gespräch.'}
+                  </p>
                 </div>
                 <p className="text-[12px] text-[#1A1A18] dark:text-[#EBEBEB]">
                   {language === 'FR' ? 'Meilleures salutations' : language === 'IT' ? 'Cordiali saluti' : language === 'EN' ? 'Kind regards' : 'Freundliche Grüsse'}
@@ -8733,7 +8754,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {/* Export footer */}
               <div className="border-t border-black/8 dark:border-white/8 px-6 py-3 flex items-center justify-between bg-[#FDFCFB] dark:bg-[#2A2A26]">
                 <span className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] font-light">
-                  {language === 'FR' ? 'Créé en 5 minutes' : language === 'IT' ? 'Creato in 5 minuti' : language === 'EN' ? 'Created in 5 minutes' : 'In 5 Minuten erstellt'}
+                  {language === 'FR' ? 'Créé en quelques minutes' : language === 'IT' ? 'Creato in pochi minuti' : language === 'EN' ? 'Created in minutes' : 'In wenigen Minuten erstellt'}
                 </span>
                 <div className="flex items-center gap-2">
                   {['PDF', 'WORD'].map(fmt => (
@@ -8833,17 +8854,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         : 'Bewerbung als Marketing Manager · Nestlé'}
                     </p>
                     <p className="text-[11px] sm:text-[13px] mb-2.5">
-                      {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren'}
+                      {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
                     </p>
                     <div className="text-[11px] sm:text-[13px] leading-[1.75] text-[#26261F] space-y-2.5">
                       <p>
                         {language === 'FR'
-                          ? 'Avec un grand intérêt, je postule pour le poste de Marketing Manager chez Nestlé. Votre approche de durabilité et de marques locales correspond exactement à ce que je veux faire avancer.'
+                          ? "C'est avec grand intérêt que je postule au poste de Marketing Manager chez Nestlé. Votre approche de durabilité et de marques locales correspond exactement à ce que je veux faire avancer."
                           : language === 'IT'
                           ? "Con grande interesse mi candido per la posizione di Marketing Manager presso Nestlé. Il vostro approccio alla sostenibilità e ai marchi locali è esattamente ciò che voglio promuovere."
                           : language === 'EN'
                           ? 'I am applying with great enthusiasm for the position of Marketing Manager at Nestlé. Your approach to sustainability and local brands is exactly the direction I want to help drive forward.'
-                          : 'Mit grossem Interesse bewerbe ich mich für die Position als Marketing Manager bei Nestlé. Ihre Strategie für nachhaltige Marken und den Schweizer Markt entspricht exakt dem, was ich vorantreiben möchte.'}
+                          : 'mit grossem Interesse bewerbe ich mich für die Position als Marketing Manager bei Nestlé. Ihre Strategie für nachhaltige Marken und den Schweizer Markt entspricht exakt dem, was ich vorantreiben möchte.'}
                       </p>
                       <p>
                         {language === 'FR'
@@ -9175,13 +9196,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <p className="text-[13px] font-bold text-[#004225] dark:text-[#00A854]">
                               {language === 'FR' ? 'Candidature: Marketing Manager · Nestlé' : language === 'IT' ? 'Candidatura: Marketing Manager · Nestlé' : language === 'EN' ? 'Application: Marketing Manager · Nestlé' : 'Bewerbung als Marketing Manager · Nestlé'}
                             </p>
+                            <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF]">
+                              {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
+                            </p>
                             <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF] leading-relaxed min-h-[4.5em]">
                               <TypeText
                                 speed={16}
-                                text={language === 'FR' ? "Avec grand intérêt, je postule au poste de Marketing Manager. Depuis trois ans, je dirige la stratégie de marque d'un acteur suisse, +28% de notoriété avec un budget de CHF 1,2 mio."
-                                  : language === 'IT' ? "Con grande interesse mi candido come Marketing Manager. Da tre anni guido la strategia di marca di un'azienda svizzera, +28% di notorietà con un budget di CHF 1,2 mio."
-                                  : language === 'EN' ? 'I am applying with great interest for the Marketing Manager role. For three years I have led brand strategy at a Swiss company, growing awareness by 28% on a CHF 1.2m budget.'
-                                  : 'Mit grossem Interesse bewerbe ich mich als Marketing Manager. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Unternehmens, +28% Bekanntheit mit CHF 1,2 Mio. Budget.'}
+                                text={language === 'FR' ? "C'est avec grand intérêt que je postule au poste de Marketing Manager chez Nestlé. Depuis trois ans, je dirige la stratégie de marque d'un fabricant suisse de biens de consommation et j'ai augmenté la notoriété de la marque de 28 pour cent."
+                                  : language === 'IT' ? 'con grande interesse mi candido come Marketing Manager presso Nestlé. Da tre anni guido la strategia di marca di un produttore svizzero di beni di consumo e ho aumentato la notorietà del marchio del 28 per cento.'
+                                  : language === 'EN' ? 'I am applying with great interest for the Marketing Manager position at Nestlé. For three years I have led the brand strategy of a Swiss consumer goods company and increased brand awareness by 28 percent.'
+                                  : 'mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Konsumgüterherstellers und habe die Markenbekanntheit um 28 Prozent gesteigert.'}
                               />
                             </p>
                             <div className="flex items-center gap-2 pt-1.5">
