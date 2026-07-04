@@ -4388,7 +4388,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "Der Standard für ambitionierte Bewerber.",
       pricing_ultimate_desc: "Maximale Power für deine Karriere.",
       faq_title: "Häufig gestellte Fragen",
-      footer_desc: "Stellify ist die Bewerbungs-KI für die Schweiz. Professionelle Bewerbungen in 5 Minuten, plus alle Tools für deine Karriere.",
+      footer_desc: "Stellify ist die Bewerbungs-KI für die Schweiz. Professionelle Bewerbungen in wenigen Minuten.",
       footer_legal: "Rechtliches",
       footer_contact: "Kontakt",
       auth_login: "Anmelden",
@@ -6135,7 +6135,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_desc: "The standard for ambitious candidates.",
       pricing_ultimate_desc: "Maximum power for your career.",
       faq_title: "Frequently Asked Questions",
-      footer_desc: "Stellify is the application AI for Switzerland. Professional applications in 5 minutes, plus a full suite of career tools.",
+      footer_desc: "Stellify is the application AI for Switzerland. Professional applications in minutes.",
       footer_legal: "Legal",
       footer_contact: "Contact",
       auth_login: "Login",
@@ -9738,7 +9738,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left — wordmark + etymology */}
@@ -9812,9 +9812,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
       {/* --- FAQ SECTION --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+      <section className="px-6 lg:px-12 py-14 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-3xl mx-auto">
-          <div className="text-left mb-16">
+          <div className="text-left mb-10 lg:mb-12">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-[#004225] text-white flex items-center justify-center text-base font-serif">?</div>
               <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854]">{t.faq_badge}</p>
@@ -9842,7 +9842,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
       {/* --- FINAL CTA --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-32 bg-[#004225] text-white text-center relative overflow-hidden">
+      <section className="px-6 lg:px-12 py-16 lg:py-24 bg-[#004225] text-white text-center relative overflow-hidden">
         <motion.div
           aria-hidden="true"
           initial={{ opacity: 0, scale: 0.8 }}
