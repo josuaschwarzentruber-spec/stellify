@@ -7007,7 +7007,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {t.stat_interviews}
                           </div>
                           <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-2 leading-none"><CountUp to={trackerStats.interview} /></p>
-                          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{t.stat_rate}</p>
+                          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2 leading-snug">
+                            {language === 'FR' ? 'Part avec entretien ou mieux' : language === 'IT' ? 'Quota con colloquio o meglio' : language === 'EN' ? 'Reached interview or better' : 'Kamen bis zum Interview oder weiter'}
+                          </p>
                         </div>
                         <div className="relative w-14 h-14 shrink-0" aria-hidden="true">
                           <svg viewBox="0 0 36 36" className="w-14 h-14 -rotate-90">
@@ -7025,7 +7027,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {t.stat_offers}
                           </div>
                           <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-2 leading-none"><CountUp to={trackerStats.offer} /></p>
-                          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{t.stat_rate}</p>
+                          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2 leading-snug">
+                            {language === 'FR' ? 'Part avec offre' : language === 'IT' ? 'Quota con offerta' : language === 'EN' ? 'Ended in an offer' : 'Führten zu einem Angebot'}
+                          </p>
                         </div>
                         <div className="relative w-14 h-14 shrink-0" aria-hidden="true">
                           <svg viewBox="0 0 36 36" className="w-14 h-14 -rotate-90">
@@ -7404,22 +7408,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.dashboard}
                 </button>
                 <button
-                  onClick={() => navigate('profile')}
-                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'profile' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                  onClick={() => navigate('tools')}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
-                  {t.profile_nav}
+                  {t.tools}
                 </button>
                 <button
                   onClick={() => navigate('tracker')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tracker' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.tracker_nav}
-                </button>
-                <button
-                  onClick={() => navigate('tools')}
-                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tools' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
-                >
-                  {t.tools}
                 </button>
                 <button
                   onClick={() => navigate('jobs')}
@@ -7432,6 +7430,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'pricing' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.pricing}
+                </button>
+                <button
+                  onClick={() => navigate('profile')}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'profile' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                >
+                  {t.profile_nav}
                 </button>
                 <button
                   onClick={() => navigate('about')}
@@ -7617,11 +7621,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {user ? (
                 <>
                   <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
-                  <button onClick={() => { navigate('profile'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'profile' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.profile_nav}</button>
-                  <button onClick={() => { navigate('tracker'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tracker' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tracker_nav}</button>
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
+                  <button onClick={() => { navigate('tracker'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tracker' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tracker_nav}</button>
                   <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
                   <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
+                  <button onClick={() => { navigate('profile'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'profile' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.profile_nav}</button>
                   <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'about' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
               ) : (
