@@ -9572,18 +9572,49 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           <style>{`
             @keyframes stellifyPricingDriftA { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(3%, 2%) scale(1.08);} }
             @keyframes stellifyPricingDriftB { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-3%, -2%) scale(1.1);} }
+            @keyframes stellifyPricingSweep { 0%, 55% { left: -40%; } 90%, 100% { left: 130%; } }
             @media (prefers-reduced-motion: reduce) {
               section#pricing [style*="stellifyPricingDrift"] { animation: none !important; }
+              section#pricing [style*="stellifyPricingSweep"] { animation: none !important; display: none; }
             }
           `}</style>
         </div>
         <div className="max-w-7xl mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/40 text-[10px] font-bold tracking-widest uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-white/30 animate-pulse" />
-              Live Payment System
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight mb-8">{t.pricing_title}</h2>
+          <div className="text-center mb-12 sm:mb-16">
+            {/* Opening: staged reveal — kicker, headline, value promise.
+                Sells before it lists. The old "Live Payment System" badge
+                was tech jargon, not an argument to buy. */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-60px' }}
+              variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
+            >
+              <motion.p
+                variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
+                className="text-[10px] font-bold uppercase tracking-[0.35em] text-[#6FCF97] mb-4"
+              >
+                {language === 'FR' ? 'Tarifs' : language === 'IT' ? 'Prezzi' : language === 'EN' ? 'Pricing' : 'Preise'}
+              </motion.p>
+              <motion.h2
+                variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' } } }}
+                className="text-4xl lg:text-6xl font-serif tracking-tight mb-5"
+              >
+                {t.pricing_title}
+              </motion.h2>
+              <motion.p
+                variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } } }}
+                className="text-white/60 font-light max-w-xl mx-auto mb-8 leading-relaxed"
+              >
+                {language === 'FR'
+                  ? "Commence gratuitement avec 3 générations. Passe au niveau supérieur quand tu es prêt. Résiliable à tout moment."
+                  : language === 'IT'
+                  ? 'Inizia gratis con 3 generazioni. Fai il salto quando sei pronto. Disdicibile in ogni momento.'
+                  : language === 'EN'
+                  ? 'Start free with 3 generations. Upgrade when you are ready. Cancel anytime.'
+                  : 'Starte gratis mit 3 Generierungen. Hol dir mehr, wenn du bereit bist. Jederzeit kündbar.'}
+              </motion.p>
+            </motion.div>
 
             {subscriptionError && (
               <div className="mb-8 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-left flex items-start justify-between gap-4">
@@ -9615,49 +9646,30 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 >
                   {t.pricing_yearly}
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${billingCycle === 'yearly' ? 'bg-black/10 text-black' : 'bg-white/15 text-white'}`}>
-                    bis −27%
+                    {language === 'FR' ? "jusqu'à −27%" : language === 'IT' ? 'fino a −27%' : language === 'EN' ? 'up to −27%' : 'bis −27%'}
                   </span>
                 </button>
               </div>
-              <p className="text-[11px] text-white/40 font-light">
+              <motion.p
+                key={billingCycle}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="text-[11px] text-white/40 font-light"
+              >
                 {billingCycle === 'monthly'
-                  ? (language === 'DE' ? '→ Jährlich wählen und bis zu 3 Monate gratis sparen' : language === 'FR' ? '→ Choisir annuel et économiser jusqu\'à 3 mois' : language === 'IT' ? '→ Scegli annuale e risparmia fino a 3 mesi' : '→ Choose yearly and save up to 3 months')
-                  : (language === 'DE' ? '✓ Jahresabo aktiv, du sparst 2 Monate' : language === 'FR' ? '✓ Abonnement annuel, vous économisez 2 mois' : language === 'IT' ? '✓ Abbonamento annuale, risparmi 2 mesi' : '✓ Annual plan active, you save 2 months')}
-              </p>
+                  ? (language === 'DE' ? 'Jährlich wählen und bis zu 3 Monate gratis sparen' : language === 'FR' ? 'Choisir annuel et économiser jusqu\'à 3 mois' : language === 'IT' ? 'Scegli annuale e risparmia fino a 3 mesi' : 'Choose yearly and save up to 3 months')
+                  : (language === 'DE' ? 'Jahresabo aktiv, du sparst 2 Monate' : language === 'FR' ? 'Abonnement annuel, vous économisez 2 mois' : language === 'IT' ? 'Abbonamento annuale, risparmi 2 mesi' : 'Annual plan active, you save 2 months')}
+              </motion.p>
             </div>
           </div>
-
-          {/* TRUST BAR */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-            className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 mb-8 sm:mb-10"
-          >
-            {[
-              { icon: <ShieldCheck size={13} className="text-white/40" />, label: language === 'FR' ? 'Protection des données suisse' : language === 'IT' ? 'Protezione dati svizzera' : language === 'EN' ? 'Swiss data protection' : 'Datenschutz nach Schweizer Standard' },
-              { icon: <Lock size={13} className="text-white/40" />, label: language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione crittografata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung' },
-              { icon: <CreditCard size={13} className="text-white/40" />, label: language === 'DE' ? 'Sichere Zahlung via Stripe' : language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro via Stripe' : 'Secure payment via Stripe' },
-              { icon: <CheckCircle2 size={13} className="text-white/40" />, label: language === 'FR' ? 'Résiliable à tout moment' : language === 'IT' ? 'Disdicibile in ogni momento' : language === 'EN' ? 'Cancel anytime' : 'Jederzeit kündbar' },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
-                className="flex items-center gap-2 text-white/50 text-xs"
-              >
-                {item.icon}
-                <span>{item.label}</span>
-              </motion.div>
-            ))}
-          </motion.div>
 
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-80px' }}
             variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-16"
+            className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-8 sm:mb-10"
           >
             {/* GRATIS — Glassmorphism */}
             <motion.div
@@ -9675,14 +9687,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
                 <p className="text-xs text-white/70 mt-2 font-light">{t.plan_free_subtitle}</p>
               </div>
-              <ul className="relative space-y-4 mb-12 flex-1">
+              <motion.ul variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } } }} className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_free_f.map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-light text-white/70">
+                  <motion.li key={i} variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: 'easeOut' } } }} className="flex items-center gap-3 text-sm font-light text-white/70">
                     <CheckCircle2 size={14} className="text-white/30 shrink-0" />
                     {f}
-                  </li>
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
               <button
                 onClick={() => user ? navigate('dashboard') : (setAuthTab('register'), setIsAuthModalOpen(true))}
                 className="relative w-full py-4 border border-white/20 hover:bg-white hover:text-black transition-all text-sm font-medium min-h-[52px]"
@@ -9702,7 +9714,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/70">Pro</span>
                 <p className="text-xs text-white/60 mt-2 font-light leading-relaxed">{t.plan_pro_subtitle}</p>
                 <div className="flex items-baseline gap-1 mt-4">
-                  <span className="text-4xl font-serif text-white">CHF {prices.pro}</span>
+                  <motion.span
+                    key={`pro-${billingCycle}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    className="text-4xl font-serif text-white"
+                  >CHF {prices.pro}</motion.span>
                   <span className="text-white/70 text-sm">/{billingCycle === 'yearly' ? (language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year') : (language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.')}</span>
                 </div>
                 {billingCycle === 'yearly' && (
@@ -9711,14 +9729,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
-              <ul className="relative space-y-4 mb-12 flex-1">
+              <motion.ul variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } } }} className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_pro_f.map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-light text-white/80">
+                  <motion.li key={i} variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: 'easeOut' } } }} className="flex items-center gap-3 text-sm font-light text-white/80">
                     <CheckCircle2 size={14} className="text-[#6FCF97] shrink-0" />
                     {f}
-                  </li>
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
               <button
                 onClick={() => handleSubscription('pro')}
                 disabled={isSubscribing}
@@ -9738,17 +9756,34 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             >
               <div className="absolute -top-32 -left-32 w-96 h-96 bg-[#00A854]/25 rounded-full blur-3xl pointer-events-none" />
               <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-[#D4AF37]/[0.10] rounded-full blur-3xl pointer-events-none" />
+              {/* Periodic light sweep — the same premium touch as the tool
+                  cards, draws the eye to the featured plan. */}
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/[0.07] to-transparent"
+                style={{ animation: 'stellifyPricingSweep 7s ease-in-out infinite' }}
+              />
 
-              {/* Most-popular badge */}
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-1/2 inline-flex items-center gap-2 bg-gradient-to-r from-[#004225] to-[#00592F] text-white text-[10px] font-bold uppercase tracking-[0.3em] px-5 py-1.5 rounded-full border border-[#D4AF37]/40 shadow-lg shadow-[#004225]/40 whitespace-nowrap">
-                <span className="w-1 h-1 rounded-full bg-[#D4AF37]" />
-                {t.pricing_popular}
+              {/* Most-popular badge — in-flow at the top of the card. The old
+                  floating version sat above the card edge and was clipped
+                  invisible by overflow-hidden. */}
+              <div className="relative flex justify-center -mt-3 mb-5">
+                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#004225] to-[#00592F] text-white text-[10px] font-bold uppercase tracking-[0.3em] px-5 py-1.5 rounded-full border border-[#D4AF37]/40 shadow-lg shadow-[#004225]/40 whitespace-nowrap">
+                  <span className="w-1 h-1 rounded-full bg-[#D4AF37]" />
+                  {t.pricing_popular}
+                </span>
               </div>
               <div className="relative mb-8">
                 <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#6FCF97]">Karriere+</span>
                 <p className="text-xs text-white/70 mt-2 font-light leading-relaxed">{t.plan_ultimate_subtitle}</p>
                 <div className="flex items-baseline gap-1 mt-4">
-                  <span className="text-4xl font-serif text-white">CHF {prices.ultimate}</span>
+                  <motion.span
+                    key={`ult-${billingCycle}`}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, ease: 'easeOut' }}
+                    className="text-4xl font-serif text-white"
+                  >CHF {prices.ultimate}</motion.span>
                   <span className="text-white/70 text-sm">/{billingCycle === 'yearly' ? (language === 'DE' ? 'Jahr' : language === 'FR' ? 'An' : language === 'IT' ? 'Anno' : 'Year') : (language === 'DE' ? 'Mo.' : language === 'FR' ? 'Mois' : language === 'IT' ? 'Mese' : 'Mo.')}</span>
                 </div>
                 {billingCycle === 'yearly' && (
@@ -9757,14 +9792,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
               </div>
-              <ul className="relative space-y-4 mb-12 flex-1">
+              <motion.ul variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } } }} className="relative space-y-4 mb-12 flex-1">
                 {t.pricing_ultimate_f.map((f: string, i: number) => (
-                  <li key={i} className="flex items-center gap-3 text-sm font-medium text-white">
+                  <motion.li key={i} variants={{ hidden: { opacity: 0, x: -10 }, visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: 'easeOut' } } }} className="flex items-center gap-3 text-sm font-medium text-white">
                     <CheckCircle2 size={14} className="text-[#6FCF97] shrink-0" />
                     {f}
-                  </li>
+                  </motion.li>
                 ))}
-              </ul>
+              </motion.ul>
               <button
                 onClick={() => handleSubscription('ultimate')}
                 disabled={isSubscribing}
@@ -9773,6 +9808,33 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {isSubscribing ? '...' : t.pricing_cta_ultimate}
               </button>
             </motion.div>
+          </motion.div>
+
+          {/* TRUST BAR — directly under the plan cards, where the buying
+              decision happens. Answers the last doubts at the moment they
+              come up. */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-40px' }}
+            variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
+            className="flex flex-wrap justify-center gap-x-4 sm:gap-x-6 gap-y-2 mb-14 sm:mb-16"
+          >
+            {[
+              { icon: <ShieldCheck size={13} className="text-white/40" />, label: language === 'FR' ? 'Protection des données suisse' : language === 'IT' ? 'Protezione dati svizzera' : language === 'EN' ? 'Swiss data protection' : 'Datenschutz nach Schweizer Standard' },
+              { icon: <Lock size={13} className="text-white/40" />, label: language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione crittografata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung' },
+              { icon: <CreditCard size={13} className="text-white/40" />, label: language === 'DE' ? 'Sichere Zahlung via Stripe' : language === 'FR' ? 'Paiement sécurisé via Stripe' : language === 'IT' ? 'Pagamento sicuro via Stripe' : 'Secure payment via Stripe' },
+              { icon: <CheckCircle2 size={13} className="text-white/40" />, label: language === 'FR' ? 'Résiliable à tout moment' : language === 'IT' ? 'Disdicibile in ogni momento' : language === 'EN' ? 'Cancel anytime' : 'Jederzeit kündbar' },
+            ].map((item, i) => (
+              <motion.div
+                key={i}
+                variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } } }}
+                className="flex items-center gap-2 text-white/50 text-xs"
+              >
+                {item.icon}
+                <span>{item.label}</span>
+              </motion.div>
+            ))}
           </motion.div>
 
           {/* VALUE BOX */}
