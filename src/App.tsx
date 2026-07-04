@@ -7656,6 +7656,31 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </p>
                 </header>
 
+                {/* Quick access: the two tools, front and centre. The
+                    dashboard's job is orientation — open a tool in one
+                    click instead of scrolling to find it. */}
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854] mb-3">
+                    {language === 'FR' ? 'Tes outils' : language === 'IT' ? 'I tuoi strumenti' : language === 'EN' ? 'Your tools' : 'Deine Tools'}
+                  </p>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {tools.map(tool => (
+                      <button
+                        key={tool.id}
+                        onClick={() => handleToolClick(tool.id)}
+                        className="group text-left p-6 bg-[#004225] text-white hover:bg-[#00331d] transition-all shadow-sm"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="w-10 h-10 bg-white/10 flex items-center justify-center">{tool.icon}</div>
+                          <ArrowRight size={16} className="opacity-60 group-hover:translate-x-1 group-hover:opacity-100 transition-all" />
+                        </div>
+                        <p className="font-serif text-lg leading-tight">{tool.title}</p>
+                        <p className="text-xs text-white/60 font-light mt-1 line-clamp-2">{tool.desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Quick Stats */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[
@@ -8773,11 +8798,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ))}
 
       {/* --- MARKETING / OVERVIEW SECTIONS ---
-           Shown for visitors (landing), on the logged-in Dashboard (a full
-           overview of the whole site, incl. price comparison), and on the
-           Preise page (pricing only). Hidden on profile / tools / jobs
-           (focused app views) and on legal + about pages. */}
-      {(!user || activeView === 'dashboard' || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
+           Shown for visitors (landing) and on the Preise page (pricing
+           only). The logged-in Dashboard stays a focused app view: tools,
+           stats and pipeline, without the marketing site repeating below.
+           Hidden on profile / tools / jobs and on legal + about pages. */}
+      {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
 
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right). */}
