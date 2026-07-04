@@ -94,7 +94,7 @@ const STR: Record<string, Record<string, string>> = {
     save_application: 'Bewerbung speichern', saved: 'Gespeichert', saving: 'Speichern…',
     load_saved: 'Gespeicherte Bewerbungen', load: 'Öffnen', no_saved: 'Noch keine gespeicherten Bewerbungen.',
     subject: 'Bewerbung als', attachment_note: 'Beilagen: Lebenslauf, Zeugnisse',
-    greeting: 'Sehr geehrte Damen und Herren', closing: 'Freundliche Grüsse',
+    greeting: 'Sehr geehrte Damen und Herren,', closing: 'Freundliche Grüsse',
     motivation_placeholder: 'Dein Bewerbungstext erscheint hier. Fülle das Formular aus, dein Motivations-Text bildet den Kern des Anschreibens. Im nächsten Schritt verfeinert die KI daraus ein vollständiges, professionelles Anschreiben.',
     profile_title: 'Profil', skills_title: 'Fähigkeiten', exp_title: 'Erfahrung', edu_title: 'Ausbildung',
     locked_title: 'Pro-Tool', locked_text: 'Der Bewerbungs-Generator ist Teil des Pro-Plans.', locked_cta: 'Pläne ansehen',
@@ -141,7 +141,7 @@ const STR: Record<string, Record<string, string>> = {
     save_application: 'Enregistrer la candidature', saved: 'Enregistré', saving: 'Enregistrement…',
     load_saved: 'Candidatures enregistrées', load: 'Ouvrir', no_saved: 'Aucune candidature enregistrée.',
     subject: 'Candidature au poste de', attachment_note: 'Annexes : CV, certificats',
-    greeting: 'Madame, Monsieur', closing: 'Meilleures salutations',
+    greeting: 'Madame, Monsieur,', closing: 'Meilleures salutations',
     motivation_placeholder: 'Ton texte de candidature apparaîtra ici. Remplis le formulaire, ton texte de motivation forme le cœur de la lettre. À l\'étape suivante, l\'IA en fera une lettre complète et professionnelle.',
     profile_title: 'Profil', skills_title: 'Compétences', exp_title: 'Expérience', edu_title: 'Formation',
     locked_title: 'Outil Pro', locked_text: 'Le générateur de candidature fait partie du plan Pro.', locked_cta: 'Voir les plans',
@@ -188,7 +188,7 @@ const STR: Record<string, Record<string, string>> = {
     save_application: 'Salva candidatura', saved: 'Salvato', saving: 'Salvataggio…',
     load_saved: 'Candidature salvate', load: 'Apri', no_saved: 'Nessuna candidatura salvata.',
     subject: 'Candidatura come', attachment_note: 'Allegati: CV, certificati',
-    greeting: 'Gentili Signore e Signori', closing: 'Cordiali saluti',
+    greeting: 'Gentili Signore e Signori,', closing: 'Cordiali saluti',
     motivation_placeholder: 'Il tuo testo di candidatura apparirà qui. Compila il modulo: il testo di motivazione è il cuore della lettera. Al prossimo passo l\'IA lo trasformerà in una lettera completa e professionale.',
     profile_title: 'Profilo', skills_title: 'Competenze', exp_title: 'Esperienza', edu_title: 'Formazione',
     locked_title: 'Strumento Pro', locked_text: 'Il generatore di candidature fa parte del piano Pro.', locked_cta: 'Vedi i piani',
@@ -235,7 +235,7 @@ const STR: Record<string, Record<string, string>> = {
     save_application: 'Save application', saved: 'Saved', saving: 'Saving…',
     load_saved: 'Saved applications', load: 'Open', no_saved: 'No saved applications yet.',
     subject: 'Application for the position of', attachment_note: 'Enclosures: CV, references',
-    greeting: 'Dear Sir or Madam', closing: 'Kind regards',
+    greeting: 'Dear Sir or Madam,', closing: 'Kind regards',
     motivation_placeholder: 'Your application text will appear here. Fill in the form. your motivation text forms the core of the letter. In the next step, the AI turns it into a complete, professional cover letter.',
     profile_title: 'Profile', skills_title: 'Skills', exp_title: 'Experience', edu_title: 'Education',
     locked_title: 'Pro Tool', locked_text: 'The application generator is part of the Pro plan.', locked_cta: 'See plans',
@@ -706,7 +706,7 @@ TONALITÄT: ${toneLabel(form.tone)}
 
 AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
-  "coverLetter": "Vollständiges Bewerbungsanschreiben, 250-350 Wörter, ohne Anrede und ohne Grussformel (werden separat ergänzt), Absätze mit \\n\\n getrennt",
+  "coverLetter": "Vollständiges Bewerbungsanschreiben, 250-350 Wörter, ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross), Absätze mit \\n\\n getrennt",
   "cvSummary": "Optimiertes Kurzprofil für den Lebenslauf, 3-4 Sätze",
   "skills": ["6-8 passende Skills als kurze Stichworte"],
   "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
