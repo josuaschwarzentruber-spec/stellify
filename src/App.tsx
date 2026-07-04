@@ -6978,20 +6978,62 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
                   {trackerStats.total > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_total}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-1 leading-none">{trackerStats.total}</p>
+                      {/* Gesamt — number + stacked pipeline bar so the mix of
+                          statuses is visible at a glance, not just a count. */}
+                      <div className="p-5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 transition-all hover:shadow-md hover:border-black/15 dark:hover:border-white/15">
+                        <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                          <Send size={11} className="text-[#004225] dark:text-[#00A854]" />
+                          {t.stat_total}
+                        </div>
+                        <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-2 leading-none"><CountUp to={trackerStats.total} /></p>
                         <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.inProcess} {t.stat_in_process}</p>
+                        <div className="mt-3 flex h-1.5 rounded-full overflow-hidden bg-black/5 dark:bg-white/5" aria-hidden="true">
+                          {[
+                            { v: trackerStats.wishlist, c: '#9A9A94' },
+                            { v: trackerStats.applied, c: '#5C5C58' },
+                            { v: trackerStats.interview, c: '#D4A852' },
+                            { v: trackerStats.offer, c: '#00A854' },
+                            { v: trackerStats.rejected, c: '#B91C1C' },
+                          ].filter(s => s.v > 0).map((s, i) => (
+                            <div key={i} style={{ width: `${(s.v / trackerStats.total) * 100}%`, background: s.c }} className="h-full" />
+                          ))}
+                        </div>
                       </div>
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_interviews}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.interview}</p>
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.interviewRate}% {t.stat_rate}</p>
+                      {/* Interviews — rate as a progress ring, gold accent */}
+                      <div className="p-5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 transition-all hover:shadow-md hover:border-black/15 dark:hover:border-white/15 flex items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                            <Mic size={11} className="text-[#D4A852]" />
+                            {t.stat_interviews}
+                          </div>
+                          <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-2 leading-none"><CountUp to={trackerStats.interview} /></p>
+                          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{t.stat_rate}</p>
+                        </div>
+                        <div className="relative w-14 h-14 shrink-0" aria-hidden="true">
+                          <svg viewBox="0 0 36 36" className="w-14 h-14 -rotate-90">
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(212,168,82,0.15)" strokeWidth="3" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#D4A852" strokeWidth="3" strokeDasharray={`${trackerStats.interviewRate} 100`} strokeLinecap="round" className="transition-all duration-700" />
+                          </svg>
+                          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-serif text-[#B8862F] dark:text-[#D4A852]">{trackerStats.interviewRate}%</span>
+                        </div>
                       </div>
-                      <div className="p-4 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8">
-                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
-                        <p className="text-2xl xl:text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-1 leading-none">{trackerStats.offer}</p>
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{trackerStats.offerRate}% {t.stat_rate}</p>
+                      {/* Angebote — rate as a progress ring, brand green */}
+                      <div className="p-5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 transition-all hover:shadow-md hover:border-black/15 dark:hover:border-white/15 flex items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                            <Award size={11} className="text-[#004225] dark:text-[#00A854]" />
+                            {t.stat_offers}
+                          </div>
+                          <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-2 leading-none"><CountUp to={trackerStats.offer} /></p>
+                          <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2">{t.stat_rate}</p>
+                        </div>
+                        <div className="relative w-14 h-14 shrink-0" aria-hidden="true">
+                          <svg viewBox="0 0 36 36" className="w-14 h-14 -rotate-90">
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.12)" strokeWidth="3" />
+                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#00A854" strokeWidth="3" strokeDasharray={`${trackerStats.offerRate} 100`} strokeLinecap="round" className="transition-all duration-700" />
+                          </svg>
+                          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-serif text-[#004225] dark:text-[#00A854]">{trackerStats.offerRate}%</span>
+                        </div>
                       </div>
                     </div>
                   )}
