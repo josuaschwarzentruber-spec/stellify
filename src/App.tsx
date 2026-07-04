@@ -7883,6 +7883,42 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
               <div className="lg:col-span-1 space-y-6">
               <div className="space-y-6">
+                {/* Upgrade card — free users only. Keeps the price visible on
+                    the dashboard (the path to purchase must never be more
+                    than one click away) without showing paying customers
+                    marketing they already acted on. */}
+                {user.role === 'client' && (
+                  <div className="p-8 border border-[#004225]/15 dark:border-[#00A854]/25 bg-white dark:bg-[#2A2A26] space-y-5 transition-colors">
+                    <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+                      <Star size={12} />
+                      {language === 'FR' ? 'Passer au niveau supérieur' : language === 'IT' ? 'Fai il salto di qualità' : language === 'EN' ? 'Take the next step' : 'Mehr aus Stellify holen'}
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-baseline justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Pro</p>
+                          <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.plan_pro_f1}</p>
+                        </div>
+                        <p className="font-serif text-lg text-[#004225] dark:text-[#00A854] whitespace-nowrap">CHF 19.90<span className="text-[10px] text-[#9A9A94]">/Mo.</span></p>
+                      </div>
+                      <div className="h-px bg-black/5 dark:bg-white/5" />
+                      <div className="flex items-baseline justify-between gap-3">
+                        <div>
+                          <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Karriere+</p>
+                          <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.plan_unlim_f2}</p>
+                        </div>
+                        <p className="font-serif text-lg text-[#004225] dark:text-[#00A854] whitespace-nowrap">CHF 39.90<span className="text-[10px] text-[#9A9A94]">/Mo.</span></p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigate('pricing')}
+                      className="w-full py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all flex items-center justify-center gap-2"
+                    >
+                      {language === 'FR' ? 'Comparer les plans' : language === 'IT' ? 'Confronta i piani' : language === 'EN' ? 'Compare plans' : 'Pläne vergleichen'}
+                      <ArrowRight size={12} />
+                    </button>
+                  </div>
+                )}
                 <div className="p-8 bg-[#004225] text-white space-y-6">
                   <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
                   <div className="space-y-4">
