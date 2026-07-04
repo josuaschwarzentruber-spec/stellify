@@ -7701,54 +7701,49 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </div>
                       <div className={`text-2xl font-serif ${stat.color || 'text-[#1A1A18] dark:text-[#FAFAF8]'}`}>{stat.value}</div>
                       
-                      {(stat.label === t.dashboard_stat_plan && (user.role === 'pro' || user.role === 'client')) && (
-                        <div className="mt-3">
-                          <div className="space-y-3">
-                            {user.role === 'pro' ? (
-                              <>
-                                {/* Monthly Usage */}
-                                <div className="space-y-1">
-                                  <div className="flex justify-between items-center">
-                                    <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                    <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 50</span>
-                                  </div>
-                                  <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
-                                    <div 
-                                      className="h-full bg-[#004225] transition-all duration-700" 
-                                      style={{ width: `${Math.min(((user.toolUses || 0) / 50) * 100, 100)}%` }}
-                                    />
-                                  </div>
-                                  <div className="flex justify-end">
-                                    <span className="text-[7px] text-[#004225] font-bold uppercase tracking-tighter opacity-60">{t.dashboard_reset_monthly}</span>
-                                  </div>
-                                </div>
-
-                              </>
-                            ) : (
-                              /* Free User Usage — one canonical "Tool-Nutzung" counter
-                                 (freeGenerationsUsed and toolUses are incremented in
-                                 lockstep; showing both was confusing on the live tile). */
-                              <>
-                                <div className="flex justify-between items-center">
-                                  <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
-                                  <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{user.toolUses || 0} / 3</span>
-                                </div>
-                                <button
-                                  onClick={() => navigate('pricing')}
-                                  className="mt-3 w-full py-2 border border-[#004225]/20 dark:border-[#00A854]/30 text-[9px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-all"
-                                >
-                                  {language === 'FR' ? 'Découvrir Karriere+' : language === 'IT' ? 'Scopri Karriere+' : language === 'EN' ? 'Discover Karriere+' : 'Karriere+ entdecken'}
-                                </button>
-                              </>
+                      {/* One quota display for every plan: bar, used/total and
+                          how many generations are LEFT — the number people
+                          actually want to know. Karriere+ gets a counter too
+                          (it used to show only a static premium line). */}
+                      {stat.label === t.dashboard_stat_plan && (() => {
+                        const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
+                        const used = Math.min(user.toolUses || 0, limit);
+                        const left = limit - used;
+                        const paid = user.role === 'pro' || user.role === 'unlimited' || user.role === 'admin';
+                        return (
+                          <div className="mt-3 space-y-1">
+                            <div className="flex justify-between items-center">
+                              <span className="text-[8px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.dashboard_usage_desc}</span>
+                              <span className="text-[10px] font-serif text-[#004225] dark:text-[#FAFAF8]">{used} / {limit}</span>
+                            </div>
+                            <div className="h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-[#004225] dark:bg-[#00A854] transition-all duration-700"
+                                style={{ width: `${Math.min((used / limit) * 100, 100)}%` }}
+                              />
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">{left} {t.remaining}</span>
+                              {paid && (
+                                <span className="text-[7px] text-[#004225] dark:text-[#00A854] font-bold uppercase tracking-tighter opacity-60">{t.dashboard_reset_monthly}</span>
+                              )}
+                            </div>
+                            {(user.role === 'unlimited' || user.role === 'admin') && (
+                              <div className="pt-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+                                {t.dashboard_usage_unlimited} ✨
+                              </div>
+                            )}
+                            {!paid && (
+                              <button
+                                onClick={() => navigate('pricing')}
+                                className="mt-3 w-full py-2 border border-[#004225]/20 dark:border-[#00A854]/30 text-[9px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-all"
+                              >
+                                {language === 'FR' ? 'Découvrir Karriere+' : language === 'IT' ? 'Scopri Karriere+' : language === 'EN' ? 'Discover Karriere+' : 'Karriere+ entdecken'}
+                              </button>
                             )}
                           </div>
-                        </div>
-                      )}
-                      {stat.label === t.dashboard_stat_plan && (user.role === 'unlimited' || user.role === 'admin') && (
-                        <div className="mt-4 text-[8px] font-bold uppercase tracking-widest text-[#004225]">
-                          {t.dashboard_usage_unlimited} ✨
-                        </div>
-                      )}
+                        );
+                      })()}
                       {stat.label === t.dashboard_stat_cv_status && cvContext && (
                         <button
                           onClick={() => handleToolClick('bewerbungs-gen')}
@@ -10957,18 +10952,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         )}
                       </button>
 
-                      {user && user.role !== 'unlimited' && user.role !== 'admin' && (
+                      {user && (
                         <div className="flex justify-between items-center px-3 py-2 bg-black/5 dark:bg-white/5 rounded-lg border border-black/5 dark:border-white/5">
                           <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-[#004225] rounded-full animate-pulse shadow-[0_0_8px_rgba(0,66,37,0.4)]" />
                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94]">
-                              {user.role === 'pro'
-                                ? `${50 - (user.toolUses || 0)} ${t.remaining}`
-                                : `${3 - (user.toolUses || 0)} ${t.remaining}`
+                              {(user.role === 'unlimited' || user.role === 'admin')
+                                ? `${Math.max(0, 150 - (user.toolUses || 0))} ${t.remaining}`
+                                : user.role === 'pro'
+                                ? `${Math.max(0, 50 - (user.toolUses || 0))} ${t.remaining}`
+                                : `${Math.max(0, 3 - (user.toolUses || 0))} ${t.remaining}`
                               }
                             </span>
                           </div>
-                          {user.role === 'pro' && (
+                          {(user.role === 'pro' || user.role === 'unlimited' || user.role === 'admin') && (
                             <span className="text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8] opacity-60">
                               {t.dashboard_reset_monthly}
                             </span>
@@ -12369,59 +12366,36 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     );
                   })()}
 
-                  {/* Detailed Usage in Settings */}
-                  {(user?.role === 'pro' || user?.role === 'client') && (
-                    <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
-                      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                        <Activity size={14} />
-                        <span>{t.settings_your_usage}</span>
-                      </div>
-                      
-                      <div className="space-y-6">
-                        {user.role === 'pro' ? (
-                          <>
-                            {/* Monthly Usage */}
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-end">
-                                <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 50 {t.settings_generations}</p>
-                                </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.round(((user.toolUses || 0) / 50) * 100)}%</span>
-                              </div>
-                              <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-[#004225] transition-all duration-700" 
-                                  style={{ width: `${Math.min(((user.toolUses || 0) / 50) * 100, 100)}%` }}
-                                />
-                              </div>
+                  {/* Detailed Usage in Settings — one dynamic block for every
+                      plan (Free 3 · Pro 50 · Karriere+ 150). Shows how many
+                      generations are LEFT instead of a percent figure. */}
+                  {user && (() => {
+                    const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
+                    const used = Math.min(user.toolUses || 0, limit);
+                    return (
+                      <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
+                          <Activity size={14} />
+                          <span>{t.settings_your_usage}</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-end">
+                            <div className="space-y-0.5">
+                              <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                              <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{used} / {limit} {user.role === 'client' ? t.settings_free_use : t.settings_generations}</p>
                             </div>
-                          </>
-                        ) : (
-                          /* Free User Usage */
-                          <div className="space-y-6">
-                            {/* Tools/Applications */}
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-end">
-                                <div className="space-y-0.5">
-                                  <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                                  <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{user.toolUses || 0} / 3 {t.settings_free_use}</p>
-                                </div>
-                                <span className="text-xs font-serif text-[#004225]">{Math.min(100, Math.round(((user.toolUses || 0) / 3) * 100))}%</span>
-                              </div>
-                              <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-[#004225] transition-all duration-700"
-                                  style={{ width: `${Math.min(100, Math.round(((user.toolUses || 0) / 3) * 100))}%` }}
-                                />
-                              </div>
-                            </div>
-
+                            <span className="text-xs font-serif text-[#004225]">{limit - used} {t.remaining}</span>
                           </div>
-                        )}
+                          <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[#004225] transition-all duration-700"
+                              style={{ width: `${Math.min(100, Math.round((used / limit) * 100))}%` }}
+                            />
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {user?.role === 'unlimited' && (
                     <div className="p-4 bg-[#004225]/5 border border-[#004225]/10 flex items-center gap-3">
