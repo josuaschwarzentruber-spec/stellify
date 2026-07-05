@@ -6999,44 +6999,32 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           ))}
                         </div>
                       </div>
-                      {/* Interviews — rate as a progress ring, gold accent */}
+                      {/* Interviews — plain count, gold accent. No percentage:
+                          the quota mixed stages and read wrong next to the
+                          raw count. */}
                       <div className="p-5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 transition-all hover:shadow-md hover:border-black/15 dark:hover:border-white/15 flex items-center justify-between gap-4">
                         <div>
-                          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                            <Mic size={11} className="text-[#D4A852]" />
-                            {t.stat_interviews}
-                          </div>
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_interviews}</p>
                           <p className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mt-2 leading-none"><CountUp to={trackerStats.interview} /></p>
                           <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2 leading-snug">
-                            {language === 'FR' ? 'Part avec entretien ou mieux' : language === 'IT' ? 'Quota con colloquio o meglio' : language === 'EN' ? 'Reached interview or better' : 'Kamen bis zum Interview oder weiter'}
+                            {language === 'FR' ? 'En phase d\'entretien' : language === 'IT' ? 'In fase di colloquio' : language === 'EN' ? 'In the interview stage' : 'Aktuell in der Interview-Phase'}
                           </p>
                         </div>
-                        <div className="relative w-14 h-14 shrink-0" aria-hidden="true">
-                          <svg viewBox="0 0 36 36" className="w-14 h-14 -rotate-90">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(212,168,82,0.15)" strokeWidth="3" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#D4A852" strokeWidth="3" strokeDasharray={`${trackerStats.interviewRate} 100`} strokeLinecap="round" className="transition-all duration-700" />
-                          </svg>
-                          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-serif text-[#B8862F] dark:text-[#D4A852]">{trackerStats.interviewRate}%</span>
+                        <div className="w-12 h-12 rounded-full bg-[#D4A852]/12 flex items-center justify-center shrink-0" aria-hidden="true">
+                          <Mic size={20} className="text-[#D4A852]" />
                         </div>
                       </div>
-                      {/* Angebote — rate as a progress ring, brand green */}
+                      {/* Angebote — plain count, brand green */}
                       <div className="p-5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 transition-all hover:shadow-md hover:border-black/15 dark:hover:border-white/15 flex items-center justify-between gap-4">
                         <div>
-                          <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                            <Award size={11} className="text-[#004225] dark:text-[#00A854]" />
-                            {t.stat_offers}
-                          </div>
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94]">{t.stat_offers}</p>
                           <p className="text-3xl font-serif text-[#004225] dark:text-[#00A854] mt-2 leading-none"><CountUp to={trackerStats.offer} /></p>
                           <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-2 leading-snug">
-                            {language === 'FR' ? 'Part avec offre' : language === 'IT' ? 'Quota con offerta' : language === 'EN' ? 'Ended in an offer' : 'Führten zu einem Angebot'}
+                            {language === 'FR' ? 'Offres sur la table' : language === 'IT' ? 'Offerte sul tavolo' : language === 'EN' ? 'Offers on the table' : 'Angebote auf dem Tisch'}
                           </p>
                         </div>
-                        <div className="relative w-14 h-14 shrink-0" aria-hidden="true">
-                          <svg viewBox="0 0 36 36" className="w-14 h-14 -rotate-90">
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(0,66,37,0.12)" strokeWidth="3" />
-                            <circle cx="18" cy="18" r="15.9" fill="none" stroke="#00A854" strokeWidth="3" strokeDasharray={`${trackerStats.offerRate} 100`} strokeLinecap="round" className="transition-all duration-700" />
-                          </svg>
-                          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-serif text-[#004225] dark:text-[#00A854]">{trackerStats.offerRate}%</span>
+                        <div className="w-12 h-12 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/12 flex items-center justify-center shrink-0" aria-hidden="true">
+                          <Award size={20} className="text-[#004225] dark:text-[#00A854]" />
                         </div>
                       </div>
                     </div>
