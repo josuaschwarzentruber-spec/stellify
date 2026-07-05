@@ -1364,7 +1364,7 @@ function StellifyApp() {
   // Which tool's example is shown in the Tools-section header preview card.
   const [headerExampleTool, setHeaderExampleTool] = useState<string>('bewerbungs-gen');
   // Width (px) of the tool modal's left input column — draggable on desktop.
-  const [toolInputW, setToolInputW] = useState<number>(420);
+  const [toolInputW, setToolInputW] = useState<number>(500);
   const [isDesktopView, setIsDesktopView] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -1379,7 +1379,7 @@ function StellifyApp() {
     const startX = e.clientX;
     const startW = toolInputW;
     const onMove = (ev: MouseEvent) => {
-      const next = Math.min(640, Math.max(260, startW + (ev.clientX - startX)));
+      const next = Math.min(760, Math.max(300, startW + (ev.clientX - startX)));
       setToolInputW(next);
     };
     const onUp = () => {
@@ -4495,7 +4495,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_resets_lifetime: "Limits bleiben bestehen. Upgrade jederzeit möglich.",
       plan_free_f1: "3 KI-Generierungen zum Ausprobieren", plan_free_f2: "Bewerbungs-Übersicht & Status", plan_free_f3: "Bewerbungen speichern & bearbeiten", plan_free_f4: "PDF-Export", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
       plan_pro_f1: "50 KI-Generierungen pro Monat", plan_pro_f2: "Massgeschneiderte Bewerbungen mit KI", plan_pro_f3: "Stelle per Link laden & Lebenslauf nutzen", plan_pro_f4: "Alle Standard-Designs", plan_pro_f5: "PDF- & Word-Export",
-      plan_unlim_f1: "Mehr KI, als du je brauchst: 150 Generierungen pro Monat", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Persönlicher E-Mail-Support", plan_unlim_f5: "Für Vielbewerber und Berufswechsel",
+      plan_unlim_f1: "Volle KI-Power: 150 Generierungen pro Monat", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Persönlicher E-Mail-Support", plan_unlim_f5: "Für Vielbewerber und Berufswechsel",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Anfragen",
       dashboard_daily_usage: "Tageslimit",
@@ -4764,7 +4764,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       pricing_free_f: ["3 Bewerbungen zum Ausprobieren", "Bewerbungs-Übersicht & Status", "Speichern & bearbeiten", "Keine Kreditkarte nötig"],
       pricing_pro_f: ["50 KI-Generierungen pro Monat", "Massgeschneiderte Bewerbungen mit KI", "Stelle per Link laden & Lebenslauf nutzen", "Alle Standard-Designs", "PDF- & Word-Export"],
-      pricing_ultimate_f: ["Alles aus Pro, plus:", "Mehr KI, als du je brauchst: 150 Generierungen pro Monat", "Alle exklusiven Premium-Designs", "Persönlicher E-Mail-Support", "Für Vielbewerber und Berufswechsel"],
+      pricing_ultimate_f: ["Alles aus Pro, plus:", "Volle KI-Power: 150 Generierungen pro Monat", "Alle exklusiven Premium-Designs", "Persönlicher E-Mail-Support", "Für Vielbewerber und Berufswechsel"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Karriere+ wählen",
@@ -5148,7 +5148,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_resets_lifetime: "Limites à vie. Upgrade possible à tout moment.",
       plan_free_f1: "3 générations IA pour essayer", plan_free_f2: "Aperçu & statut des candidatures", plan_free_f3: "Enregistrer & modifier les candidatures", plan_free_f4: "Export PDF", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
       plan_pro_f1: "50 générations IA par mois", plan_pro_f2: "Candidatures sur mesure avec l'IA", plan_pro_f3: "Charger l'offre par lien & utiliser le CV", plan_pro_f4: "Tous les designs standard", plan_pro_f5: "Export PDF & Word",
-      plan_unlim_f1: "Plus d'IA qu'il n'en faut : 150 générations par mois", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support e-mail personnel", plan_unlim_f5: "Pour candidatures fréquentes et reconversions",
+      plan_unlim_f1: "Pleine puissance IA : 150 générations par mois", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support e-mail personnel", plan_unlim_f5: "Pour candidatures fréquentes et reconversions",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Requêtes Stella",
       dashboard_daily_usage: "Limite quotidienne",
@@ -5417,7 +5417,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       pricing_free_f: ["3 candidatures à essayer", "Aperçu & statut des candidatures", "Enregistrer & modifier", "Sans carte de crédit"],
       pricing_pro_f: ["50 générations IA par mois", "Candidatures sur mesure avec l'IA", "Charger l'offre par lien & utiliser le CV", "Tous les designs standard", "Export PDF & Word"],
-      pricing_ultimate_f: ["Tout de Pro, plus :", "Plus d'IA qu'il n'en faut : 150 générations par mois", "Tous les designs Premium exclusifs", "Support e-mail personnel", "Pour candidatures fréquentes et reconversions"],
+      pricing_ultimate_f: ["Tout de Pro, plus :", "Pleine puissance IA : 150 générations par mois", "Tous les designs Premium exclusifs", "Support e-mail personnel", "Pour candidatures fréquentes et reconversions"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Karriere+",
@@ -5695,7 +5695,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_resets_lifetime: "Limiti a vita. Upgrade possibile in qualsiasi momento.",
       plan_free_f1: "3 generazioni IA da provare", plan_free_f2: "Panoramica & stato delle candidature", plan_free_f3: "Salva & modifica le candidature", plan_free_f4: "Esportazione PDF", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
       plan_pro_f1: "50 generazioni IA al mese", plan_pro_f2: "Candidature su misura con l'IA", plan_pro_f3: "Carica l'annuncio da link & usa il CV", plan_pro_f4: "Tutti i design standard", plan_pro_f5: "Esportazione PDF & Word",
-      plan_unlim_f1: "Più IA di quanta te ne serva: 150 generazioni al mese", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto e-mail personale", plan_unlim_f5: "Per chi si candida spesso o cambia carriera",
+      plan_unlim_f1: "Piena potenza IA: 150 generazioni al mese", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto e-mail personale", plan_unlim_f5: "Per chi si candida spesso o cambia carriera",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Richieste Stella",
       dashboard_daily_usage: "Limite giornaliero",
@@ -5964,7 +5964,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       pricing_free_f: ["3 candidature da provare", "Panoramica & stato delle candidature", "Salva & modifica", "Nessuna carta di credito"],
       pricing_pro_f: ["50 generazioni IA al mese", "Candidature su misura con l'IA", "Carica l'annuncio da link & usa il CV", "Tutti i design standard", "Esportazione PDF & Word"],
-      pricing_ultimate_f: ["Tutto di Pro, più:", "Più IA di quanta te ne serva: 150 generazioni al mese", "Tutti i design Premium esclusivi", "Supporto e-mail personale", "Per chi si candida spesso o cambia carriera"],
+      pricing_ultimate_f: ["Tutto di Pro, più:", "Piena potenza IA: 150 generazioni al mese", "Tutti i design Premium esclusivi", "Supporto e-mail personale", "Per chi si candida spesso o cambia carriera"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Karriere+",
@@ -6242,7 +6242,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_resets_lifetime: "Lifetime limits. Upgrade anytime.",
       plan_free_f1: "3 AI generations to try", plan_free_f2: "Application overview & status", plan_free_f3: "Save & edit applications", plan_free_f4: "PDF export", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
       plan_pro_f1: "50 AI generations per month", plan_pro_f2: "Tailored applications with AI", plan_pro_f3: "Load job by link & use your CV", plan_pro_f4: "All standard designs", plan_pro_f5: "PDF & Word export",
-      plan_unlim_f1: "More AI than you'll ever need: 150 generations a month", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Personal email support", plan_unlim_f5: "For frequent applicants and career changers",
+      plan_unlim_f1: "Full AI power: 150 generations per month", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Personal email support", plan_unlim_f5: "For frequent applicants and career changers",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella requests",
       dashboard_daily_usage: "Daily Limit",
@@ -6511,7 +6511,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       pricing_free_f: ["3 applications to try", "Application overview & status", "Save & edit", "No credit card required"],
       pricing_pro_f: ["50 AI generations per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
-      pricing_ultimate_f: ["Everything in Pro, plus:", "More AI than you'll ever need: 150 generations a month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
+      pricing_ultimate_f: ["Everything in Pro, plus:", "Full AI power: 150 generations per month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Karriere+",
@@ -7402,6 +7402,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {t.tools}
                 </button>
                 <button
+                  onClick={() => navigate('pricing')}
+                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'pricing' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
+                >
+                  {t.pricing}
+                </button>
+                <button
                   onClick={() => navigate('tracker')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'tracker' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
@@ -7412,12 +7418,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'jobs' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
                   {t.search_type_job}
-                </button>
-                <button
-                  onClick={() => navigate('pricing')}
-                  className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'pricing' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
-                >
-                  {t.pricing}
                 </button>
                 <button
                   onClick={() => navigate('profile')}
@@ -7451,8 +7451,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   };
                   return <>
                     <a href="#tools" onClick={handleAnchor('tools')} className={goToAnchor('tools')}>{t.tools}</a>
-                    <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
                     <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
+                    <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
                     <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
                     </button>
@@ -7610,9 +7610,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <>
                   <button onClick={() => { navigate('dashboard'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'dashboard' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.dashboard}</button>
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
+                  <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
                   <button onClick={() => { navigate('tracker'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tracker' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tracker_nav}</button>
                   <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
-                  <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
                   <button onClick={() => { navigate('profile'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'profile' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.profile_nav}</button>
                   <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'about' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
