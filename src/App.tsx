@@ -1364,7 +1364,7 @@ function StellifyApp() {
   // Which tool's example is shown in the Tools-section header preview card.
   const [headerExampleTool, setHeaderExampleTool] = useState<string>('bewerbungs-gen');
   // Width (px) of the tool modal's left input column — draggable on desktop.
-  const [toolInputW, setToolInputW] = useState<number>(340);
+  const [toolInputW, setToolInputW] = useState<number>(420);
   const [isDesktopView, setIsDesktopView] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return;
@@ -10986,7 +10986,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   )}
                   <h4 className="text-xs font-bold uppercase tracking-widest mb-6 text-[#004225] dark:text-[#FAFAF8]">{t.tool_inputs}</h4>
                   <div className="space-y-4">
-                    {activeTool.inputs.map((input: any) => (
+                    {activeTool.inputs.map((input: any, inputIdx: number) => (
                       <div key={input.key}>
                         <div className="flex justify-between items-center mb-2">
                           <label className="block text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{input.label}</label>
@@ -11043,6 +11043,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         ) : (
                           <input
                             type={input.type}
+                            autoFocus={isDesktopView && inputIdx === 0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !isProcessingTool && !isToolLocked && !isToolLimitReached && !isDailyLimitReached) {
+                                e.preventDefault();
+                                processTool();
+                              }
+                            }}
                             className="w-full p-4 bg-white dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 text-sm focus:outline-none focus:border-[#004225] dark:focus:border-[#FAFAF8] transition-all font-light text-[#1A1A18] dark:text-[#FAFAF8]"
                             placeholder={input.placeholder}
                             value={toolInput[input.key] || ''}
@@ -11051,6 +11058,34 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         )}
                       </div>
                     ))}
+                    {/* Strategy tool: tappable Swiss examples fill the single
+                        field in one click — the fastest path to a first
+                        result, and they show what a good input looks like. */}
+                    {activeTool.id === 'tracker' && (
+                      <div>
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-[#9A9A94] mb-2">
+                          {language === 'FR' ? 'Exemples à taper' : language === 'IT' ? 'Esempi da toccare' : language === 'EN' ? 'Tap an example' : 'Beispiele zum Antippen'}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {(language === 'FR'
+                            ? ['Chef de projet chez Roche, Bâle', 'Infirmière au CHUV, Lausanne', 'Employé de commerce dans une banque, Genève']
+                            : language === 'IT'
+                            ? ['Project manager presso Roche, Basilea', 'Infermiera all\'ospedale cantonale, Lugano', 'Impiegato di commercio in banca, Bellinzona']
+                            : language === 'EN'
+                            ? ['Project lead at Roche, Basel', 'Nurse at the University Hospital, Zurich', 'Commercial apprentice at a bank, Bern']
+                            : ['Projektleiter bei Roche, Basel', 'Pflegefachfrau am Unispital, Zürich', 'KV-Abgänger bei einer Bank, Bern']
+                          ).map((ex) => (
+                            <button
+                              key={ex}
+                              onClick={() => setToolInput({ ...toolInput, jobTitle: ex })}
+                              className="px-3 py-1.5 text-[11px] font-light border border-black/10 dark:border-white/10 rounded-full text-[#4A4A45] dark:text-[#9A9A94] hover:border-[#004225] hover:text-[#004225] dark:hover:border-[#00A854] dark:hover:text-[#00A854] hover:bg-[#004225]/[0.04] transition-all"
+                            >
+                              {ex}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                     {activeTool.id === 'salary-calc' && (
                       <div className="p-4 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 flex items-start gap-3">
                         <ShieldCheck size={16} className="text-[#004225] dark:text-[#FAFAF8] shrink-0 mt-0.5" />
@@ -11115,9 +11150,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   role="separator"
                   aria-orientation="vertical"
                   title="Breite ziehen"
-                  className="hidden lg:flex w-2 shrink-0 cursor-col-resize items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-[#004225]/25 dark:hover:bg-[#00A854]/30 active:bg-[#004225]/40 transition-colors group/resize"
+                  className="hidden lg:flex w-2 shrink-0 cursor-col-resize items-center justify-center bg-transparent hover:bg-[#004225]/15 dark:hover:bg-[#00A854]/20 active:bg-[#004225]/30 transition-colors group/resize"
                 >
-                  <span className="w-0.5 h-8 rounded-full bg-black/20 dark:bg-white/20 group-hover/resize:bg-[#004225] dark:group-hover/resize:bg-[#00A854]" />
+                  <span className="w-0.5 h-8 rounded-full bg-transparent group-hover/resize:bg-[#004225] dark:group-hover/resize:bg-[#00A854] transition-colors" />
                 </div>
 
                 {/* Results */}
