@@ -9950,21 +9950,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             {/* Right — founder quote, pure typography. No portrait by design:
                 the words carry the weight, the star signs them. */}
             <div className="lg:col-span-7">
-              <div className="relative mb-10 pl-2 sm:pl-6">
-                {/* Oversized decorative quote mark behind the text */}
-                <span aria-hidden="true" className="absolute -top-10 -left-2 sm:-left-4 font-serif text-[140px] sm:text-[180px] leading-none text-[#004225]/[0.07] dark:text-[#00A854]/[0.09] select-none pointer-events-none">«</span>
+              {/* Clean quote: a slim brand-green rule instead of the huge
+                  watermark « that collided with the text and read as a
+                  rendering glitch. */}
+              <div className="relative mb-10 pl-5 sm:pl-7 border-l-2 border-[#004225]/30 dark:border-[#00A854]/40">
                 <blockquote className="relative font-serif italic text-2xl md:text-[2.1rem] text-[#1A1A18] dark:text-[#FAFAF8] leading-snug max-w-2xl">
                   {language === 'FR' ? "J'aurais aimé avoir moi-même un outil comme Stellify. Un outil qui comprenne vraiment le marché du travail suisse."
                     : language === 'IT' ? 'Avrei voluto avere io stesso uno strumento come Stellify. Uno strumento che capisca davvero il mercato del lavoro svizzero.'
                     : language === 'EN' ? "I wish I'd had a tool like Stellify myself, back then. One that truly understands the Swiss job market."
                     : 'Ich hätte mir früher selbst ein Werkzeug wie Stellify gewünscht. Eines, das den Schweizer Arbeitsmarkt wirklich versteht.'}
                 </blockquote>
-                {/* Signature row: star, rule, attribution */}
-                <div className="relative mt-7 flex items-center gap-4">
+                {/* Signature row: star + attribution, no stray rule between */}
+                <div className="relative mt-7 flex items-center gap-3">
                   <svg width="22" height="22" viewBox="0 0 28 28" fill="none" aria-hidden="true">
                     <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
                   </svg>
-                  <span className="h-px w-12 bg-[#004225]/25 dark:bg-[#00A854]/40" />
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#1A1A18] dark:text-[#FAFAF8]">
                       {language === 'FR' ? 'Le fondateur' : language === 'IT' ? 'Il fondatore' : language === 'EN' ? 'The Founder' : 'Der Gründer'}
