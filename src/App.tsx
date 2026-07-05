@@ -7417,7 +7417,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   onClick={() => navigate('jobs')}
                   className={`px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full transition-all whitespace-nowrap ${activeView === 'jobs' ? 'bg-white dark:bg-[#1A1A18] text-[#004225] dark:text-[#6FCF97] shadow-sm' : 'text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5'}`}
                 >
-                  {t.search_type_job}
+                  <span className="inline-flex items-center gap-1.5">
+                    {t.search_type_job}
+                    {/* Animated "coming soon" pill — the job board is not
+                        live yet; the tab itself says so before the click. */}
+                    <span className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded-full bg-[#D4A852]/15 text-[#B8862F] dark:text-[#D4A852] text-[8px] font-bold uppercase tracking-widest">
+                      <span className="relative flex w-1.5 h-1.5" aria-hidden="true">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4A852] opacity-60" />
+                        <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-[#D4A852]" />
+                      </span>
+                      {language === 'FR' ? 'Bientôt' : language === 'IT' ? 'Presto' : language === 'EN' ? 'Soon' : 'Bald'}
+                    </span>
+                  </span>
                 </button>
                 <button
                   onClick={() => navigate('profile')}
@@ -7453,9 +7464,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <a href="#tools" onClick={handleAnchor('tools')} className={goToAnchor('tools')}>{t.tools}</a>
                     <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
-                    <button onClick={() => navigate('about')} className={`${goToAnchor('about')} ${activeView === 'about' ? 'text-[#004225] dark:text-[#00A854]' : ''}`}>
+                    {/* Über uns scrolls to the story section like every other
+                        header item — consistent one-page flow for visitors.
+                        The full story page stays reachable from the section. */}
+                    <a href="#story" onClick={handleAnchor('story')} className={goToAnchor('story')}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
-                    </button>
+                    </a>
                   </>;
                 })()}
               </>
@@ -7612,7 +7626,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <button onClick={() => { navigate('tools'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tools' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tools}</button>
                   <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'pricing' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.pricing}</button>
                   <button onClick={() => { navigate('tracker'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'tracker' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.tracker_nav}</button>
-                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.search_type_job}</button>
+                  <button onClick={() => { navigate('jobs'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'jobs' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                    <span className="inline-flex items-center gap-2">
+                      {t.search_type_job}
+                      <span className="inline-flex items-center gap-1 px-1.5 py-[1px] rounded-full bg-[#D4A852]/15 text-[#B8862F] dark:text-[#D4A852] text-[9px] font-bold uppercase tracking-widest">
+                        <span className="relative flex w-1.5 h-1.5" aria-hidden="true">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4A852] opacity-60" />
+                          <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-[#D4A852]" />
+                        </span>
+                        {language === 'FR' ? 'Bientôt' : language === 'IT' ? 'Presto' : language === 'EN' ? 'Soon' : 'Bald'}
+                      </span>
+                    </span>
+                  </button>
                   <button onClick={() => { navigate('profile'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'profile' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{t.profile_nav}</button>
                   <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className={`px-4 py-3 text-base font-medium text-left rounded-full transition-colors ${activeView === 'about' ? 'bg-[#004225]/10 text-[#004225] dark:text-[#6FCF97]' : 'text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5'}`}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
@@ -7636,11 +7661,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     const cls = "px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left";
                     return <>
                       <a href="#tools" onClick={goAnchor('tools')} className={cls}>{t.tools}</a>
-                      <a href="#features" onClick={goAnchor('features')} className={cls}>{t.features}</a>
                       <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={cls}>{t.pricing}</button>
+                      <a href="#features" onClick={goAnchor('features')} className={cls}>{t.features}</a>
+                      <a href="#story" onClick={goAnchor('story')} className={cls}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</a>
                     </>;
                   })()}
-                  <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className="px-4 py-3 text-base font-medium rounded-full text-left text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors">{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                 </>
               )}
             </div>
@@ -9462,6 +9487,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 : language === 'EN' ? 'Connecting talent and companies intelligently.'
                 : 'Talente und Unternehmen intelligent vernetzen.'}
             </p>
+            <p className="mt-2 text-sm text-white/40 font-light">
+              {language === 'FR' ? "Aussi pour les talents de l'étranger qui veulent travailler en Suisse."
+                : language === 'IT' ? "Anche per i talenti dall'estero che vogliono lavorare in Svizzera."
+                : language === 'EN' ? 'Open to talent from abroad who want to work in Switzerland, too.'
+                : 'Auch für Talente aus dem Ausland, die in der Schweiz arbeiten möchten.'}
+            </p>
           </div>
 
           {/* Coverage panel. No drawn map (every silhouette attempt read
@@ -9914,7 +9945,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section id="story" className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left — wordmark + etymology */}
