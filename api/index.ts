@@ -1481,6 +1481,36 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
   const uid = (req as any).uid;
   try {
     const { adminAuth, adminDb } = getAdminServices();
+    // Read the profile BEFORE deleting it — we need the Stripe customer id.
+    const snap = await adminDb.collection('users').doc(uid).get();
+    const customerId = (snap.data() || {}).stripe_customer_id as string | undefined;
+    // Stop billing first: deleting the account must never leave a running
+    // subscription silently charging a card nobody can manage anymore.
+    if (customerId) {
+      try {
+        const subs = await getStripe().subscriptions.list({ customer: customerId, status: 'all', limit: 20 });
+        for (const s of subs.data) {
+          if (s.status !== 'canceled' && s.status !== 'incomplete_expired') {
+            await getStripe().subscriptions.cancel(s.id);
+          }
+        }
+      } catch (e: any) {
+        // Deletion still proceeds — but leave a loud trace for follow-up.
+        console.error('[DELETE ACCOUNT] Stripe cancel failed for', customerId, e.message);
+      }
+    }
+    // The tracker entries are personal data (companies, salaries) and fall
+    // under the right to erasure — they go with the account.
+    try {
+      const apps = await adminDb.collection('applications').where('user_id', '==', uid).get();
+      if (!apps.empty) {
+        const batch = adminDb.batch();
+        apps.docs.forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+      }
+    } catch (e: any) {
+      console.error('[DELETE ACCOUNT] applications cleanup failed:', e.message);
+    }
     await adminDb.collection('users').doc(uid).delete();
     await adminAuth.deleteUser(uid);
     res.json({ ok: true });
