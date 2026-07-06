@@ -7753,8 +7753,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
                     {
                       label: t.dashboard_stat_applications, value: trackerStats?.total ?? 0, icon: <Send size={15} />, num: true,
-                      sub: language === 'FR' ? "Enregistrées dans ton tracker, pas des essais utilisés" : language === 'IT' ? 'Salvate nel tuo tracker, non tentativi usati' : language === 'EN' ? 'Saved in your tracker, not used attempts' : 'In deinem Tracker erfasst, keine verbrauchten Versuche',
-                      action: { label: language === 'FR' ? 'Ouvrir le tracker' : language === 'IT' ? 'Apri il tracker' : language === 'EN' ? 'Open tracker' : 'Tracker öffnen', onClick: () => navigate('tracker') },
+                      sub: language === 'FR' ? 'Dans ta vue d\'ensemble' : language === 'IT' ? 'Nella tua panoramica' : language === 'EN' ? 'In your overview' : 'In deiner Übersicht',
+                      action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
                     { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} /> }
                   ] as any[]).map((stat, i) => (
