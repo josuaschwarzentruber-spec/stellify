@@ -7740,26 +7740,52 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 </div>
 
-                {/* Quick Stats */}
+                {/* Quick Stats — every tile says what its number MEANS.
+                    "Bewerbungen 3" alone read like used-up attempts; it is
+                    the count of applications saved in the tracker, so the
+                    tile now explains itself and links there. */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {[
-                    { label: t.dashboard_stat_analyses, value: toolHistory.length, icon: <TrendingUp size={16} /> },
-                    { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={16} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
-                    { label: t.dashboard_stat_applications, value: trackerStats?.total ?? 0, icon: <Send size={16} /> },
-                    { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={16} /> }
-                  ].map((stat, i) => (
+                  {([
+                    {
+                      label: t.dashboard_stat_analyses, value: toolHistory.length, icon: <TrendingUp size={15} />, num: true,
+                      sub: language === 'FR' ? 'Résultats IA créés' : language === 'IT' ? 'Risultati IA creati' : language === 'EN' ? 'AI results created' : 'Erstellte KI-Ergebnisse',
+                    },
+                    { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
+                    {
+                      label: t.dashboard_stat_applications, value: trackerStats?.total ?? 0, icon: <Send size={15} />, num: true,
+                      sub: language === 'FR' ? "Enregistrées dans ton tracker, pas des essais utilisés" : language === 'IT' ? 'Salvate nel tuo tracker, non tentativi usati' : language === 'EN' ? 'Saved in your tracker, not used attempts' : 'In deinem Tracker erfasst, keine verbrauchten Versuche',
+                      action: { label: language === 'FR' ? 'Ouvrir le tracker' : language === 'IT' ? 'Apri il tracker' : language === 'EN' ? 'Open tracker' : 'Tracker öffnen', onClick: () => navigate('tracker') },
+                    },
+                    { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} /> }
+                  ] as any[]).map((stat, i) => (
                     <motion.div
                       key={i}
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.07, duration: 0.4 }}
-                      className="p-5 md:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 shadow-sm transition-colors flex flex-col h-full">
-                      <div className="flex items-center gap-2 text-[#9A9A94] dark:text-[#5C5C58] text-[10px] font-bold uppercase tracking-widest mb-2">
-                        {stat.icon}
-                        {stat.label}
+                      className="p-5 md:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 shadow-sm hover:shadow-md hover:border-black/10 dark:hover:border-white/10 transition-all flex flex-col h-full">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-7 h-7 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/12 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0" aria-hidden="true">
+                          {stat.icon}
+                        </div>
+                        <span className="text-[#9A9A94] dark:text-[#5C5C58] text-[10px] font-bold uppercase tracking-widest leading-tight">{stat.label}</span>
                       </div>
-                      <div className={`text-2xl font-serif ${stat.color || 'text-[#1A1A18] dark:text-[#FAFAF8]'}`}>{stat.value}</div>
-                      
+                      <div className={`text-3xl font-serif ${stat.color || 'text-[#1A1A18] dark:text-[#FAFAF8]'}`}>
+                        {stat.num ? <CountUp to={stat.value as number} /> : stat.value}
+                      </div>
+                      {stat.sub && (
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-1.5 leading-snug">{stat.sub}</p>
+                      )}
+                      {stat.action && (
+                        <button
+                          onClick={stat.action.onClick}
+                          className="mt-3 self-start inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:gap-2.5 transition-all"
+                        >
+                          {stat.action.label}
+                          <ArrowRight size={11} />
+                        </button>
+                      )}
+
                       {/* One quota display for every plan: bar, used/total and
                           how many generations are LEFT — the number people
                           actually want to know. Karriere+ gets a counter too
