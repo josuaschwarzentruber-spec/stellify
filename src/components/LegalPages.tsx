@@ -25,7 +25,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
 
   return (
     <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
-      <div className={`${activeView === 'about' ? 'max-w-4xl' : 'max-w-3xl'} mx-auto`}>
+      {/* Gentle page entrance — the content used to pop in hard after the
+          lazy chunk loaded, which felt like a rendering bug. */}
+      <style>{`
+        @keyframes stellifyPageIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .stellify-page-in { animation: stellifyPageIn .5s cubic-bezier(.22,.61,.36,1) both; }
+        @media (prefers-reduced-motion: reduce) { .stellify-page-in { animation: none; } }
+      `}</style>
+      <div className={`${activeView === 'about' ? 'max-w-4xl' : 'max-w-3xl'} mx-auto stellify-page-in`}>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"

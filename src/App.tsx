@@ -1276,10 +1276,22 @@ function StellifyApp() {
     if (view === 'pricing') {
       // Wait one tick for the section to mount, then smooth-scroll
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
+    } else if (view === 'about' || view === 'datenschutz' || view === 'impressum' || view === 'agb') {
+      // Full-page views: jump straight to the top. Smooth-scrolling while
+      // the lazy chunk was still mounting read as a glitch.
+      window.scrollTo(0, 0);
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  // Preload the legal/about chunk once the app is idle so the first click
+  // on Über uns / AGB / Datenschutz opens instantly instead of flashing a
+  // blank frame while the module downloads.
+  useEffect(() => {
+    const id = window.setTimeout(() => { import('./components/LegalPages').catch(() => {}); }, 2500);
+    return () => window.clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     type RouteView = 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
@@ -7713,7 +7725,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- LEGAL PAGES + ABOUT --- */}
       {(activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about') && (
-        <Suspense fallback={null}>
+        <Suspense fallback={
+          /* Branded loading beat instead of a blank frame while the chunk
+             downloads — the blank flash read as a bug when opening Über uns. */
+          <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] dark:bg-[#1A1A18]">
+            <svg width="30" height="30" viewBox="0 0 28 28" className="animate-pulse" aria-hidden="true">
+              <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
+            </svg>
+          </div>
+        }>
           <LegalPages activeView={activeView} onBack={() => navigate(user ? 'dashboard' : 'dashboard')} language={language} />
         </Suspense>
       )}
