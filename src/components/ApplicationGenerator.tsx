@@ -474,10 +474,12 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage }: {
+const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage, initialTarget }: {
   language: string;
   user: { id: string; email?: string } | null;
   profile?: { firstName?: string; email?: string } | null;
+  /** Prefill for company/position when opened from a tracker row. */
+  initialTarget?: { company?: string; position?: string } | null;
   cvContext?: string;
   locked: boolean;
   onUpgrade: () => void;
@@ -517,6 +519,19 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
   }, [step]);
+
+  // Opened from a tracker row: company + position arrive prefilled. Only
+  // fills empty fields so it never overwrites the user's own edits.
+  useEffect(() => {
+    if (initialTarget && (initialTarget.company || initialTarget.position)) {
+      setForm(prev => ({
+        ...prev,
+        targetCompany: prev.targetCompany || initialTarget.company || '',
+        targetPosition: prev.targetPosition || initialTarget.position || '',
+      }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCvFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

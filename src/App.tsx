@@ -693,7 +693,7 @@ function CardActionButton({ onClick, label, icon, className }: { onClick: () => 
 }
 
 // Sortable table row — drag handle on the left, rest of the row stays clickable.
-function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange }: any) {
+function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange, onCreateApplication }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: app.id });
   const style: React.CSSProperties = {
     transform: DndCSS.Transform.toString(transform),
@@ -701,6 +701,11 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
     opacity: isDragging ? 0.5 : 1,
     background: isDragging ? 'rgba(0,66,37,0.04)' : undefined,
   };
+  // Nudge when an open application has had no movement for two weeks —
+  // the moment a short follow-up call or mail pays off most.
+  const updatedDate = app.updated_at ? new Date(app.updated_at) : (app.updatedAt?.toDate ? app.updatedAt.toDate() : null);
+  const staleDays = updatedDate ? Math.floor((Date.now() - updatedDate.getTime()) / 86400000) : 0;
+  const isStale = !app.archived && staleDays >= 14 && (app.status === 'Wishlist' || app.status === 'Applied' || app.status === 'Interview');
   return (
     <tr ref={setNodeRef} style={style} className={`border-b border-black/5 dark:border-white/5 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] transition-colors ${app.archived ? 'opacity-60' : ''}`}>
       <td className="pl-2 pr-1 py-3 w-8">
@@ -736,10 +741,24 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
       <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '-'}</td>
       <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '-'}</td>
       <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
-        {app.updated_at ? new Date(app.updated_at).toLocaleDateString('de-CH') : (app.updatedAt?.toDate ? app.updatedAt.toDate().toLocaleDateString('de-CH') : '-')}
+        <span className="inline-flex items-center gap-2">
+          {updatedDate ? updatedDate.toLocaleDateString('de-CH') : '-'}
+          {isStale && (
+            <span
+              title={language === 'FR' ? `Aucun mouvement depuis ${staleDays} jours — le bon moment pour relancer` : language === 'IT' ? `Nessun movimento da ${staleDays} giorni — il momento giusto per un sollecito` : language === 'EN' ? `No movement for ${staleDays} days — time to follow up` : `Seit ${staleDays} Tagen keine Bewegung — Zeit zum Nachfassen`}
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#D4A852]/15 text-[#B8862F] dark:text-[#D4A852] text-[9px] font-bold uppercase tracking-wider"
+            >
+              <span className="w-1 h-1 rounded-full bg-[#D4A852]" />
+              {staleDays}d
+            </span>
+          )}
+        </span>
       </td>
       <td className="px-4 py-3">
         <div className="flex gap-1 justify-end">
+          {onCreateApplication && (
+            <button onClick={() => onCreateApplication(app)} title={language === 'FR' ? 'Créer la candidature avec Stella' : language === 'IT' ? 'Crea la candidatura con Stella' : language === 'EN' ? 'Create the application with Stella' : 'Bewerbung mit Stella erstellen'} className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"><Sparkles size={12} /></button>
+          )}
           <button onClick={() => onEdit(app)} title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'} className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"><Edit2 size={12} /></button>
           <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all">{app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}</button>
           <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"><Trash2 size={12} /></button>
@@ -1053,6 +1072,10 @@ function StellifyApp() {
   }, [isAuthModalOpen]);
   const authEmailRef = useRef<HTMLInputElement>(null);
   const justLoggedIn = useRef(false);
+  // True once the saved theme/language from the profile has been applied
+  // for the current login — prevents the live profile listener from
+  // fighting the user's own theme toggle.
+  const profilePrefsApplied = useRef(false);
   const [isDeleteAccountOpen, setIsDeleteAccountOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -1362,6 +1385,10 @@ function StellifyApp() {
   
   // Tool Modal State
   const [activeTool, setActiveTool] = useState<any | null>(null);
+  // Prefill for the generator when it is opened from a tracker row
+  // ("Bewerbung mit Stella erstellen"): company + position travel along.
+  const [generatorPrefill, setGeneratorPrefill] = useState<{ company?: string; position?: string } | null>(null);
+  useEffect(() => { if (!activeTool) setGeneratorPrefill(null); }, [activeTool]);
   // "So funktioniert's" explainer inside the tool modal (question mark).
   const [showToolHelp, setShowToolHelp] = useState(false);
 
@@ -1543,8 +1570,16 @@ function StellifyApp() {
     let unsubscribeUser: (() => void) | null = null;
 
     const processUserData = (rawData: any, firebaseUser: FirebaseUser) => {
-      if (rawData?.language && rawData.language !== language) setLanguage(rawData.language);
-      if (rawData?.theme && rawData.theme !== theme) setTheme(rawData.theme);
+      // Apply saved theme/language ONCE per login. The profile listener
+      // fires on every write — including our own theme save — and a cached
+      // snapshot could carry the OLD theme, snapping the toggle back for a
+      // beat (light → dark → light). After the first sync, the user's
+      // click is the boss and the profile only stores it.
+      if (!profilePrefsApplied.current && rawData) {
+        if (rawData.language && rawData.language !== language) setLanguage(rawData.language);
+        if (rawData.theme && rawData.theme !== theme) setTheme(rawData.theme);
+        profilePrefsApplied.current = true;
+      }
 
       const rawName = rawData?.first_name || firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
       const cleanName = rawName.replace(/\./g, ' ');
@@ -1680,6 +1715,8 @@ function StellifyApp() {
       } else {
         setUser(null);
         setIsAuthReady(true);
+        // Next login syncs the saved prefs once again.
+        profilePrefsApplied.current = false;
       }
     });
 
@@ -7317,6 +7354,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                     onArchive={setApplicationArchived}
                                     onDelete={deleteApplication}
                                     onStatusChange={updateApplicationStatus}
+                                    onCreateApplication={(a: any) => {
+                                      setGeneratorPrefill({ company: a.company || '', position: a.position || '' });
+                                      handleToolClick('bewerbungs-gen');
+                                    }}
                                   />
                                 );
                               })}
@@ -11011,6 +11052,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         language={language}
                         user={user}
                         profile={user ? { firstName: user.firstName, email: user.email } : null}
+                        initialTarget={generatorPrefill}
                         cvContext={cvContext}
                         locked={isToolLocked}
                         onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
