@@ -6989,35 +6989,48 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <p className="text-xs text-[#9A9A94] mb-6">
                           {language === 'FR' ? 'Toutes tes candidatures, un seul endroit.' : language === 'IT' ? 'Tutte le tue candidature, in un solo posto.' : language === 'EN' ? 'All your applications, one place.' : 'Alle deine Bewerbungen an einem Ort.'}
                         </p>
-                        <div className="space-y-4">
+                        <div className="space-y-5 max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                           {(language === 'FR' ? [
-                            ['Ajoute chaque candidature avec Nouveau : entreprise, poste, lieu, salaire.'],
-                            ['Change le statut directement dans la ligne : Postulé, Entretien, Offre.'],
-                            ['L\'étoile ouvre le générateur avec l\'entreprise et le poste déjà remplis.'],
-                            ['Un badge doré apparaît après 14 jours sans mouvement : le moment de relancer.'],
-                            ['Archive ce qui est terminé, exporte tout en CSV.'],
+                            { icon: 'plus', title: 'Ajouter', text: 'Clique sur Nouveau et saisis entreprise, poste, lieu et salaire. Chaque candidature devient une ligne.' },
+                            { icon: 'status', title: 'Suivre le statut', text: "Change le statut directement dans la ligne : Liste de souhaits, Postulé, Entretien, Offre, Refusée. La pipeline en haut se met à jour toute seule." },
+                            { icon: 'sparkles', title: 'Créer la candidature', text: "L'étoile dans la ligne ouvre le générateur, entreprise et poste sont déjà remplis. Stella écrit la lettre." },
+                            { icon: 'gold', title: 'Le badge doré', text: "Si une candidature ouverte n'a pas bougé depuis 14 jours, un badge doré apparaît à côté de la date, par exemple 21d = 21 jours sans mouvement. C'est le signal de relancer par mail ou téléphone. Dès que tu changes quelque chose, il disparaît." },
+                            { icon: 'archive', title: 'Archiver & exporter', text: "L'icône boîte archive les candidatures terminées, la flèche exporte tout en fichier CSV pour Excel." },
                           ] : language === 'IT' ? [
-                            ['Aggiungi ogni candidatura con Nuovo: azienda, posizione, luogo, stipendio.'],
-                            ['Cambia lo stato direttamente nella riga: Inviato, Colloquio, Offerta.'],
-                            ['La stellina apre il generatore con azienda e posizione già compilate.'],
-                            ['Dopo 14 giorni senza movimento appare un badge dorato: il momento di sollecitare.'],
-                            ['Archivia ciò che è concluso, esporta tutto in CSV.'],
+                            { icon: 'plus', title: 'Aggiungere', text: 'Clicca su Nuovo e inserisci azienda, posizione, luogo e stipendio. Ogni candidatura diventa una riga.' },
+                            { icon: 'status', title: 'Seguire lo stato', text: 'Cambia lo stato direttamente nella riga: Lista desideri, Inviato, Colloquio, Offerta, Rifiutata. La pipeline in alto si aggiorna da sola.' },
+                            { icon: 'sparkles', title: 'Creare la candidatura', text: 'La stellina nella riga apre il generatore con azienda e posizione già compilate. Stella scrive la lettera.' },
+                            { icon: 'gold', title: 'Il badge dorato', text: 'Se una candidatura aperta non si muove da 14 giorni, accanto alla data appare un badge dorato, per esempio 21d = 21 giorni senza movimento. È il segnale per un sollecito via mail o telefono. Appena cambi qualcosa, sparisce.' },
+                            { icon: 'archive', title: 'Archiviare & esportare', text: "L'icona scatola archivia le candidature concluse, la freccia esporta tutto in CSV per Excel." },
                           ] : language === 'EN' ? [
-                            ['Add every application via New: company, position, location, salary.'],
-                            ['Change the status right in the row: Applied, Interview, Offer.'],
-                            ['The sparkle opens the generator with company and position prefilled.'],
-                            ['After 14 days without movement a gold badge appears: time to follow up.'],
-                            ['Archive what is done, export everything as CSV.'],
+                            { icon: 'plus', title: 'Add', text: 'Click New and enter company, position, location and salary. Every application becomes one row.' },
+                            { icon: 'status', title: 'Track the status', text: 'Change the status right in the row: Wishlist, Applied, Interview, Offer, Rejected. The pipeline on top updates by itself.' },
+                            { icon: 'sparkles', title: 'Create the application', text: 'The sparkle in the row opens the generator with company and position prefilled. Stella writes the letter.' },
+                            { icon: 'gold', title: 'The gold badge', text: 'If an open application has not moved for 14 days, a gold badge appears next to the date, for example 21d = 21 days without movement. That is your signal to follow up by mail or phone. As soon as you change anything, it disappears.' },
+                            { icon: 'archive', title: 'Archive & export', text: 'The box icon archives finished applications, the arrow exports everything as a CSV file for Excel.' },
                           ] : [
-                            ['Erfasse jede Bewerbung über Neu: Firma, Position, Ort, Gehalt.'],
-                            ['Ändere den Status direkt in der Zeile: Beworben, Interview, Angebot.'],
-                            ['Das Funkeln öffnet den Generator mit Firma und Position schon ausgefüllt.'],
-                            ['Nach 14 Tagen ohne Bewegung erscheint ein goldenes Abzeichen: Zeit zum Nachfassen.'],
-                            ['Archiviere Erledigtes, exportiere alles als CSV.'],
-                          ]).map(([txt], i) => (
+                            { icon: 'plus', title: 'Hinzufügen', text: 'Klicke auf Neu und trage Firma, Position, Ort und Gehalt ein. Jede Bewerbung wird eine Zeile.' },
+                            { icon: 'status', title: 'Status verfolgen', text: 'Ändere den Status direkt in der Zeile: Wunschliste, Beworben, Interview, Angebot, Abgelehnt. Die Pipeline oben zählt automatisch mit.' },
+                            { icon: 'sparkles', title: 'Bewerbung erstellen', text: 'Das Funkeln in der Zeile öffnet den Generator, Firma und Position sind schon eingetragen. Stella schreibt das Anschreiben.' },
+                            { icon: 'gold', title: 'Das goldene Abzeichen', text: 'Wenn sich eine offene Bewerbung 14 Tage lang nicht bewegt, erscheint neben dem Datum ein goldenes Abzeichen, zum Beispiel 21d = seit 21 Tagen keine Bewegung. Das ist dein Signal, per Mail oder Telefon nachzufassen. Sobald du etwas änderst, verschwindet es.' },
+                            { icon: 'archive', title: 'Archivieren & exportieren', text: 'Das Kisten-Symbol archiviert erledigte Bewerbungen, der Pfeil exportiert alles als CSV-Datei für Excel.' },
+                          ]).map((item, i) => (
                             <div key={i} className="flex items-start gap-3">
-                              <span className="shrink-0 w-6 h-6 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[11px] font-bold flex items-center justify-center">{i + 1}</span>
-                              <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-snug pt-0.5">{txt}</p>
+                              <span className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${item.icon === 'gold' ? 'bg-[#D4A852]/15 text-[#B8862F] dark:text-[#D4A852]' : 'bg-[#004225]/8 dark:bg-[#00A854]/12 text-[#004225] dark:text-[#00A854]'}`}>
+                                {item.icon === 'plus' && <Plus size={15} />}
+                                {item.icon === 'status' && <Layout size={15} />}
+                                {item.icon === 'sparkles' && <Sparkles size={15} />}
+                                {item.icon === 'gold' && (
+                                  <span className="inline-flex items-center gap-0.5 text-[9px] font-bold">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4A852]" />d
+                                  </span>
+                                )}
+                                {item.icon === 'archive' && <Archive size={15} />}
+                              </span>
+                              <div>
+                                <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{item.title}</p>
+                                <p className="text-[13px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mt-0.5">{item.text}</p>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -8626,6 +8639,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                   <h1 className="text-4xl lg:text-5xl font-serif tracking-tight mb-4 text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_page_title}</h1>
                   <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-2xl leading-relaxed">{t.tracker_page_desc}</p>
+                  {/* Prominent help entry — the tiny grey ? next to the lower
+                      section title was easy to miss. */}
+                  <button
+                    onClick={() => setShowTrackerHelp(true)}
+                    className="mt-5 inline-flex items-center gap-2 px-4 py-2 border border-[#004225]/25 dark:border-[#00A854]/35 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] text-[#004225] dark:text-[#00A854] hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-all"
+                  >
+                    <HelpCircle size={14} />
+                    {language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
+                  </button>
                 </header>
                 {renderPipelineFunnel(false)}
                 {trackerSection}
