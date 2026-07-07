@@ -106,9 +106,9 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
       .email-title  { color:#FAFAF8 !important; }
       .email-body   { color:#C8C8C2 !important; }
       .email-muted  { color:#9A9A94 !important; }
-      .email-link   { color:#6FCF97 !important; }
+      .email-link   { color:#00A854 !important; }
       .email-footer { border-color:#3A3A35 !important; }
-      .email-cta    { background:#6FCF97 !important; color:#0F2A1B !important; }
+      .email-cta    { background:#00A854 !important; color:#06130c !important; }
     }
   </style>
 </head>
@@ -116,9 +116,10 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="email-bg" style="background:#F5F4F0;padding:32px 16px;">
     <tr><td align="center">
       <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" class="email-card" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:560px;width:100%;">
-        <!-- Header -->
+        <!-- Header — Stellify forest gradient with a bright-green hairline,
+             the same tones as the dark sections on stellify.ch -->
         <tr>
-          <td style="background:#004225;padding:24px 32px;">
+          <td style="background:#004225;background-image:linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%);padding:26px 32px;border-bottom:2px solid #00A854;">
             ${brandImage}
           </td>
         </tr>
@@ -456,7 +457,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
         });
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
         if (existingUser?.email) {
-          const planLabel = planId === 'ultimate' ? 'Ultimate' : 'Pro';
+          const planLabel = planId === 'ultimate' ? 'Karriere+' : 'Pro';
           const userLang = ((existingUser?.language || 'DE') as string).toUpperCase() as Lang;
           const localeMap: Record<Lang, string> = { DE: 'de-CH', FR: 'fr-CH', IT: 'it-CH', EN: 'en-GB' };
           const dateStr = expiresAt.toLocaleDateString(localeMap[userLang] || 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -496,7 +497,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
               signoff: 'Il team Stellify',
             },
             EN: {
-              subject: `Welcome to the ${planLabel} plan — your Stellify subscription is active`,
+              subject: `Welcome to the ${planLabel} plan, your Stellify subscription is active`,
               title:   `Welcome to the ${planLabel} plan`,
               lines: [
                 `Hello ${firstName},`,
@@ -969,7 +970,7 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
       }
       if (used >= QUOTA.client.lifetime) {
         return res.status(402).json({
-          error: 'Du hast deine 3 kostenlosen Versuche aufgebraucht. Upgrade auf Pro oder Ultimate für weitere KI-Anfragen.',
+          error: 'Du hast deine 3 kostenlosen Versuche aufgebraucht. Upgrade auf Pro oder Karriere+ für weitere KI-Anfragen.',
           upgrade: true,
           remaining: 0,
         });
@@ -1448,25 +1449,25 @@ app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
   const lang = language || 'DE';
   const resetCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
     DE: {
-      subject: 'Stellify – Passwort zurücksetzen',
+      subject: 'Stellify, Passwort zurücksetzen',
       title: 'Passwort zurücksetzen',
       lines: ['Hallo,', 'du hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.', 'Klicke auf den Button unten um ein neues Passwort festzulegen. Der Link ist <strong>1 Stunde gültig</strong>.', 'Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.'],
       cta: 'Passwort jetzt zurücksetzen',
     },
     FR: {
-      subject: 'Stellify – Réinitialiser votre mot de passe',
+      subject: 'Stellify, réinitialiser votre mot de passe',
       title: 'Réinitialiser votre mot de passe',
       lines: ['Bonjour,', 'vous avez demandé la réinitialisation de votre mot de passe Stellify.', 'Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe. Le lien est valable <strong>1 heure</strong>.', 'Si vous n\'avez pas fait cette demande, ignorez simplement cet e-mail.'],
       cta: 'Réinitialiser maintenant',
     },
     IT: {
-      subject: 'Stellify – Reimposta la tua password',
+      subject: 'Stellify, reimposta la tua password',
       title: 'Reimposta la password',
       lines: ['Ciao,', 'hai richiesto il reset della password di Stellify.', 'Clicca sul pulsante qui sotto per impostare una nuova password. Il link è valido per <strong>1 ora</strong>.', 'Se non hai fatto questa richiesta, ignora semplicemente questa email.'],
       cta: 'Reimposta ora',
     },
     EN: {
-      subject: 'Stellify – Reset your password',
+      subject: 'Stellify, reset your password',
       title: 'Reset your password',
       lines: ['Hello,', 'you requested a password reset for your Stellify account.', 'Click the button below to set a new password. The link is valid for <strong>1 hour</strong>.', 'If you did not request this, you can safely ignore this email.'],
       cta: 'Reset password now',
@@ -1548,6 +1549,30 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
     } catch (e: any) {
       console.error('[DELETE ACCOUNT] applications cleanup failed:', e.message);
     }
+    // Confirmation e-mail BEFORE the auth user is gone (we need the address).
+    // Sent best-effort; a mail failure must never block the deletion.
+    try {
+      const email = String(profile.email || (await adminAuth.getUser(uid)).email || '').trim();
+      const nm = (profile.first_name as string) || '';
+      const lang = ((profile.language as string) || 'DE').toUpperCase();
+      const dc: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
+        DE: { subject: 'Dein Stellify-Konto wurde gelöscht', title: 'Konto gelöscht', lines: [`Hallo ${nm},`, 'dein Stellify-Konto und alle damit verbundenen Daten wurden dauerhaft gelöscht. Ein allfälliges Abo wurde gekündigt, es wird nichts mehr abgebucht.', 'Es tut uns leid, dich gehen zu sehen. Du bist jederzeit willkommen zurück, ein neues Konto ist in einer Minute erstellt.'], cta: 'Zurück zu Stellify' },
+        FR: { subject: 'Ton compte Stellify a été supprimé', title: 'Compte supprimé', lines: [`Bonjour ${nm},`, 'ton compte Stellify et toutes les données associées ont été supprimés définitivement. Tout abonnement éventuel a été résilié, plus aucun prélèvement ne sera effectué.', 'Nous sommes désolés de te voir partir. Tu es le/la bienvenu(e) à tout moment, un nouveau compte se crée en une minute.'], cta: 'Retour sur Stellify' },
+        IT: { subject: 'Il tuo account Stellify è stato eliminato', title: 'Account eliminato', lines: [`Ciao ${nm},`, 'il tuo account Stellify e tutti i dati associati sono stati eliminati definitivamente. Un eventuale abbonamento è stato disdetto, non verrà più addebitato nulla.', 'Ci dispiace vederti andare. Sei sempre il benvenuto, un nuovo account si crea in un minuto.'], cta: 'Torna su Stellify' },
+        EN: { subject: 'Your Stellify account has been deleted', title: 'Account deleted', lines: [`Hello ${nm},`, 'your Stellify account and all associated data have been permanently deleted. Any subscription has been cancelled and nothing further will be charged.', 'We are sorry to see you go. You are welcome back any time, a new account takes a minute to create.'], cta: 'Back to Stellify' },
+      };
+      const copy = dc[lang] || dc.DE;
+      if (email) {
+        await sendEmail({
+          to: email,
+          subject: copy.subject,
+          html: buildEmailHtml(copy.title, copy.lines, copy.cta, (process.env.SITE_URL || 'https://stellify.ch') + '/', lang),
+          text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + '\n\nStellify',
+        }).catch(() => {});
+      }
+    } catch (e: any) {
+      console.error('[DELETE ACCOUNT] confirmation email failed:', e.message);
+    }
     await adminDb.collection('users').doc(uid).delete();
     await adminAuth.deleteUser(uid);
     res.json({ ok: true });
@@ -1566,27 +1591,27 @@ app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
   const lang = language || 'DE';
   const welcomeCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
     DE: {
-      subject: 'Willkommen bei Stellify – Dein KI-Karriere-Co-Pilot',
+      subject: 'Willkommen bei Stellify, deine KI-Bewerbung für die Schweiz',
       title: `Willkommen bei Stellify, ${name}!`,
-      lines: [`Hallo ${name},`, 'dein Konto wurde erfolgreich erstellt. Wir freuen uns, dich als Teil der Stellify-Community begrüssen zu dürfen.', 'Mit dem <strong>kostenlosen Plan</strong> kannst du sofort loslegen: Analysiere deinen Lebenslauf, bereite dich auf Interviews vor und finde passende Stellen in der Schweiz.', 'Wann immer du bereit bist, kannst du auf einen Pro- oder Ultimate-Plan upgraden.'],
+      lines: [`Hallo ${name},`, 'dein Konto ist erstellt. Schön, dass du da bist.', 'Mit dem <strong>Gratis-Plan</strong> hast du <strong>3 Generierungen</strong>, um Stellify auszuprobieren: Erstelle mit dem <strong>Bewerbungs-Generator</strong> eine vollständige, auf die Stelle zugeschnittene Bewerbung als PDF und Word, und plane mit der <strong>Bewerbungs-Strategie</strong> deinen nächsten Schritt.', 'Lade deinen Lebenslauf hoch, damit alles noch persönlicher wird. Wann immer du mehr brauchst, wechselst du zu Pro oder Karriere+.'],
       cta: 'Jetzt loslegen',
     },
     FR: {
-      subject: 'Bienvenue sur Stellify – Ton co-pilote carrière IA',
+      subject: 'Bienvenue sur Stellify, ton IA de candidature pour la Suisse',
       title: `Bienvenue sur Stellify, ${name}!`,
-      lines: [`Bonjour ${name},`, 'ton compte a été créé avec succès. Nous sommes ravis de t\'accueillir dans la communauté Stellify.', 'Avec le <strong>plan gratuit</strong>, tu peux démarrer immédiatement: analyse ton CV, prépare-toi aux entretiens et trouve des emplois en Suisse.', 'Quand tu es prêt à aller plus loin, tu peux passer au plan Pro ou Ultimate.'],
+      lines: [`Bonjour ${name},`, 'ton compte est créé. Ravis de t\'accueillir.', 'Avec le <strong>plan gratuit</strong>, tu as <strong>3 générations</strong> pour essayer Stellify : crée une candidature complète et sur mesure en PDF et Word avec le <strong>Générateur de candidatures</strong>, et prépare ton prochain pas avec la <strong>Stratégie de candidature</strong>.', 'Télécharge ton CV pour un résultat encore plus personnel. Quand tu en as besoin, passe à Pro ou Karriere+.'],
       cta: 'Commencer maintenant',
     },
     IT: {
-      subject: 'Benvenuto su Stellify – Il tuo co-pilota carriera AI',
+      subject: 'Benvenuto su Stellify, la tua IA di candidatura per la Svizzera',
       title: `Benvenuto su Stellify, ${name}!`,
-      lines: [`Ciao ${name},`, 'il tuo account è stato creato con successo. Siamo felici di averti nella comunità Stellify.', 'Con il <strong>piano gratuito</strong> puoi iniziare subito: analizza il tuo CV, preparati ai colloqui e trova lavoro in Svizzera.', 'Quando sei pronto per fare di più, puoi passare al piano Pro o Ultimate.'],
+      lines: [`Ciao ${name},`, 'il tuo account è stato creato. Felici di averti qui.', 'Con il <strong>piano gratuito</strong> hai <strong>3 generazioni</strong> per provare Stellify: crea una candidatura completa e su misura in PDF e Word con il <strong>Generatore di candidature</strong> e pianifica il prossimo passo con la <strong>Strategia di candidatura</strong>.', 'Carica il tuo CV per un risultato ancora più personale. Quando ti serve, passa a Pro o Karriere+.'],
       cta: 'Inizia ora',
     },
     EN: {
-      subject: 'Welcome to Stellify – Your AI Career Co-Pilot',
+      subject: 'Welcome to Stellify, your application AI for Switzerland',
       title: `Welcome to Stellify, ${name}!`,
-      lines: [`Hello ${name},`, 'your account has been successfully created. We\'re thrilled to have you as part of the Stellify community.', 'With the <strong>free plan</strong> you can start right away: analyse your CV, prepare for interviews and find jobs in Switzerland.', 'Whenever you\'re ready to do more, you can upgrade to a Pro or Ultimate plan.'],
+      lines: [`Hello ${name},`, 'your account is ready. Great to have you.', 'On the <strong>free plan</strong> you have <strong>3 generations</strong> to try Stellify: create a complete, job-tailored application as PDF and Word with the <strong>Application Generator</strong>, and plan your next move with the <strong>Application Strategy</strong>.', 'Upload your CV to make everything even more personal. Whenever you need more, switch to Pro or Karriere+.'],
       cta: 'Get started now',
     },
   };
@@ -1609,28 +1634,28 @@ app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
 // ── Test Email ────────────────────────────────────────────────────────────────
 const TEST_EMAIL_COPY: Record<string, { subject: string; title: string; lines: string[]; cta: string; signoff: string }> = {
   DE: {
-    subject: 'Stellify – Test-E-Mail',
+    subject: 'Stellify, Test-E-Mail',
     title: 'Test-E-Mail',
     lines: ['Hallo,', 'dies ist eine Test-E-Mail von Stellify, um zu bestätigen dass der E-Mail-Versand korrekt konfiguriert ist.'],
     cta: 'Zur Website',
     signoff: 'Das Stellify-Team',
   },
   FR: {
-    subject: 'Stellify – E-mail de test',
+    subject: 'Stellify, e-mail de test',
     title: 'E-mail de test',
     lines: ['Bonjour,', 'ceci est un e-mail de test de Stellify pour confirmer que l\'envoi d\'e-mails est correctement configuré.'],
     cta: 'Vers le site',
     signoff: 'L\'équipe Stellify',
   },
   IT: {
-    subject: 'Stellify – Email di test',
+    subject: 'Stellify, email di test',
     title: 'Email di test',
     lines: ['Ciao,', 'questa è un\'email di test da Stellify per confermare che l\'invio di email è configurato correttamente.'],
     cta: 'Vai al sito',
     signoff: 'Il team Stellify',
   },
   EN: {
-    subject: 'Stellify – Test email',
+    subject: 'Stellify, test email',
     title: 'Test email',
     lines: ['Hello,', 'this is a test email from Stellify to confirm that email delivery is correctly configured.'],
     cta: 'Open website',
