@@ -49,6 +49,7 @@ import { auth, db } from './firebase';
 import {
   onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,
   signOut as firebaseSignOut, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
+  reauthenticateWithCredential, EmailAuthProvider,
   type User as FirebaseUser,
 } from 'firebase/auth';
 import {
@@ -1598,15 +1599,19 @@ function StellifyApp() {
         // Show app immediately with basic auth data — Firestore loads in background
         processUserData(null, firebaseUser);
         setIsAuthReady(true);
-        if (justLoggedIn.current) {
-          justLoggedIn.current = false;
-          setTimeout(() => setShowLoginWelcome(true), 700);
-        }
 
         const userRef = doc(db, 'users', firebaseUser.uid);
 
         try {
           const userSnap = await getDoc(userRef);
+          // "Willkommen zurück" only for RETURNING users (profile already
+          // exists). Fresh registrations — including Google first-timers and
+          // deleted-then-recreated accounts — get the onboarding tour
+          // instead, not a welcome-back.
+          if (justLoggedIn.current) {
+            justLoggedIn.current = false;
+            if (userSnap.exists()) setTimeout(() => setShowLoginWelcome(true), 700);
+          }
           if (!userSnap.exists()) {
             const rawName = firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Nutzer';
             const cleanName = rawName.replace(/\./g, ' ');
@@ -2451,9 +2456,32 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
   const handleDeleteAccount = async () => {
     if (!user) return;
-    setIsDeletingAccount(true);
     setDeleteError('');
+    // Password users must prove it is really them; the field used to be
+    // decorative. Google users have no password — their live Google
+    // session is the proof, so they skip this step.
+    const fbUser = auth.currentUser;
+    const usesPassword = !!fbUser?.providerData.some(p => p.providerId === 'password');
+    if (usesPassword && !deletePassword) {
+      setDeleteError(language === 'DE' ? 'Bitte gib dein Passwort ein.' : language === 'FR' ? 'Veuillez saisir votre mot de passe.' : language === 'IT' ? 'Inserisci la tua password.' : 'Please enter your password.');
+      return;
+    }
+    setIsDeletingAccount(true);
     try {
+      if (usesPassword && fbUser) {
+        try {
+          await reauthenticateWithCredential(fbUser, EmailAuthProvider.credential(fbUser.email || user.email, deletePassword));
+        } catch (reauthErr: any) {
+          const c = reauthErr?.code || '';
+          setDeleteError(
+            c === 'auth/wrong-password' || c === 'auth/invalid-credential'
+              ? (language === 'DE' ? 'Falsches Passwort.' : language === 'FR' ? 'Mot de passe incorrect.' : language === 'IT' ? 'Password errata.' : 'Wrong password.')
+              : (language === 'DE' ? 'Bestätigung fehlgeschlagen. Bitte erneut versuchen.' : language === 'FR' ? 'Échec de la confirmation. Veuillez réessayer.' : language === 'IT' ? 'Conferma non riuscita. Riprova.' : 'Confirmation failed. Please try again.')
+          );
+          setIsDeletingAccount(false);
+          return;
+        }
+      }
       const token = await getAuthToken();
       const res = await fetch('/api/delete-account', {
         method: 'POST',
@@ -12338,7 +12366,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {language === 'DE' ? 'Diese Aktion ist unwiderruflich. Alle deine Daten werden dauerhaft gelöscht.' : language === 'FR' ? 'Cette action est irréversible. Toutes vos données seront définitivement supprimées.' : language === 'IT' ? 'Questa azione è irreversibile. Tutti i tuoi dati verranno eliminati definitivamente.' : 'This action is irreversible. All your data will be permanently deleted.'}
                 </p>
               </div>
-              {user && (
+              {user && (auth.currentUser?.providerData.some(p => p.providerId === 'password') ? (
                 <div className="space-y-1.5 mb-4">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
                     {language === 'DE' ? 'Passwort zur Bestätigung' : language === 'FR' ? 'Mot de passe pour confirmer' : language === 'IT' ? 'Password per confermare' : 'Password to confirm'}
@@ -12348,7 +12376,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <input type="password" value={deletePassword} onChange={(e) => setDeletePassword(e.target.value)} className="w-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 pl-9 pr-4 py-2.5 text-sm outline-none focus:border-red-400 transition-all dark:text-[#FAFAF8]" placeholder="••••••••" />
                   </div>
                 </div>
-              )}
+              ) : (
+                <p className="text-[10px] text-[#9A9A94] text-center mb-4">
+                  {language === 'DE' ? 'Du bist mit Google angemeldet, dein aktives Google-Login gilt als Bestätigung.' : language === 'FR' ? 'Tu es connecté avec Google, ta session Google active sert de confirmation.' : language === 'IT' ? 'Sei connesso con Google, la tua sessione Google attiva vale come conferma.' : 'You are signed in with Google; your active Google session counts as confirmation.'}
+                </p>
+              ))}
               {deleteError && <p className="text-xs text-red-500 text-center mb-3">{deleteError}</p>}
               <div className="flex gap-3">
                 <button onClick={() => setIsDeleteAccountOpen(false)} className="flex-1 py-2.5 border border-black/10 dark:border-white/10 text-xs font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all">

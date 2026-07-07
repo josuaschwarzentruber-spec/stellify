@@ -9,6 +9,7 @@ import Stripe from "stripe";
 import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
+import { createHash } from "crypto";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
@@ -944,7 +945,28 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
     }
 
     if (role === 'client') {
-      const used = u.ai_calls_lifetime || 0;
+      let used = u.ai_calls_lifetime || 0;
+      // The free lifetime quota survives account deletion: a ledger keyed by
+      // the e-mail fingerprint remembers consumed free calls, so
+      // delete-and-re-register does not grant 3 fresh generations forever.
+      const email = String(u.email || '').trim().toLowerCase();
+      if (email && used < QUOTA.client.lifetime) {
+        try {
+          const ledgerRef = adminDb.collection('free_quota_ledger').doc(createHash('sha256').update(email).digest('hex'));
+          const ledgerSnap = await ledgerRef.get();
+          const carried = (ledgerSnap.data() || {}).used || 0;
+          if (carried > used) {
+            used = carried;
+            // Keep the in-memory copy consistent so recordAIUsage counts on
+            // from the carried value, and sync the visible counters so the
+            // dashboard matches reality.
+            u.ai_calls_lifetime = carried;
+            userRef.update({ ai_calls_lifetime: carried, tool_uses: carried }).catch(() => {});
+          }
+        } catch (e: any) {
+          console.error('[QUOTA] ledger read failed:', e.message);
+        }
+      }
       if (used >= QUOTA.client.lifetime) {
         return res.status(402).json({
           error: 'Du hast deine 3 kostenlosen Versuche aufgebraucht. Upgrade auf Pro oder Ultimate für weitere KI-Anfragen.',
@@ -1483,7 +1505,22 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
     const { adminAuth, adminDb } = getAdminServices();
     // Read the profile BEFORE deleting it — we need the Stripe customer id.
     const snap = await adminDb.collection('users').doc(uid).get();
-    const customerId = (snap.data() || {}).stripe_customer_id as string | undefined;
+    const profile = snap.data() || {};
+    const customerId = profile.stripe_customer_id as string | undefined;
+    // Remember consumed FREE generations under the e-mail fingerprint so a
+    // re-registration with the same address cannot restart at 3 free calls.
+    // Only the counter survives — no name, no CV, no personal content.
+    try {
+      const email = String(profile.email || (await adminAuth.getUser(uid)).email || '').trim().toLowerCase();
+      const usedFree = Math.max(profile.ai_calls_lifetime || 0, profile.tool_uses || 0);
+      if (email && usedFree > 0) {
+        const ledgerRef = adminDb.collection('free_quota_ledger').doc(createHash('sha256').update(email).digest('hex'));
+        const existing = ((await ledgerRef.get()).data() || {}).used || 0;
+        await ledgerRef.set({ used: Math.max(existing, usedFree), updated_at: new Date().toISOString() });
+      }
+    } catch (e: any) {
+      console.error('[DELETE ACCOUNT] quota ledger write failed:', e.message);
+    }
     // Stop billing first: deleting the account must never leave a running
     // subscription silently charging a card nobody can manage anymore.
     if (customerId) {
