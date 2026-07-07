@@ -745,7 +745,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           {updatedDate ? updatedDate.toLocaleDateString('de-CH') : '-'}
           {isStale && (
             <span
-              title={language === 'FR' ? `Aucun mouvement depuis ${staleDays} jours — le bon moment pour relancer` : language === 'IT' ? `Nessun movimento da ${staleDays} giorni — il momento giusto per un sollecito` : language === 'EN' ? `No movement for ${staleDays} days — time to follow up` : `Seit ${staleDays} Tagen keine Bewegung — Zeit zum Nachfassen`}
+              title={language === 'FR' ? `Aucun mouvement depuis ${staleDays} jours, le bon moment pour relancer` : language === 'IT' ? `Nessun movimento da ${staleDays} giorni, il momento giusto per un sollecito` : language === 'EN' ? `No movement for ${staleDays} days, time to follow up` : `Seit ${staleDays} Tagen keine Bewegung, Zeit zum Nachfassen`}
               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#D4A852]/15 text-[#B8862F] dark:text-[#D4A852] text-[9px] font-bold uppercase tracking-wider"
             >
               <span className="w-1 h-1 rounded-full bg-[#D4A852]" />
@@ -9763,48 +9763,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             );
           })()}
 
-          {/* Benefit cards with icons */}
-          {(() => {
-            const benefits = language === 'FR' ? [
-              { Icon: Briefcase, kicker: 'Pour les employeurs', body: 'Trouver les bons talents plus rapidement.' },
-              { Icon: UserIcon,  kicker: 'Pour les candidats',  body: 'Faire le prochain pas de carrière plus facilement.' },
-              { Icon: MapPin,    kicker: 'Toute la Suisse',     body: 'Conçue pour le marché du travail suisse.' },
-            ] : language === 'IT' ? [
-              { Icon: Briefcase, kicker: 'Per i datori di lavoro', body: 'Trovare i talenti giusti più velocemente.' },
-              { Icon: UserIcon,  kicker: 'Per i candidati',        body: 'Fare il prossimo passo di carriera più facilmente.' },
-              { Icon: MapPin,    kicker: 'In tutta la Svizzera',   body: 'Progettata per il mercato del lavoro svizzero.' },
-            ] : language === 'EN' ? [
-              { Icon: Briefcase, kicker: 'For employers',  body: 'Find the right talent faster.' },
-              { Icon: UserIcon,  kicker: 'For candidates', body: 'Take your next career step more easily.' },
-              { Icon: MapPin,    kicker: 'Nationwide',     body: 'Built for the Swiss job market.' },
-            ] : [
-              { Icon: Briefcase, kicker: 'Für Arbeitgeber', body: 'Die passenden Talente schneller finden.' },
-              { Icon: UserIcon,  kicker: 'Für Bewerber',    body: 'Den nächsten Karriereschritt einfacher starten.' },
-              { Icon: MapPin,    kicker: 'Schweizweit',     body: 'Entwickelt für den Schweizer Arbeitsmarkt.' },
-            ];
-            return (
-              <div className="mt-10 lg:mt-14 grid sm:grid-cols-3 gap-4 lg:gap-6 max-w-5xl mx-auto">
-                {benefits.map((b, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 12 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ delay: 0.25 + i * 0.1, duration: 0.5 }}
-                    className="p-6 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm flex items-start gap-4"
-                  >
-                    <div className="shrink-0 w-10 h-10 rounded-lg border border-[#00A854]/40 bg-[#00A854]/[0.08] flex items-center justify-center text-[#00A854]">
-                      <b.Icon size={18} strokeWidth={1.75} />
-                    </div>
-                    <div>
-                      <p className="text-base font-semibold text-white leading-tight">{b.kicker}</p>
-                      <p className="mt-1.5 text-sm text-white/65 font-light leading-relaxed">{b.body}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            );
-          })()}
         </div>
       </section>
       )}

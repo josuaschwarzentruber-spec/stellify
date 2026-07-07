@@ -527,7 +527,7 @@
         text.split('').forEach((ch, i) => {
           const s = document.createElement('span');
           s.className   = 'letter';
-          s.textContent = ch === ' ' ? ' ' : ch;
+          s.textContent = ch === ' ' ? '\u00A0' : ch; // nbsp: a plain space collapses to zero width in an inline-block span, gluing the words together
           s.style.animationDelay = (startDelaySec + i * step) + 's';
           tagEl.appendChild(s);
         });
