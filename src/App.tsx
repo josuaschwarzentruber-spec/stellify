@@ -1821,7 +1821,7 @@ function StellifyApp() {
       // Pages (Über uns, AGB, Datenschutz, Impressum, Preise) — always discoverable
       const pages = [
         { view: 'about',       keys: ['über uns','about','geschichte','story','team','founder','gründer'], title: language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns', content: language === 'FR' ? 'Notre histoire, le fondateur et le sens du nom Stellify.' : language === 'IT' ? 'La nostra storia, il fondatore e il significato del nome Stellify.' : language === 'EN' ? 'Our story, the founder and the meaning behind the name Stellify.' : 'Unsere Geschichte, der Gründer und die Bedeutung des Namens Stellify.' },
-        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Karriere+. Sans renouvellement automatique.' : language === 'IT' ? 'Piani Gratuito, Pro e Karriere+. Senza rinnovo automatico.' : language === 'EN' ? 'Free, Pro and Karriere+ plans. No auto-renewal.' : 'Gratis-, Pro- und Karriere+-Plan. Ohne automatische Verlängerung.' },
+        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Karriere+. Résiliable à tout moment.' : language === 'IT' ? 'Piani Gratuito, Pro e Karriere+. Disdicibile in ogni momento.' : language === 'EN' ? 'Free, Pro and Karriere+ plans. Cancel anytime.' : 'Gratis-, Pro- und Karriere+-Plan. Jederzeit kündbar.' },
         { view: 'datenschutz', keys: ['datenschutz','privacy','dsgvo','dsg','privacidad','vie privée'], title: language === 'FR' ? 'Politique de confidentialité' : language === 'IT' ? 'Informativa sulla privacy' : language === 'EN' ? 'Privacy Policy' : 'Datenschutz', content: language === 'FR' ? 'Comment nous traitons tes données personnelles selon LPD et RGPD.' : language === 'IT' ? 'Come trattiamo i tuoi dati personali secondo LPD e GDPR.' : language === 'EN' ? 'How we process your personal data under Swiss DPA and GDPR.' : 'Wie wir deine persönlichen Daten gemäss DSG und DSGVO bearbeiten.' },
         { view: 'agb',         keys: ['agb','terms','bedingungen','widerruf','kündigung'], title: language === 'FR' ? 'CGV' : language === 'IT' ? 'Termini' : language === 'EN' ? 'Terms' : 'AGB', content: language === 'FR' ? 'Conditions générales, paiement et droit de rétractation.' : language === 'IT' ? 'Condizioni generali, pagamento e diritto di recesso.' : language === 'EN' ? 'Terms, payment and right of withdrawal.' : 'Geschäftsbedingungen, Zahlung und Widerrufsrecht.' },
         { view: 'impressum',   keys: ['impressum','kontakt','contact','imprint','jtsp','zug','firma'], title: language === 'FR' ? 'Mentions légales' : language === 'IT' ? 'Informazioni legali' : language === 'EN' ? 'Imprint' : 'Impressum', content: language === 'FR' ? "Coordonnées de l'exploitant et juridiction." : language === 'IT' ? 'Dati del gestore e giurisdizione.' : language === 'EN' ? 'Operator details and jurisdiction.' : 'Betreiber-Angaben und Gerichtsstand.' },
@@ -10474,9 +10474,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             >
               <div className="p-6 border-b border-black/5 dark:border-white/5 flex items-center gap-4 dark:bg-[#2A2A26]">
                 <Search className="text-[#004225] dark:text-[#FAFAF8]" size={20} />
-                <input 
+                <input
                   autoFocus
-                  type="text" 
+                  id="stellify-search-input"
+                  type="text"
                   placeholder={t.search_label_tool || t.search_label}
                   className="flex-1 text-xl font-serif outline-none bg-transparent text-[#1A1A18] dark:text-[#FAFAF8]"
                   value={searchQuery}
@@ -10527,16 +10528,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="py-8 px-4">
                     <h5 className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-4">{t.search_popular}</h5>
                     <div className="flex flex-wrap gap-2 mb-8">
+                      {/* Only searches that lead somewhere in V1 — the old
+                          chips (Stellensuche, Lohn, Interview, Karriereplan)
+                          pointed at disabled tools and returned nothing. */}
                       {[
-                        { label: language === 'FR' ? 'CV & Curriculum' : language === 'IT' ? 'CV & Curriculum' : language === 'EN' ? 'CV & Resume' : 'Lebenslauf & CV', query: 'lebenslauf' },
-                        { label: language === 'FR' ? 'Recherche d\'emploi' : language === 'IT' ? 'Ricerca lavoro' : language === 'EN' ? 'Job Search' : 'Stellensuche', query: 'stellen' },
-                        { label: language === 'FR' ? 'Salaire' : language === 'IT' ? 'Stipendio' : language === 'EN' ? 'Salary' : 'Lohn & Gehalt', query: 'lohn' },
-                        { label: language === 'FR' ? 'Entretien' : language === 'IT' ? 'Colloquio' : language === 'EN' ? 'Interview' : 'Interview', query: 'interview' },
-                        { label: language === 'FR' ? 'Plan de carrière' : language === 'IT' ? 'Piano carriera' : language === 'EN' ? 'Career Plan' : 'Karriereplan', query: 'karriere' },
+                        { label: language === 'FR' ? 'Créer une candidature' : language === 'IT' ? 'Creare una candidatura' : language === 'EN' ? 'Create an application' : 'Bewerbung erstellen', query: language === 'FR' ? 'candidature' : language === 'IT' ? 'candidature' : language === 'EN' ? 'application' : 'bewerbung' },
+                        { label: language === 'FR' ? 'Plan de candidature' : language === 'IT' ? 'Piano di candidatura' : language === 'EN' ? 'Application plan' : 'Bewerbungs-Strategie', query: language === 'DE' ? 'strategie' : 'plan' },
+                        { label: language === 'FR' ? 'Prix & abonnement' : language === 'IT' ? 'Prezzi & abbonamento' : language === 'EN' ? 'Pricing & plan' : 'Preise & Abo', query: language === 'FR' ? 'prix' : language === 'IT' ? 'prezzo' : language === 'EN' ? 'pricing' : 'preise' },
+                        { label: language === 'FR' ? 'À propos de Stellify' : language === 'IT' ? 'Su Stellify' : language === 'EN' ? 'About Stellify' : 'Über Stellify', query: language === 'DE' ? 'über uns' : 'about' },
                       ].map(tag => (
                         <button
                           key={tag.query}
-                          onClick={() => setSearchQuery(tag.query)}
+                          onClick={() => {
+                            setSearchQuery(tag.query);
+                            // Return focus to the input so Enter runs the
+                            // search — after the click it sat on the chip
+                            // and Enter re-clicked the chip instead.
+                            setTimeout(() => document.getElementById('stellify-search-input')?.focus(), 0);
+                          }}
                           className="px-3 py-1.5 bg-black/5 dark:bg-white/5 text-[11px] font-medium text-[#5C5C58] dark:text-[#FAFAF8] hover:bg-[#004225] hover:text-white transition-all rounded-md"
                         >
                           {tag.label}
