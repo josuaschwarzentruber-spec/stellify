@@ -129,7 +129,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
             <h1 class="email-title" style="margin:0 0 20px;font-size:22px;font-weight:600;color:#1A1A18;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
             ${bodyLines.map(l => `<p class="email-body" style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.65;">${l}</p>`).join('')}
             <div style="margin:32px 0 8px;">
-              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
+              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;background-image:linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%);color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
             </div>
             <p class="email-muted" style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">${shell.contact} <a href="mailto:${supportAddr}" class="email-link" style="color:#004225;">${supportAddr}</a></p>
           </td>
@@ -908,23 +908,6 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
   try {
     const { adminDb } = getAdminServices();
 
-    // Global cap check (last line of defence — protects against bugs/DDoS)
-    const ok = await checkGlobalBudget(adminDb);
-    if (!ok) {
-      // The daily ceiling for everyone combined was hit — tell the owner
-      // privately (very high usage, or a possible attack worth a look).
-      alertOwnerOncePerDay(
-        'global_cap',
-        '🟠 Stellify: Tageslimit der KI-Anfragen erreicht',
-        `<p>Das gemeinsame Tageslimit von <b>${GLOBAL_DAILY_CALL_CAP}</b> KI-Anfragen wurde heute erreicht.</p>
-         <p>Das ist entweder sehr hohe (gute!) Nutzung – dann kannst du das Limit erhöhen (Vercel: <code>GLOBAL_DAILY_CALL_CAP</code>) und ggf. DeepSeek aufladen – oder ein Hinweis auf ungewöhnliche Nutzung, die du kurz prüfen solltest.</p>`
-      ).catch(() => {});
-      return res.status(503).json({
-        error: 'Stella legt gerade eine kurze Pause ein. Bitte versuche es in ein paar Stunden erneut – sorry für die Unterbrechung!',
-        retryAfter: 3600,
-      });
-    }
-
     const userRef = adminDb.collection('users').doc(uid);
     const userSnap = await userRef.get();
     const u = userSnap.data() || {};
@@ -946,6 +929,27 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
     }
 
     if (role === 'client') {
+      // Global daily cap protects the DeepSeek wallet from a free-tier surge
+      // (e.g. the site goes viral): it applies to FREE users only. Paying
+      // customers are never blocked by it — they have paid and are already
+      // bounded by their own per-plan limits below. So a flood of free
+      // sign-ups can cost at most GLOBAL_DAILY_CALL_CAP calls per day, and
+      // it can never lock a subscriber out of what they paid for.
+      const budgetOk = await checkGlobalBudget(adminDb);
+      if (!budgetOk) {
+        alertOwnerOncePerDay(
+          'global_cap',
+          '🟠 Stellify: Tageslimit der kostenlosen KI-Anfragen erreicht',
+          `<p>Das gemeinsame Tageslimit von <b>${GLOBAL_DAILY_CALL_CAP}</b> kostenlosen KI-Anfragen wurde heute erreicht.</p>
+           <p>Zahlende Kunden sind davon nicht betroffen, sie arbeiten normal weiter. Nur Gratis-Nutzer pausieren bis morgen.</p>
+           <p>Das ist entweder sehr hohe (gute!) Nutzung, dann kannst du das Limit erhöhen (Vercel: <code>GLOBAL_DAILY_CALL_CAP</code>) und ggf. DeepSeek aufladen, oder ein Hinweis auf ungewöhnliche Nutzung, die du kurz prüfen solltest.</p>`
+        ).catch(() => {});
+        return res.status(503).json({
+          error: 'Die kostenlosen Generierungen sind für heute stark gefragt. Bitte versuche es morgen erneut, oder hol dir Pro für sofortigen Zugang ohne Wartezeit.',
+          retryAfter: 3600,
+          upgrade: true,
+        });
+      }
       let used = u.ai_calls_lifetime || 0;
       // The free lifetime quota survives account deletion: a ledger keyed by
       // the e-mail fingerprint remembers consumed free calls, so
@@ -1255,7 +1259,7 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   // /jobs/view/ page renders — but when it fails we return a tailored hint
   // instead of the generic "page unreachable".
   const isLinkedIn = /(^|\.)linkedin\.com$/i.test(parsed.hostname);
-  const linkedInHint = 'LinkedIn schützt Stelleninserate teils vor automatischem Laden. Öffne die Anzeige, kopiere den Text und füge ihn unten manuell ein – oder nutze einen Yousty-/jobs.ch-Link.';
+  const linkedInHint = 'LinkedIn schützt Stelleninserate teils vor automatischem Laden. Öffne die Anzeige, kopiere den Text und füge ihn unten manuell ein, oder nutze einen Yousty-/jobs.ch-Link.';
 
   // This endpoint makes a DeepSeek call. It deliberately does NOT consume a
   // generation from the user's plan (importing a job is a helper step, not
@@ -1265,7 +1269,7 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   try {
     const { adminDb } = getAdminServices();
     if (!(await checkGlobalBudget(adminDb))) {
-      return res.status(503).json({ error: 'Kurze Pause – bitte in ein paar Stunden erneut versuchen.', needsManual: true });
+      return res.status(503).json({ error: 'Kurze Pause, bitte in ein paar Stunden erneut versuchen.', needsManual: true });
     }
     const uid = (req as any).uid as string;
     const userRef = adminDb.collection('users').doc(uid);
