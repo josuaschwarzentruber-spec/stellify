@@ -513,15 +513,22 @@
       }
 
       /* ── Tagline letter-by-letter ───────────────────── */
-      function buildTagline(startDelaySec) {
+      /* The line must be fully readable on EVERY device before the splash
+         exits. Weak phones run a much shorter splash and return visits an
+         almost instant one; with one fixed 1.25s delay the text often
+         never appeared there (the 50/50 feel). Timing now scales with the
+         actual splash duration, and short splashes show it instantly. */
+      function buildTagline() {
         const text = 'SWISS CAREER EXCELLENCE';
         tagEl.innerHTML = '';
-        if (reducedMotion) { tagEl.textContent = text; return; }
+        if (reducedMotion || isReturnVisit) { tagEl.textContent = text; return; }
+        const startDelaySec = isLowPower ? 0.35 : 1.25;
+        const step = isLowPower ? 0.03 : 0.05;
         text.split('').forEach((ch, i) => {
           const s = document.createElement('span');
           s.className   = 'letter';
-          s.textContent = ch === ' ' ? ' ' : ch;
-          s.style.animationDelay = `${startDelaySec + i * 0.05}s`;
+          s.textContent = ch === ' ' ? ' ' : ch;
+          s.style.animationDelay = (startDelaySec + i * step) + 's';
           tagEl.appendChild(s);
         });
       }
@@ -698,7 +705,7 @@
           if (t >= .35 && !contentEl.classList.contains('visible')) {
             contentEl.classList.add('visible');
             footerEl.classList.add('visible');
-            buildTagline(1.25);
+            buildTagline();
           }
           if (!shootScheduled && stateFrame === Math.floor(INTRO_F * .55)) {
             shootScheduled = true;
@@ -758,7 +765,7 @@
         state = 'running';
         contentEl.classList.add('visible');
         footerEl.classList.add('visible');
-        buildTagline(0);
+        buildTagline();
       }
 
       frame();

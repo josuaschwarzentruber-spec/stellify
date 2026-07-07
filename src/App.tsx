@@ -1391,6 +1391,8 @@ function StellifyApp() {
   useEffect(() => { if (!activeTool) setGeneratorPrefill(null); }, [activeTool]);
   // "So funktioniert's" explainer inside the tool modal (question mark).
   const [showToolHelp, setShowToolHelp] = useState(false);
+  // "?" help for the tracker — same pattern as the tools' help overlay.
+  const [showTrackerHelp, setShowTrackerHelp] = useState(false);
 
   // Lock the page behind while a tool is open. Without this, iOS Safari
   // often scrolls the BACKGROUND instead of the modal content.
@@ -6953,10 +6955,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <div className="space-y-6">
                   <div className="flex justify-between items-end">
                     <div className="space-y-1">
-                      <h2 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_title}</h2>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_title}</h2>
+                        <button
+                          onClick={() => setShowTrackerHelp(true)}
+                          aria-label={language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
+                          title={language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
+                          className="p-1 rounded-full text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] hover:bg-[#004225]/8 dark:hover:bg-[#00A854]/10 transition-all"
+                        >
+                          <HelpCircle size={16} />
+                        </button>
+                      </div>
                       <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest font-medium">{t.tracker_desc}</p>
                     </div>
-                    <button 
+                    <button
                       onClick={() => setIsAddingApp(true)}
                       className="flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
                     >
@@ -6964,6 +6976,60 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       {t.tracker_add}
                     </button>
                   </div>
+
+                  {/* Tracker help — same "?" pattern as the tools */}
+                  {showTrackerHelp && (
+                    <div className="fixed inset-0 z-[500] flex items-center justify-center p-6">
+                      <div onClick={() => setShowTrackerHelp(false)} className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+                      <motion.div initial={{ opacity: 0, scale: 0.96, y: 14 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="relative z-10 w-full max-w-md bg-white dark:bg-[#1A1A18] p-8 shadow-2xl">
+                        <button onClick={() => setShowTrackerHelp(false)} className="absolute top-4 right-4 p-2 text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-all" aria-label="Schliessen">
+                          <X size={16} />
+                        </button>
+                        <h3 className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{t.tracker_title}</h3>
+                        <p className="text-xs text-[#9A9A94] mb-6">
+                          {language === 'FR' ? 'Toutes tes candidatures, un seul endroit.' : language === 'IT' ? 'Tutte le tue candidature, in un solo posto.' : language === 'EN' ? 'All your applications, one place.' : 'Alle deine Bewerbungen an einem Ort.'}
+                        </p>
+                        <div className="space-y-4">
+                          {(language === 'FR' ? [
+                            ['Ajoute chaque candidature avec Nouveau : entreprise, poste, lieu, salaire.'],
+                            ['Change le statut directement dans la ligne : Postulé, Entretien, Offre.'],
+                            ['L\'étoile ouvre le générateur avec l\'entreprise et le poste déjà remplis.'],
+                            ['Un badge doré apparaît après 14 jours sans mouvement : le moment de relancer.'],
+                            ['Archive ce qui est terminé, exporte tout en CSV.'],
+                          ] : language === 'IT' ? [
+                            ['Aggiungi ogni candidatura con Nuovo: azienda, posizione, luogo, stipendio.'],
+                            ['Cambia lo stato direttamente nella riga: Inviato, Colloquio, Offerta.'],
+                            ['La stellina apre il generatore con azienda e posizione già compilate.'],
+                            ['Dopo 14 giorni senza movimento appare un badge dorato: il momento di sollecitare.'],
+                            ['Archivia ciò che è concluso, esporta tutto in CSV.'],
+                          ] : language === 'EN' ? [
+                            ['Add every application via New: company, position, location, salary.'],
+                            ['Change the status right in the row: Applied, Interview, Offer.'],
+                            ['The sparkle opens the generator with company and position prefilled.'],
+                            ['After 14 days without movement a gold badge appears: time to follow up.'],
+                            ['Archive what is done, export everything as CSV.'],
+                          ] : [
+                            ['Erfasse jede Bewerbung über Neu: Firma, Position, Ort, Gehalt.'],
+                            ['Ändere den Status direkt in der Zeile: Beworben, Interview, Angebot.'],
+                            ['Das Funkeln öffnet den Generator mit Firma und Position schon ausgefüllt.'],
+                            ['Nach 14 Tagen ohne Bewegung erscheint ein goldenes Abzeichen: Zeit zum Nachfassen.'],
+                            ['Archiviere Erledigtes, exportiere alles als CSV.'],
+                          ]).map(([txt], i) => (
+                            <div key={i} className="flex items-start gap-3">
+                              <span className="shrink-0 w-6 h-6 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[11px] font-bold flex items-center justify-center">{i + 1}</span>
+                              <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-snug pt-0.5">{txt}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <button
+                          onClick={() => setShowTrackerHelp(false)}
+                          className="mt-7 w-full py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                        >
+                          {language === 'FR' ? 'Compris' : language === 'IT' ? 'Capito' : language === 'EN' ? 'Got it' : 'Verstanden'}
+                        </button>
+                      </motion.div>
+                    </div>
+                  )}
 
                   {applications.length > 0 && (
                     <div className="flex flex-col md:flex-row md:items-center gap-3">
