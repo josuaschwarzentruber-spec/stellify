@@ -7490,14 +7490,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </span>
           )}
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
+        {/* Five stages, always on one row. Stacked (number over label) on
+            phones so nothing gets cut off, side by side from sm up. */}
+        <div className="grid grid-cols-5 gap-1.5 sm:gap-4">
           {cols.map((c) => {
             const pct = empty ? 0 : Math.round((c.value / max) * 100);
             return (
-              <div key={c.key} className="space-y-2">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-[9px] font-bold uppercase tracking-widest truncate" style={{ color: c.accent }}>{c.label}</span>
-                  <span className="text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
+              <div key={c.key} className="space-y-1.5 sm:space-y-2 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0 sm:gap-2 min-w-0">
+                  <span className="order-2 sm:order-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider sm:tracking-widest truncate leading-tight" style={{ color: c.accent }}>{c.label}</span>
+                  <span className="order-1 sm:order-2 text-xl sm:text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
                 </div>
                 <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
                   <motion.div
