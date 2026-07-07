@@ -106,9 +106,9 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
       .email-title  { color:#FAFAF8 !important; }
       .email-body   { color:#C8C8C2 !important; }
       .email-muted  { color:#9A9A94 !important; }
-      .email-link   { color:#00A854 !important; }
+      .email-link   { color:#4E9E74 !important; }
       .email-footer { border-color:#3A3A35 !important; }
-      .email-cta    { background:#00A854 !important; color:#06130c !important; }
+      .email-cta    { background:#0a5233 !important; color:#FDFCFB !important; }
     }
   </style>
 </head>
@@ -119,7 +119,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
         <!-- Header — Stellify forest gradient with a bright-green hairline,
              the same tones as the dark sections on stellify.ch -->
         <tr>
-          <td style="background:#004225;background-image:linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%);padding:26px 32px;border-bottom:2px solid #00A854;">
+          <td style="background:#004225;background-image:linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%);padding:26px 32px;border-bottom:2px solid #0a5233;">
             ${brandImage}
           </td>
         </tr>
