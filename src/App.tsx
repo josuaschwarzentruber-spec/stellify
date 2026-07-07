@@ -662,6 +662,13 @@ const CookieBanner = ({ t, onAccept, onEssential, onPrivacyLink }: { t: any; onA
 );
 
 
+// Capitalise the first letter of a typed entry (Firma / Position / Ort) so
+// "googel" becomes "Googel" without touching the rest of what the user typed.
+const capFirst = (s: string) => {
+  const t = (s || '').trim();
+  return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
+};
+
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
     {src ? (
@@ -742,7 +749,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
       <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '-'}</td>
       <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
         <span className="inline-flex items-center gap-2">
-          {updatedDate ? updatedDate.toLocaleDateString('de-CH') : '-'}
+          {updatedDate ? updatedDate.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-'}
           {isStale && (
             <span
               title={language === 'FR' ? `Aucun mouvement depuis ${staleDays} jours, le bon moment pour relancer` : language === 'IT' ? `Nessun movimento da ${staleDays} giorni, il momento giusto per un sollecito` : language === 'EN' ? `No movement for ${staleDays} days, time to follow up` : `Seit ${staleDays} Tagen keine Bewegung, Zeit zum Nachfassen`}
@@ -2614,7 +2621,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       return;
     }
     try {
-      await addDoc(collection(db, 'applications'), { ...newApp, user_id: user.id, created_at: new Date().toISOString() });
+      await addDoc(collection(db, 'applications'), { ...newApp, company: capFirst(newApp.company), position: capFirst(newApp.position), location: capFirst(newApp.location), user_id: user.id, created_at: new Date().toISOString() });
       setIsAddingApp(false);
       setNewApp({ company: '', position: '', status: 'Applied', location: '', salary: '', notes: '', reminder_at: '' });
       showToast(language === 'FR' ? 'Candidature ajoutée' : language === 'IT' ? 'Candidatura aggiunta' : language === 'EN' ? 'Application added' : 'Bewerbung hinzugefügt', 'success');
@@ -2635,7 +2642,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
     try {
       const { id, user_id, created_at, ...fields } = editingApp;
-      await updateDoc(doc(db, 'applications', editingApp.id), { ...fields, updated_at: new Date().toISOString() });
+      await updateDoc(doc(db, 'applications', editingApp.id), { ...fields, company: capFirst(fields.company), position: capFirst(fields.position), location: capFirst(fields.location), updated_at: new Date().toISOString() });
       setEditingApp(null);
       showToast(language === 'FR' ? 'Modifications enregistrées' : language === 'IT' ? 'Modifiche salvate' : language === 'EN' ? 'Changes saved' : 'Änderungen gespeichert', 'success');
     } catch (e: any) {
@@ -4609,7 +4616,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_salary: "Gehaltsvorstellung",
       tracker_salary_ph: "z.B. 120'000 CHF",
       tracker_notes: "Notizen",
-      tracker_notes_ph: "z.B. Kontaktperson: Hans Muster...",
+      tracker_notes_ph: "z.B. Bonus, Geschäftsauto, Kontaktperson, nächster Schritt…",
       tracker_save: "Speichern",
       tracker_update: "Aktualisieren",
       tracker_cancel: "Abbrechen",
@@ -5262,7 +5269,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_salary: "Prétentions salariales",
       tracker_salary_ph: "ex. 120'000 CHF",
       tracker_notes: "Notes",
-      tracker_notes_ph: "ex. Contact: Jean Dupont...",
+      tracker_notes_ph: "ex. bonus, voiture de fonction, personne de contact, prochaine étape…",
       tracker_save: "Enregistrer",
       tracker_update: "Mettre à jour",
       tracker_cancel: "Annuler",
@@ -5809,7 +5816,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_salary: "Aspettative salariali",
       tracker_salary_ph: "es. 120'000 CHF",
       tracker_notes: "Note",
-      tracker_notes_ph: "es. Contatto: Mario Rossi...",
+      tracker_notes_ph: "es. bonus, auto aziendale, persona di contatto, prossimo passo…",
       tracker_save: "Salva",
       tracker_update: "Aggiorna",
       tracker_cancel: "Annulla",
@@ -6356,7 +6363,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_salary: "Salary expectation",
       tracker_salary_ph: "e.g. CHF 120,000",
       tracker_notes: "Notes",
-      tracker_notes_ph: "e.g. Contact: John Smith...",
+      tracker_notes_ph: "e.g. bonus, company car, contact person, next step…",
       tracker_save: "Save",
       tracker_update: "Update",
       tracker_cancel: "Cancel",
