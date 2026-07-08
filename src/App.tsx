@@ -10196,8 +10196,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span className="text-[8px] font-bold uppercase tracking-widest text-white/40">Stripe Secure</span>
               </div>
             </div>
+            {/* Only methods that actually work for automatic subscriptions.
+                TWINT, PostFinance and Klarna do not support recurring billing
+                in Stripe, so showing them here would mislead. */}
             <div className="flex flex-wrap justify-center gap-4 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
-              {['Twint', 'Visa', 'Mastercard', 'Amex', 'Apple Pay', 'Google Pay', 'SEPA', 'PostFinance', 'Klarna'].map(p => (
+              {['Visa', 'Mastercard', 'Amex', 'Apple Pay', 'Google Pay'].map(p => (
                 <div key={p} className="px-4 py-2 border border-white/10 text-[10px] font-bold uppercase tracking-widest">{p}</div>
               ))}
             </div>
