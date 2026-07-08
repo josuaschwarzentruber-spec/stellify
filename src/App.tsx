@@ -755,8 +755,8 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           </svg>
         </button>
       </td>
-      <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{app.company}</td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94]">{app.position}</td>
+      <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{capFirst(app.company)}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94]">{capFirst(app.position)}</td>
       <td className="px-4 py-3">
         <select
           value={app.status}
@@ -770,7 +770,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           <option value="Rejected">{t.tracker_rejected}</option>
         </select>
       </td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location || '-'}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location ? capFirst(app.location) : '-'}</td>
       <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '-'}</td>
       <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
         <span className="inline-flex items-center gap-2">
@@ -840,12 +840,12 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         />
       </div>
       <div className="space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate group-hover:pr-20 transition-all" title={app.company}>{app.company}</p>
-        <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug truncate" title={app.position}>{app.position}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate group-hover:pr-20 transition-all" title={app.company}>{capFirst(app.company)}</p>
+        <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug truncate" title={app.position}>{capFirst(app.position)}</p>
         {app.location && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94]">
             <MapPin size={11} className="shrink-0" />
-            <span className="truncate">{app.location}</span>
+            <span className="truncate">{capFirst(app.location)}</span>
           </div>
         )}
         {app.salary && (() => {
@@ -869,7 +869,7 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
           const due = new Date(app.reminder_at);
           const isOverdue = due < today;
           const isToday = due.getTime() === today.getTime();
-          const dateStr = due.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: '2-digit' });
+          const dateStr = due.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
           return (
             <div className={`flex items-center gap-1.5 text-[10px] font-medium ${isOverdue ? 'text-red-600' : isToday ? 'text-[#D4AF37]' : 'text-[#004225]'}`}>
               <Calendar size={10} />
@@ -906,9 +906,9 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
             <option value="Rejected">{t.tracker_rejected}</option>
           </select>
         </div>
-        {app.updatedAt?.toDate && (
+        {(app.updatedAt?.toDate || app.updated_at) && (
           <span className="text-[9px] text-[#9A9A94] font-mono shrink-0 self-end pb-1.5">
-            {app.updatedAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit' })}
+            {(app.updatedAt?.toDate ? app.updatedAt.toDate() : new Date(app.updated_at)).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' })}
           </span>
         )}
       </div>
