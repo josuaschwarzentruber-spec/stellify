@@ -853,7 +853,7 @@ const QUOTA = {
 // separately in enforceAIQuota. Default 1500/day ≈ $22/day worst case:
 // high enough that real customers never hit it, low enough to cap an
 // attack. Override with the Vercel env GLOBAL_DAILY_CALL_CAP if needed.
-const GLOBAL_DAILY_CALL_CAP = Math.max(50, Number(process.env.GLOBAL_DAILY_CALL_CAP) || 1500);
+const GLOBAL_DAILY_CALL_CAP = Math.max(50, Number(process.env.GLOBAL_DAILY_CALL_CAP) || 700);
 
 // In-memory per-user minute counters (resets on server restart, fine for short windows)
 const minuteCounters = new Map<string, { count: number; resetAt: number }>();

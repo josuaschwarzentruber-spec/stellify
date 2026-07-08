@@ -416,6 +416,85 @@ interface UserData {
   avatar_url?: string;
 }
 
+// --- UPGRADE PROMPT ---
+// A convincing, premium modal shown when a free user runs out of tries
+// ('quota') or the daily free ceiling is reached ('daily'). Turns a hard
+// stop into a warm invitation to upgrade, with the value and the plans.
+const UpgradePrompt = ({ reason, language, onClose, onPricing }: { reason: 'quota' | 'daily'; language: string; onClose: () => void; onPricing: () => void }) => {
+  const L = (de: string, fr: string, it: string, en: string) =>
+    language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
+  const headline = reason === 'daily'
+    ? L('Heute besonders gefragt', 'Très demandé aujourd\'hui', 'Molto richiesto oggi', 'In high demand today')
+    : L('Deine 3 Gratis-Bewerbungen sind erstellt', 'Tes 3 candidatures gratuites sont créées', 'Le tue 3 candidature gratuite sono create', 'Your 3 free applications are done');
+  const sub = reason === 'daily'
+    ? L('Die kostenlosen Generierungen sind für heute ausgeschöpft. Mit Pro geht es sofort weiter, ganz ohne Wartezeit.',
+        'Les générations gratuites sont épuisées pour aujourd\'hui. Avec Pro, tu continues tout de suite, sans attendre.',
+        'Le generazioni gratuite sono esaurite per oggi. Con Pro continui subito, senza attese.',
+        'Today\'s free generations are used up. With Pro you continue right away, no waiting.')
+    : L('Du hast gesehen, wie gut Stella schreibt. Hol dir Pro und erstelle so viele Bewerbungen, wie du brauchst.',
+        'Tu as vu comme Stella écrit bien. Passe à Pro et crée autant de candidatures que nécessaire.',
+        'Hai visto quanto bene scrive Stella. Passa a Pro e crea tutte le candidature che ti servono.',
+        'You have seen how well Stella writes. Get Pro and create as many applications as you need.');
+  const benefits = language === 'FR' ? ['50 générations IA par mois', 'Tous les designs standard', 'Import par lien et réutilisation du CV', 'Export PDF et Word']
+    : language === 'IT' ? ['50 generazioni IA al mese', 'Tutti i design standard', 'Import da link e riuso del CV', 'Esportazione PDF e Word']
+    : language === 'EN' ? ['50 AI generations per month', 'All standard designs', 'Link import and CV reuse', 'PDF and Word export']
+    : ['50 KI-Generierungen pro Monat', 'Alle Standard-Designs', 'Stelle per Link laden und Lebenslauf nutzen', 'PDF- und Word-Export'];
+  return (
+    <div className="fixed inset-0 z-[1200] flex items-center justify-center p-5">
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+        className="relative z-10 w-full max-w-md bg-white dark:bg-[#1A1A18] rounded-2xl overflow-hidden shadow-2xl"
+      >
+        {/* Forest header with the brand star */}
+        <div className="relative px-8 pt-8 pb-7 text-center text-white overflow-hidden" style={{ background: 'linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%)' }}>
+          <div aria-hidden="true" className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[#00A854]/25 blur-3xl" />
+          <div className="relative">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center">
+              <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#6FCF97"/></svg>
+            </div>
+            <h3 className="text-2xl font-serif leading-tight">{headline}</h3>
+          </div>
+        </div>
+        <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all" aria-label="Schliessen">
+          <X size={18} />
+        </button>
+
+        <div className="px-8 py-7">
+          <p className="text-[15px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed text-center mb-6">{sub}</p>
+          <div className="space-y-2.5 mb-7">
+            {benefits.map((b, i) => (
+              <div key={i} className="flex items-center gap-3 text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light">
+                <CheckCircle2 size={16} className="text-[#004225] dark:text-[#00A854] shrink-0" />
+                {b}
+              </div>
+            ))}
+          </div>
+          {/* Price anchor */}
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <span className="text-[11px] text-[#9A9A94] uppercase tracking-widest font-bold">Pro</span>
+            <span className="font-serif text-2xl text-[#004225] dark:text-[#00A854]">CHF 19.90</span>
+            <span className="text-[11px] text-[#9A9A94]">{L('/Monat', '/mois', '/mese', '/month')}</span>
+          </div>
+          <button
+            onClick={onPricing}
+            className="w-full py-4 text-white text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:opacity-95"
+            style={{ background: 'linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%)' }}
+          >
+            {L('Pläne ansehen', 'Voir les plans', 'Vedi i piani', 'See the plans')}
+          </button>
+          <button onClick={onClose} className="w-full mt-3 py-2 text-[11px] font-bold uppercase tracking-widest text-[#9A9A94] hover:text-[#5C5C58] dark:hover:text-[#9A9A94] transition-colors">
+            {reason === 'daily' ? L('Morgen wieder', 'Revenir demain', 'Torna domani', 'Come back tomorrow') : L('Vielleicht später', 'Peut-être plus tard', 'Forse più tardi', 'Maybe later')}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 // --- ERROR BOUNDARY ---
 class ErrorBoundary extends React.Component<any, any> {
   constructor(props: any) {
@@ -1557,6 +1636,8 @@ function StellifyApp() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  // Convincing upgrade modal: 'quota' = free tries used up, 'daily' = daily cap hit.
+  const [upgradePrompt, setUpgradePrompt] = useState<'quota' | 'daily' | null>(null);
   const [expiryBanner, setExpiryBanner] = useState<{ daysLeft: number; interval: 'monthly' | 'annual' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -3862,8 +3943,13 @@ Bewerte in 3 Kategorien (je 0 bis 100%):
       // Free quota used up: show the server's clear message in the result
       // panel instead of a generic failure, so the user knows what to do.
       if (toolRes.status === 402) {
-        setToolResult(toolData.error || t.tool_limit_free);
         setIsProcessingTool(false);
+        setUpgradePrompt('quota');
+        return;
+      }
+      if (toolRes.status === 503 && toolData.upgrade) {
+        setIsProcessingTool(false);
+        setUpgradePrompt('daily');
         return;
       }
       if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
@@ -10395,6 +10481,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
 
+      {/* --- UPGRADE PROMPT --- */}
+      <AnimatePresence>
+        {upgradePrompt && (
+          <UpgradePrompt
+            reason={upgradePrompt}
+            language={language}
+            onClose={() => setUpgradePrompt(null)}
+            onPricing={() => { setUpgradePrompt(null); setActiveTool(null); navigate('pricing'); }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* --- TOAST NOTIFICATION ---
            A clean pill: white card, a coloured icon chip, message in normal
            case. Springs up from the bottom, works in light and dark. */}
@@ -11217,7 +11315,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         initialTarget={generatorPrefill}
                         cvContext={cvContext}
                         locked={isToolLocked}
-                        onUpgrade={() => { setActiveTool(null); navigate('pricing'); }}
+                        onUpgrade={(reason?: 'quota' | 'daily') => setUpgradePrompt(reason || 'quota')}
                         showToast={showToast}
                         authFetch={authFetch}
                         onUploadCv={processFile}

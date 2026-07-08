@@ -482,7 +482,7 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   initialTarget?: { company?: string; position?: string } | null;
   cvContext?: string;
   locked: boolean;
-  onUpgrade: () => void;
+  onUpgrade: (reason?: 'quota' | 'daily') => void;
   showToast: (msg: string, type?: string) => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
   /** Called when user picks a CV file inside the generator. Should parse it
@@ -740,8 +740,13 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
         // cases straight to the plans page. Nothing was generated, nothing
         // was counted against the user in these cases.
         if (res.status === 402) {
-          showToast(data.error || s.quota_free_done, 'error');
-          onUpgrade();
+          onUpgrade('quota');
+          return;
+        }
+        // Daily free ceiling reached (server sends upgrade:true) → same warm
+        // upgrade modal, "daily" variant. A plain rate limit stays a toast.
+        if (res.status === 503 && data.upgrade) {
+          onUpgrade('daily');
           return;
         }
         if (res.status === 429 || res.status === 503) {
@@ -945,7 +950,7 @@ ${bodyText}
         <div className="w-12 h-12 bg-[#004225]/10 flex items-center justify-center text-[#004225] mb-4 rounded-full"><Lock size={24} /></div>
         <h3 className="text-lg font-serif mb-2 text-[#1A1A18] dark:text-[#FAFAF8]">{s.locked_title}</h3>
         <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xs mb-5">{s.locked_text}</p>
-        <button onClick={onUpgrade} className="px-6 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all">{s.locked_cta}</button>
+        <button onClick={() => onUpgrade()} className="px-6 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all">{s.locked_cta}</button>
       </div>
     );
   }
@@ -1271,7 +1276,7 @@ ${bodyText}
                   )}
                   {quotaBlocked ? (
                     <button
-                      onClick={onUpgrade}
+                      onClick={() => onUpgrade()}
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
                     >
                       <Sparkles size={12} />{s.locked_cta}
