@@ -669,6 +669,30 @@ const capFirst = (s: string) => {
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
 };
 
+// Gentle desktop hint — mobile only, shown on the dashboard and the landing.
+// Stellify works fully on the phone; the split editor/preview simply has more
+// room on a laptop. Premium framing, positive, no nag.
+const DesktopTip = ({ language, className = '' }: { language: string; className?: string }) => (
+  <div className={`lg:hidden ${className}`}>
+    <div className="flex items-start gap-3.5 p-4 rounded-2xl border border-[#004225]/12 dark:border-[#00A854]/20 bg-gradient-to-br from-[#004225]/[0.06] via-[#004225]/[0.03] to-[#00A854]/[0.02]">
+      <div className="w-9 h-9 rounded-xl bg-white dark:bg-[#1A1A18] shadow-sm border border-[#004225]/10 dark:border-[#00A854]/20 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0">
+        <Monitor size={16} strokeWidth={1.75} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-[#004225] dark:text-[#00A854] mb-1">
+          {language === 'FR' ? 'Astuce' : language === 'IT' ? 'Suggerimento' : language === 'EN' ? 'Tip' : 'Tipp'}
+        </p>
+        <p className="text-[12.5px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
+          {language === 'FR' ? "Sur ordinateur, tu vis Stellify au mieux : éditeur et aperçu côte à côte, encore plus de vue d'ensemble."
+            : language === 'IT' ? 'Sul computer vivi Stellify al meglio: editor e anteprima affiancati, ancora più panoramica.'
+            : language === 'EN' ? 'On a laptop Stellify is at its best: editor and preview side by side, even more overview.'
+            : 'Am Laptop erlebst du Stellify am schönsten: Editor und Vorschau nebeneinander, noch mehr Überblick.'}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
     {src ? (
@@ -7886,20 +7910,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">
                     {t.dashboard_desc}
                   </p>
-                  {/* Gentle desktop hint — mobile only. Stellify works fully
-                      on the phone, but the split panes and previews have more
-                      room to breathe on a laptop. Positive framing, no nag. */}
-                  <div className="lg:hidden mt-5 flex items-center gap-3 px-4 py-3 rounded-xl border border-[#004225]/15 dark:border-[#00A854]/25 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06]">
-                    <div className="w-8 h-8 rounded-lg bg-[#004225]/10 dark:bg-[#00A854]/12 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0">
-                      <Monitor size={15} />
-                    </div>
-                    <p className="text-[12px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-snug">
-                      {language === 'FR' ? 'Astuce : sur ordinateur, tu as encore plus de vue d\'ensemble, éditeur et aperçu côte à côte.'
-                        : language === 'IT' ? 'Suggerimento: sul computer hai ancora più panoramica, editor e anteprima affiancati.'
-                        : language === 'EN' ? 'Tip: on a laptop you get even more overview, with the editor and preview side by side.'
-                        : 'Tipp: Am Laptop hast du noch mehr Überblick, mit Editor und Vorschau nebeneinander.'}
-                    </p>
-                  </div>
+                  <DesktopTip language={language} className="mt-5" />
                 </header>
 
                 {/* Quick access: the two tools, front and centre. The
@@ -9484,6 +9495,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 : 'Zwei Werkzeuge, ein Ziel: deine nächste Stelle. Wähle eines und leg direkt los.'}
             </p>
           </div>
+
+          <DesktopTip language={language} className="max-w-md mx-auto mb-8" />
 
           <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {tools.map((tool: any) => (
