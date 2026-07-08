@@ -6985,7 +6985,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   // sync by the Firestore onSnapshot listener — naturally synchronised.
   const trackerSection = (
                 <div className="space-y-6">
-                  <div className="flex justify-between items-end">
+                  {/* Stack on phones so the title, the ? and the Neu button
+                      never fight for space in one cramped row. */}
+                  <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-end">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <h2 className="text-xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]">{t.tracker_title}</h2>
@@ -6993,7 +6995,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           onClick={() => setShowTrackerHelp(true)}
                           aria-label={language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
                           title={language === 'FR' ? 'Comment ça marche ?' : language === 'IT' ? 'Come funziona?' : language === 'EN' ? 'How does it work?' : 'Wie funktioniert das?'}
-                          className="p-1 rounded-full text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] hover:bg-[#004225]/8 dark:hover:bg-[#00A854]/10 transition-all"
+                          className="p-1 rounded-full text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] hover:bg-[#004225]/8 dark:hover:bg-[#00A854]/10 transition-all shrink-0"
                         >
                           <HelpCircle size={16} />
                         </button>
@@ -7002,7 +7004,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                     <button
                       onClick={() => setIsAddingApp(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
+                      className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 sm:py-2 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all shadow-sm"
                     >
                       <Plus size={14} />
                       {t.tracker_add}
