@@ -377,6 +377,7 @@ const ApplicationGenerator = lazy(() => import('./components/ApplicationGenerato
 const PromoVideoModal = lazy(() => import('./components/PromoVideoModal'));
 const PromoSequence = lazy(() => import('./components/PromoSequence'));
 const LegalPages = lazy(() => import('./components/LegalPages'));
+const GuidePages = lazy(() => import('./components/GuidePages'));
 
 declare global {
   interface Window {
@@ -1237,7 +1238,7 @@ function StellifyApp() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber'>('dashboard');
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -1323,14 +1324,14 @@ function StellifyApp() {
   }, [activeView]);
 
   // Browser history (back/forward button support)
-  const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about') => {
+  const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber') => {
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
     if (view === 'pricing') {
       // Wait one tick for the section to mount, then smooth-scroll
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
-    } else if (view === 'about' || view === 'datenschutz' || view === 'impressum' || view === 'agb') {
+    } else if (view === 'about' || view === 'datenschutz' || view === 'impressum' || view === 'agb' || view === 'ratgeber') {
       // Full-page views: jump straight to the top. Smooth-scrolling while
       // the lazy chunk was still mounting read as a glitch.
       window.scrollTo(0, 0);
@@ -1343,13 +1344,13 @@ function StellifyApp() {
   // on Über uns / AGB / Datenschutz opens instantly instead of flashing a
   // blank frame while the module downloads.
   useEffect(() => {
-    const id = window.setTimeout(() => { import('./components/LegalPages').catch(() => {}); }, 2500);
+    const id = window.setTimeout(() => { import('./components/LegalPages').catch(() => {}); import('./components/GuidePages').catch(() => {}); }, 2500);
     return () => window.clearTimeout(id);
   }, []);
 
   useEffect(() => {
-    type RouteView = 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about';
-    const validViews: RouteView[] = ['dashboard', 'profile', 'tracker', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about'];
+    type RouteView = 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber';
+    const validViews: RouteView[] = ['dashboard', 'profile', 'tracker', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about', 'ratgeber'];
     const viewFromPath = (path: string): RouteView | null => {
       const slug = path.replace(/^\/+/, '').replace(/\/+$/, '');
       if (!slug) return 'dashboard';
@@ -7891,8 +7892,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </Suspense>
       )}
 
+      {activeView === 'ratgeber' && (
+        <Suspense fallback={
+          <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] dark:bg-[#1A1A18]">
+            <svg width="30" height="30" viewBox="0 0 28 28" className="animate-pulse" aria-hidden="true">
+              <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
+            </svg>
+          </div>
+        }>
+          <GuidePages
+            onBack={() => navigate('dashboard')}
+            onOpenTool={() => { if (user) { const tl = tools.find((x: any) => x.id === 'bewerbungs-gen'); if (tl) setActiveTool(tl); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }}
+            language={language}
+          />
+        </Suspense>
+      )}
+
       {/* --- HERO SECTION / DASHBOARD --- */}
-      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about') && ((user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs')) || !user) && (user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs') ? (
+      {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && activeView !== 'ratgeber') && ((user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs')) || !user) && (user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs') ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
           <div className="max-w-7xl mx-auto">
             {activeView === 'dashboard' && (
@@ -9125,7 +9142,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            only). The logged-in Dashboard stays a focused app view: tools,
            stats and pipeline, without the marketing site repeating below.
            Hidden on profile / tools / jobs and on legal + about pages. */}
-      {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && <>
+      {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && activeView !== 'ratgeber' && <>
 
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right). */}
@@ -10521,6 +10538,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <h4 className="text-[10px] font-bold uppercase tracking-widest text-white/70 mb-6">{language === 'DE' ? 'Unternehmen' : language === 'FR' ? 'Entreprise' : language === 'IT' ? 'Azienda' : 'Company'}</h4>
               <ul className="space-y-4 text-sm font-light">
                 <li><button onClick={() => navigate('about')} className="hover:text-white transition-colors text-left">{language === 'DE' ? 'Über uns' : language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : 'About'}</button></li>
+                <li><button onClick={() => navigate('ratgeber')} className="hover:text-white transition-colors text-left">{language === 'FR' ? 'Guides' : language === 'IT' ? 'Guide' : language === 'EN' ? 'Guides' : 'Ratgeber'}</button></li>
                 <li><button onClick={() => navigate('pricing')} className="hover:text-white transition-colors text-left">{t.pricing}</button></li>
                 <li><a href={`mailto:support.stellify@gmail.com?subject=${language === 'FR' ? 'Proposition%20de%20partenariat' : language === 'IT' ? 'Proposta%20di%20collaborazione' : language === 'EN' ? 'Partnership%20Inquiry' : 'Kooperationsanfrage'}`} className="hover:text-white transition-colors">
                   {language === 'DE' ? 'Kooperationen' : language === 'FR' ? 'Partenariats' : language === 'IT' ? 'Collaborazioni' : 'Partnerships'}
