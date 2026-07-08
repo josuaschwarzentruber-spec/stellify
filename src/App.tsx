@@ -10390,17 +10390,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
 
-      {/* --- TOAST NOTIFICATION --- */}
+      {/* --- TOAST NOTIFICATION ---
+           A clean pill: white card, a coloured icon chip, message in normal
+           case. Springs up from the bottom, works in light and dark. */}
       <AnimatePresence>
         {toast && (
           <motion.div
-            initial={{ opacity: 0, y: 50, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: 20, x: '-50%' }}
-            className="fixed bottom-12 left-1/2 z-[1000] px-6 py-3 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl flex items-center gap-3"
+            initial={{ opacity: 0, y: 40, x: '-50%', scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, x: '-50%', scale: 1 }}
+            exit={{ opacity: 0, y: 16, x: '-50%', scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+            role="status"
+            aria-live="polite"
+            className="fixed bottom-8 left-1/2 z-[1000] max-w-[90vw] flex items-center gap-3 pl-3 pr-5 py-2.5 rounded-full bg-white dark:bg-[#23231F] border border-black/5 dark:border-white/10 shadow-xl shadow-black/15"
           >
-            {toast.type === 'success' ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />}
-            {toast.message}
+            <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${toast.type === 'success' ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-red-500'} text-white`}>
+              {toast.type === 'success' ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
+            </span>
+            <span className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{toast.message}</span>
           </motion.div>
         )}
       </AnimatePresence>
