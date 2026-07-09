@@ -441,13 +441,15 @@
       let state      = 'intro';
       let stateFrame = 0;
       let stopped    = false;
-      // Splash timing
-      //  first visit          → cinematic full intro (~5s) for brand impact
-      //  low-power devices    → shorter so weak laptops/phones feel snappy
-      //  return visit (back from Stripe etc.) → near-instant 0.25s fade
-      const INTRO_F   = isReturnVisit ? 12 : (isLowPower ? 50 : 110);
-      const OUTRO_F   = isReturnVisit ? 14 : (isLowPower ? 30 : 60);
-      const MINIMUM_MS = isReturnVisit ? 250 : (isLowPower ? 2200 : 5000);
+      // Splash timing — kept in a tight, consistent band so it never feels
+      // "5 seconds one time, a flash the next". First visit is a calm branded
+      // intro (~2.6s), a reload in the same session is quick but still smooth
+      // (~1.4s, not a 0.25s flash), low-power sits in between. Load speed can
+      // still extend it a touch (we wait for the app to be ready), but the
+      // minimum below is the dominant, predictable factor.
+      const INTRO_F   = isReturnVisit ? 40 : (isLowPower ? 55 : 80);
+      const OUTRO_F   = isReturnVisit ? 40 : (isLowPower ? 40 : 50);
+      const MINIMUM_MS = isReturnVisit ? 1400 : (isLowPower ? 1900 : 2600);
       const startTime  = Date.now();
       let   readyComplete = false;
       let   readyCalled   = false;
