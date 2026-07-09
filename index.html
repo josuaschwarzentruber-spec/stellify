@@ -212,40 +212,54 @@
       }
       /* Icon glow halo removed for a cleaner mark. only the brightness pulse stays */
 
-      /* Professionelle Logo-Enthüllung. Der Stern dreht sich gross ins Bild,
-         eine weiche Licht-Blüte pulst einmal auf, dann folgt die Wortmarke.
-         Startet erst wenn #content sichtbar wird, damit alles synchron ist. */
+      /* Lichtstrahl-Opening. Ein Lichtstrahl fährt von oben herab, der Stern
+         zündet mit einem hellen Aufblitzen auf, dann leuchtet die Wortmarke
+         mit dem Schimmer. Startet erst wenn #content sichtbar wird. */
+
+      /* Der herabfahrende Strahl, hinter dem Icon zentriert. */
+      #stellify-splash .beam {
+        position: absolute; top: 0; left: 50%;
+        width: 2px; height: 46%;
+        transform: translateX(-50%) scaleY(0); transform-origin: top center;
+        background: linear-gradient(180deg, rgba(120,240,170,.95) 0%, rgba(0,168,84,.35) 45%, transparent 100%);
+        filter: blur(.6px); opacity: 0; z-index: 5; pointer-events: none;
+      }
+      #stellify-splash #content.visible .beam {
+        animation: stellifyBeam 1s cubic-bezier(.5,0,.3,1) .1s forwards;
+      }
+      @keyframes stellifyBeam {
+        0%   { opacity: 0; transform: translateX(-50%) scaleY(0); }
+        25%  { opacity: 1; }
+        70%  { opacity: 1; transform: translateX(-50%) scaleY(1); }
+        100% { opacity: 0; transform: translateX(-50%) scaleY(1); }
+      }
+
+      /* Der Stern zündet auf, wenn der Strahl ihn erreicht: kurzes helles
+         Aufblitzen mit sanftem Über-Skalieren, kein Drehen. */
       #stellify-splash #content.visible .icon-outer {
-        animation: stellifyLogoIn 1s cubic-bezier(.22,.61,.36,1) both,
-                   stellifyIconIgnite 1.6s ease-out 1s forwards;
+        animation: stellifyIgnite 1.1s cubic-bezier(.3,1.4,.5,1) .5s both;
       }
-      @keyframes stellifyLogoIn {
-        0%   { opacity: 0; transform: scale(.5); }
-        60%  { opacity: 1; transform: scale(1.07); }
-        100% { opacity: 1; transform: scale(1); }
+      @keyframes stellifyIgnite {
+        0%   { opacity: 0; transform: scale(.55); filter: brightness(1); }
+        45%  { opacity: 1; transform: scale(1.12); filter: brightness(1.9); }
+        100% { opacity: 1; transform: scale(1);    filter: brightness(1); }
       }
-      #stellify-splash #content.visible .icon-outer svg {
-        animation: stellifyStarIn 1.15s cubic-bezier(.34,1.56,.64,1) both;
-      }
-      @keyframes stellifyStarIn {
-        0%   { opacity: 0; transform: rotate(-135deg) scale(.25); }
-        100% { opacity: 1; transform: rotate(0deg) scale(1); }
-      }
+      /* Licht-Blüte als Blitz genau im Zünd-Moment. */
       #stellify-splash .icon-outer::after {
         content: '';
-        position: absolute; inset: -34px;
+        position: absolute; inset: -40px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(0,168,84,.38) 0%, rgba(0,168,84,.10) 45%, transparent 70%);
+        background: radial-gradient(circle, rgba(0,168,84,.45) 0%, rgba(0,168,84,.12) 45%, transparent 70%);
         opacity: 0;
         pointer-events: none;
       }
       #stellify-splash #content.visible .icon-outer::after {
-        animation: stellifyBloom 1.5s cubic-bezier(.22,.61,.36,1) .15s;
+        animation: stellifyFlash 1.1s ease-out .6s;
       }
-      @keyframes stellifyBloom {
-        0%   { opacity: 0;  transform: scale(.4); }
-        35%  { opacity: .95; }
-        100% { opacity: 0;  transform: scale(1.7); }
+      @keyframes stellifyFlash {
+        0%   { opacity: 0;  transform: scale(.3); }
+        30%  { opacity: 1; }
+        100% { opacity: 0;  transform: scale(1.8); }
       }
 
       /* Wortmarke. Canonical Brand Logo (Stell white + ify forest-green, matches App header/footer/auth) */
@@ -349,6 +363,7 @@
       }
       #stellify-splash.low-power .icon-outer { backdrop-filter: none; -webkit-backdrop-filter: none; }
       #stellify-splash.low-power .icon-outer::after { animation: none !important; opacity: 0; }
+      #stellify-splash.low-power .beam { display: none; }
 
       /* Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
@@ -368,6 +383,7 @@
         #stellify-splash #content.visible .icon-outer,
         #stellify-splash #content.visible .icon-outer svg { animation: none !important; opacity: 1; }
         #stellify-splash .icon-outer::after { animation: none !important; opacity: 0; }
+        #stellify-splash .beam { display: none; }
       }
     </style>
   </head>
@@ -383,6 +399,7 @@
       <div class="corner bl"></div><div class="corner br"></div>
 
       <div id="content">
+        <div class="beam"></div>
         <div class="icon-outer">
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
             <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
