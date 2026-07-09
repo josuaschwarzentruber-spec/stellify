@@ -362,8 +362,10 @@
         opacity: .7;
       }
       #stellify-splash.low-power .icon-outer { backdrop-filter: none; -webkit-backdrop-filter: none; }
-      #stellify-splash.low-power .icon-outer::after { animation: none !important; opacity: 0; }
-      #stellify-splash.low-power .beam { display: none; }
+      /* The beam and ignite flash are cheap CSS, so they stay ON even on
+         low-power (iPhones report unknown memory and get flagged low-power,
+         but must still see the Lichtstrahl). Only the truly heavy bits
+         (grain, canvas density) are reduced elsewhere. */
 
       /* Reduced Motion */
       @media (prefers-reduced-motion: reduce) {
