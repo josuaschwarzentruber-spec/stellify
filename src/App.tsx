@@ -1793,7 +1793,6 @@ function StellifyApp() {
     setCookieConsent(type);
     localStorage.setItem('cookieConsent', type);
   };
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
   const [isSavingName, setIsSavingName] = useState(false);
@@ -8079,7 +8078,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           {user ? (
             <div className="flex items-center gap-2 sm:gap-3">
               <button
-                onClick={() => setIsSettingsOpen(true)}
+                onClick={() => navigate('profile')}
                 className="p-2 bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] rounded-full transition-colors text-[#5C5C58] dark:text-[#9A9A94]"
                 title={t.nav_settings}
               >
@@ -8944,13 +8943,254 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="grid sm:grid-cols-2 gap-x-8 gap-y-4">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_name}</p>
-                      <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '-'}</p>
+                      {isEditingName ? (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            className="flex-1 min-w-0 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2 text-sm outline-none focus:border-[#004225]/30"
+                            autoFocus
+                          />
+                          <button
+                            onClick={handleUpdateName}
+                            disabled={isSavingName}
+                            className="bg-[#004225] text-white px-3 py-2 text-xs font-medium hover:bg-[#00331d] disabled:opacity-50"
+                          >
+                            {isSavingName ? '...' : 'OK'}
+                          </button>
+                          <button onClick={() => setIsEditingName(false)} className="text-[#9A9A94] hover:text-black dark:hover:text-white p-2">
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8]">{user.firstName || '-'}</p>
+                          <button
+                            onClick={() => { setNewName(user.firstName || ''); setIsEditingName(true); }}
+                            className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
+                          >
+                            {t.edit || 'Bearbeiten'}
+                          </button>
+                        </div>
+                      )}
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_account_email}</p>
                       <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate" title={user.email}>{user.email}</p>
                     </div>
                   </div>
+                  <div className="pt-4">
+                    <button
+                      onClick={() => setIsTutorialOpen(true)}
+                      className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline"
+                    >
+                      <Sparkles size={12} />
+                      {t.settings_rewatch_tutorial || 'Tutorial erneut ansehen'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Subscription — moved here from the old settings popup */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-1">{t.subscription}</p>
+                  <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 flex justify-between items-center">
+                    <div>
+                      <p className="text-sm font-medium dark:text-[#FAFAF8]">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Karriere+' : 'Stellify Gratis'}</p>
+                      {user?.subscriptionExpiresAt && (user?.role === 'pro' || user?.role === 'unlimited') ? (
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">
+                          {language === 'DE' ? 'Gültig bis' : language === 'FR' ? 'Valide jusqu\'au' : language === 'IT' ? 'Valido fino al' : 'Valid until'}{' '}
+                          <span className="font-semibold text-[#004225] dark:text-[#00A854]">
+                            {new Date(user.subscriptionExpiresAt).toLocaleDateString(language === 'DE' ? 'de-CH' : language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </span>
+                        </p>
+                      ) : (
+                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
+                      )}
+                    </div>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <button
+                        onClick={() => navigate('pricing')}
+                        className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border border-[#004225]/20 px-3 py-1.5 hover:bg-[#004225] hover:text-white transition-all"
+                      >
+                        {t.settings_change_plan}
+                      </button>
+                      {(user?.role === 'pro' || user?.role === 'unlimited') && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              const r = await authFetch('/api/create-portal-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+                              const d = await r.json();
+                              if (d.url) window.location.href = d.url;
+                              else showToast(d.error || 'Fehler', 'error');
+                            } catch { showToast('Verbindung fehlgeschlagen', 'error'); }
+                          }}
+                          className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] border border-black/10 dark:border-white/10 px-3 py-1.5 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                        >
+                          {t.settings_manage_sub}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Plan overview — visible to every plan, lists what's
+                      included and (for Free/Pro) what an upgrade unlocks. */}
+                  {(() => {
+                    const isUnlim = user?.role === 'unlimited' || user?.role === 'admin';
+                    const isProPlan = user?.role === 'pro';
+                    const planFeatures: string[] = isUnlim
+                      ? [t.plan_unlim_f1, t.plan_unlim_f2, t.plan_unlim_f3, t.plan_unlim_f4, t.plan_unlim_f5]
+                      : isProPlan
+                      ? [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f4, t.plan_pro_f5]
+                      : [t.plan_free_f1, t.plan_free_f2, t.plan_free_f3, t.plan_free_f4, t.plan_free_f5];
+                    const upgradeFeatures: string[] | null = isUnlim ? null
+                      : isProPlan ? [t.plan_unlim_f1, t.plan_unlim_f2, t.plan_unlim_f4, t.plan_unlim_f5]
+                      : [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f5];
+                    return (
+                      <div className="p-5 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-5">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
+                          <Star size={12} />
+                          <span>{t.plan_overview_title}</span>
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-2.5">{t.plan_what_included}</p>
+                          <ul className="space-y-1.5">
+                            {planFeatures.map((f, i) => (
+                              <li key={i} className="flex items-start gap-2 text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light">
+                                <CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
+                                <span>{f}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        {upgradeFeatures && (
+                          <div className="pt-4 border-t border-black/5 dark:border-white/5">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-2.5">{t.plan_what_upgrade}</p>
+                            <ul className="space-y-1.5 mb-4">
+                              {upgradeFeatures.map((f, i) => (
+                                <li key={i} className="flex items-start gap-2 text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">
+                                  <Sparkles size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
+                                  <span>{f}</span>
+                                </li>
+                              ))}
+                            </ul>
+                            <button
+                              onClick={() => navigate('pricing')}
+                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
+                            >
+                              <Sparkles size={12} />{t.plan_upgrade_cta}
+                            </button>
+                          </div>
+                        )}
+                        <p className="text-[10px] text-[#9A9A94] dark:text-[#6B6B66] italic leading-relaxed pt-1 border-t border-black/5 dark:border-white/5">
+                          {isProPlan ? t.plan_reset_info : isUnlim ? t.dashboard_usage_unlimited : t.plan_resets_lifetime}
+                        </p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Detailed Usage in Settings — one dynamic block for every
+                      plan (Free 3 · Pro 50 · Karriere+ 150). Shows how many
+                      generations are LEFT instead of a percent figure. */}
+                  {user && (() => {
+                    const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
+                    const used = Math.min(user.toolUses || 0, limit);
+                    return (
+                      <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
+                          <Activity size={14} />
+                          <span>{t.settings_your_usage}</span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-end">
+                            <div className="space-y-0.5">
+                              <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                              <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{used} / {limit} {user.role === 'client' ? t.settings_free_use : t.settings_generations}</p>
+                            </div>
+                            <span className="text-xs font-serif text-[#004225]">{limit - used} {t.remaining}</span>
+                          </div>
+                          <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[#004225] transition-all duration-700"
+                              style={{ width: `${Math.min(100, Math.round((used / limit) * 100))}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {user?.role === 'unlimited' && (
+                    <div className="p-4 bg-[#004225]/5 border border-[#004225]/10 flex items-center gap-3">
+                      <Sparkles size={16} className="text-[#004225]" />
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">{t.dashboard_usage_unlimited}</p>
+                    </div>
+                  )}
+
+                  {/* Admin Debug Section */}
+                  {(import.meta.env.DEV && user?.email === 'support.stellify@gmail.com') && (
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
+                      <div className="flex items-center gap-2 text-amber-900">
+                        <Shield size={14} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Admin Debug Tools</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={async () => {
+                            if (!user?.id) return;
+                            try {
+                              await updateDoc(doc(db, 'users', user.id), { role: 'client' });
+                              window.location.reload();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="text-[9px] font-bold uppercase tracking-widest bg-gray-600 text-white px-2 py-1 hover:bg-gray-700 transition-colors"
+                        >
+                          Simulate Free
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!user?.id) return;
+                            try {
+                              await updateDoc(doc(db, 'users', user.id), { role: 'pro' });
+                              window.location.reload();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="text-[9px] font-bold uppercase tracking-widest bg-amber-600 text-white px-2 py-1 hover:bg-amber-700 transition-colors"
+                        >
+                          Simulate Pro
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (!user?.id) return;
+                            try {
+                              await updateDoc(doc(db, 'users', user.id), { role: 'unlimited' });
+                              window.location.reload();
+                            } catch (e) {
+                              console.error(e);
+                            }
+                          }}
+                          className="text-[9px] font-bold uppercase tracking-widest bg-amber-900 text-white px-2 py-1 hover:bg-amber-950 transition-colors"
+                        >
+                          Simulate Unlimited
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                
+                </div>
+
+                {/* Privacy & account deletion — moved here from the old settings popup */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-1">{t.data_privacy}</p>
+                  <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
+                    {t.settings_privacy_desc}
+                  </p>
+                  <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
+                
                 </div>
 
                 {/* Tool activity */}
@@ -13036,329 +13276,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- SETTINGS MODAL --- */}
       <AnimatePresence>
-        {isSettingsOpen && (
-          <div className="fixed inset-0 z-[400] flex items-center justify-center p-3 sm:p-6 bg-black/40 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-2xl max-h-[92dvh] shadow-2xl overflow-hidden flex flex-col"
-            >
-              <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FDFCFB]">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-[#004225] text-white flex items-center justify-center">
-                    <Settings size={20} />
-                  </div>
-                  <h3 className="text-xl font-serif">{t.settings}</h3>
-                </div>
-                <button onClick={() => setIsSettingsOpen(false)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="p-5 sm:p-8 space-y-8 overflow-y-auto flex-1 min-h-0 overscroll-contain">
-                <section className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.profile}</h4>
-
-                  {/* Avatar picker */}
-                  <div className="p-4 sm:p-5 border border-black/8 bg-[#FDFCFB]">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-[#9A9A94] mb-1">{t.profile_photo}</p>
-                    <p className="text-[11px] text-[#5C5C58] font-light leading-snug mb-3">{t.profile_photo_hint}</p>
-                    <div className="flex flex-wrap gap-2.5">
-                      <button
-                        onClick={() => handleSelectAvatar(null)}
-                        title={t.profile_avatar_initial}
-                        className={`w-11 h-11 rounded-full bg-[#004225]/8 flex items-center justify-center text-base font-serif text-[#004225] transition-all ${!user?.avatarId ? 'ring-2 ring-[#004225] ring-offset-2' : 'hover:ring-2 hover:ring-[#004225]/30'}`}
-                      >
-                        {(user?.firstName || '?').charAt(0).toUpperCase()}
-                      </button>
-                      {[...AVATAR_PRESETS, ...SYMBOL_AVATARS].map(p => (
-                        <button
-                          key={p.id}
-                          onClick={() => handleSelectAvatar(p.id)}
-                          title={AVATAR_MEANINGS[p.id] ? `${AVATAR_MEANINGS[p.id][language].name}: ${AVATAR_MEANINGS[p.id][language].desc}` : undefined}
-                          className={`w-11 h-11 rounded-full overflow-hidden transition-all ${user?.avatarId === p.id ? 'ring-2 ring-[#004225] ring-offset-2' : 'hover:ring-2 hover:ring-[#004225]/30 hover:scale-105'}`}
-                        >
-                          <PresetAvatar id={p.id} className="w-full h-full" />
-                        </button>
-                      ))}
-                    </div>
-                    {user?.avatarId && AVATAR_MEANINGS[user.avatarId] && (
-                      <p className="mt-3 pt-3 border-t border-black/5 text-[11px] text-[#5C5C58] font-light">
-                        <span className="font-bold uppercase tracking-widest text-[10px] text-[#004225] mr-2">{AVATAR_MEANINGS[user.avatarId][language].name}</span>
-                        {AVATAR_MEANINGS[user.avatarId][language].desc}
-                      </p>
-                    )}
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94]">{t.settings_first_name}</label>
-                      {isEditingName ? (
-                        <div className="flex gap-2">
-                          <input 
-                            type="text"
-                            value={newName}
-                            onChange={(e) => setNewName(e.target.value)}
-                            className="flex-1 bg-[#FDFCFB] border border-black/10 px-3 py-2 text-sm outline-none focus:border-[#004225]/30"
-                            autoFocus
-                          />
-                          <button 
-                            onClick={handleUpdateName}
-                            disabled={isSavingName}
-                            className="bg-[#004225] text-white px-3 py-2 text-xs font-medium hover:bg-[#00331d] disabled:opacity-50"
-                          >
-                            {isSavingName ? '...' : 'OK'}
-                          </button>
-                          <button 
-                            onClick={() => setIsEditingName(false)}
-                            className="text-[#9A9A94] hover:text-black p-2"
-                          >
-                            <X size={14} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-between group">
-                          <p className="text-sm font-medium">{user?.firstName}</p>
-                          <button 
-                            onClick={() => {
-                              setNewName(user?.firstName || '');
-                              setIsEditingName(true);
-                            }}
-                            className="text-[10px] font-bold uppercase tracking-widest text-[#004225] opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            {t.edit || 'Bearbeiten'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <label className="block text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94]">{t.settings_email}</label>
-                      <p className="text-sm font-medium text-[#6B6B66] dark:text-[#9A9A94]">{user?.email}</p>
-                    </div>
-                  </div>
-                  <div className="pt-4">
-                    <button 
-                      onClick={() => {
-                        setIsSettingsOpen(false);
-                        setIsTutorialOpen(true);
-                      }}
-                      className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] hover:underline"
-                    >
-                      <Sparkles size={12} />
-                      {t.settings_rewatch_tutorial || 'Tutorial erneut ansehen'}
-                    </button>
-                  </div>
-                </section>
-
-                <section className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.subscription}</h4>
-                  <div className="p-4 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 flex justify-between items-center">
-                    <div>
-                      <p className="text-sm font-medium dark:text-[#FAFAF8]">{user?.role === 'pro' ? 'Stellify Pro' : user?.role === 'unlimited' ? 'Stellify Karriere+' : 'Stellify Gratis'}</p>
-                      {user?.subscriptionExpiresAt && (user?.role === 'pro' || user?.role === 'unlimited') ? (
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] mt-0.5">
-                          {language === 'DE' ? 'Gültig bis' : language === 'FR' ? 'Valide jusqu\'au' : language === 'IT' ? 'Valido fino al' : 'Valid until'}{' '}
-                          <span className="font-semibold text-[#004225] dark:text-[#00A854]">
-                            {new Date(user.subscriptionExpiresAt).toLocaleDateString(language === 'DE' ? 'de-CH' : language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                          </span>
-                        </p>
-                      ) : (
-                        <p className="text-[10px] text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-widest">{t.settings_status}</p>
-                      )}
-                    </div>
-                    <div className="flex flex-col items-end gap-1.5">
-                      <button
-                        onClick={() => { setIsSettingsOpen(false); navigate('pricing'); }}
-                        className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border border-[#004225]/20 px-3 py-1.5 hover:bg-[#004225] hover:text-white transition-all"
-                      >
-                        {t.settings_change_plan}
-                      </button>
-                      {(user?.role === 'pro' || user?.role === 'unlimited') && (
-                        <button
-                          onClick={async () => {
-                            try {
-                              const r = await authFetch('/api/create-portal-session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
-                              const d = await r.json();
-                              if (d.url) window.location.href = d.url;
-                              else showToast(d.error || 'Fehler', 'error');
-                            } catch { showToast('Verbindung fehlgeschlagen', 'error'); }
-                          }}
-                          className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] border border-black/10 dark:border-white/10 px-3 py-1.5 hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                        >
-                          {t.settings_manage_sub}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Plan overview — visible to every plan, lists what's
-                      included and (for Free/Pro) what an upgrade unlocks. */}
-                  {(() => {
-                    const isUnlim = user?.role === 'unlimited' || user?.role === 'admin';
-                    const isProPlan = user?.role === 'pro';
-                    const planFeatures: string[] = isUnlim
-                      ? [t.plan_unlim_f1, t.plan_unlim_f2, t.plan_unlim_f3, t.plan_unlim_f4, t.plan_unlim_f5]
-                      : isProPlan
-                      ? [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f4, t.plan_pro_f5]
-                      : [t.plan_free_f1, t.plan_free_f2, t.plan_free_f3, t.plan_free_f4, t.plan_free_f5];
-                    const upgradeFeatures: string[] | null = isUnlim ? null
-                      : isProPlan ? [t.plan_unlim_f1, t.plan_unlim_f2, t.plan_unlim_f4, t.plan_unlim_f5]
-                      : [t.plan_pro_f1, t.plan_pro_f2, t.plan_pro_f3, t.plan_pro_f5];
-                    return (
-                      <div className="p-5 bg-[#FDFCFB] dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-5">
-                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
-                          <Star size={12} />
-                          <span>{t.plan_overview_title}</span>
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-2.5">{t.plan_what_included}</p>
-                          <ul className="space-y-1.5">
-                            {planFeatures.map((f, i) => (
-                              <li key={i} className="flex items-start gap-2 text-xs text-[#1A1A18] dark:text-[#FAFAF8] font-light">
-                                <CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
-                                <span>{f}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        {upgradeFeatures && (
-                          <div className="pt-4 border-t border-black/5 dark:border-white/5">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] mb-2.5">{t.plan_what_upgrade}</p>
-                            <ul className="space-y-1.5 mb-4">
-                              {upgradeFeatures.map((f, i) => (
-                                <li key={i} className="flex items-start gap-2 text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">
-                                  <Sparkles size={12} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
-                                  <span>{f}</span>
-                                </li>
-                              ))}
-                            </ul>
-                            <button
-                              onClick={() => { setIsSettingsOpen(false); navigate('pricing'); }}
-                              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
-                            >
-                              <Sparkles size={12} />{t.plan_upgrade_cta}
-                            </button>
-                          </div>
-                        )}
-                        <p className="text-[10px] text-[#9A9A94] dark:text-[#6B6B66] italic leading-relaxed pt-1 border-t border-black/5 dark:border-white/5">
-                          {isProPlan ? t.plan_reset_info : isUnlim ? t.dashboard_usage_unlimited : t.plan_resets_lifetime}
-                        </p>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Detailed Usage in Settings — one dynamic block for every
-                      plan (Free 3 · Pro 50 · Karriere+ 150). Shows how many
-                      generations are LEFT instead of a percent figure. */}
-                  {user && (() => {
-                    const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
-                    const used = Math.min(user.toolUses || 0, limit);
-                    return (
-                      <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
-                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                          <Activity size={14} />
-                          <span>{t.settings_your_usage}</span>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-end">
-                            <div className="space-y-0.5">
-                              <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
-                              <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{used} / {limit} {user.role === 'client' ? t.settings_free_use : t.settings_generations}</p>
-                            </div>
-                            <span className="text-xs font-serif text-[#004225]">{limit - used} {t.remaining}</span>
-                          </div>
-                          <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-[#004225] transition-all duration-700"
-                              style={{ width: `${Math.min(100, Math.round((used / limit) * 100))}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {user?.role === 'unlimited' && (
-                    <div className="p-4 bg-[#004225]/5 border border-[#004225]/10 flex items-center gap-3">
-                      <Sparkles size={16} className="text-[#004225]" />
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">{t.dashboard_usage_unlimited}</p>
-                    </div>
-                  )}
-
-                  {/* Admin Debug Section */}
-                  {(import.meta.env.DEV && user?.email === 'support.stellify@gmail.com') && (
-                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg space-y-3">
-                      <div className="flex items-center gap-2 text-amber-900">
-                        <Shield size={14} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest">Admin Debug Tools</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={async () => {
-                            if (!user?.id) return;
-                            try {
-                              await updateDoc(doc(db, 'users', user.id), { role: 'client' });
-                              window.location.reload();
-                            } catch (e) {
-                              console.error(e);
-                            }
-                          }}
-                          className="text-[9px] font-bold uppercase tracking-widest bg-gray-600 text-white px-2 py-1 hover:bg-gray-700 transition-colors"
-                        >
-                          Simulate Free
-                        </button>
-                        <button
-                          onClick={async () => {
-                            if (!user?.id) return;
-                            try {
-                              await updateDoc(doc(db, 'users', user.id), { role: 'pro' });
-                              window.location.reload();
-                            } catch (e) {
-                              console.error(e);
-                            }
-                          }}
-                          className="text-[9px] font-bold uppercase tracking-widest bg-amber-600 text-white px-2 py-1 hover:bg-amber-700 transition-colors"
-                        >
-                          Simulate Pro
-                        </button>
-                        <button
-                          onClick={async () => {
-                            if (!user?.id) return;
-                            try {
-                              await updateDoc(doc(db, 'users', user.id), { role: 'unlimited' });
-                              window.location.reload();
-                            } catch (e) {
-                              console.error(e);
-                            }
-                          }}
-                          className="text-[9px] font-bold uppercase tracking-widest bg-amber-900 text-white px-2 py-1 hover:bg-amber-950 transition-colors"
-                        >
-                          Simulate Unlimited
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </section>
-
-                <section className="space-y-4">
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.data_privacy}</h4>
-                  <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
-                    {t.settings_privacy_desc}
-                  </p>
-                  <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
-                </section>
-              </div>
-              <div className="p-6 border-t border-black/5 bg-[#FDFCFB] flex justify-end">
-                <button 
-                  onClick={() => setIsSettingsOpen(false)}
-                  className="px-6 py-2 bg-[#004225] text-white text-xs font-bold uppercase tracking-widest hover:bg-[#00331d] transition-all"
-                >
-                  {t.close}
-                </button>
-              </div>
-            </motion.div>
-          </div>
-        )}
       </AnimatePresence>
       <AnimatePresence>
         {isPromoOpen && (
