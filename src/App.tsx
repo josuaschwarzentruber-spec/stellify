@@ -812,7 +812,74 @@ const AVATAR_PRESETS: AvatarPresetDef[] = [
   { id: 'finn',   bg: '#E6EDDC', skin: '#F1BE93', hair: '#A67C48', style: 'buzz',  suit: '#37413D' },
 ];
 
+// Symbol avatars — Stella (the Stellify star) and career-themed icons for
+// everyone who prefers no face at all.
+const SYMBOL_AVATARS: { id: string; bg: string; node: React.ReactNode }[] = [
+  { id: 'stella', bg: '#0B2E21', node: <>
+    <path d="M50 16 Q55 42 80 52 Q56 56 48 84 Q45 58 20 46 Q46 42 50 16 Z" fill="#2BC98C" />
+    <circle cx="69" cy="28" r="2.5" fill="#EAF7F0" opacity="0.9" />
+    <circle cx="30" cy="66" r="1.8" fill="#EAF7F0" opacity="0.6" />
+  </> },
+  { id: 'rocket', bg: '#E2E9F0', node: <>
+    <path d="M50 16 Q63 32 63 54 L37 54 Q37 32 50 16 Z" fill="#1F4D3A" />
+    <circle cx="50" cy="38" r="6" fill="#EAF7F0" />
+    <circle cx="50" cy="38" r="3.2" fill="#9FC5B4" />
+    <path d="M37 54 L27 68 L39 62 Z" fill="#14352A" />
+    <path d="M63 54 L73 68 L61 62 Z" fill="#14352A" />
+    <path d="M44 60 Q50 80 56 60 Q53 66 50 66 Q47 66 44 60 Z" fill="#F2B23E" />
+  </> },
+  { id: 'berg', bg: '#EAF0E4', node: <>
+    <circle cx="72" cy="26" r="6" fill="#F2B23E" />
+    <path d="M12 78 L42 30 L60 58 L70 44 L90 78 Z" fill="#3E5C4E" />
+    <path d="M42 30 L49 41 L44 45 L38 40 Z" fill="#F5F7F4" />
+    <path d="M70 44 L75 52 L71 55 L66 51 Z" fill="#F5F7F4" />
+  </> },
+  { id: 'pokal', bg: '#F0EBDD', node: <>
+    <path d="M34 26 L66 26 L63 50 Q50 62 37 50 Z" fill="#D9A93C" />
+    <path d="M34 30 Q22 32 30 44 Q34 48 38 48" stroke="#B98A2E" strokeWidth="3.5" fill="none" />
+    <path d="M66 30 Q78 32 70 44 Q66 48 62 48" stroke="#B98A2E" strokeWidth="3.5" fill="none" />
+    <rect x="46" y="56" width="8" height="10" fill="#B98A2E" />
+    <rect x="36" y="66" width="28" height="7" rx="2" fill="#8A6A20" />
+    <path d="M50 32 L52 37 L57 38 L52 40 L50 45 L48 40 L43 38 L48 37 Z" fill="#F7EFD8" />
+  </> },
+  { id: 'ziel', bg: '#E4EEF0', node: <>
+    <circle cx="50" cy="50" r="24" fill="#14352A" />
+    <circle cx="50" cy="50" r="17" fill="#F5F5F2" />
+    <circle cx="50" cy="50" r="10" fill="#2BAE7E" />
+    <circle cx="50" cy="50" r="3.5" fill="#14352A" />
+    <path d="M50 50 L72 28" stroke="#C0392B" strokeWidth="3" strokeLinecap="round" />
+    <path d="M72 28 L74 18 L78 26 L86 28 L76 32 Z" fill="#C0392B" />
+  </> },
+  { id: 'idee', bg: '#F0EBD8', node: <>
+    <circle cx="50" cy="42" r="16" fill="#F2C94C" />
+    <path d="M44 55 Q50 60 56 55 L55 62 L45 62 Z" fill="#E5B93C" />
+    <rect x="44" y="62" width="12" height="4" rx="2" fill="#8A8A88" />
+    <rect x="45" y="67" width="10" height="3.5" rx="1.75" fill="#8A8A88" />
+    <path d="M50 18 L50 12 M68 24 L72 20 M32 24 L28 20 M74 42 L80 42 M26 42 L20 42" stroke="#D9A93C" strokeWidth="2.5" strokeLinecap="round" />
+  </> },
+  { id: 'koffer', bg: '#DFE9E4', node: <>
+    <rect x="27" y="38" width="46" height="32" rx="4" fill="#14352A" />
+    <path d="M42 38 L42 30 Q42 28 44 28 L56 28 Q58 28 58 30 L58 38" stroke="#14352A" strokeWidth="4" fill="none" />
+    <rect x="27" y="50" width="46" height="3" fill="#0B241A" />
+    <rect x="45" y="48" width="10" height="8" rx="1.5" fill="#D9A93C" />
+  </> },
+  { id: 'kompass', bg: '#EAE4F0', node: <>
+    <circle cx="50" cy="50" r="22" fill="#F5F5F2" stroke="#14352A" strokeWidth="2.5" />
+    <path d="M50 32 L56 50 L44 50 Z" fill="#C0392B" />
+    <path d="M44 50 L56 50 L50 68 Z" fill="#14352A" />
+    <circle cx="50" cy="50" r="2.6" fill="#F5F5F2" />
+  </> },
+];
+
 const PresetAvatar = ({ id, className }: { id: string; className?: string }) => {
+  const sym = SYMBOL_AVATARS.find(a => a.id === id);
+  if (sym) return (
+    <svg viewBox="0 0 100 100" className={className} aria-hidden="true">
+      <circle cx="50" cy="50" r="50" fill={sym.bg} />
+      <clipPath id={`avs-${sym.id}`}><circle cx="50" cy="50" r="50" /></clipPath>
+      <g clipPath={`url(#avs-${sym.id})`}>{sym.node}</g>
+    </svg>
+  );
   const p = AVATAR_PRESETS.find(a => a.id === id);
   if (!p) return null;
   return (
@@ -8643,7 +8710,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     >
                       {(user.firstName || '?').charAt(0).toUpperCase()}
                     </button>
-                    {AVATAR_PRESETS.map(p => (
+                    {[...AVATAR_PRESETS, ...SYMBOL_AVATARS].map(p => (
                       <button
                         key={p.id}
                         onClick={() => handleSelectAvatar(p.id)}
@@ -12716,7 +12783,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       >
                         {(user?.firstName || '?').charAt(0).toUpperCase()}
                       </button>
-                      {AVATAR_PRESETS.map(p => (
+                      {[...AVATAR_PRESETS, ...SYMBOL_AVATARS].map(p => (
                         <button
                           key={p.id}
                           onClick={() => handleSelectAvatar(p.id)}
