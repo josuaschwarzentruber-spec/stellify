@@ -3307,15 +3307,20 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           </div>
           <div className="bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
             <div className="bg-[#004225] px-3 py-2 flex items-center justify-between gap-2">
-              <span className="flex items-center gap-2 min-w-0">
-                <PresetAvatar id={previewAvatarId} className="w-6 h-6 shrink-0 rounded-full border border-white/40" />
-                <span className="text-white text-[10px] font-serif font-bold truncate">{previewIdentity.name}</span>
-              </span>
+              <span className="text-white text-[10px] font-serif font-bold truncate">{previewIdentity.name}</span>
               <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
             </div>
             <div className="p-3 space-y-1.5">
-              <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
-              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Sehr geehrte Damen und Herren,</p>
+              {/* Photo sits inside the document, top right — like a real Swiss application. */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1.5 min-w-0 pt-0.5">
+                  <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
+                  <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Sehr geehrte Damen und Herren,</p>
+                </div>
+                <span className="shrink-0 w-10 h-10 rounded-sm overflow-hidden border border-black/10 dark:border-white/15 shadow-sm" style={{ backgroundColor: AVATAR_PRESETS.find(p => p.id === previewAvatarId)?.bg }}>
+                  <PresetAvatar id={previewAvatarId} className="w-full h-full" />
+                </span>
+              </div>
               <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Konsumgüterherstellers und habe die Markenbekanntheit um 28 Prozent gesteigert." speed={18} /></p>
               <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">In meiner aktuellen Rolle führe ich ein Team von vier Personen, verantworte ein Jahresbudget von CHF 800 000 und habe zuletzt eine Kampagne umgesetzt, die den Onlineumsatz innerhalb eines Jahres um 35 Prozent erhöht hat. Die Zusammenarbeit mit Agenturen, Handelspartnern und internen Stakeholdern gehört dabei zu meinem Alltag.</p>
               <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">Nestlé begeistert mich, weil Sie Markenführung mit echter Konsumentennähe verbinden. Genau diese Kombination aus Strategie und Umsetzung ist meine Stärke, und ich freue mich darauf, sie in Ihr Team einzubringen.</p>
@@ -9948,19 +9953,24 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {/* Step 3: the finished document */}
                         <div className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
                           <div className="bg-[#004225] px-4 py-3 flex items-center justify-between gap-3">
-                            <span className="flex items-center gap-2.5 min-w-0">
-                              <PresetAvatar id={previewAvatarId} className="w-8 h-8 shrink-0 rounded-full border border-white/40" />
-                              <span className="text-white text-sm font-serif font-bold truncate">{previewIdentity.name}</span>
-                            </span>
+                            <span className="text-white text-sm font-serif font-bold truncate">{previewIdentity.name}</span>
                             <span className="text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
                           </div>
                           <div className="p-4 md:p-5 space-y-2.5">
-                            <p className="text-[13px] font-bold text-[#004225] dark:text-[#00A854]">
-                              {language === 'FR' ? 'Candidature: Marketing Manager · Nestlé' : language === 'IT' ? 'Candidatura: Marketing Manager · Nestlé' : language === 'EN' ? 'Application: Marketing Manager · Nestlé' : 'Bewerbung als Marketing Manager · Nestlé'}
-                            </p>
-                            <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF]">
-                              {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
-                            </p>
+                            {/* Photo inside the document, top right — like a real Swiss application. */}
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="space-y-2.5 min-w-0 pt-0.5">
+                                <p className="text-[13px] font-bold text-[#004225] dark:text-[#00A854]">
+                                  {language === 'FR' ? 'Candidature: Marketing Manager · Nestlé' : language === 'IT' ? 'Candidatura: Marketing Manager · Nestlé' : language === 'EN' ? 'Application: Marketing Manager · Nestlé' : 'Bewerbung als Marketing Manager · Nestlé'}
+                                </p>
+                                <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF]">
+                                  {language === 'FR' ? 'Madame, Monsieur,' : language === 'IT' ? 'Gentili Signore e Signori,' : language === 'EN' ? 'Dear Sir or Madam,' : 'Sehr geehrte Damen und Herren,'}
+                                </p>
+                              </div>
+                              <span className="shrink-0 w-14 h-14 rounded-sm overflow-hidden border border-black/10 dark:border-white/15 shadow-sm" style={{ backgroundColor: AVATAR_PRESETS.find(p => p.id === previewAvatarId)?.bg }}>
+                                <PresetAvatar id={previewAvatarId} className="w-full h-full" />
+                              </span>
+                            </div>
                             <p className="text-[13px] text-[#26261F] dark:text-[#D5D5CF] leading-relaxed min-h-[4.5em]">
                               <TypeText
                                 speed={16}
