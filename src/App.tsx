@@ -43,7 +43,7 @@ import {
   Headphones, Radio, ChevronLeft, BarChart3, CreditCard, Instagram, Image as ImageIcon,
   Pause, Volume2, VolumeX, Link2,
   Archive, ArchiveRestore, LayoutGrid, List as ListIcon,
-  Clock, Monitor
+  Clock, Monitor, Bell
 } from 'lucide-react';
 import { auth, db } from './firebase';
 import {
@@ -797,6 +797,32 @@ type AvatarPresetDef = {
   beard?: boolean;
 };
 
+// Name + trait shown in the picker when an avatar is hovered or selected.
+// Kept next to the presets (not in the big i18n tables) so avatar data stays
+// in one place.
+const AVATAR_MEANINGS: Record<string, Record<'DE' | 'FR' | 'IT' | 'EN', { name: string; desc: string }>> = {
+  aria:    { DE: { name: 'Aria',    desc: 'Die Kreative. Findet Wege, die andere übersehen.' },        FR: { name: 'Aria',    desc: 'La créative. Trouve des chemins que les autres ne voient pas.' },      IT: { name: 'Aria',    desc: 'La creativa. Trova strade che gli altri non vedono.' },            EN: { name: 'Aria',    desc: 'The creative. Finds paths others overlook.' } },
+  luca:    { DE: { name: 'Luca',    desc: 'Der Macher. Redet nicht lange, liefert.' },                  FR: { name: 'Luca',    desc: "L'homme d'action. Peu de mots, des résultats." },                      IT: { name: 'Luca',    desc: "L'uomo del fare. Poche parole, risultati." },                      EN: { name: 'Luca',    desc: 'The doer. Less talk, more results.' } },
+  mira:    { DE: { name: 'Mira',    desc: 'Die Strategin. Denkt zwei Schritte voraus.' },               FR: { name: 'Mira',    desc: 'La stratège. Toujours deux coups en avance.' },                        IT: { name: 'Mira',    desc: 'La stratega. Pensa sempre due mosse avanti.' },                    EN: { name: 'Mira',    desc: 'The strategist. Always two steps ahead.' } },
+  jon:     { DE: { name: 'Jon',     desc: 'Der Analytiker. Zahlen, Fakten, klare Sicht.' },             FR: { name: 'Jon',     desc: "L'analyste. Chiffres, faits, vision claire." },                        IT: { name: 'Jon',     desc: "L'analista. Numeri, fatti, visione chiara." },                     EN: { name: 'Jon',     desc: 'The analyst. Numbers, facts, clear view.' } },
+  noa:     { DE: { name: 'Noa',     desc: 'Die Visionärin. Sieht das grosse Ganze.' },                  FR: { name: 'Noa',     desc: 'La visionnaire. Voit la grande image.' },                              IT: { name: 'Noa',     desc: 'La visionaria. Vede il quadro completo.' },                        EN: { name: 'Noa',     desc: 'The visionary. Sees the big picture.' } },
+  elias:   { DE: { name: 'Elias',   desc: 'Der Ruhepol. Bleibt gelassen, wenn es zählt.' },             FR: { name: 'Elias',   desc: 'Le calme. Serein quand ça compte.' },                                  IT: { name: 'Elias',   desc: 'La calma. Sereno quando conta.' },                                 EN: { name: 'Elias',   desc: 'The calm one. Steady when it matters.' } },
+  lena:    { DE: { name: 'Lena',    desc: 'Die Energie. Bringt Schwung in jedes Team.' },               FR: { name: 'Lena',    desc: "L'énergie. Dynamise chaque équipe." },                                 IT: { name: 'Lena',    desc: "L'energia. Dà slancio a ogni team." },                             EN: { name: 'Lena',    desc: 'The energy. Lifts every team.' } },
+  samu:    { DE: { name: 'Samu',    desc: 'Der Mentor. Erfahrung, auf die man baut.' },                 FR: { name: 'Samu',    desc: 'Le mentor. Une expérience sur laquelle compter.' },                    IT: { name: 'Samu',    desc: 'Il mentore. Esperienza su cui contare.' },                         EN: { name: 'Samu',    desc: 'The mentor. Experience you can build on.' } },
+  ivy:     { DE: { name: 'Ivy',     desc: 'Die Perfektionistin. Details machen den Unterschied.' },     FR: { name: 'Ivy',     desc: 'La perfectionniste. Les détails font la différence.' },                IT: { name: 'Ivy',     desc: 'La perfezionista. I dettagli fanno la differenza.' },              EN: { name: 'Ivy',     desc: 'The perfectionist. Details make the difference.' } },
+  timo:    { DE: { name: 'Timo',    desc: 'Der Optimist. Sieht in jeder Absage eine Chance.' },         FR: { name: 'Timo',    desc: "L'optimiste. Chaque refus est une chance." },                          IT: { name: 'Timo',    desc: "L'ottimista. Ogni rifiuto è una chance." },                        EN: { name: 'Timo',    desc: 'The optimist. Every no hides a yes.' } },
+  sofia:   { DE: { name: 'Sofia',   desc: 'Die Souveräne. Ruhe und Klarheit im Auftritt.' },            FR: { name: 'Sofia',   desc: 'La souveraine. Calme et clarté en toute situation.' },                 IT: { name: 'Sofia',   desc: 'La sicura. Calma e chiarezza in ogni situazione.' },               EN: { name: 'Sofia',   desc: 'The composed one. Calm and clarity in every room.' } },
+  finn:    { DE: { name: 'Finn',    desc: 'Der Aufsteiger. Am Anfang, aber nicht mehr lange.' },        FR: { name: 'Finn',    desc: "L'étoile montante. Au début, mais plus pour longtemps." },             IT: { name: 'Finn',    desc: "L'emergente. All'inizio, ma non per molto." },                     EN: { name: 'Finn',    desc: 'The riser. At the start, but not for long.' } },
+  stella:  { DE: { name: 'Stella',  desc: 'Der Stern von Stellify. Für alle, die hoch hinauswollen.' }, FR: { name: 'Stella',  desc: "L'étoile de Stellify. Pour celles et ceux qui visent haut." },         IT: { name: 'Stella',  desc: 'La stella di Stellify. Per chi punta in alto.' },                  EN: { name: 'Stella',  desc: 'The Stellify star. For everyone aiming high.' } },
+  rocket:  { DE: { name: 'Rakete',  desc: 'Der Durchstarter. Karriere mit Schub.' },                    FR: { name: 'Fusée',   desc: 'Le décollage. Une carrière propulsée.' },                              IT: { name: 'Razzo',   desc: 'Il decollo. Carriera con la spinta giusta.' },                     EN: { name: 'Rocket',  desc: 'The launcher. A career with thrust.' } },
+  berg:    { DE: { name: 'Gipfel',  desc: 'Die Beständigkeit. Schritt für Schritt nach oben.' },        FR: { name: 'Sommet',  desc: 'La constance. Pas à pas vers le haut.' },                              IT: { name: 'Vetta',   desc: 'La costanza. Passo dopo passo verso la cima.' },                   EN: { name: 'Summit',  desc: 'The steady climb. Step by step to the top.' } },
+  pokal:   { DE: { name: 'Pokal',   desc: 'Der Champion. Erfolge sind kein Zufall.' },                  FR: { name: 'Trophée', desc: 'Le champion. Le succès n’est pas un hasard.' },                   IT: { name: 'Trofeo',  desc: 'Il campione. Il successo non è un caso.' },                        EN: { name: 'Trophy',  desc: 'The champion. Success is no accident.' } },
+  ziel:    { DE: { name: 'Ziel',    desc: 'Die Zielstrebige. Fokus auf den Punkt, der zählt.' },        FR: { name: 'Cible',   desc: 'La détermination. Le focus sur ce qui compte.' },                      IT: { name: 'Bersaglio', desc: 'La determinazione. Focus su ciò che conta.' },                   EN: { name: 'Target',  desc: 'The focused one. Eyes on what counts.' } },
+  idee:    { DE: { name: 'Idee',    desc: 'Der Ideengeber. Immer einen Einfall voraus.' },              FR: { name: 'Idée',    desc: "L'inventif. Toujours une idée d'avance." },                            IT: { name: 'Idea',    desc: "L'inventivo. Sempre un'idea avanti." },                            EN: { name: 'Idea',    desc: 'The idea machine. Always one thought ahead.' } },
+  koffer:  { DE: { name: 'Koffer',  desc: 'Die Professionalität. Bereit für den nächsten Termin.' },    FR: { name: 'Mallette', desc: 'Le professionnalisme. Prêt pour le prochain rendez-vous.' },          IT: { name: 'Valigetta', desc: 'La professionalità. Pronto per il prossimo appuntamento.' },     EN: { name: 'Briefcase', desc: 'The professional. Ready for the next meeting.' } },
+  kompass: { DE: { name: 'Kompass', desc: 'Der Kursfinder. Kennt die Richtung, auch im Sturm.' },       FR: { name: 'Boussole', desc: 'Le cap. Garde la direction, même dans la tempête.' },                 IT: { name: 'Bussola', desc: 'La rotta. Conosce la direzione anche nella tempesta.' },           EN: { name: 'Compass', desc: 'The navigator. Knows the way, even in a storm.' } },
+};
+
 const AVATAR_PRESETS: AvatarPresetDef[] = [
   { id: 'aria',   bg: '#DCE9E2', skin: '#F4C89C', hair: '#5B4630', style: 'long',  suit: '#14352A' },
   { id: 'luca',   bg: '#EFE7D8', skin: '#E8B98A', hair: '#2C2C2A', style: 'short', suit: '#37413D' },
@@ -1457,6 +1483,7 @@ function StellifyApp() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [avatarHover, setAvatarHover] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber'>('dashboard');
@@ -3236,19 +3263,29 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
     if (id === 'bewerbungs-gen' || id === 'cv-gen') {
       return (
-        <div className="w-full bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
-          <div className="bg-[#004225] px-3 py-2 flex items-center justify-between">
-            <span className="text-white text-[10px] font-serif font-bold">{previewIdentity.name}</span>
-            <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest">Marketing Manager</span>
-          </div>
-          <div className="p-3 space-y-1.5">
-            <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
-            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Sehr geehrte Damen und Herren,</p>
-            <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Konsumgüterherstellers und habe die Markenbekanntheit um 28 Prozent gesteigert." speed={18} /></p>
-            <div className="flex gap-1.5 pt-1">
-              <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />PDF</span>
-              <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />Word</span>
+        <div className="w-full space-y-2.5">
+          <div className="bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
+            <div className="bg-[#004225] px-3 py-2 flex items-center justify-between">
+              <span className="text-white text-[10px] font-serif font-bold">{previewIdentity.name}</span>
+              <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest">Marketing Manager</span>
             </div>
+            <div className="p-3 space-y-1.5">
+              <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
+              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Sehr geehrte Damen und Herren,</p>
+              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Konsumgüterherstellers und habe die Markenbekanntheit um 28 Prozent gesteigert." speed={18} /></p>
+              <div className="flex items-center justify-between pt-1">
+                <div className="flex gap-1.5">
+                  <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />PDF</span>
+                  <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />Word</span>
+                </div>
+                <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-white bg-[#004225] dark:bg-[#00A854] px-1.5 py-0.5 rounded"><CheckCircle2 size={8} />{language === 'FR' ? 'Prêt à envoyer' : language === 'IT' ? 'Pronto per l\'invio' : language === 'EN' ? 'Ready to send' : 'Versandbereit'}</span>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><Clock size={9} />{language === 'FR' ? '60 secondes' : language === 'IT' ? '60 secondi' : language === 'EN' ? '60 seconds' : '60 Sekunden'}</span>
+            <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><CheckCircle2 size={9} />{language === 'FR' ? 'Standard suisse' : language === 'IT' ? 'Standard svizzero' : language === 'EN' ? 'Swiss standard' : 'Schweizer Standard'}</span>
+            <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><Sparkles size={9} />{language === 'FR' ? 'Adapté à l\'annonce' : language === 'IT' ? 'Su misura per l\'annuncio' : language === 'EN' ? 'Tailored to the ad' : 'Aufs Inserat zugeschnitten'}</span>
           </div>
         </div>
       );
@@ -3351,20 +3388,39 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
     if (id === 'tracker') {
       const cols = [
-        { l: language === 'EN' ? 'Applied' : 'Beworben', c: '#9A9A94', items: ['Roche', 'PostFinance'] },
+        { l: language === 'FR' ? 'Envoyées' : language === 'IT' ? 'Inviate' : language === 'EN' ? 'Applied' : 'Beworben', c: '#9A9A94', items: ['Roche', 'PostFinance'] },
         { l: 'Interview', c: '#D4A852', items: ['Swisscom'] },
-        { l: language === 'EN' ? 'Offer' : 'Angebot', c: '#004225', items: ['Nestlé'] },
+        { l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', c: '#004225', items: ['Nestlé'] },
+      ];
+      const stats = [
+        { n: '8', l: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
+        { n: '3', l: 'Interviews' },
+        { n: '1', l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot' },
       ];
       return (
-        <div className="w-full grid grid-cols-3 gap-2">
-          {cols.map((col, i) => (
-            <div key={i} className="space-y-1.5">
-              <p className="text-[8px] font-bold uppercase tracking-widest" style={{ color: col.c }}>{col.l}</p>
-              {col.items.map((it, j) => (
-                <div key={j} className="bg-white dark:bg-[#2A2A26] border-l-2 px-1.5 py-1 text-[9px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] shadow-sm" style={{ borderLeftColor: col.c }}>{it}</div>
-              ))}
-            </div>
-          ))}
+        <div className="w-full space-y-2.5">
+          <div className="grid grid-cols-3 gap-2">
+            {stats.map((s, i) => (
+              <div key={i} className="bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm px-2 py-1.5 text-center">
+                <p className="text-base font-serif text-[#004225] dark:text-[#00A854] leading-none">{s.n}</p>
+                <p className="text-[7.5px] font-bold uppercase tracking-widest text-[#9A9A94] mt-0.5">{s.l}</p>
+              </div>
+            ))}
+          </div>
+          <div className="w-full grid grid-cols-3 gap-2">
+            {cols.map((col, i) => (
+              <div key={i} className="space-y-1.5">
+                <p className="text-[8px] font-bold uppercase tracking-widest" style={{ color: col.c }}>{col.l}</p>
+                {col.items.map((it, j) => (
+                  <div key={j} className="bg-white dark:bg-[#2A2A26] border-l-2 px-1.5 py-1 text-[9px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] shadow-sm" style={{ borderLeftColor: col.c }}>{it}</div>
+                ))}
+              </div>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 bg-[#D4A852]/12 border border-[#D4A852]/30 rounded-sm px-2 py-1.5">
+            <Bell size={10} className="text-[#B8860B] shrink-0" />
+            <p className="text-[9px] font-medium text-[#7A5C10] dark:text-[#D4A852]">{language === 'FR' ? 'Relancer: Swisscom · dans 3 jours' : language === 'IT' ? 'Follow-up: Swisscom · tra 3 giorni' : language === 'EN' ? 'Follow up: Swisscom · in 3 days' : 'Nachfassen: Swisscom · in 3 Tagen'}</p>
+          </div>
         </div>
       );
     }
@@ -4613,6 +4669,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_photo: "Avatar",
       profile_photo_hint: "Wähle deinen Avatar. Er erscheint oben in der Navigation und in deinem Profil.",
       profile_avatar_initial: "Dein Anfangsbuchstabe",
+      profile_avatar_pick_hint: "Fahre über einen Avatar, um seine Bedeutung zu sehen.",
       tools: "Tools",
       pricing: "Preise",
       login: "Anmelden",
@@ -4635,6 +4692,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abonnement",
       data_privacy: "Datenschutz",
       tools_title: "Dein Werkzeug für jede Bewerbung.",
+      tools_gen_f1: "Anschreiben, Lebenslauf und E-Mail in 60 Sekunden",
+      tools_gen_f2: "Schweizer Standard, zugeschnitten aufs Stelleninserat",
+      tools_gen_f3: "Export als PDF und Word, sofort versandbereit",
+      tools_tracker_f1: "Alle Bewerbungen in einer klaren Pipeline",
+      tools_tracker_f2: "Erinnerungen fürs Nachfassen zur richtigen Zeit",
+      tools_tracker_f3: "Statistiken, die zeigen, was funktioniert",
+      tools_cta_title: "Überzeug dich selbst. Die ersten 3 Bewerbungen sind geschenkt.",
+      tools_cta_sub: "Kein Abo nötig zum Ausprobieren. Danach ab CHF 19.90 pro Monat, jederzeit kündbar.",
+      tools_cta_btn: "Jetzt gratis testen",
+      tools_cta_btn2: "Pläne ansehen",
       tools_badge: "Karriere-Tools",
       tools_view_all: "Alle Tools ansehen",
       market_title: "Warum jetzt. Warum Schweiz.",
@@ -5263,6 +5330,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_photo: "Avatar",
       profile_photo_hint: "Choisis ton avatar. Il apparaît dans la navigation et sur ton profil.",
       profile_avatar_initial: "Ton initiale",
+      profile_avatar_pick_hint: "Survole un avatar pour découvrir sa signification.",
       tools: "Outils",
       pricing: "Tarifs",
       login: "Connexion",
@@ -5285,6 +5353,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abonnement",
       data_privacy: "Confidentialité",
       tools_title: "Ton outil pour chaque candidature.",
+      tools_gen_f1: "Lettre, CV et e-mail en 60 secondes",
+      tools_gen_f2: "Standard suisse, adapté à l'annonce",
+      tools_gen_f3: "Export PDF et Word, prêt à envoyer",
+      tools_tracker_f1: "Toutes tes candidatures dans un pipeline clair",
+      tools_tracker_f2: "Rappels de relance au bon moment",
+      tools_tracker_f3: "Des statistiques qui montrent ce qui marche",
+      tools_cta_title: "Convaincs-toi. Les 3 premières candidatures sont offertes.",
+      tools_cta_sub: "Aucun abonnement pour essayer. Ensuite dès CHF 19.90 par mois, résiliable à tout moment.",
+      tools_cta_btn: "Essayer gratuitement",
+      tools_cta_btn2: "Voir les plans",
       tools_badge: "Outils de carrière",
       tools_view_all: "Voir tous les outils",
       market_title: "Pourquoi maintenant. Pourquoi la Suisse.",
@@ -5807,6 +5885,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_photo: "Avatar",
       profile_photo_hint: "Scegli il tuo avatar. Appare nella navigazione e nel tuo profilo.",
       profile_avatar_initial: "La tua iniziale",
+      profile_avatar_pick_hint: "Passa sopra un avatar per scoprirne il significato.",
       tools: "Strumenti",
       pricing: "Prezzi",
       login: "Accedi",
@@ -5829,6 +5908,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Abbonamento",
       data_privacy: "Privacy",
       tools_title: "Lo strumento per ogni candidatura.",
+      tools_gen_f1: "Lettera, CV ed e-mail in 60 secondi",
+      tools_gen_f2: "Standard svizzero, su misura per l'annuncio",
+      tools_gen_f3: "Export PDF e Word, pronto per l'invio",
+      tools_tracker_f1: "Tutte le candidature in una pipeline chiara",
+      tools_tracker_f2: "Promemoria per il follow-up al momento giusto",
+      tools_tracker_f3: "Statistiche che mostrano cosa funziona",
+      tools_cta_title: "Convinciti. Le prime 3 candidature sono in regalo.",
+      tools_cta_sub: "Nessun abbonamento per provare. Poi da CHF 19.90 al mese, disdicibile in ogni momento.",
+      tools_cta_btn: "Prova gratis",
+      tools_cta_btn2: "Vedi i piani",
       tools_badge: "Strumenti di carriera",
       tools_view_all: "Vedi tutti gli strumenti",
       market_title: "Perché ora. Perché la Svizzera.",
@@ -6351,6 +6440,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       profile_photo: "Avatar",
       profile_photo_hint: "Pick your avatar. It shows in the navigation and on your profile.",
       profile_avatar_initial: "Your initial",
+      profile_avatar_pick_hint: "Hover over an avatar to see its meaning.",
       tools: "Tools",
       pricing: "Pricing",
       login: "Login",
@@ -6373,6 +6463,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       subscription: "Subscription",
       data_privacy: "Privacy",
       tools_title: "Your toolkit for every application.",
+      tools_gen_f1: "Cover letter, CV and email in 60 seconds",
+      tools_gen_f2: "Swiss standard, tailored to the job ad",
+      tools_gen_f3: "PDF and Word export, ready to send",
+      tools_tracker_f1: "Every application in one clear pipeline",
+      tools_tracker_f2: "Follow-up reminders at the right moment",
+      tools_tracker_f3: "Statistics that show what works",
+      tools_cta_title: "See for yourself. Your first 3 applications are on us.",
+      tools_cta_sub: "No subscription needed to try. Then from CHF 19.90 per month, cancel anytime.",
+      tools_cta_btn: "Try for free",
+      tools_cta_btn2: "See plans",
       tools_badge: "Career Tools",
       tools_view_all: "View all tools",
       market_title: "Why now. Why Switzerland.",
@@ -8702,10 +8802,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                     <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">{t.profile_photo_hint}</p>
                   </div>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-3" onMouseLeave={() => setAvatarHover(null)}>
                     <button
                       onClick={() => handleSelectAvatar(null)}
                       title={t.profile_avatar_initial}
+                      onMouseEnter={() => setAvatarHover(null)}
                       className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-lg font-serif text-[#004225] dark:text-[#00A854] transition-all ${!user.avatarId ? 'ring-2 ring-[#004225] dark:ring-[#00A854] ring-offset-2 dark:ring-offset-[#2A2A26]' : 'hover:ring-2 hover:ring-[#004225]/30 dark:hover:ring-[#00A854]/40'}`}
                     >
                       {(user.firstName || '?').charAt(0).toUpperCase()}
@@ -8714,12 +8815,33 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <button
                         key={p.id}
                         onClick={() => handleSelectAvatar(p.id)}
+                        onMouseEnter={() => setAvatarHover(p.id)}
+                        title={AVATAR_MEANINGS[p.id]?.[language]?.name}
                         className={`w-12 h-12 sm:w-14 sm:h-14 rounded-full overflow-hidden transition-all ${user.avatarId === p.id ? 'ring-2 ring-[#004225] dark:ring-[#00A854] ring-offset-2 dark:ring-offset-[#2A2A26]' : 'hover:ring-2 hover:ring-[#004225]/30 dark:hover:ring-[#00A854]/40 hover:scale-105'}`}
                       >
                         <PresetAvatar id={p.id} className="w-full h-full" />
                       </button>
                     ))}
                   </div>
+                  {(() => {
+                    const shownId = avatarHover ?? user.avatarId;
+                    const m = shownId ? AVATAR_MEANINGS[shownId]?.[language] : undefined;
+                    return (
+                      <div className="mt-5 pt-4 border-t border-black/5 dark:border-white/5 min-h-[40px] flex items-center gap-3">
+                        {m ? (
+                          <>
+                            <PresetAvatar id={shownId!} className="w-8 h-8 rounded-full shrink-0" />
+                            <p className="text-xs text-[#5C5C58] dark:text-[#9A9A94] font-light">
+                              <span className="font-bold uppercase tracking-widest text-[10px] text-[#004225] dark:text-[#00A854] mr-2">{m.name}</span>
+                              {m.desc}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-xs text-[#9A9A94] font-light italic">{t.profile_avatar_pick_hint}</p>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* Account / personal data */}
@@ -8932,7 +9054,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/10 px-2 py-1">{tool.badge}</span>
                         </div>
                         <h3 className="text-lg md:text-xl font-medium mb-2 text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool.title}</h3>
-                        <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-5 line-clamp-3">{tool.desc}</p>
+                        <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-4 line-clamp-3">{tool.desc}</p>
+                        <ul className="space-y-1.5 mb-5">
+                          {(tool.id === 'bewerbungs-gen'
+                            ? [t.tools_gen_f1, t.tools_gen_f2, t.tools_gen_f3]
+                            : tool.id === 'tracker'
+                            ? [t.tools_tracker_f1, t.tools_tracker_f2, t.tools_tracker_f3]
+                            : []
+                          ).map((f: string, fi: number) => (
+                            <li key={fi} className="flex items-start gap-2 text-xs text-[#4A4A45] dark:text-[#9A9A94]">
+                              <CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854] shrink-0 mt-0.5" />
+                              {f}
+                            </li>
+                          ))}
+                        </ul>
                         <button className="mt-auto text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] flex items-center gap-2 group/btn">
                           {t.tool_open} <ArrowRight size={12} className="group-hover/btn:translate-x-1 transition-transform" />
                         </button>
@@ -8957,6 +9092,34 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   ))}
                 </div>
+                {/* Conversion strip — only for users without a paid plan. */}
+                {user?.role !== 'pro' && user?.role !== 'unlimited' && user?.role !== 'admin' && (
+                  <div className="relative overflow-hidden p-7 sm:p-10 text-white" style={{ background: 'linear-gradient(135deg, #00331d 0%, #004225 55%, #0a5233 100%)' }}>
+                    <svg viewBox="0 0 100 100" className="absolute -right-6 -top-6 w-40 h-40 opacity-[0.12]" aria-hidden="true">
+                      <path d="M50 16 Q55 42 80 52 Q56 56 48 84 Q45 58 20 46 Q46 42 50 16 Z" fill="#6FCF97" />
+                    </svg>
+                    <div className="relative flex flex-col sm:flex-row sm:items-center gap-6 sm:justify-between">
+                      <div className="max-w-xl">
+                        <h3 className="text-xl sm:text-2xl font-serif mb-2">{t.tools_cta_title}</h3>
+                        <p className="text-sm text-white/75 font-light">{t.tools_cta_sub}</p>
+                      </div>
+                      <div className="flex flex-col sm:items-end gap-2.5 shrink-0">
+                        <button
+                          onClick={() => handleToolClick('bewerbungs-gen')}
+                          className="px-6 py-3 bg-white text-[#004225] text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#E8F3EC] transition-colors"
+                        >
+                          {t.tools_cta_btn}
+                        </button>
+                        <button
+                          onClick={() => navigate('pricing')}
+                          className="px-6 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80 hover:text-white border border-white/25 hover:border-white/50 transition-colors"
+                        >
+                          {t.tools_cta_btn2}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -12787,12 +12950,19 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <button
                           key={p.id}
                           onClick={() => handleSelectAvatar(p.id)}
+                          title={AVATAR_MEANINGS[p.id] ? `${AVATAR_MEANINGS[p.id][language].name}: ${AVATAR_MEANINGS[p.id][language].desc}` : undefined}
                           className={`w-11 h-11 rounded-full overflow-hidden transition-all ${user?.avatarId === p.id ? 'ring-2 ring-[#004225] ring-offset-2' : 'hover:ring-2 hover:ring-[#004225]/30 hover:scale-105'}`}
                         >
                           <PresetAvatar id={p.id} className="w-full h-full" />
                         </button>
                       ))}
                     </div>
+                    {user?.avatarId && AVATAR_MEANINGS[user.avatarId] && (
+                      <p className="mt-3 pt-3 border-t border-black/5 text-[11px] text-[#5C5C58] font-light">
+                        <span className="font-bold uppercase tracking-widest text-[10px] text-[#004225] mr-2">{AVATAR_MEANINGS[user.avatarId][language].name}</span>
+                        {AVATAR_MEANINGS[user.avatarId][language].desc}
+                      </p>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
