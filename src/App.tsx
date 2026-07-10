@@ -7884,8 +7884,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </p>
           <div className="flex items-center gap-3 shrink-0">
             {user && (() => {
-              const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
-              const left = Math.max(0, limit - Math.min(user.toolUses || 0, limit));
               const planName = (user.role === 'unlimited' || user.role === 'admin') ? 'Karriere+' : user.role === 'pro' ? 'Pro' : 'Gratis';
               return (
                 <button
@@ -7894,7 +7892,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2.5 py-1.5 rounded-full hover:bg-[#004225]/12 dark:hover:bg-[#00A854]/20 transition-colors"
                 >
                   <Star size={10} />
-                  {planName} · {left} {t.remaining}
+                  {t.subscription}: {planName}
                 </button>
               );
             })()}
