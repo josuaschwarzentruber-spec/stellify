@@ -7801,13 +7801,41 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     const empty = trackerStats.total === 0;
     const kickerText = language === 'FR' ? 'Ta pipeline en un coup d\'œil' : language === 'IT' ? 'La tua pipeline a colpo d\'occhio' : language === 'EN' ? 'Your pipeline at a glance' : 'Deine Pipeline auf einen Blick';
     const emptyText = language === 'FR' ? 'Pas encore de candidature. Ajoute la première ci-dessous.' : language === 'IT' ? 'Nessuna candidatura ancora. Aggiungi la prima qui sotto.' : language === 'EN' ? 'No applications yet. Add your first one below.' : 'Noch keine Bewerbung. Trag deine erste unten ein.';
-    const summary = language === 'FR'
-      ? `${trackerStats.total} dans la pipeline · ${trackerStats.interviewRate}% entretiens · ${trackerStats.offerRate}% offres`
-      : language === 'IT'
-      ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% colloqui · ${trackerStats.offerRate}% offerte`
-      : language === 'EN'
-      ? `${trackerStats.total} in pipeline · ${trackerStats.interviewRate}% interview rate · ${trackerStats.offerRate}% offer rate`
-      : `${trackerStats.total} in der Pipeline · ${trackerStats.interviewRate}% Interview-Quote · ${trackerStats.offerRate}% Erfolgsquote`;
+    // Percentages need volume to mean anything — with a handful of entries
+    // they contradict the columns (2 offers imply interviews the Interview
+    // column never shows). Below 6 answered applications we state plain
+    // counts; the rates appear once the sample carries them.
+    const responded = trackerStats.applied + trackerStats.interview + trackerStats.offer + trackerStats.rejected;
+    const summaryParts: string[] = [
+      language === 'FR' ? `${trackerStats.total} dans la pipeline`
+        : language === 'IT' ? `${trackerStats.total} in pipeline`
+        : language === 'EN' ? `${trackerStats.total} in pipeline`
+        : `${trackerStats.total} in der Pipeline`,
+    ];
+    if (responded >= 6) {
+      summaryParts.push(
+        language === 'FR' ? `${trackerStats.interviewRate}% entretiens` : language === 'IT' ? `${trackerStats.interviewRate}% colloqui` : language === 'EN' ? `${trackerStats.interviewRate}% interview rate` : `${trackerStats.interviewRate}% Interview-Quote`,
+        language === 'FR' ? `${trackerStats.offerRate}% offres` : language === 'IT' ? `${trackerStats.offerRate}% offerte` : language === 'EN' ? `${trackerStats.offerRate}% offer rate` : `${trackerStats.offerRate}% Erfolgsquote`,
+      );
+    } else {
+      if (trackerStats.interview > 0) {
+        summaryParts.push(
+          language === 'FR' ? `${trackerStats.interview} entretien${trackerStats.interview > 1 ? 's' : ''}`
+            : language === 'IT' ? `${trackerStats.interview} colloqui${trackerStats.interview === 1 ? 'o' : ''}`
+            : language === 'EN' ? `${trackerStats.interview} interview${trackerStats.interview > 1 ? 's' : ''}`
+            : `${trackerStats.interview} Interview${trackerStats.interview > 1 ? 's' : ''}`,
+        );
+      }
+      if (trackerStats.offer > 0) {
+        summaryParts.push(
+          language === 'FR' ? `${trackerStats.offer} offre${trackerStats.offer > 1 ? 's' : ''} reçue${trackerStats.offer > 1 ? 's' : ''}`
+            : language === 'IT' ? `${trackerStats.offer} offert${trackerStats.offer > 1 ? 'e' : 'a'} ricevut${trackerStats.offer > 1 ? 'e' : 'a'}`
+            : language === 'EN' ? `${trackerStats.offer} offer${trackerStats.offer > 1 ? 's' : ''} received`
+            : `${trackerStats.offer} Angebot${trackerStats.offer > 1 ? 'e' : ''} erhalten`,
+        );
+      }
+    }
+    const summary = summaryParts.join(' · ');
     return (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
