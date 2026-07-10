@@ -3271,10 +3271,22 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (id === 'bewerbungs-gen' || id === 'cv-gen') {
       return (
         <div className="w-full space-y-2.5">
+          <div className="flex items-center gap-1.5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm px-2 py-1.5 min-w-0">
+            <Link2 size={10} className="text-[#9A9A94] shrink-0" />
+            <span className="text-[8.5px] text-[#5C5C58] dark:text-[#9A9A94] truncate font-mono">jobs.ch/stellen/marketing-manager-nestle</span>
+            <span className="ml-auto shrink-0 inline-flex items-center gap-1 text-[7.5px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/12 px-1.5 py-0.5 rounded">
+              <CheckCircle2 size={8} />{language === 'FR' ? 'Importé' : language === 'IT' ? 'Importato' : language === 'EN' ? 'Imported' : 'Importiert'}
+            </span>
+          </div>
           <div className="bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
-            <div className="bg-[#004225] px-3 py-2 flex items-center justify-between">
-              <span className="text-white text-[10px] font-serif font-bold">{previewIdentity.name}</span>
-              <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest">Marketing Manager</span>
+            <div className="bg-[#004225] px-3 py-2 flex items-center justify-between gap-2">
+              <span className="flex items-center gap-2 min-w-0">
+                <span className="w-6 h-6 shrink-0 rounded-full bg-white/15 border border-white/30 flex items-center justify-center" aria-hidden="true">
+                  <UserIcon size={11} className="text-white/85" />
+                </span>
+                <span className="text-white text-[10px] font-serif font-bold truncate">{previewIdentity.name}</span>
+              </span>
+              <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
             </div>
             <div className="p-3 space-y-1.5">
               <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
@@ -3296,7 +3308,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           <div className="flex flex-wrap gap-1.5">
             <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><Clock size={9} />{language === 'FR' ? '60 secondes' : language === 'IT' ? '60 secondi' : language === 'EN' ? '60 seconds' : '60 Sekunden'}</span>
             <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><CheckCircle2 size={9} />{language === 'FR' ? 'Standard suisse' : language === 'IT' ? 'Standard svizzero' : language === 'EN' ? 'Swiss standard' : 'Schweizer Standard'}</span>
-            <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><Sparkles size={9} />{language === 'FR' ? 'Adapté à l\'annonce' : language === 'IT' ? 'Su misura per l\'annuncio' : language === 'EN' ? 'Tailored to the ad' : 'Aufs Inserat zugeschnitten'}</span>
+            <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><FileText size={9} />{language === 'FR' ? 'CV repris automatiquement' : language === 'IT' ? 'CV ripreso automaticamente' : language === 'EN' ? 'CV applied automatically' : 'Lebenslauf automatisch übernommen'}</span>
+            <span className="inline-flex items-center gap-1 text-[8.5px] font-bold text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full"><ImageIcon size={9} />{language === 'FR' ? 'Photo intégrée' : language === 'IT' ? 'Foto inserita' : language === 'EN' ? 'Photo placed' : 'Foto eingefügt'}</span>
           </div>
         </div>
       );
@@ -7780,9 +7793,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             const pct = empty ? 0 : Math.round((c.value / max) * 100);
             return (
               <div key={c.key} className="space-y-1.5 sm:space-y-2 min-w-0">
-                <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-0 sm:gap-2 min-w-0">
-                  <span className="order-2 sm:order-1 text-[8px] sm:text-[9px] font-bold uppercase tracking-wider sm:tracking-widest truncate leading-tight" style={{ color: c.accent }}>{c.label}</span>
-                  <span className="order-1 sm:order-2 text-xl sm:text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
+                {/* Number above its label in every viewport — a right-aligned
+                    number visually attaches to the NEXT column on laptops. */}
+                <div className="flex flex-col gap-0.5 min-w-0">
+                  <span className="text-xl sm:text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-none">{c.value}</span>
+                  <span className="text-[8px] sm:text-[9px] font-bold uppercase tracking-wider sm:tracking-widest truncate leading-tight" style={{ color: c.accent }}>{c.label}</span>
                 </div>
                 <div className="h-1.5 w-full bg-black/[0.04] dark:bg-white/[0.06] overflow-hidden">
                   <motion.div
@@ -9849,9 +9864,33 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </div>
                     <div className="p-5 md:p-6">
                       {tool.id === 'bewerbungs-gen' ? (
+                        <div className="space-y-2.5">
+                          {/* Step 1: the pasted job-ad link, already imported */}
+                          <div className="flex items-center gap-2 bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm px-3 py-2 min-w-0">
+                            <Link2 size={12} className="text-[#9A9A94] shrink-0" />
+                            <span className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] truncate font-mono">jobs.ch/stellen/marketing-manager-nestle</span>
+                            <span className="ml-auto shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/12 px-1.5 py-0.5 rounded">
+                              <CheckCircle2 size={9} />{language === 'FR' ? 'Importé' : language === 'IT' ? 'Importato' : language === 'EN' ? 'Imported' : 'Importiert'}
+                            </span>
+                          </div>
+                          {/* Step 2: CV and photo picked up automatically */}
+                          <div className="flex flex-wrap gap-1.5">
+                            <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full">
+                              <FileText size={10} />{language === 'FR' ? 'CV repris automatiquement' : language === 'IT' ? 'CV ripreso automaticamente' : language === 'EN' ? 'CV applied automatically' : 'Lebenslauf automatisch übernommen'}
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2 py-1 rounded-full">
+                              <ImageIcon size={10} />{language === 'FR' ? 'Photo intégrée' : language === 'IT' ? 'Foto inserita' : language === 'EN' ? 'Photo placed' : 'Foto eingefügt'}
+                            </span>
+                          </div>
+                          {/* Step 3: the finished document */}
                         <div className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
                           <div className="bg-[#004225] px-4 py-3 flex items-center justify-between gap-3">
-                            <span className="text-white text-sm font-serif font-bold truncate">{previewIdentity.name}</span>
+                            <span className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-8 h-8 shrink-0 rounded-full bg-white/15 border border-white/30 flex items-center justify-center" aria-hidden="true">
+                                <UserIcon size={14} className="text-white/85" />
+                              </span>
+                              <span className="text-white text-sm font-serif font-bold truncate">{previewIdentity.name}</span>
+                            </span>
                             <span className="text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
                           </div>
                           <div className="p-4 md:p-5 space-y-2.5">
@@ -9876,6 +9915,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]"><CheckCircle2 size={12} className="text-[#004225] dark:text-[#00A854]" />{language === 'FR' ? 'Prêt' : language === 'IT' ? 'Pronto' : language === 'EN' ? 'Ready' : 'Fertig'}</span>
                             </div>
                           </div>
+                        </div>
                         </div>
                       ) : (
                         <div className="space-y-3">
