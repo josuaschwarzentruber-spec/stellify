@@ -1432,6 +1432,31 @@ function StellifyApp() {
       .map((a) => parseFloat(String(a.salary || '').replace(/[^\d.]/g, '')))
       .filter((n) => !isNaN(n) && n > 0);
     const avgSalary = salaries.length > 0 ? salaries.reduce((a, b) => a + b, 0) / salaries.length : 0;
+    // Actionable extras for the pipeline card: due follow-ups (an explicit
+    // reminder that is due, or an application sitting in "Applied" for 7+
+    // days without movement) and this week's activity.
+    const nowMs = Date.now();
+    const dayMs = 86400000;
+    const dueFollowUps = active
+      .map((a) => {
+        if (a.reminder_at) {
+          const days = Math.floor((nowMs - new Date(a.reminder_at).getTime()) / dayMs);
+          if (days >= 0) return { company: a.company as string, kind: 'reminder' as const, days };
+        }
+        if (a.status === 'Applied') {
+          const ref = new Date(a.updated_at || a.created_at || 0).getTime();
+          const days = ref > 0 ? Math.floor((nowMs - ref) / dayMs) : 0;
+          if (days >= 7) return { company: a.company as string, kind: 'stale' as const, days };
+        }
+        return null;
+      })
+      .filter((x): x is { company: string; kind: 'reminder' | 'stale'; days: number } => x !== null)
+      .sort((x, y) => y.days - x.days)
+      .slice(0, 2);
+    const weekNew = active.filter((a) => {
+      const c = new Date(a.created_at || 0).getTime();
+      return c > 0 && nowMs - c <= 7 * dayMs;
+    }).length;
     return {
       total: active.length,
       inProcess: wishlist + applied + interview,
@@ -1444,6 +1469,8 @@ function StellifyApp() {
       offerRate,
       avgSalary,
       salaryCount: salaries.length,
+      dueFollowUps,
+      weekNew,
     };
   }, [applications]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -7811,9 +7838,34 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             );
           })}
         </div>
+        {/* Due follow-ups: turns the passive overview into a to-do — an
+            explicit reminder that is due, or 7+ days in "Applied" without
+            movement. Max two, stalest first. */}
+        {!empty && trackerStats.dueFollowUps.length > 0 && (
+          <div className="mt-5 space-y-2">
+            {trackerStats.dueFollowUps.map((f, i) => (
+              <div key={i} className="flex items-center gap-2 bg-[#D4A852]/12 border border-[#D4A852]/30 rounded-sm px-3 py-2">
+                <Bell size={12} className="text-[#B8860B] shrink-0" />
+                <p className="text-[11px] font-medium text-[#7A5C10] dark:text-[#D4A852] truncate">
+                  {f.kind === 'reminder'
+                    ? (language === 'FR' ? `Rappel échu: ${f.company}` : language === 'IT' ? `Promemoria scaduto: ${f.company}` : language === 'EN' ? `Reminder due: ${f.company}` : `Erinnerung fällig: ${f.company}`)
+                    : (language === 'FR' ? `Relancer ${f.company} · sans réponse depuis ${f.days} jours` : language === 'IT' ? `Follow-up ${f.company} · senza risposta da ${f.days} giorni` : language === 'EN' ? `Follow up with ${f.company} · no reply for ${f.days} days` : `Nachfassen bei ${f.company} · seit ${f.days} Tagen keine Antwort`)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="mt-6 pt-5 border-t border-black/5 dark:border-white/5 flex flex-wrap items-center justify-between gap-3">
           <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
             {empty ? emptyText : summary}
+            {!empty && trackerStats.weekNew > 0 && (
+              <span className="text-[#004225] dark:text-[#00A854] font-medium">
+                {language === 'FR' ? ` · Cette semaine: ${trackerStats.weekNew} ${trackerStats.weekNew === 1 ? 'nouvelle candidature' : 'nouvelles candidatures'}`
+                  : language === 'IT' ? ` · Questa settimana: ${trackerStats.weekNew} ${trackerStats.weekNew === 1 ? 'nuova candidatura' : 'nuove candidature'}`
+                  : language === 'EN' ? ` · This week: ${trackerStats.weekNew} new ${trackerStats.weekNew === 1 ? 'application' : 'applications'}`
+                  : ` · Diese Woche: ${trackerStats.weekNew} neue ${trackerStats.weekNew === 1 ? 'Bewerbung' : 'Bewerbungen'}`}
+              </span>
+            )}
           </p>
           <button
             onClick={(e) => { e.stopPropagation(); setIsAddingApp(true); }}
