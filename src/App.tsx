@@ -3470,9 +3470,9 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
               </div>
             ))}
           </div>
-          <div className="flex items-center gap-1.5 bg-[#D4A852]/12 border border-[#D4A852]/30 rounded-sm px-2 py-1.5">
-            <Bell size={10} className="text-[#B8860B] shrink-0" />
-            <p className="text-[9px] font-medium text-[#7A5C10] dark:text-[#D4A852]">{language === 'FR' ? 'Relancer: Swisscom · dans 3 jours' : language === 'IT' ? 'Follow-up: Swisscom · tra 3 giorni' : language === 'EN' ? 'Follow up: Swisscom · in 3 days' : 'Nachfassen: Swisscom · in 3 Tagen'}</p>
+          <div className="flex items-center gap-1.5 bg-[#004225]/6 dark:bg-[#00A854]/10 border border-[#004225]/20 dark:border-[#00A854]/25 rounded-sm px-2 py-1.5">
+            <Bell size={10} className="text-[#004225] dark:text-[#00A854] shrink-0" />
+            <p className="text-[9px] font-medium text-[#004225] dark:text-[#00A854]">{language === 'FR' ? 'Relancer: Swisscom · dans 3 jours' : language === 'IT' ? 'Follow-up: Swisscom · tra 3 giorni' : language === 'EN' ? 'Follow up: Swisscom · in 3 days' : 'Nachfassen: Swisscom · in 3 Tagen'}</p>
           </div>
         </div>
       );
@@ -7859,9 +7859,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         {!empty && trackerStats.dueFollowUps.length > 0 && (
           <div className="mt-5 space-y-2">
             {trackerStats.dueFollowUps.map((f, i) => (
-              <div key={i} className="flex items-center gap-2 bg-[#D4A852]/12 border border-[#D4A852]/30 rounded-sm px-3 py-2">
-                <Bell size={12} className="text-[#B8860B] shrink-0" />
-                <p className="text-[11px] font-medium text-[#7A5C10] dark:text-[#D4A852] truncate">
+              <div key={i} className="flex items-center gap-2 bg-[#004225]/6 dark:bg-[#00A854]/10 border border-[#004225]/20 dark:border-[#00A854]/25 rounded-sm px-3 py-2">
+                <Bell size={12} className="text-[#004225] dark:text-[#00A854] shrink-0" />
+                <p className="text-[11px] font-medium text-[#004225] dark:text-[#00A854] truncate">
                   {f.kind === 'reminder'
                     ? (language === 'FR' ? `Rappel échu: ${f.company}` : language === 'IT' ? `Promemoria scaduto: ${f.company}` : language === 'EN' ? `Reminder due: ${f.company}` : `Erinnerung fällig: ${f.company}`)
                     : (language === 'FR' ? `Relancer ${f.company} · sans réponse depuis ${f.days} jours` : language === 'IT' ? `Follow-up ${f.company} · senza risposta da ${f.days} giorni` : language === 'EN' ? `Follow up with ${f.company} · no reply for ${f.days} days` : `Nachfassen bei ${f.company} · seit ${f.days} Tagen keine Antwort`)}
@@ -7882,12 +7882,29 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </span>
             )}
           </p>
-          <button
-            onClick={(e) => { e.stopPropagation(); setIsAddingApp(true); }}
-            className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline shrink-0"
-          >
-            + {t.tracker_add}
-          </button>
+          <div className="flex items-center gap-3 shrink-0">
+            {user && (() => {
+              const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
+              const left = Math.max(0, limit - Math.min(user.toolUses || 0, limit));
+              const planName = (user.role === 'unlimited' || user.role === 'admin') ? 'Karriere+' : user.role === 'pro' ? 'Pro' : 'Gratis';
+              return (
+                <button
+                  onClick={(e) => { e.stopPropagation(); navigate('profile'); }}
+                  title={t.subscription}
+                  className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/6 dark:bg-[#00A854]/10 px-2.5 py-1.5 rounded-full hover:bg-[#004225]/12 dark:hover:bg-[#00A854]/20 transition-colors"
+                >
+                  <Star size={10} />
+                  {planName} · {left} {t.remaining}
+                </button>
+              );
+            })()}
+            <button
+              onClick={(e) => { e.stopPropagation(); setIsAddingApp(true); }}
+              className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline shrink-0"
+            >
+              + {t.tracker_add}
+            </button>
+          </div>
         </div>
       </motion.div>
     );
@@ -10256,9 +10273,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               </div>
                             ))}
                           </div>
-                          <div className="flex items-center gap-2 bg-[#D4A852]/12 border border-[#D4A852]/30 rounded-sm px-3 py-2">
-                            <Bell size={12} className="text-[#B8860B] shrink-0" />
-                            <p className="text-[11px] font-medium text-[#7A5C10] dark:text-[#D4A852]">{language === 'FR' ? 'Relancer: Swisscom · dans 3 jours' : language === 'IT' ? 'Follow-up: Swisscom · tra 3 giorni' : language === 'EN' ? 'Follow up: Swisscom · in 3 days' : 'Nachfassen: Swisscom · in 3 Tagen'}</p>
+                          <div className="flex items-center gap-2 bg-[#004225]/6 dark:bg-[#00A854]/10 border border-[#004225]/20 dark:border-[#00A854]/25 rounded-sm px-3 py-2">
+                            <Bell size={12} className="text-[#004225] dark:text-[#00A854] shrink-0" />
+                            <p className="text-[11px] font-medium text-[#004225] dark:text-[#00A854]">{language === 'FR' ? 'Relancer: Swisscom · dans 3 jours' : language === 'IT' ? 'Follow-up: Swisscom · tra 3 giorni' : language === 'EN' ? 'Follow up: Swisscom · in 3 days' : 'Nachfassen: Swisscom · in 3 Tagen'}</p>
                           </div>
                         </div>
                       )}
