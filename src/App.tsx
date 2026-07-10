@@ -4833,6 +4833,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
       faq_5_a: "Wir unterstützen Deutsch, Englisch, Französisch und Italienisch.",
+      faq_6_q: "Warum Stellify statt einfach ChatGPT?",
+      faq_6_a: "Ein Chat gibt dir Text, den du selbst formatieren, prüfen und zusammenbauen musst. Stellify liefert das fertige Resultat: Du fügst das Stelleninserat per Link ein, dein Lebenslauf und dein Foto werden automatisch übernommen, und in 60 Sekunden hältst du ein versandbereites Dokument im Schweizer Standard in der Hand, als PDF und Word, im Design deiner Wahl. Dazu behält der kostenlose Tracker alle deine Bewerbungen, Fristen und Erinnerungen im Blick. Das ist der Unterschied zwischen einem Werkzeug und einem Textfenster.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Einstellungen",
       nav_logout: "Abmelden",
@@ -5494,6 +5496,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
       faq_5_a: "Nous prenons en charge l'allemand, l'anglais, le français et l'italien.",
+      faq_6_q: "Pourquoi Stellify plutôt que ChatGPT ?",
+      faq_6_a: "Un chat te donne du texte que tu dois formater, vérifier et assembler toi-même. Stellify livre le résultat fini : tu colles le lien de l'annonce, ton CV et ta photo sont repris automatiquement, et en 60 secondes tu tiens un document prêt à envoyer au standard suisse, en PDF et Word, dans le design de ton choix. En plus, le tracker gratuit garde toutes tes candidatures, échéances et rappels sous contrôle. C'est la différence entre un outil et une fenêtre de texte.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Paramètres",
       nav_logout: "Déconnexion",
@@ -6049,6 +6053,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
       faq_5_a: "Supportiamo tedesco, inglese, francese e italiano.",
+      faq_6_q: "Perché Stellify invece di ChatGPT?",
+      faq_6_a: "Una chat ti dà testo che devi formattare, controllare e assemblare da solo. Stellify consegna il risultato finito: incolli il link dell'annuncio, il tuo CV e la tua foto vengono ripresi automaticamente, e in 60 secondi hai un documento pronto per l'invio secondo lo standard svizzero, in PDF e Word, nel design che preferisci. In più il tracker gratuito tiene sotto controllo tutte le candidature, le scadenze e i promemoria. Questa è la differenza tra uno strumento e una finestra di testo.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Impostazioni",
       nav_logout: "Disconnetti",
@@ -6604,6 +6610,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
       faq_5_a: "We support German, English, French, and Italian.",
+      faq_6_q: "Why Stellify instead of just ChatGPT?",
+      faq_6_a: "A chat gives you text you still have to format, check and assemble yourself. Stellify delivers the finished result: paste the job-ad link, your CV and photo are applied automatically, and in 60 seconds you hold a ready-to-send document in Swiss standard, as PDF and Word, in the design of your choice. On top, the free tracker keeps every application, deadline and reminder in view. That is the difference between a tool and a text box.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Settings",
       nav_logout: "Logout",
@@ -7225,6 +7233,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const tools = allTools.filter(tl => ENABLED_TOOL_IDS.has(tl.id));
 
   const faqs = [
+    { q: t.faq_6_q, a: t.faq_6_a },
     { q: t.faq_1_q, a: t.faq_1_a },
     { q: t.faq_2_q, a: t.faq_2_a },
     { q: t.faq_3_q, a: t.faq_3_a },
@@ -8560,7 +8569,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <div className="pt-6 border-t border-white/10">
                       <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
                       <div className="flex flex-wrap gap-2">
-                        {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
+                        {['Präzision', 'Schweizer Markt', 'Massgeschneidert'].map(tag => (
                           <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
                         ))}
                       </div>
@@ -8993,7 +9002,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <div className="pt-6 border-t border-white/10">
                       <p className="text-[10px] text-white/40 uppercase tracking-widest mb-3">{t.stella_context_focus}</p>
                       <div className="flex flex-wrap gap-2">
-                        {['Präzision', 'Schweizer Markt', 'ATS-Optimiert'].map(tag => (
+                        {['Präzision', 'Schweizer Markt', 'Massgeschneidert'].map(tag => (
                           <span key={tag} className="px-2 py-1 bg-white/5 text-[8px] font-bold uppercase tracking-widest border border-white/10">{tag}</span>
                         ))}
                       </div>

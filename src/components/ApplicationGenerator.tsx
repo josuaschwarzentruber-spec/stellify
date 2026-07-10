@@ -114,7 +114,7 @@ const STR: Record<string, Record<string, string>> = {
     badge_new: 'Neu',
     cv_upload_btn: 'Lebenslauf hochladen', cv_uploading: 'Lade …', cv_upload_ok: 'Lebenslauf importiert.',
     photo_title: 'Foto', photo_hint: 'Optional. Quadratisch oder Hochformat, JPG/PNG.', photo_upload: 'Foto hochladen', photo_replace: 'Foto ändern', photo_remove: 'Entfernen',
-    try_example: 'Mit Beispiel ausprobieren', try_example_sub: 'Beispiel-Bewerbung mit realistischen Schweizer Daten, direkt zur Vorschau.',
+    try_example: 'Mit Beispiel ausprobieren', try_example_sub: 'Beispiel-Bewerbung mit realistischen Schweizer Daten und Foto, direkt zur Vorschau.',
   },
   FR: {
     step_design: 'Design', step_data: 'Données', step_preview: 'Aperçu',
@@ -161,7 +161,7 @@ const STR: Record<string, Record<string, string>> = {
     badge_new: 'Nouveau',
     cv_upload_btn: 'Téléverser un CV', cv_uploading: 'Chargement …', cv_upload_ok: 'CV importé.',
     photo_title: 'Photo', photo_hint: 'Optionnel. Carré ou portrait, JPG/PNG.', photo_upload: 'Téléverser une photo', photo_replace: 'Changer la photo', photo_remove: 'Supprimer',
-    try_example: 'Essayer avec un exemple', try_example_sub: 'Candidature exemple avec des données suisses réalistes, directement vers l\'aperçu.',
+    try_example: 'Essayer avec un exemple', try_example_sub: 'Candidature exemple avec données suisses réalistes et photo, directement vers l\'aperçu.',
   },
   IT: {
     step_design: 'Design', step_data: 'Dati', step_preview: 'Anteprima',
@@ -208,7 +208,7 @@ const STR: Record<string, Record<string, string>> = {
     badge_new: 'Nuovo',
     cv_upload_btn: 'Carica CV', cv_uploading: 'Caricamento …', cv_upload_ok: 'CV importato.',
     photo_title: 'Foto', photo_hint: 'Opzionale. Quadrato o verticale, JPG/PNG.', photo_upload: 'Carica foto', photo_replace: 'Cambia foto', photo_remove: 'Rimuovi',
-    try_example: 'Prova con un esempio', try_example_sub: 'Candidatura di esempio con dati svizzeri realistici, direttamente all\'anteprima.',
+    try_example: 'Prova con un esempio', try_example_sub: 'Candidatura di esempio con dati svizzeri realistici e foto, direttamente all\'anteprima.',
   },
   EN: {
     step_design: 'Design', step_data: 'Details', step_preview: 'Preview',
@@ -255,7 +255,7 @@ const STR: Record<string, Record<string, string>> = {
     badge_new: 'New',
     cv_upload_btn: 'Upload CV', cv_uploading: 'Uploading …', cv_upload_ok: 'CV imported.',
     photo_title: 'Photo', photo_hint: 'Optional. Square or portrait, JPG/PNG.', photo_upload: 'Upload photo', photo_replace: 'Replace photo', photo_remove: 'Remove',
-    try_example: 'Try with example', try_example_sub: 'Sample application with realistic Swiss data, straight to the preview.',
+    try_example: 'Try with example', try_example_sub: 'Sample application with realistic Swiss data and photo, straight to the preview.',
   },
 };
 
@@ -594,6 +594,38 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
       and jumps straight to the preview step. Lets visitors and new users
       see what a finished dossier looks like in one click, without typing
       anything. The current design pick is preserved. */
+  // Illustrated sample portrait for the example flow — clearly a drawing,
+  // never a real person, so the preview and the exports show how a photo
+  // sits in every design. Converted to JPEG via canvas because Word/PDF
+  // exports handle raster data URLs much more reliably than SVG.
+  const EXAMPLE_PORTRAIT_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">'
+    + '<rect width="100" height="100" fill="#DCE9E2"/>'
+    + '<path d="M28 40 Q26 78 32 92 L68 92 Q74 78 72 40 Q71 22 50 22 Q29 22 28 40 Z" fill="#5B4630"/>'
+    + '<path d="M22 100 Q24 74 50 74 Q76 74 78 100 Z" fill="#14352A"/>'
+    + '<rect x="44" y="58" width="12" height="14" rx="5" fill="#F4C89C"/>'
+    + '<circle cx="50" cy="44" r="19" fill="#F4C89C"/>'
+    + '<path d="M31 46 Q29 23 50 23 Q71 23 69 46 Q68 34 60 32 Q50 28 40 32 Q32 34 31 46 Z" fill="#5B4630"/>'
+    + '<circle cx="43" cy="45" r="2.1" fill="#2A2622"/><circle cx="57" cy="45" r="2.1" fill="#2A2622"/>'
+    + '<path d="M45 53 Q50 57 55 53" stroke="#2A2622" stroke-width="1.7" stroke-linecap="round" fill="none"/>'
+    + '</svg>';
+  const loadExamplePortrait = (): Promise<string> => new Promise((resolve) => {
+    try {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = 360; c.height = 360;
+          const ctx = c.getContext('2d');
+          if (!ctx) { resolve(''); return; }
+          ctx.drawImage(img, 0, 0, 360, 360);
+          resolve(c.toDataURL('image/jpeg', 0.9));
+        } catch { resolve(''); }
+      };
+      img.onerror = () => resolve('');
+      img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(EXAMPLE_PORTRAIT_SVG);
+    } catch { resolve(''); }
+  });
+
   const loadExample = () => {
     const sample: ApplicationForm = {
       firstName: (form.firstName || profile?.firstName || 'Anna').trim(),
@@ -616,6 +648,13 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
     };
     setForm(sample);
     setStep(2);
+    // Attach the illustrated portrait when the user has no own photo yet —
+    // async so the step switch stays instant.
+    if (!sample.photo) {
+      loadExamplePortrait().then((dataUrl) => {
+        if (dataUrl) setForm(prev => (prev.photo ? prev : { ...prev, photo: dataUrl }));
+      });
+    }
   };
 
   // Prefill the applicant's name + email from the account once, on mount.
