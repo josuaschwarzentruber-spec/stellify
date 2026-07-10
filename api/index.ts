@@ -1897,7 +1897,9 @@ CV: ${String(profile.text).substring(0, 1000)}`;
     res.json({ success: true, roadmap: Array.isArray(roadmap) ? roadmap.slice(0, 3) : [] });
   } catch (error: any) {
     console.error("[ROADMAP ERROR]", error.message);
-    res.status(500).json({ success: false, error: error.message || 'Roadmap-Generierung fehlgeschlagen' });
+    // The client has its own fallback path and only checks `success` — a
+    // 200 keeps this optional feature out of the 5xx error metrics.
+    res.json({ success: false, roadmap: [] });
   }
 });
 
