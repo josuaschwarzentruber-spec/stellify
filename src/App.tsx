@@ -3128,6 +3128,13 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       return;
     }
 
+    // The strategy card IS the tracker — open the real board instead of a
+    // separate AI overlay, so there is exactly one tracker experience.
+    if (toolId === 'tracker') {
+      navigate('tracker');
+      return;
+    }
+
     const tool = tools.find(t => t.id === toolId);
     if (!tool) return;
 
@@ -5163,7 +5170,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         },
         'tracker': { 
           title: 'Bewerbungs-Strategie', 
-          desc: 'Erstelle einen massgeschneiderten Schlachtplan für deine nächste Bewerbung.', 
+          desc: 'Dein Bewerbungs-Tracker: alle Bewerbungen in einer Pipeline, mit Erinnerungen und Statistiken.', 
           input_label: 'Jobtitel / Firma', 
           input_placeholder: 'z.B. Senior Projektleiter bei Roche',
           tutorial: 'Beispiel: Schlachtplan für UBS. Schritt 1: Networking via LinkedIn. Schritt 2: Lebenslauf-Anpassung auf "Wealth Management". Schritt 3: Vorbereitung auf Verhaltensfragen.'
@@ -5776,7 +5783,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'zeugnis': { title: 'Décodeur de certificat Premium', desc: 'Décode le code secret des certificats de travail suisses. Identifie les messages négatifs cachés et évalue votre position sur le marché.', input_label: 'Texte du certificat', input_placeholder: 'Copiez le texte ici...' },
         'skill-gap': { title: 'Analyse Skill-Gap', desc: 'Comparez votre profil avec le job de vos rêves.', input_label: 'Poste cible', input_placeholder: 'ex: Senior Data Scientist' },
         'cv-analysis': { title: 'Analyse CV', desc: 'Analyse approfondie de votre CV pour les mots-clés, l\'adéquation au secteur et le potentiel d\'amélioration.' },
-        'tracker': { title: 'Stratégie de candidature', desc: 'Créez un plan de bataille sur mesure pour votre prochaine candidature.', input_label: 'Titre du poste / Entreprise', input_placeholder: 'ex. Chef de projet senior chez Roche' },
+        'tracker': { title: 'Stratégie de candidature', desc: 'Ton suivi de candidatures : toutes tes candidatures dans un pipeline, avec rappels et statistiques.', input_label: 'Titre du poste / Entreprise', input_placeholder: 'ex. Chef de projet senior chez Roche' },
         'matching': { title: 'Job Matching', desc: 'L\'IA trouve vos 5 profils de postes correspondants.' },
         'interview': { title: 'Coach d\'entretien', desc: 'L\'IA simule 5 questions réelles et évalue vos réponses.', input_label: 'Poste pour l\'entretien', input_placeholder: 'ex: Responsable Marketing' },
         'berufseinstieg': { title: 'Guide premier emploi', desc: 'Fraîchement diplômé ? Nous vous aidons à trouver votre premier "vrai" job.', input_label: 'Quel diplôme avez-vous ?', input_placeholder: 'ex: CFC Informatique...' },
@@ -6331,7 +6338,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'zeugnis': { title: 'Decodificatore certificati Premium', desc: 'Decodifica il codice segreto dei certificati di lavoro svizzeri. Identifica messaggi negativi nascosti e valuta la tua posizione sul mercato.', input_label: 'Testo del certificato', input_placeholder: 'Copia il testo qui...' },
         'skill-gap': { title: 'Analisi Skill-Gap', desc: 'Confronta il tuo profilo con il lavoro dei tuoi sogni.', input_label: 'Posizione target', input_placeholder: 'es. Senior Data Scientist' },
         'cv-analysis': { title: 'Analisi CV', desc: 'Analisi approfondita del tuo CV per parole chiave, adattamento al settore e potenziale di miglioramento.' },
-        'tracker': { title: 'Strategia di candidatura', desc: 'Crea un piano di battaglia su misura per la tua prossima candidatura.', input_label: 'Titolo del lavoro / Azienda', input_placeholder: 'es. Senior Project Manager presso Roche' },
+        'tracker': { title: 'Strategia di candidatura', desc: 'Il tuo tracker: tutte le candidature in una pipeline, con promemoria e statistiche.', input_label: 'Titolo del lavoro / Azienda', input_placeholder: 'es. Senior Project Manager presso Roche' },
         'matching': { title: 'Job Matching', desc: 'L\'IA trova i tuoi 5 profili lavorativi corrispondenti.' },
         'interview': { title: 'Coach per colloqui', desc: 'L\'IA simula 5 domande reali e valuta le tue risposte.', input_label: 'Posizione per il colloquio', input_placeholder: 'es. Responsabile Marketing' },
         'berufseinstieg': { title: 'Guida primo lavoro', desc: 'Appena diplomato? Ti aiutiamo a trovare il tuo primo "vero" lavoro.', input_label: 'Cosa hai completato?', input_placeholder: 'es. AFC Informatica...' },
@@ -6886,7 +6893,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         'zeugnis': { title: 'Premium Certificate Decoder', desc: 'Decodes the secret code of Swiss work certificates. Identifies hidden negative messages and evaluates your market position.', input_label: 'Certificate Text', input_placeholder: 'Paste the text here...' },
         'skill-gap': { title: 'Skill-Gap Analysis', desc: 'Compare your profile with your dream job and find out what you are still missing.', input_label: 'Target Position', input_placeholder: 'e.g. Senior Data Scientist' },
         'cv-analysis': { title: 'CV Analysis', desc: 'Deep analysis of your CV for keywords, industry fit, and improvement potential.' },
-        'tracker': { title: 'Application Strategy', desc: 'Create a tailored battle plan for your next application.', input_label: 'Job Title / Company', input_placeholder: 'e.g. Senior Project Manager at Roche' },
+        'tracker': { title: 'Application Strategy', desc: 'Your application tracker: every application in one pipeline, with reminders and statistics.', input_label: 'Job Title / Company', input_placeholder: 'e.g. Senior Project Manager at Roche' },
         'matching': { title: 'Job Matching', desc: 'AI finds your top 5 matching job profiles with fit score.' },
         'interview': { title: 'Interview Coach', desc: 'AI simulates 5 real questions, evaluates answers, gives a grade 0-100.', input_label: 'Position for the interview', input_placeholder: 'e.g. Marketing Manager' },
         'berufseinstieg': { title: 'Career Entry Guide', desc: 'Fresh out of apprenticeship or studies? We show you how to find your first "real" job.', input_label: 'What did you complete?', input_placeholder: 'e.g. EFZ IT...' },
