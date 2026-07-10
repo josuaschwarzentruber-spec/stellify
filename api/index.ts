@@ -42,6 +42,35 @@ function getAdminServices() {
   };
 }
 
+// Save a file to Firebase Storage, trying every plausible bucket name: the
+// configured one plus both Firebase naming schemes (newer projects get
+// <id>.firebasestorage.app, older ones <id>.appspot.com). Remembers the first
+// bucket that works so later uploads skip the probing.
+let resolvedStorageBucket: string | undefined;
+async function saveToStorage(adminStorage: ReturnType<typeof getStorage>, path: string, buffer: Buffer, contentType: string) {
+  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const candidates = [...new Set([
+    resolvedStorageBucket,
+    process.env.FIREBASE_STORAGE_BUCKET,
+    projectId ? `${projectId}.firebasestorage.app` : undefined,
+    projectId ? `${projectId}.appspot.com` : undefined,
+  ].filter(Boolean))] as string[];
+  let lastErr: any = null;
+  for (const name of candidates) {
+    try {
+      const file = adminStorage.bucket(name).file(path);
+      await file.save(buffer, { contentType });
+      const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2100' });
+      resolvedStorageBucket = name;
+      return { url, bucket: name };
+    } catch (err: any) {
+      lastErr = err;
+      if (!/bucket does not exist|notFound|404/i.test(err?.message || '')) throw err;
+    }
+  }
+  throw lastErr || new Error('Kein Storage-Bucket gefunden');
+}
+
 // ── Stripe (lazy) ────────────────────────────────────────────────────────────
 let stripe: Stripe | null = null;
 const getStripe = () => {
@@ -1883,18 +1912,14 @@ app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
     const buffer = Buffer.from(base64, 'base64');
     const safeName = `cv-files/${uid}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-    const bucket = adminStorage.bucket();
-    const file = bucket.file(safeName);
-    await file.save(buffer, { contentType: mimeType || 'application/octet-stream' });
-
-    const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2100' });
+    const { url } = await saveToStorage(adminStorage, safeName, buffer, mimeType || 'application/octet-stream');
 
     await adminDb.collection('users').doc(uid).update({ cv_file_path: safeName }).catch(console.error);
 
     res.json({ success: true, path: safeName, url });
   } catch (error: any) {
     console.error("[CV UPLOAD ERROR]", error);
-    res.status(500).json({ error: error.message || 'Upload fehlgeschlagen' });
+    res.status(500).json({ error: 'Der Upload ist im Moment nicht möglich. Bitte versuch es später erneut.' });
   }
 });
 
@@ -1962,15 +1987,12 @@ app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
     const buffer = Buffer.from(base64, 'base64');
     const ext = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
     const path = `avatars/${uid}/avatar_${Date.now()}.${ext}`;
-    const bucket = adminStorage.bucket();
-    const file = bucket.file(path);
-    await file.save(buffer, { contentType: mimeType });
-    const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2100' });
-    await adminDb.collection('users').doc(uid).update({ avatar_url: url, avatar_path: path });
+    const { url, bucket } = await saveToStorage(adminStorage, path, buffer, mimeType);
+    await adminDb.collection('users').doc(uid).update({ avatar_url: url, avatar_path: path, avatar_bucket: bucket });
     res.json({ success: true, url });
   } catch (error: any) {
     console.error("[AVATAR UPLOAD ERROR]", error);
-    res.status(500).json({ error: error.message || 'Avatar-Upload fehlgeschlagen' });
+    res.status(500).json({ error: 'Der Upload ist im Moment nicht möglich. Bitte versuch es später erneut.' });
   }
 });
 
@@ -1980,17 +2002,23 @@ app.delete("/api/upload-avatar", requireAuth, async (req, res) => {
     const { adminDb, adminStorage } = getAdminServices();
     const snap = await adminDb.collection('users').doc(uid).get();
     const path = snap.data()?.avatar_path as string | undefined;
+    const bucketName = snap.data()?.avatar_bucket as string | undefined;
     if (path) {
-      await adminStorage.bucket().file(path).delete().catch(() => {});
+      try {
+        const name = bucketName || resolvedStorageBucket || process.env.FIREBASE_STORAGE_BUCKET;
+        const bucket = name ? adminStorage.bucket(name) : adminStorage.bucket();
+        await bucket.file(path).delete();
+      } catch { /* stale or missing file — removing the reference is enough */ }
     }
     await adminDb.collection('users').doc(uid).update({
       avatar_url: FieldValue.delete(),
       avatar_path: FieldValue.delete(),
+      avatar_bucket: FieldValue.delete(),
     });
     res.json({ success: true });
   } catch (error: any) {
     console.error("[AVATAR DELETE ERROR]", error);
-    res.status(500).json({ error: error.message || 'Avatar konnte nicht entfernt werden' });
+    res.status(500).json({ error: 'Das Bild konnte nicht entfernt werden. Bitte versuch es später erneut.' });
   }
 });
 
