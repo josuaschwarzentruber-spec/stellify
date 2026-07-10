@@ -1511,6 +1511,10 @@ function StellifyApp() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [avatarHover, setAvatarHover] = useState<string | null>(null);
+  // Starter checklist on the dashboard — dismissed state survives reloads.
+  const [starterDismissed, setStarterDismissed] = useState<boolean>(() => {
+    try { return localStorage.getItem('stellify_starter_dismissed') === '1'; } catch { return false; }
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber'>('dashboard');
@@ -8305,6 +8309,75 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </p>
                   <DesktopTip language={language} className="mt-5" />
                 </header>
+
+                {/* Starter checklist — walks brand-new users through the
+                    three steps that make Stellify click. Checks itself off
+                    from real state and disappears once everything is done
+                    (or when dismissed). */}
+                {!starterDismissed && (() => {
+                  const steps = [
+                    {
+                      done: !!cvContext,
+                      label: language === 'FR' ? 'Télécharge ton CV' : language === 'IT' ? 'Carica il tuo CV' : language === 'EN' ? 'Upload your CV' : 'Lade deinen Lebenslauf hoch',
+                      hint: language === 'FR' ? 'Stella l\'utilise pour chaque candidature' : language === 'IT' ? 'Stella lo usa per ogni candidatura' : language === 'EN' ? 'Stella uses it for every application' : 'Stella nutzt ihn für jede Bewerbung',
+                      action: () => fileInputRef.current?.click(),
+                    },
+                    {
+                      done: (user.toolUses || 0) > 0 || (user.freeGenerationsUsed || 0) > 0,
+                      label: language === 'FR' ? 'Crée ta première candidature' : language === 'IT' ? 'Crea la tua prima candidatura' : language === 'EN' ? 'Create your first application' : 'Erstelle deine erste Bewerbung',
+                      hint: language === 'FR' ? '3 essais gratuits, 60 secondes' : language === 'IT' ? '3 prove gratuite, 60 secondi' : language === 'EN' ? '3 free tries, 60 seconds' : '3 Gratis-Versuche, 60 Sekunden',
+                      action: () => handleToolClick('bewerbungs-gen'),
+                    },
+                    {
+                      done: applications.length > 0,
+                      label: language === 'FR' ? 'Note ta candidature dans le tracker' : language === 'IT' ? 'Registra la candidatura nel tracker' : language === 'EN' ? 'Log the application in the tracker' : 'Erfasse die Bewerbung im Tracker',
+                      hint: language === 'FR' ? 'Gratuit, avec rappels de relance' : language === 'IT' ? 'Gratis, con promemoria' : language === 'EN' ? 'Free, with follow-up reminders' : 'Gratis, mit Nachfass-Erinnerungen',
+                      action: () => navigate('tracker'),
+                    },
+                  ];
+                  const doneCount = steps.filter(s => s.done).length;
+                  if (doneCount === steps.length) return null;
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5"
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854]">
+                          {language === 'FR' ? 'Premiers pas' : language === 'IT' ? 'Primi passi' : language === 'EN' ? 'Getting started' : 'Erste Schritte'}
+                          <span className="ml-2 text-[#9A9A94]">{doneCount} / {steps.length}</span>
+                        </p>
+                        <button
+                          onClick={() => { setStarterDismissed(true); try { localStorage.setItem('stellify_starter_dismissed', '1'); } catch { /* ignore */ } }}
+                          title={language === 'FR' ? 'Masquer' : language === 'IT' ? 'Nascondi' : language === 'EN' ? 'Hide' : 'Ausblenden'}
+                          className="p-1.5 text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                      <div className="space-y-2.5">
+                        {steps.map((s, i) => (
+                          <button
+                            key={i}
+                            onClick={s.done ? undefined : s.action}
+                            disabled={s.done}
+                            className={`w-full flex items-center gap-3 p-3 border text-left transition-all ${s.done ? 'border-black/5 dark:border-white/5 opacity-60' : 'border-[#004225]/15 dark:border-[#00A854]/25 hover:border-[#004225]/40 dark:hover:border-[#00A854]/50 hover:bg-[#004225]/[0.03] dark:hover:bg-[#00A854]/[0.06] cursor-pointer'}`}
+                          >
+                            <span className={`shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${s.done ? 'bg-[#004225] dark:bg-[#00A854] text-white' : 'border-2 border-[#004225]/30 dark:border-[#00A854]/40 text-[#004225] dark:text-[#00A854] text-[10px] font-bold'}`}>
+                              {s.done ? <CheckCircle2 size={14} /> : i + 1}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className={`block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] ${s.done ? 'line-through decoration-[#004225]/40' : ''}`}>{s.label}</span>
+                              <span className="block text-[11px] text-[#9A9A94] font-light">{s.hint}</span>
+                            </span>
+                            {!s.done && <ArrowRight size={14} className="shrink-0 text-[#004225] dark:text-[#00A854]" />}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  );
+                })()}
 
                 {/* Quick access: the two tools, front and centre. The
                     dashboard's job is orientation — open a tool in one
