@@ -3308,9 +3308,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           <div className="bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
             <div className="bg-[#004225] px-3 py-2 flex items-center justify-between gap-2">
               <span className="flex items-center gap-2 min-w-0">
-                <span className="w-6 h-6 shrink-0 rounded-full bg-white/15 border border-white/30 flex items-center justify-center" aria-hidden="true">
-                  <UserIcon size={11} className="text-white/85" />
-                </span>
+                <PresetAvatar id={previewAvatarId} className="w-6 h-6 shrink-0 rounded-full border border-white/40" />
                 <span className="text-white text-[10px] font-serif font-bold truncate">{previewIdentity.name}</span>
               </span>
               <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
@@ -7266,6 +7264,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     const emailMask = email.length > 26 ? email.slice(0, 23) + '…' : email;
     return { name: fullName, emailMask };
   })();
+  // Illustrated portrait for the example documents: the user's own avatar if
+  // it is one of the face presets, otherwise a fixed sample face. Never a
+  // real photo, always instantly recognisable as an illustration.
+  const previewAvatarId = AVATAR_PRESETS.some(p => p.id === user?.avatarId) ? (user!.avatarId as string) : 'aria';
   const isToolLocked = activeTool ? ((activeTool.type === 'pro' && (!user?.role || user.role === 'client')) ||
                        (activeTool.type === 'ultimate' && (!user?.role || user.role === 'client' || user.role === 'pro'))) : false;
 
@@ -9938,9 +9940,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <div className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm shadow-sm overflow-hidden">
                           <div className="bg-[#004225] px-4 py-3 flex items-center justify-between gap-3">
                             <span className="flex items-center gap-2.5 min-w-0">
-                              <span className="w-8 h-8 shrink-0 rounded-full bg-white/15 border border-white/30 flex items-center justify-center" aria-hidden="true">
-                                <UserIcon size={14} className="text-white/85" />
-                              </span>
+                              <PresetAvatar id={previewAvatarId} className="w-8 h-8 shrink-0 rounded-full border border-white/40" />
                               <span className="text-white text-sm font-serif font-bold truncate">{previewIdentity.name}</span>
                             </span>
                             <span className="text-[#6FCF97] text-[10px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
@@ -11541,7 +11541,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 24, scale: 0.98 }}
                         onClick={(e) => e.stopPropagation()}
-                        className="bg-[#FDFCFB] dark:bg-[#1A1A18] w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl border border-black/10 dark:border-white/10 rounded-xl"
+                        className="bg-[#FDFCFB] dark:bg-[#1A1A18] w-full max-w-2xl max-h-[92dvh] overflow-y-auto custom-scrollbar shadow-2xl border border-black/10 dark:border-white/10 rounded-xl"
                       >
                         <div className="p-5 border-b border-black/8 dark:border-white/8 flex items-center justify-between sticky top-0 bg-[#FDFCFB] dark:bg-[#1A1A18] z-10">
                           <div className="flex items-center gap-2.5">
@@ -12555,12 +12555,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- GENERATED APP MODAL --- */}
       <AnimatePresence>
         {generatedApp && (
-          <div className="fixed inset-0 z-[300] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-            <motion.div 
+          <div className="fixed inset-0 z-[300] flex items-center justify-center p-3 sm:p-6 bg-black/40 backdrop-blur-sm">
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-3xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
+              className="bg-white w-full max-w-3xl max-h-[88dvh] overflow-hidden flex flex-col shadow-2xl"
             >
               <div className="p-6 border-b border-black/8 flex items-center justify-between gap-4 bg-[#FDFCFB]">
                 <div className="flex items-center gap-4 min-w-0">
@@ -13018,12 +13018,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- SETTINGS MODAL --- */}
       <AnimatePresence>
         {isSettingsOpen && (
-          <div className="fixed inset-0 z-[400] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm">
-            <motion.div 
+          <div className="fixed inset-0 z-[400] flex items-center justify-center p-3 sm:p-6 bg-black/40 backdrop-blur-sm">
+            <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white w-full max-w-2xl max-h-[90vh] shadow-2xl overflow-hidden flex flex-col"
+              className="bg-white w-full max-w-2xl max-h-[92dvh] shadow-2xl overflow-hidden flex flex-col"
             >
               <div className="p-6 border-b border-black/5 flex items-center justify-between bg-[#FDFCFB]">
                 <div className="flex items-center gap-4">
@@ -13036,7 +13036,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <X size={20} />
                 </button>
               </div>
-              <div className="p-8 space-y-8 overflow-y-auto">
+              <div className="p-5 sm:p-8 space-y-8 overflow-y-auto flex-1 min-h-0 overscroll-contain">
                 <section className="space-y-4">
                   <h4 className="text-xs font-bold uppercase tracking-widest text-[#004225] border-b border-black/5 pb-2">{t.profile}</h4>
 

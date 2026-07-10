@@ -1582,6 +1582,24 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
     } catch (e: any) {
       console.error('[DELETE ACCOUNT] applications cleanup failed:', e.message);
     }
+    // Uploaded files (CV, legacy avatars) are erased too — both for the
+    // right to erasure and so deleted accounts never leave storage behind.
+    try {
+      const { adminStorage } = getAdminServices();
+      const projectId = process.env.FIREBASE_PROJECT_ID;
+      const buckets = [...new Set([
+        process.env.FIREBASE_STORAGE_BUCKET,
+        projectId ? `${projectId}.firebasestorage.app` : undefined,
+        projectId ? `${projectId}.appspot.com` : undefined,
+      ].filter(Boolean))] as string[];
+      for (const name of buckets) {
+        for (const prefix of [`cv-files/${uid}/`, `avatars/${uid}/`]) {
+          await adminStorage.bucket(name).deleteFiles({ prefix }).catch(() => {});
+        }
+      }
+    } catch (e: any) {
+      console.error('[DELETE ACCOUNT] storage cleanup failed:', e.message);
+    }
     // Confirmation e-mail BEFORE the auth user is gone (we need the address).
     // Sent best-effort; a mail failure must never block the deletion.
     try {
@@ -1904,123 +1922,52 @@ CV: ${String(profile.text).substring(0, 1000)}`;
 });
 
 // ── CV File Storage (Firebase Storage) ───────────────────────────────────────
-app.post("/api/upload-cv", aiLimiter, requireAuth, async (req, res) => {
+// Tight upload limiter: CV changes are rare, so 10 per 15 minutes is plenty
+// for humans and useless for storage-abuse scripts.
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.post("/api/upload-cv", uploadLimiter, requireAuth, async (req, res) => {
   const { base64, fileName, mimeType } = req.body;
   const uid = (req as any).uid;
   if (!base64 || !fileName) return res.status(400).json({ error: "base64 und fileName erforderlich" });
+  // Only document types a CV can be — anything else is refused.
+  const allowed = new Set([
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain',
+  ]);
+  if (mimeType && !allowed.has(String(mimeType))) {
+    return res.status(400).json({ error: 'Nur PDF, Word oder Text' });
+  }
+  if ((base64.length * 3) / 4 > 8 * 1024 * 1024) {
+    return res.status(413).json({ error: 'Datei ist grösser als 8 MB' });
+  }
 
   try {
     const { adminDb, adminStorage } = getAdminServices();
     const buffer = Buffer.from(base64, 'base64');
     const safeName = `cv-files/${uid}/${Date.now()}_${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-    const { url } = await saveToStorage(adminStorage, safeName, buffer, mimeType || 'application/octet-stream');
+    // One CV per user: remember the old path, then replace it. Without this
+    // every upload would pile another file onto storage forever.
+    const prevPath = ((await adminDb.collection('users').doc(uid).get()).data() || {}).cv_file_path as string | undefined;
+
+    const { url, bucket } = await saveToStorage(adminStorage, safeName, buffer, mimeType || 'application/octet-stream');
 
     await adminDb.collection('users').doc(uid).update({ cv_file_path: safeName }).catch(console.error);
+    if (prevPath && prevPath !== safeName) {
+      adminStorage.bucket(bucket).file(prevPath).delete().catch(() => {});
+    }
 
     res.json({ success: true, path: safeName, url });
   } catch (error: any) {
     console.error("[CV UPLOAD ERROR]", error);
     res.status(500).json({ error: 'Der Upload ist im Moment nicht möglich. Bitte versuch es später erneut.' });
-  }
-});
-
-// ── Avatar upload with Gemini moderation ─────────────────────────────────────
-// Two-step: ask Gemini (multimodal) to flag inappropriate content, then store
-// the image in Firebase Storage under avatars/<uid>/avatar.<ext> and save the
-// signed URL on the user document. We err on the side of rejecting borderline
-// content — this is a career platform, not a social network.
-app.post("/api/upload-avatar", aiLimiter, requireAuth, async (req, res) => {
-  const { base64, mimeType } = req.body as { base64?: string; mimeType?: string };
-  const uid = (req as any).uid;
-  // Gemini is only used for image moderation. In DeepSeek-only setups (no
-  // GEMINI_API_KEY) the upload still works — moderation is simply skipped,
-  // since DeepSeek has no vision capability.
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!base64) return res.status(400).json({ error: "base64 fehlt" });
-  if (!mimeType || !/^image\/(jpe?g|png|webp)$/.test(mimeType)) {
-    return res.status(400).json({ error: "Nur JPG, PNG oder WEBP" });
-  }
-
-  // Size cap: 5 MB raw (base64 inflates ~33%).
-  const approxBytes = (base64.length * 3) / 4;
-  if (approxBytes > 5 * 1024 * 1024) {
-    return res.status(413).json({ error: "Bild ist grösser als 5 MB" });
-  }
-
-  try {
-    // Moderation step — wrapped on its own so a Gemini API/infra failure
-    // (403/503/network) does NOT block the upload. Only an explicit
-    // {ok:false} content verdict rejects the image. This keeps the feature
-    // usable even if the moderation model is temporarily unreachable; the
-    // check re-engages automatically once Gemini responds again.
-    if (apiKey) try {
-      const ai = new GoogleGenAI({ apiKey });
-      const moderation = await geminiWithRetry((mdl) =>
-        ai.models.generateContent({
-          model: mdl,
-          contents: [{
-            role: 'user',
-            parts: [
-              { inlineData: { mimeType, data: base64 } },
-              { text: 'Du bist ein Inhaltsmoderator für eine seriöse Schweizer Karriere-Plattform. Bewerte ob dieses Bild als Profilfoto erlaubt ist. NICHT erlaubt: Nacktheit, sexueller Inhalt, Gewalt, Waffen, Drogen, Hass-Symbole, beleidigende Gesten, Logos politischer Bewegungen, Markenlogos im Vordergrund, sowie Bilder anderer (echter) Personen die offensichtlich nicht der Profilinhaber sein können (z.B. Prominente, Memes). Erlaubt: neutrale Portraits, Personen in Berufskleidung, Outdoor-Portraits, Avatar-Illustrationen. Antworte AUSSCHLIESSLICH mit kompaktem JSON: {"ok": true|false, "reason": "kurzer Grund auf Deutsch"}.' }
-            ]
-          }],
-          config: { temperature: 0, maxOutputTokens: 120 }
-        })
-      , 2, PRO_MODEL);
-
-      const raw = (moderation.text || '').trim();
-      const jsonMatch = raw.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const verdict = JSON.parse(jsonMatch[0]) as { ok?: boolean; reason?: string };
-        if (verdict.ok === false) {
-          return res.status(422).json({ error: verdict.reason || 'Bild abgelehnt' });
-        }
-      } else {
-        console.warn('[AVATAR MOD] no JSON in response, allowing:', raw.slice(0, 120));
-      }
-    } catch (modErr: any) {
-      // API error, not a content rejection — log and proceed with the upload.
-      console.warn('[AVATAR MOD] moderation unavailable, allowing upload:', (modErr?.message || '').slice(0, 160));
-    }
-
-    const { adminDb, adminStorage } = getAdminServices();
-    const buffer = Buffer.from(base64, 'base64');
-    const ext = mimeType === 'image/png' ? 'png' : mimeType === 'image/webp' ? 'webp' : 'jpg';
-    const path = `avatars/${uid}/avatar_${Date.now()}.${ext}`;
-    const { url, bucket } = await saveToStorage(adminStorage, path, buffer, mimeType);
-    await adminDb.collection('users').doc(uid).update({ avatar_url: url, avatar_path: path, avatar_bucket: bucket });
-    res.json({ success: true, url });
-  } catch (error: any) {
-    console.error("[AVATAR UPLOAD ERROR]", error);
-    res.status(500).json({ error: 'Der Upload ist im Moment nicht möglich. Bitte versuch es später erneut.' });
-  }
-});
-
-app.delete("/api/upload-avatar", requireAuth, async (req, res) => {
-  const uid = (req as any).uid;
-  try {
-    const { adminDb, adminStorage } = getAdminServices();
-    const snap = await adminDb.collection('users').doc(uid).get();
-    const path = snap.data()?.avatar_path as string | undefined;
-    const bucketName = snap.data()?.avatar_bucket as string | undefined;
-    if (path) {
-      try {
-        const name = bucketName || resolvedStorageBucket || process.env.FIREBASE_STORAGE_BUCKET;
-        const bucket = name ? adminStorage.bucket(name) : adminStorage.bucket();
-        await bucket.file(path).delete();
-      } catch { /* stale or missing file — removing the reference is enough */ }
-    }
-    await adminDb.collection('users').doc(uid).update({
-      avatar_url: FieldValue.delete(),
-      avatar_path: FieldValue.delete(),
-      avatar_bucket: FieldValue.delete(),
-    });
-    res.json({ success: true });
-  } catch (error: any) {
-    console.error("[AVATAR DELETE ERROR]", error);
-    res.status(500).json({ error: 'Das Bild konnte nicht entfernt werden. Bitte versuch es später erneut.' });
   }
 });
 
