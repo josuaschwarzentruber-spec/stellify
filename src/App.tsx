@@ -10428,7 +10428,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="p-7 sm:p-9 bg-[#F4F3F0] dark:bg-[#22221F] border border-black/5 dark:border-white/5">
               <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#9A9A94] mb-1">ChatGPT · Claude · Gemini</p>
               <p className="text-xl font-serif text-[#5C5C58] dark:text-[#9A9A94] mb-6">
-                {language === 'FR' ? 'Tout reste à ta charge' : language === 'IT' ? 'Tutto resta a carico tuo' : language === 'EN' ? 'Everything stays on you' : 'Alles bleibt an dir hängen'}
+                {language === 'FR' ? 'De bons textes. Ensuite, ton travail commence.' : language === 'IT' ? 'Buoni testi. Poi inizia il tuo lavoro.' : language === 'EN' ? 'Good text. Then your work begins.' : 'Gute Texte. Danach beginnt deine Arbeit.'}
               </p>
               <ul className="space-y-3.5">
                 {(language === 'FR' ? [
@@ -10457,7 +10457,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   'Keine Übersicht: Bewerbungen, Fristen und Nachfassen bleiben im Kopf',
                 ]).map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
-                    <X size={15} className="shrink-0 mt-0.5 text-[#B91C1C]/70" />
+                    <span className="shrink-0 mt-[9px] w-3 h-[1.5px] bg-[#9A9A94]/70 rounded-full" aria-hidden="true" />
                     {item}
                   </li>
                 ))}
@@ -10512,6 +10512,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </button>
             </div>
           </div>
+          <p className="mt-8 text-center text-sm text-[#9A9A94] font-light max-w-2xl mx-auto">
+            {language === 'FR' ? 'D\'ailleurs : Stellify utilise elle-même l\'IA la plus moderne. La différence, c\'est tout ce qu\'il y a autour.'
+              : language === 'IT' ? 'Tra l\'altro: anche Stellify usa l\'IA più moderna. La differenza è tutto ciò che c\'è intorno.'
+              : language === 'EN' ? 'By the way: Stellify runs on state-of-the-art AI itself. The difference is everything around it.'
+              : 'Übrigens: Stellify nutzt selbst modernste KI. Der Unterschied ist alles rundherum.'}
+          </p>
         </div>
       </section>
       )}
@@ -11153,6 +11159,75 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+      )}
+      {/* --- RATGEBER TEASER --- Free Swiss career guides, surfaced on the
+           landing page so the knowledge section actually gets found. */}
+      {(!user || activeView === 'dashboard') && (
+      <section className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
+            <div>
+              <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">
+                {language === 'FR' ? 'Guide gratuit' : language === 'IT' ? 'Guida gratuita' : language === 'EN' ? 'Free guides' : 'Gratis Ratgeber'}
+              </p>
+              <h2 className="text-3xl lg:text-4xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
+                {language === 'FR' ? 'Le savoir-faire suisse de la candidature' : language === 'IT' ? 'Il know-how svizzero della candidatura' : language === 'EN' ? 'Swiss application know-how' : 'Schweizer Bewerbungswissen'}
+              </h2>
+              <p className="mt-3 text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">
+                {language === 'FR' ? 'Quatre guides détaillés, écrits pour le marché suisse. Sans inscription, sans frais.'
+                  : language === 'IT' ? 'Quattro guide dettagliate, scritte per il mercato svizzero. Senza registrazione, gratis.'
+                  : language === 'EN' ? 'Four in-depth guides, written for the Swiss market. No sign-up, no cost.'
+                  : 'Vier ausführliche Leitfäden, geschrieben für den Schweizer Markt. Ohne Anmeldung, ohne Kosten.'}
+              </p>
+            </div>
+            <button
+              onClick={() => navigate('ratgeber')}
+              className="shrink-0 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:gap-3 transition-all"
+            >
+              {language === 'FR' ? 'Tous les guides' : language === 'IT' ? 'Tutte le guide' : language === 'EN' ? 'All guides' : 'Alle Ratgeber'}
+              <ArrowRight size={14} />
+            </button>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {(language === 'FR' ? [
+              { icon: <FileText size={18} />, title: 'Postuler en Suisse : le guide complet' },
+              { icon: <Layout size={18} />, title: 'CV au standard suisse : structure, ordre, photo' },
+              { icon: <Edit2 size={18} />, title: 'Lettre de motivation : structure et formulations' },
+              { icon: <Coins size={18} />, title: 'Négocier son salaire en Suisse' },
+            ] : language === 'IT' ? [
+              { icon: <FileText size={18} />, title: 'Candidarsi in Svizzera: la guida completa' },
+              { icon: <Layout size={18} />, title: 'CV secondo lo standard svizzero' },
+              { icon: <Edit2 size={18} />, title: 'Lettera di motivazione: struttura e formulazioni' },
+              { icon: <Coins size={18} />, title: 'Negoziare lo stipendio in Svizzera' },
+            ] : language === 'EN' ? [
+              { icon: <FileText size={18} />, title: 'Applying in Switzerland: the complete guide' },
+              { icon: <Layout size={18} />, title: 'CV to the Swiss standard: structure and photo' },
+              { icon: <Edit2 size={18} />, title: 'Cover letter: structure and wording' },
+              { icon: <Coins size={18} />, title: 'Negotiating salary in Switzerland' },
+            ] : [
+              { icon: <FileText size={18} />, title: 'Bewerbung schreiben in der Schweiz: der komplette Leitfaden' },
+              { icon: <Layout size={18} />, title: 'Lebenslauf nach Schweizer Standard: Aufbau, Reihenfolge, Foto' },
+              { icon: <Edit2 size={18} />, title: 'Motivationsschreiben: Aufbau, Formulierungen, typische Fehler' },
+              { icon: <Coins size={18} />, title: 'Lohn verhandeln in der Schweiz: Vorbereitung und Timing' },
+            ]).map((g, i) => (
+              <button
+                key={i}
+                onClick={() => navigate('ratgeber')}
+                className="group text-left p-6 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/25 dark:hover:border-[#00A854]/40 hover:shadow-lg transition-all flex flex-col gap-4"
+              >
+                <span className="w-10 h-10 bg-[#004225]/8 dark:bg-[#00A854]/12 text-[#004225] dark:text-[#00A854] flex items-center justify-center group-hover:bg-[#004225] group-hover:text-white transition-all">
+                  {g.icon}
+                </span>
+                <span className="text-sm font-medium leading-snug text-[#1A1A18] dark:text-[#FAFAF8] flex-1">{g.title}</span>
+                <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854]">
+                  {language === 'FR' ? 'Lire' : language === 'IT' ? 'Leggi' : language === 'EN' ? 'Read' : 'Lesen'}
+                  <ArrowRight size={11} className="group-hover:translate-x-1 transition-transform" />
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </section>
