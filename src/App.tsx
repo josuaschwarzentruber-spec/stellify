@@ -3273,6 +3273,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
               <p className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">Bewerbung als Marketing Manager · Nestlé</p>
               <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Sehr geehrte Damen und Herren,</p>
               <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed min-h-[3em]"><TypeText text="mit grossem Interesse bewerbe ich mich als Marketing Manager bei Nestlé. Seit drei Jahren verantworte ich die Markenstrategie eines Schweizer Konsumgüterherstellers und habe die Markenbekanntheit um 28 Prozent gesteigert." speed={18} /></p>
+              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">In meiner aktuellen Rolle führe ich ein Team von vier Personen, verantworte ein Jahresbudget von CHF 800 000 und habe zuletzt eine Kampagne umgesetzt, die den Onlineumsatz innerhalb eines Jahres um 35 Prozent erhöht hat. Die Zusammenarbeit mit Agenturen, Handelspartnern und internen Stakeholdern gehört dabei zu meinem Alltag.</p>
+              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">Nestlé begeistert mich, weil Sie Markenführung mit echter Konsumentennähe verbinden. Genau diese Kombination aus Strategie und Umsetzung ist meine Stärke, und ich freue mich darauf, sie in Ihr Team einzubringen.</p>
+              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF] leading-relaxed">Gerne überzeuge ich Sie in einem persönlichen Gespräch.</p>
+              <p className="text-[8.5px] text-[#26261F] dark:text-[#B5B5AF]">Freundliche Grüsse<br /><span className="font-semibold">{previewIdentity.name}</span></p>
               <div className="flex items-center justify-between pt-1">
                 <div className="flex gap-1.5">
                   <span className="inline-flex items-center gap-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-1.5 py-0.5 rounded"><Download size={8} />PDF</span>
@@ -4698,8 +4702,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f1: "Alle Bewerbungen in einer klaren Pipeline",
       tools_tracker_f2: "Erinnerungen fürs Nachfassen zur richtigen Zeit",
       tools_tracker_f3: "Statistiken, die zeigen, was funktioniert",
-      tools_cta_title: "Überzeug dich selbst. Die ersten 3 Bewerbungen sind geschenkt.",
-      tools_cta_sub: "Kein Abo nötig zum Ausprobieren. Danach ab CHF 19.90 pro Monat, jederzeit kündbar.",
+      tools_cta_title: "Überzeug dich selbst. Die ersten 3 Bewerbungen aus dem Generator sind geschenkt.",
+      tools_cta_sub: "Die Bewerbungs-Strategie ist komplett kostenlos, für immer. Zum Ausprobieren brauchst du kein Abo. Danach ab CHF 19.90 pro Monat, jederzeit kündbar.",
       tools_cta_btn: "Jetzt gratis testen",
       tools_cta_btn2: "Pläne ansehen",
       tools_badge: "Karriere-Tools",
@@ -5359,8 +5363,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f1: "Toutes tes candidatures dans un pipeline clair",
       tools_tracker_f2: "Rappels de relance au bon moment",
       tools_tracker_f3: "Des statistiques qui montrent ce qui marche",
-      tools_cta_title: "Convaincs-toi. Les 3 premières candidatures sont offertes.",
-      tools_cta_sub: "Aucun abonnement pour essayer. Ensuite dès CHF 19.90 par mois, résiliable à tout moment.",
+      tools_cta_title: "Convaincs-toi. Les 3 premières candidatures du générateur sont offertes.",
+      tools_cta_sub: "La stratégie de candidature est entièrement gratuite, pour toujours. Aucun abonnement pour essayer. Ensuite dès CHF 19.90 par mois, résiliable à tout moment.",
       tools_cta_btn: "Essayer gratuitement",
       tools_cta_btn2: "Voir les plans",
       tools_badge: "Outils de carrière",
@@ -5914,8 +5918,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f1: "Tutte le candidature in una pipeline chiara",
       tools_tracker_f2: "Promemoria per il follow-up al momento giusto",
       tools_tracker_f3: "Statistiche che mostrano cosa funziona",
-      tools_cta_title: "Convinciti. Le prime 3 candidature sono in regalo.",
-      tools_cta_sub: "Nessun abbonamento per provare. Poi da CHF 19.90 al mese, disdicibile in ogni momento.",
+      tools_cta_title: "Convinciti. Le prime 3 candidature del generatore sono in regalo.",
+      tools_cta_sub: "La strategia di candidatura è completamente gratuita, per sempre. Nessun abbonamento per provare. Poi da CHF 19.90 al mese, disdicibile in ogni momento.",
       tools_cta_btn: "Prova gratis",
       tools_cta_btn2: "Vedi i piani",
       tools_badge: "Strumenti di carriera",
@@ -6469,8 +6473,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f1: "Every application in one clear pipeline",
       tools_tracker_f2: "Follow-up reminders at the right moment",
       tools_tracker_f3: "Statistics that show what works",
-      tools_cta_title: "See for yourself. Your first 3 applications are on us.",
-      tools_cta_sub: "No subscription needed to try. Then from CHF 19.90 per month, cancel anytime.",
+      tools_cta_title: "See for yourself. Your first 3 generator applications are on us.",
+      tools_cta_sub: "The application strategy is completely free, forever. No subscription needed to try. Then from CHF 19.90 per month, cancel anytime.",
       tools_cta_btn: "Try for free",
       tools_cta_btn2: "See plans",
       tools_badge: "Career Tools",
@@ -7066,11 +7070,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       inputs: [{ key: 'targetJob', label: t.tools_data['skill-gap'].input_label, type: 'text', placeholder: t.tools_data['skill-gap'].input_placeholder }] 
     },
     {
-      id: 'tracker', 
-      title: t.tools_data['tracker'].title, 
-      desc: t.tools_data['tracker'].desc, 
+      id: 'tracker',
+      title: t.tools_data['tracker'].title,
+      desc: t.tools_data['tracker'].desc,
       icon: <Layout size={20} />,
-      badge: 'Plan',
+      badge: 'Gratis',
       // gratis: matches the "Gratis" badge in the welcome modal, and free
       // usage is already bounded by the 3-generation lifetime quota anyway.
       type: 'gratis',
