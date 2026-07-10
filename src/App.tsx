@@ -4758,13 +4758,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_title: "Bezahle wie du willst",
       payment_secure: "Sicher via Stripe verarbeitet.",
       how_badge: "Der Prozess",
-      how_desc: "Vom Lebenslauf bis zur Vertragsunterschrift: Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
-      how_1_t: "Lebenslauf hochladen & analysieren",
-      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig, erkennt deine Stärken und optimiert ihn auf Schweizer Niveau, in Sekunden.",
-      how_2_t: "Bewerbung perfektionieren",
-      how_2_d: "Generiere massgeschneiderte Motivationsschreiben, optimiere jeden Lebenslauf-Abschnitt und prüfe, ob Recruiter-Software deinen Lebenslauf findet, alles in Schweizer Hochdeutsch.",
-      how_3_t: "Interview bestehen",
-      how_3_d: "Trainiere mit dem KI-Interview-Coach: echte Schweizer Fragen, dein persönliches Bewertungsraster und konkrete Formulierungsvorschläge für jede Situation.",
+      how_desc: "Vom Lebenslauf bis zur Zusage: Stellify begleitet dich durch jeden Schritt deiner Bewerbung.",
+      how_1_t: "Lebenslauf hochladen",
+      how_1_d: "Lade deinen Lebenslauf als PDF hoch. Stella liest ihn vollständig und nutzt deine Stärken für jede massgeschneiderte Bewerbung, in Sekunden.",
+      how_2_t: "Bewerbung generieren",
+      how_2_d: "Design wählen, Stelleninserat einfügen, fertig: In 60 Sekunden stehen Anschreiben, Lebenslauf und E-Mail in Schweizer Hochdeutsch bereit, als PDF oder Word.",
+      how_3_t: "Überblick behalten & Zusage holen",
+      how_3_d: "Verfolge jede Bewerbung im kostenlosen Tracker: klare Pipeline, Erinnerungen fürs Nachfassen und Statistiken, die zeigen, was funktioniert.",
       faq_badge: "Häufige Fragen",
       faq_subtitle: "Alles was du wissen musst",
       faq_contact: "Noch Fragen?",
@@ -5420,12 +5420,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_secure: "Traitement sécurisé via Stripe.",
       how_badge: "Le processus",
       how_desc: "Du CV à la signature du contrat : Stellify vous accompagne à chaque étape de votre candidature.",
-      how_1_t: "Télécharger & analyser le CV",
-      how_1_d: "Téléchargez votre CV en PDF. Stella le lit entièrement, identifie vos points forts et l'optimise selon les standards ATS suisses.",
-      how_2_t: "Perfectionner la candidature",
-      how_2_d: "Générez des lettres de motivation sur mesure, optimisez chaque section du CV et simulez le contrôle ATS, en allemand suisse standard.",
-      how_3_t: "Réussir l'entretien",
-      how_3_d: "Entraînez-vous avec le coach d'entretien IA : questions réelles, grille d'évaluation personnalisée et suggestions de formulation concrètes.",
+      how_1_t: "Télécharger le CV",
+      how_1_d: "Télécharge ton CV en PDF. Stella le lit entièrement et utilise tes points forts pour chaque candidature sur mesure, en quelques secondes.",
+      how_2_t: "Générer la candidature",
+      how_2_d: "Choisis un design, colle l'annonce, c'est prêt : en 60 secondes, lettre, CV et e-mail sont prêts, en PDF ou Word.",
+      how_3_t: "Garder la vue d'ensemble",
+      how_3_d: "Suis chaque candidature dans le tracker gratuit : pipeline claire, rappels de relance et statistiques qui montrent ce qui marche.",
       faq_badge: "Questions fréquentes",
       faq_subtitle: "Tout ce que vous devez savoir",
       faq_contact: "Encore des questions ?",
@@ -5975,12 +5975,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_secure: "Elaborazione sicura tramite Stripe.",
       how_badge: "Il processo",
       how_desc: "Dal CV alla firma del contratto: Stellify ti accompagna in ogni fase della tua candidatura.",
-      how_1_t: "Carica & analizza il CV",
-      how_1_d: "Carica il tuo CV in PDF. Stella lo legge completamente, individua i tuoi punti di forza e lo ottimizza secondo gli standard ATS svizzeri.",
-      how_2_t: "Perfeziona la candidatura",
-      how_2_d: "Genera lettere di motivazione su misura, ottimizza ogni sezione del CV e simula il controllo ATS, in tedesco svizzero standard.",
-      how_3_t: "Supera il colloquio",
-      how_3_d: "Allenati con il coach per colloqui IA: domande reali, griglia di valutazione personalizzata e suggerimenti concreti per ogni situazione.",
+      how_1_t: "Carica il CV",
+      how_1_d: "Carica il tuo CV in PDF. Stella lo legge completamente e usa i tuoi punti di forza per ogni candidatura su misura, in pochi secondi.",
+      how_2_t: "Genera la candidatura",
+      how_2_d: "Scegli un design, incolla l'annuncio, fatto: in 60 secondi lettera, CV ed e-mail sono pronti, in PDF o Word.",
+      how_3_t: "Mantieni la visione d'insieme",
+      how_3_d: "Segui ogni candidatura nel tracker gratuito: pipeline chiara, promemoria per il follow-up e statistiche che mostrano cosa funziona.",
       faq_badge: "Domande frequenti",
       faq_subtitle: "Tutto quello che devi sapere",
       faq_contact: "Altre domande?",
@@ -6530,12 +6530,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       payment_secure: "Securely processed via Stripe.",
       how_badge: "Your Path to Success",
       how_desc: "In three steps, Stellify prepares you perfectly for every stage of the Swiss application process.",
-      how_1_t: "Upload & Analyze CV",
-      how_1_d: "Upload your CV as a PDF. Stella identifies weaknesses, missing keywords, and optimization potential for Swiss recruiters in seconds.",
-      how_2_t: "Perfect Your Application",
-      how_2_d: "Optimize your CV, write tailored cover letters, and prepare for ATS systems of Swiss companies, with AI precision.",
-      how_3_t: "Ace the Interview",
-      how_3_d: "Train with realistic interview simulations, get immediate feedback, and learn exactly what Swiss employers look for.",
+      how_1_t: "Upload your CV",
+      how_1_d: "Upload your CV as a PDF. Stella reads it fully and uses your strengths for every tailored application, in seconds.",
+      how_2_t: "Generate the application",
+      how_2_d: "Pick a design, paste the job ad, done: in 60 seconds your cover letter, CV and email are ready, as PDF or Word.",
+      how_3_t: "Keep the overview",
+      how_3_d: "Track every application in the free tracker: a clear pipeline, follow-up reminders and statistics that show what works.",
       faq_badge: "Frequently Asked Questions",
       faq_subtitle: "Everything you need to know",
       faq_contact: "Any questions?",
@@ -9878,34 +9878,37 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </div>
                         </div>
                       ) : (
-                        <div className="space-y-3.5">
-                          <p className="text-[11px] font-bold uppercase tracking-widest text-[#9A9A94]">
-                            {language === 'FR' ? 'Plan de bataille · Roche, Bâle' : language === 'IT' ? 'Piano di battaglia · Roche, Basilea' : language === 'EN' ? 'Battle plan · Roche, Basel' : 'Schlachtplan · Roche, Basel'}
-                          </p>
-                          {(language === 'FR' ? [
-                            'Adapter le CV à «Gestion de projet Pharma»',
-                            'Contacter le département via LinkedIn',
-                            'Préparer les 3 questions les plus fréquentes',
-                          ] : language === 'IT' ? [
-                            'Adattare il CV a «Gestione progetti Pharma»',
-                            'Contattare il reparto via LinkedIn',
-                            'Preparare le 3 domande più frequenti',
-                          ] : language === 'EN' ? [
-                            'Sharpen the CV for "Pharma project lead"',
-                            'Reach the department via LinkedIn',
-                            'Prepare the 3 most common questions',
-                          ] : [
-                            'Lebenslauf auf «Projektleitung Pharma» zuspitzen',
-                            'Kontakt zur Fachabteilung über LinkedIn',
-                            'Antworten auf die 3 häufigsten Fragen vorbereiten',
-                          ]).map((step, i) => (
-                            <div key={i} className="flex items-start gap-3 bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm p-3.5">
-                              <span className="shrink-0 w-7 h-7 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[12px] font-bold flex items-center justify-center">{i + 1}</span>
-                              <p className="text-[13px] text-[#1A1A18] dark:text-[#EBEBEB] leading-snug pt-1 min-h-[1.4em]">
-                                <TypeText text={step} speed={16} startDelay={i * 1100} />
-                              </p>
-                            </div>
-                          ))}
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-3 gap-2.5">
+                            {[
+                              { n: '8', l: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
+                              { n: '3', l: 'Interviews' },
+                              { n: '1', l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot' },
+                            ].map((s, i) => (
+                              <div key={i} className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm px-2 py-2.5 text-center">
+                                <p className="text-xl font-serif text-[#004225] dark:text-[#00A854] leading-none">{s.n}</p>
+                                <p className="text-[8.5px] font-bold uppercase tracking-widest text-[#9A9A94] mt-1">{s.l}</p>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="grid grid-cols-3 gap-2.5">
+                            {[
+                              { l: language === 'FR' ? 'Envoyées' : language === 'IT' ? 'Inviate' : language === 'EN' ? 'Applied' : 'Beworben', c: '#9A9A94', items: ['Roche', 'PostFinance'] },
+                              { l: 'Interview', c: '#D4A852', items: ['Swisscom'] },
+                              { l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', c: '#004225', items: ['Nestlé'] },
+                            ].map((col, i) => (
+                              <div key={i} className="space-y-1.5">
+                                <p className="text-[9px] font-bold uppercase tracking-widest" style={{ color: col.c }}>{col.l}</p>
+                                {col.items.map((it, j) => (
+                                  <div key={j} className="bg-white dark:bg-[#26261F] border-l-2 px-2 py-1.5 text-[11px] font-medium text-[#1A1A18] dark:text-[#EBEBEB] shadow-sm" style={{ borderLeftColor: col.c }}>{it}</div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-2 bg-[#D4A852]/12 border border-[#D4A852]/30 rounded-sm px-3 py-2">
+                            <Bell size={12} className="text-[#B8860B] shrink-0" />
+                            <p className="text-[11px] font-medium text-[#7A5C10] dark:text-[#D4A852]">{language === 'FR' ? 'Relancer: Swisscom · dans 3 jours' : language === 'IT' ? 'Follow-up: Swisscom · tra 3 giorni' : language === 'EN' ? 'Follow up: Swisscom · in 3 days' : 'Nachfassen: Swisscom · in 3 Tagen'}</p>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -9917,7 +9920,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <div className="flex flex-wrap gap-1.5">
                     {(tool.id === 'bewerbungs-gen'
                       ? (language === 'FR' ? ['Import par lien', 'Photo', 'PDF & Word'] : language === 'IT' ? ['Import da link', 'Foto', 'PDF & Word'] : language === 'EN' ? ['Link import', 'Photo', 'PDF & Word'] : ['Link-Import', 'Foto', 'PDF & Word'])
-                      : (language === 'FR' ? ['3 étapes claires', 'Sur mesure'] : language === 'IT' ? ['3 passi chiari', 'Su misura'] : language === 'EN' ? ['3 clear steps', 'Tailored'] : ['3 klare Schritte', 'Auf die Firma zugeschnitten'])
+                      : (language === 'FR' ? ['Pipeline', 'Rappels', 'Statistiques'] : language === 'IT' ? ['Pipeline', 'Promemoria', 'Statistiche'] : language === 'EN' ? ['Pipeline', 'Reminders', 'Statistics'] : ['Pipeline', 'Erinnerungen', 'Statistiken'])
                     ).map((chip: string) => (
                       <span key={chip} className="text-[10px] font-medium text-[#5C5C58] dark:text-[#9A9A94] bg-black/[0.04] dark:bg-white/[0.06] px-2 py-1 rounded">{chip}</span>
                     ))}
