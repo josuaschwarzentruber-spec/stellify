@@ -10403,6 +10403,118 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
+      {/* --- STELLIFY VS CHAT AI --- The one big advantage, spelled out:
+           a chat gives you text, Stellify hands you the finished
+           application. Honest, concrete, side by side. */}
+      {(!user || activeView === 'dashboard') && (
+      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto mb-14">
+            <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">
+              {language === 'FR' ? 'La grande différence' : language === 'IT' ? 'La grande differenza' : language === 'EN' ? 'The big difference' : 'Der grosse Unterschied'}
+            </p>
+            <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
+              {language === 'FR' ? 'Pourquoi pas simplement ChatGPT ?' : language === 'IT' ? 'Perché non semplicemente ChatGPT?' : language === 'EN' ? 'Why not just ChatGPT?' : 'Warum nicht einfach ChatGPT?'}
+            </h2>
+            <p className="mt-4 text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light">
+              {language === 'FR' ? 'Un chat te donne du texte. Stellify te donne la candidature finie.'
+                : language === 'IT' ? 'Una chat ti dà testo. Stellify ti dà la candidatura finita.'
+                : language === 'EN' ? 'A chat gives you text. Stellify hands you the finished application.'
+                : 'Ein Chat gibt dir Text. Stellify gibt dir die fertige Bewerbung.'}
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 items-stretch">
+            {/* Chat AI — the manual way */}
+            <div className="p-7 sm:p-9 bg-[#F4F3F0] dark:bg-[#22221F] border border-black/5 dark:border-white/5">
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#9A9A94] mb-1">ChatGPT · Claude · Gemini</p>
+              <p className="text-xl font-serif text-[#5C5C58] dark:text-[#9A9A94] mb-6">
+                {language === 'FR' ? 'Tout reste à ta charge' : language === 'IT' ? 'Tutto resta a carico tuo' : language === 'EN' ? 'Everything stays on you' : 'Alles bleibt an dir hängen'}
+              </p>
+              <ul className="space-y-3.5">
+                {(language === 'FR' ? [
+                  'Écrire les prompts, copier le texte, tout formater toi-même dans Word',
+                  'Réexpliquer ton CV et ta photo à chaque nouvelle candidature',
+                  'Pas de standard suisse automatique, les tournures sonnent souvent allemandes',
+                  'Pas de document fini : pas de design, pas d\'export PDF et Word',
+                  'Aucune vue d\'ensemble : candidatures, délais et relances restent dans ta tête',
+                ] : language === 'IT' ? [
+                  'Scrivere i prompt, copiare il testo, formattare tutto da solo in Word',
+                  'Rispiegare CV e foto a ogni nuova candidatura',
+                  'Nessuno standard svizzero automatico, le formule suonano spesso tedesche',
+                  'Nessun documento finito: niente design, niente export PDF e Word',
+                  'Nessuna panoramica: candidature, scadenze e follow-up restano nella tua testa',
+                ] : language === 'EN' ? [
+                  'Write prompts, copy text, format everything yourself in Word',
+                  'Re-explain your CV and photo for every single application',
+                  'No automatic Swiss standard, phrasing often sounds German',
+                  'No finished document: no design, no PDF and Word export',
+                  'No overview: applications, deadlines and follow-ups stay in your head',
+                ] : [
+                  'Prompts schreiben, Text kopieren, alles selbst in Word formatieren',
+                  'Lebenslauf und Foto bei jeder Bewerbung neu erklären',
+                  'Kein Schweizer Standard: ß statt ss, deutsche Floskeln',
+                  'Kein fertiges Dokument: kein Design, kein PDF- und Word-Export',
+                  'Keine Übersicht: Bewerbungen, Fristen und Nachfassen bleiben im Kopf',
+                ]).map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+                    <X size={15} className="shrink-0 mt-0.5 text-[#B91C1C]/70" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            {/* Stellify — the finished result */}
+            <div className="relative p-7 sm:p-9 text-white shadow-xl" style={{ background: 'linear-gradient(135deg, #00331d 0%, #004225 55%, #0a5233 100%)' }}>
+              <svg viewBox="0 0 100 100" className="absolute -right-4 -top-4 w-32 h-32 opacity-[0.14]" aria-hidden="true">
+                <path d="M50 16 Q55 42 80 52 Q56 56 48 84 Q45 58 20 46 Q46 42 50 16 Z" fill="#6FCF97" />
+              </svg>
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#6FCF97] mb-1">Stellify</p>
+              <p className="text-xl font-serif mb-6">
+                {language === 'FR' ? 'Le résultat fini, prêt à envoyer' : language === 'IT' ? 'Il risultato finito, pronto per l\'invio' : language === 'EN' ? 'The finished result, ready to send' : 'Das fertige Resultat, versandbereit'}
+              </p>
+              <ul className="space-y-3.5">
+                {(language === 'FR' ? [
+                  'Colle le lien de l\'annonce, Stellify lit l\'offre automatiquement',
+                  'CV et photo enregistrés une fois, repris dans chaque candidature',
+                  'Suisse d\'office : orthographe, ton et normes correctes',
+                  'Document fini en 60 secondes : design au choix, PDF et Word',
+                  'Tracker gratuit inclus : pipeline, rappels et statistiques',
+                ] : language === 'IT' ? [
+                  'Incolla il link dell\'annuncio, Stellify lo legge automaticamente',
+                  'CV e foto salvati una volta, ripresi in ogni candidatura',
+                  'Svizzero di serie: ortografia, tono e standard corretti',
+                  'Documento finito in 60 secondi: design a scelta, PDF e Word',
+                  'Tracker gratuito incluso: pipeline, promemoria e statistiche',
+                ] : language === 'EN' ? [
+                  'Paste the job-ad link, Stellify reads the posting automatically',
+                  'CV and photo saved once, applied to every application',
+                  'Swiss by default: correct spelling, tone and standards',
+                  'Finished document in 60 seconds: your design, PDF and Word',
+                  'Free tracker included: pipeline, reminders and statistics',
+                ] : [
+                  'Link vom Inserat einfügen, Stellify liest die Stelle automatisch',
+                  'Lebenslauf und Foto einmal hinterlegt, in jeder Bewerbung drin',
+                  'Schweizer Standard ab Werk: Rechtschreibung, Ton und Normen',
+                  'Fertiges Dokument in 60 Sekunden: Wunschdesign, PDF und Word',
+                  'Gratis Tracker inklusive: Pipeline, Erinnerungen und Statistiken',
+                ]).map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm font-light leading-relaxed">
+                    <CheckCircle2 size={15} className="shrink-0 mt-0.5 text-[#6FCF97]" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <button
+                onClick={() => { if (user) { handleToolClick('bewerbungs-gen'); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }}
+                className="mt-8 w-full sm:w-auto px-8 py-3.5 bg-white text-[#004225] text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#E8F3EC] transition-colors"
+              >
+                {language === 'FR' ? 'Essayer gratuitement, 3 candidatures offertes' : language === 'IT' ? 'Prova gratis, 3 candidature in regalo' : language === 'EN' ? 'Try for free, 3 applications on us' : 'Gratis testen, 3 Bewerbungen geschenkt'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
       {/* --- WHY STELLIFY SECTION --- */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
