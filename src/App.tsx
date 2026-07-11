@@ -13216,11 +13216,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
             <div className="relative min-h-full flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12">
               {/* Brand mark above the card — this is a page, not a popup */}
-              <div className="flex items-center gap-2 mb-6 text-[#1A1A18] dark:text-[#FAFAF8]">
-                <svg width="22" height="22" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854]" aria-hidden="true">
+              <div className="flex items-center gap-2.5 mb-7 text-[#1A1A18] dark:text-[#FAFAF8]">
+                <svg width="30" height="30" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854]" aria-hidden="true">
                   <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
                 </svg>
-                <span className="text-2xl font-serif tracking-tight">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
+                <span className="text-3xl sm:text-4xl font-serif tracking-tight">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
               </div>
             <motion.div
               initial={{ opacity: 0, y: 24 }}
