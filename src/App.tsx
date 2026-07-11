@@ -416,7 +416,6 @@ interface UserData {
   stripeCustomerId?: string;
   avatarId?: string;
   newsletterOptIn?: boolean;
-  upgradeMailsOptIn?: boolean;
 }
 
 // --- UPGRADE PROMPT ---
@@ -454,7 +453,7 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing }: { reason: 'quot
       >
         {/* Forest header with the brand star */}
         <div className="relative px-8 pt-8 pb-7 text-center text-white overflow-hidden" style={{ background: 'linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%)' }}>
-          <div aria-hidden="true" className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[#00A854]/25 blur-3xl" />
+          <div aria-hidden="true" className="absolute -bottom-20 -left-16 w-48 h-48 rounded-full bg-[#00A854]/25 blur-3xl" />
           <div className="relative">
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center">
               <svg width="26" height="26" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#6FCF97"/></svg>
@@ -462,8 +461,8 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing }: { reason: 'quot
             <h3 className="text-2xl font-serif leading-tight">{headline}</h3>
           </div>
         </div>
-        <button onClick={onClose} className="absolute top-4 right-4 z-20 p-2 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-all" aria-label="Schliessen">
-          <X size={18} />
+        <button onClick={onClose} className="absolute top-3.5 right-3.5 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/25 border border-white/20 text-white/85 hover:text-white hover:bg-black/40 transition-all" aria-label="Schliessen">
+          <X size={16} />
         </button>
 
         <div className="px-8 py-7">
@@ -1541,7 +1540,6 @@ function StellifyApp() {
   // Admin newsletter composer state
   const [nlSubject, setNlSubject] = useState('');
   const [nlMessage, setNlMessage] = useState('');
-  const [nlAudience, setNlAudience] = useState<'all' | 'free' | 'paying'>('free');
   const [nlSending, setNlSending] = useState(false);
   // Starter checklist on the dashboard — dismissed state survives reloads.
   const [starterDismissed, setStarterDismissed] = useState<boolean>(() => {
@@ -1966,7 +1964,6 @@ function StellifyApp() {
         searchUses: rawData?.search_uses || 0,
         avatarId: rawData?.avatar_id || undefined,
         newsletterOptIn: rawData?.newsletter !== false,
-        upgradeMailsOptIn: rawData?.upgrade_mails !== false,
       };
       setUser(newUser);
 
@@ -2020,7 +2017,6 @@ function StellifyApp() {
               created_at: new Date().toISOString(),
               ab_hero: getHeroVariant(),
               newsletter: true,
-              upgrade_mails: true,
               free_generations_used: 0,
               tool_uses: 0,
               daily_tool_uses: 0,
@@ -2672,7 +2668,6 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           created_at: new Date().toISOString(),
           ab_hero: getHeroVariant(),
           newsletter: true,
-          upgrade_mails: true,
           cv_context: cvContext || null,
           free_generations_used: 0,
           tool_uses: 0,
@@ -9399,15 +9394,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Privacy & account deletion — moved here from the old settings popup */}
                 <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
                   <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-1">{t.data_privacy}</p>
-                  {/* Newsletter opt-out — on by default, one tap to change */}
+                  {/* Newsletter opt-out — on by default, one tap to change.
+                      Free accounts only: paying customers receive no
+                      marketing mails at all. */}
+                  {user.role === 'client' && (
                   <div className="flex items-center justify-between gap-4 p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Newsletter</p>
                       <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">
-                        {language === 'FR' ? 'Conseils et nouveautés de Stellify par e-mail. Désactivable à tout moment.'
-                          : language === 'IT' ? 'Consigli e novità di Stellify via e-mail. Disattivabile in ogni momento.'
-                          : language === 'EN' ? 'Tips and news from Stellify by email. Switch off anytime.'
-                          : 'Tipps und Neuigkeiten von Stellify per E-Mail. Jederzeit abschaltbar.'}
+                        {language === 'FR' ? 'Conseils, nouveautés et offres sur les plans Stellify par e-mail. Désactivable à tout moment.'
+                          : language === 'IT' ? 'Consigli, novità e offerte sui piani Stellify via e-mail. Disattivabile in ogni momento.'
+                          : language === 'EN' ? 'Tips, news and offers on the Stellify plans by email. Switch off anytime.'
+                          : 'Tipps, Neuigkeiten und Angebote zu den Stellify-Plänen per E-Mail. Jederzeit abschaltbar.'}
                       </p>
                     </div>
                     <button
@@ -9428,39 +9426,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${user.newsletterOptIn !== false ? 'left-[22px]' : 'left-0.5'}`} />
                     </button>
                   </div>
-                  {/* Upgrade offers by mail — free accounts only; paying
-                      customers never receive upgrade pitches anyway. */}
-                  {user.role === 'client' && (
-                    <div className="flex items-center justify-between gap-4 p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">
-                          {language === 'FR' ? 'Offres d\'upgrade par e-mail' : language === 'IT' ? 'Offerte di upgrade via e-mail' : language === 'EN' ? 'Upgrade offers by email' : 'Upgrade-Angebote per E-Mail'}
-                        </p>
-                        <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">
-                          {language === 'FR' ? 'Occasionnellement des infos sur Pro et Karriere+. Jamais pour les clients payants.'
-                            : language === 'IT' ? 'Occasionalmente informazioni su Pro e Karriere+. Mai per i clienti paganti.'
-                            : language === 'EN' ? 'Occasional info about Pro and Karriere+. Paying customers never receive these.'
-                            : 'Gelegentlich Infos zu Pro und Karriere+. Zahlende Kunden erhalten solche Mails nie.'}
-                        </p>
-                      </div>
-                      <button
-                        role="switch"
-                        aria-checked={user.upgradeMailsOptIn !== false}
-                        onClick={async () => {
-                          const next = !(user.upgradeMailsOptIn !== false);
-                          try {
-                            await updateDoc(doc(db, 'users', user.id), { upgrade_mails: next });
-                            setUser({ ...user, upgradeMailsOptIn: next });
-                            showToast(next
-                              ? (language === 'FR' ? 'Offres activées' : language === 'IT' ? 'Offerte attivate' : language === 'EN' ? 'Offers on' : 'Upgrade-Mails aktiviert')
-                              : (language === 'FR' ? 'Offres désactivées' : language === 'IT' ? 'Offerte disattivate' : language === 'EN' ? 'Offers off' : 'Upgrade-Mails abgeschaltet'));
-                          } catch { showToast('Fehler', 'error'); }
-                        }}
-                        className={`shrink-0 w-11 h-6 rounded-full transition-colors relative ${user.upgradeMailsOptIn !== false ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'}`}
-                      >
-                        <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${user.upgradeMailsOptIn !== false ? 'left-[22px]' : 'left-0.5'}`} />
-                      </button>
-                    </div>
                   )}
                   <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
                     {t.settings_privacy_desc}
@@ -9472,7 +9437,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Admin only: send a newsletter to the chosen audience */}
                 {user.email === 'support.stellify@gmail.com' && (
                   <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-[#D4A852]/40 space-y-4">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B8860B] mb-1">Newsletter versenden (nur für dich sichtbar)</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B8860B] mb-1">Abo-Newsletter an Gratis-Nutzer (nur für dich sichtbar)</p>
                     <input
                       type="text"
                       value={nlSubject}
@@ -9488,15 +9453,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       className="w-full bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2.5 text-sm outline-none focus:border-[#004225]/40 resize-y"
                     />
                     <div className="flex flex-wrap items-center gap-3">
-                      <select
-                        value={nlAudience}
-                        onChange={(e) => setNlAudience(e.target.value as 'all' | 'free' | 'paying')}
-                        className="bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2.5 text-sm outline-none"
-                      >
-                        <option value="free">Nur Gratis-Nutzer (für Upgrade-Werbung)</option>
-                        <option value="all">An alle mit Newsletter an</option>
-                        <option value="paying">Nur zahlende Kunden</option>
-                      </select>
                       <button
                         disabled={nlSending || !nlSubject.trim() || !nlMessage.trim()}
                         onClick={async () => {
@@ -9506,7 +9462,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             const r = await authFetch('/api/admin/send-newsletter', {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ subject: nlSubject.trim(), message: nlMessage.trim(), audience: nlAudience }),
+                              body: JSON.stringify({ subject: nlSubject.trim(), message: nlMessage.trim() }),
                             });
                             const d = await r.json();
                             if (!r.ok) throw new Error(d.error || 'Fehler');
@@ -9520,7 +9476,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         {nlSending ? 'Wird gesendet…' : 'Jetzt senden'}
                       </button>
                     </div>
-                    <p className="text-[10px] text-[#9A9A94] font-light">Empfänger sind nur Konten, bei denen der Newsletter-Schalter an ist. Bei "Nur Gratis-Nutzer" wird zusätzlich der Schalter "Upgrade-Angebote per E-Mail" respektiert, ideal für Upgrade-Werbung: Pro und Karriere+ Kunden brauchen die nicht. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
+                    <p className="text-[10px] text-[#9A9A94] font-light">Geht ausschliesslich an Gratis-Nutzer mit eingeschaltetem Newsletter. Zahlende Kunden erhalten nie Werbe-Mails. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
                   </div>
                 )}
 

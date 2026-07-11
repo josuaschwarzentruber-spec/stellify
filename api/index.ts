@@ -119,7 +119,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
   const lang = (language || 'DE').toUpperCase();
   const shell = EMAIL_SHELL_COPY[lang] || EMAIL_SHELL_COPY.DE;
   // Hosted brand image (Gmail / Outlook reliably render <img>, inline SVG is filtered)
-  const brandImage = `<img src="${siteUrl}/email-brand.svg?v=2" alt="Stellify" width="160" height="40" style="display:block;border:0;outline:none;text-decoration:none;height:40px;width:160px;"/>`;
+  const brandImage = `<img src="${siteUrl}/email-brand.png?v=3" alt="Stellify" width="160" height="40" style="display:block;border:0;outline:none;text-decoration:none;height:40px;width:160px;"/>`;
   return `<!DOCTYPE html>
 <html lang="${shell.htmlLang}">
 <head>
@@ -1701,7 +1701,7 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
     if ((requester.email || '').toLowerCase() !== 'support.stellify@gmail.com') {
       return res.status(403).json({ error: 'Nur der Inhaber darf Newsletter versenden.' });
     }
-    const { subject, message, audience } = req.body as { subject?: string; message?: string; audience?: string };
+    const { subject, message } = req.body as { subject?: string; message?: string };
     if (!subject?.trim() || !message?.trim()) {
       return res.status(400).json({ error: 'Betreff und Nachricht erforderlich.' });
     }
@@ -1718,10 +1718,9 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
     for (const d of snap.docs) {
       const u = d.data() as any;
       if (!u.email || u.newsletter === false) continue;
-      const paying = u.role === 'pro' || u.role === 'unlimited';
-      if (audience === 'free' && paying) continue;
-      if (audience === 'free' && u.upgrade_mails === false) continue;
-      if (audience === 'paying' && !paying) continue;
+      // Newsletters go to FREE users only — paying customers never receive
+      // marketing mail of any kind.
+      if (u.role !== 'client') continue;
       const lang = (['DE','FR','IT','EN'].includes(String(u.language || '').toUpperCase()) ? String(u.language).toUpperCase() : 'DE') as Lang;
       await sendEmail({
         to: u.email,
@@ -1731,7 +1730,7 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
       }).catch((e) => console.error('[NEWSLETTER] send failed for', u.email, e.message));
       sent++;
     }
-    console.log(`[NEWSLETTER] "${subject.trim()}" sent to ${sent} recipients (audience=${audience || 'all'})`);
+    console.log(`[NEWSLETTER] "${subject.trim()}" sent to ${sent} free-plan recipients`);
     res.json({ ok: true, sent });
   } catch (e: any) {
     console.error('[NEWSLETTER]', e.message);
@@ -1768,7 +1767,7 @@ app.get("/api/cron/onboarding", async (req, res) => {
         const u = d.data() as any;
         if (!u.email || u[st.flag]) continue;
         if (u.newsletter === false) continue;
-        if (st.day === 7 && (u.role !== 'client' || u.upgrade_mails === false)) continue;
+        if (st.day === 7 && u.role !== 'client') continue;
         const lang = (String(u.language || 'DE').toUpperCase() as Lang);
         const copy = onboardingCopy(st.day, u.first_name || '', ['DE','FR','IT','EN'].includes(lang) ? lang : 'DE');
         await sendEmail({
