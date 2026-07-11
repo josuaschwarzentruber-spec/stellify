@@ -1069,7 +1069,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           )}
           <button onClick={() => onEdit(app)} title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'} className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"><Edit2 size={12} /></button>
           <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all">{app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}</button>
-          <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500 hover:bg-red-50 rounded transition-all"><Trash2 size={12} /></button>
+          <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500 dark:text-[#E08585] hover:bg-red-50 dark:hover:bg-red-500/10 rounded transition-all"><Trash2 size={12} /></button>
         </div>
       </td>
     </tr>
@@ -1111,7 +1111,7 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         <CardActionButton
           onClick={() => onDelete(app.id)}
           label={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'}
-          className="text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
+          className="text-red-500 dark:text-[#E08585] hover:bg-red-50 dark:hover:bg-red-500/10"
           icon={<Trash2 size={12} />}
         />
       </div>
@@ -1147,7 +1147,7 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
           const isToday = due.getTime() === today.getTime();
           const dateStr = due.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
           return (
-            <div className={`flex items-center gap-1.5 text-[10px] font-medium ${isOverdue ? 'text-red-600' : isToday ? 'text-[#D4AF37]' : 'text-[#004225]'}`}>
+            <div className={`flex items-center gap-1.5 text-[10px] font-medium ${isOverdue ? 'text-red-600 dark:text-[#E08585]' : isToday ? 'text-[#D4AF37]' : 'text-[#004225]'}`}>
               <Calendar size={10} />
               <span className="truncate">
                 {isOverdue ? `${t.tracker_reminder_short} ${dateStr} (${t.tracker_reminder_overdue})`
@@ -7867,7 +7867,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       { key: 'applied',   label: language === 'FR' ? 'Postulé' : language === 'IT' ? 'Inviato' : language === 'EN' ? 'Applied' : 'Beworben', value: trackerStats.applied, accent: '#5C5C58', tint: 'bg-[#5C5C58]' },
       { key: 'interview', label: 'Interview', value: trackerStats.interview, accent: '#D4A852', tint: 'bg-[#D4A852]' },
       { key: 'offer',     label: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', value: trackerStats.offer, accent: '#004225', tint: 'bg-[#004225] dark:bg-[#00A854]' },
-      { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: trackerStats.rejected, accent: '#B91C1C', tint: 'bg-[#B91C1C]' },
+      { key: 'rejected',  label: language === 'FR' ? 'Refusée' : language === 'IT' ? 'Rifiutata' : language === 'EN' ? 'Rejected' : 'Abgelehnt', value: trackerStats.rejected, accent: '#C0504D', tint: 'bg-[#C0504D]' },
     ];
     const max = Math.max(1, ...cols.map(c => c.value));
     const empty = trackerStats.total === 0;
@@ -8506,7 +8506,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       label: t.dashboard_stat_analyses, value: toolHistory.length, icon: <TrendingUp size={15} />, num: true,
                       sub: language === 'FR' ? 'Résultats IA créés' : language === 'IT' ? 'Risultati IA creati' : language === 'EN' ? 'AI results created' : 'Erstellte KI-Ergebnisse',
                     },
-                    { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
+                    { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500 dark:text-[#E08585]' },
                     {
                       label: 'Tracker', value: trackerStats?.total ?? 0, icon: <Layout size={15} />, num: true,
                       sub: language === 'FR' ? 'Candidatures suivies' : language === 'IT' ? 'Candidature seguite' : language === 'EN' ? 'Applications tracked' : 'Laufende Bewerbungen',
@@ -8765,7 +8765,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
+                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500 dark:bg-[#C96A6A]'} animate-pulse`} />
                       <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
                     </div>
                     <div className="flex items-center gap-3 opacity-60">
@@ -9431,7 +9431,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
                     {t.settings_privacy_desc}
                   </p>
-                  <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
+                  <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 dark:text-[#E08585] hover:text-red-700 dark:hover:text-[#F0A6A6] transition-colors">{t.settings_delete_account}</button>
 
                 </div>
 
@@ -9526,7 +9526,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <h3 className="text-xl font-serif">{t.stella_context_title}</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500'} animate-pulse`} />
+                      <div className={`w-2 h-2 rounded-full ${cvContext ? 'bg-[#059669]' : 'bg-red-500 dark:bg-[#C96A6A]'} animate-pulse`} />
                       <span className="text-xs font-light">{cvContext ? t.stella_context_cv_ready : t.stella_context_no_cv}</span>
                     </div>
                     <CVDropzone
@@ -11576,7 +11576,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             aria-live="polite"
             className="fixed bottom-8 left-1/2 z-[1000] max-w-[90vw] flex items-center gap-3 pl-3 pr-5 py-2.5 rounded-full bg-white dark:bg-[#23231F] border border-black/5 dark:border-white/10 shadow-xl shadow-black/15"
           >
-            <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${toast.type === 'success' ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-red-500'} text-white`}>
+            <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${toast.type === 'success' ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-red-500 dark:bg-[#C96A6A]'} text-white`}>
               {toast.type === 'success' ? <CheckCircle2 size={15} /> : <AlertCircle size={15} />}
             </span>
             <span className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{toast.message}</span>
