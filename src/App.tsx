@@ -2583,16 +2583,6 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         justLoggedIn.current = true;
         await signInWithEmailAndPassword(auth, email, password);
       } else {
-        if (password !== confirmPassword) {
-          setAuthError(
-            language === 'DE' ? 'Die Passwörter stimmen nicht überein.' :
-            language === 'FR' ? 'Les mots de passe ne correspondent pas.' :
-            language === 'IT' ? 'Le password non corrispondono.' :
-            'Passwords do not match.'
-          );
-          setIsAuthLoading(false);
-          return;
-        }
         if (password.length < 6) {
           setAuthError(
             language === 'DE' ? 'Das Passwort muss mindestens 6 Zeichen haben.' :
@@ -4710,11 +4700,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_placeholder: "Frag Stella etwas...",
       stella_secure_data: "SSL-verschlüsselt · Sicher übertragen",
       hero_title: "Dein persönlicher KI-Karriereassistent",
-      hero_desc: "Erstelle professionelle Bewerbungen, optimiere deinen Lebenslauf und bereite dich erfolgreich auf Vorstellungsgespräche vor. Präzise, diskret und auf den Schweizer Arbeitsmarkt zugeschnitten.",
+      hero_desc: "Füge den Link eines Stelleninserats ein und erhalte in 60 Sekunden eine vollständige, versandbereite Bewerbung. Präzise, diskret und auf den Schweizer Arbeitsmarkt zugeschnitten.",
       cta_free: "Kostenlos starten",
       upload_cv: "Lebenslauf hochladen",
       update_cv: "Lebenslauf aktualisieren",
-      cv_info: "① Lebenslauf hochladen → ② Stella analysiert dein Profil → ③ Bewerbung optimieren → ④ Interview meistern",
+      cv_info: "① Lebenslauf hochladen → ② Inserat-Link einfügen → ③ Bewerbung in 60 Sekunden → ④ Im Tracker verfolgen",
       dashboard: "Dashboard",
       profile_nav: "Profil",
       tracker_nav: "Tracker",
@@ -5373,7 +5363,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_placeholder: "Demandez quelque chose à Stella...",
       stella_secure_data: "Traitement sécurisé des données suisses",
       hero_title: "Ton assistant carrière IA personnel",
-      hero_desc: "Crée des candidatures professionnelles, optimise ton CV et prépare-toi efficacement aux entretiens. Précis, discret et adapté au marché du travail suisse.",
+      hero_desc: "Colle le lien d'une annonce et reçois en 60 secondes une candidature complète, prête à envoyer. Précis, discret et adapté au marché du travail suisse.",
       cta_free: "Tester gratuitement",
       upload_cv: "Télécharger ton CV",
       update_cv: "Mettre à jour CV (Lebenslauf)",
@@ -5930,7 +5920,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_placeholder: "Chiedi qualcosa a Stella...",
       stella_secure_data: "Elaborazione sicura dei dati svizzeri",
       hero_title: "Il tuo assistente di carriera IA personale",
-      hero_desc: "Crea candidature professionali, ottimizza il tuo CV e preparati con successo ai colloqui. Preciso, discreto e calibrato sul mercato del lavoro svizzero.",
+      hero_desc: "Incolla il link di un annuncio e ricevi in 60 secondi una candidatura completa, pronta per l'invio. Preciso, discreto e calibrato sul mercato del lavoro svizzero.",
       cta_free: "Prova gratuitamente",
       upload_cv: "Carica il tuo CV",
       update_cv: "Aggiorna CV (Lebenslauf)",
@@ -6487,7 +6477,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       stella_placeholder: "Ask Stella something...",
       stella_secure_data: "Secure Swiss Data Processing",
       hero_title: "Your personal AI career assistant",
-      hero_desc: "Create professional applications, optimise your CV and prepare successfully for interviews. Precise, discreet and tuned to the Swiss job market.",
+      hero_desc: "Paste a job-ad link and get a complete, ready-to-send application in 60 seconds. Precise, discreet and tuned to the Swiss job market.",
       cta_free: "Test for free",
       upload_cv: "Upload CV (Resume)",
       update_cv: "Update CV (Resume)",
@@ -9660,26 +9650,39 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <p className="text-base sm:text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
               {t.hero_desc}
             </p>
-            {language === 'DE' ? (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
-                {([
-                  ['1', 'Lebenslauf hochladen'],
-                  ['2', 'KI-Analyse'],
-                  ['3', 'Bewerbung optimieren'],
-                  ['4', 'Interview meistern'],
-                ] as [string, string][]).map(([num, label], i, arr) => (
-                  <React.Fragment key={num}>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <span className="w-4 h-4 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
-                      <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] whitespace-nowrap">{label}</span>
-                    </div>
-                    {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5 hidden sm:inline">→</span>}
-                  </React.Fragment>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">{t.cv_info}</p>
-            )}
+            {/* The real four-step journey, identical in every language —
+                the hero must only promise what V1 actually delivers. */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+              {((language === 'FR' ? [
+                ['1', 'Télécharger le CV'],
+                ['2', "Coller le lien de l'annonce"],
+                ['3', 'Candidature en 60 sec.'],
+                ['4', 'Suivre dans le tracker'],
+              ] : language === 'IT' ? [
+                ['1', 'Carica il CV'],
+                ['2', "Incolla il link dell'annuncio"],
+                ['3', 'Candidatura in 60 sec.'],
+                ['4', 'Segui nel tracker'],
+              ] : language === 'EN' ? [
+                ['1', 'Upload your CV'],
+                ['2', 'Paste the job-ad link'],
+                ['3', 'Application in 60 sec.'],
+                ['4', 'Track it in the tracker'],
+              ] : [
+                ['1', 'Lebenslauf hochladen'],
+                ['2', 'Inserat-Link einfügen'],
+                ['3', 'Bewerbung in 60 Sek.'],
+                ['4', 'Im Tracker verfolgen'],
+              ]) as [string, string][]).map(([num, label], i, arr) => (
+                <React.Fragment key={num}>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <span className="w-4 h-4 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
+                    <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] whitespace-nowrap">{label}</span>
+                  </div>
+                  {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5 hidden sm:inline">→</span>}
+                </React.Fragment>
+              ))}
+            </div>
             <div className="flex flex-col gap-5 w-full max-w-md">
               <CVDropzone
                 onFileAccepted={processFile}
@@ -9759,6 +9762,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {language === 'FR' ? 'Lancer ta carrière' : language === 'IT' ? 'Lancia la carriera' : language === 'EN' ? 'Launch career' : 'Karriere starten'}
                 </motion.span>
               </motion.div>
+
+              {/* Risk reversal right under the primary CTA — the two doubts
+                  that cost sign-ups: does it cost something, is it a trap. */}
+              <p className="text-center text-[11px] text-[#9A9A94] font-light -mt-1">
+                {language === 'FR' ? 'Sans carte de crédit · 3 candidatures offertes · résiliable à tout moment'
+                  : language === 'IT' ? 'Senza carta di credito · 3 candidature in regalo · disdicibile in ogni momento'
+                  : language === 'EN' ? 'No credit card · 3 applications on us · cancel anytime'
+                  : 'Keine Kreditkarte nötig · 3 Bewerbungen geschenkt · jederzeit kündbar'}
+              </p>
 
               {/* Secondary links */}
               <div className="flex items-center justify-center gap-4 text-xs text-[#9A9A94]">
@@ -13422,41 +13434,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                 )}
 
-                {authTab === 'register' && (
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">
-                      {language === 'FR' ? 'Confirmer le mot de passe' : language === 'IT' ? 'Conferma password' : language === 'EN' ? 'Confirm password' : 'Passwort bestätigen'}
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4A4A45] dark:text-[#9A9A94]" size={16} />
-                      <input
-                        type="password"
-                        required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full bg-white dark:bg-[#2A2A26] border pl-10 pr-10 py-3.5 text-base font-light text-[#1A1A18] dark:text-[#FAFAF8] placeholder:text-[#9A9A94] dark:placeholder:text-[#5C5C58] outline-none transition-all min-h-[48px] ${
-                          confirmPassword && confirmPassword !== password
-                            ? 'border-red-400 focus:border-red-400'
-                            : confirmPassword && confirmPassword === password
-                            ? 'border-green-500 focus:border-green-500'
-                            : 'border-black/10 dark:border-white/10 focus:border-[#004225] dark:focus:border-[#00A854]'
-                        }`}
-                        placeholder="••••••••"
-                      />
-                      {confirmPassword && (
-                        <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold ${confirmPassword === password ? 'text-green-500' : 'text-red-400'}`}>
-                          {confirmPassword === password ? '✓' : '✗'}
-                        </span>
-                      )}
-                    </div>
-                    {confirmPassword && confirmPassword !== password && (
-                      <p className="text-[9px] text-red-400 uppercase tracking-wider">
-                        {language === 'FR' ? 'Les mots de passe ne correspondent pas' : language === 'IT' ? 'Le password non corrispondono' : language === 'EN' ? 'Passwords do not match' : 'Passwörter stimmen nicht überein'}
-                      </p>
-                    )}
-                  </div>
-                )}
-
                 {authError && (
                   <div className="space-y-2">
                     <p className={`text-xs text-center ${
@@ -13501,6 +13478,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     authTab === 'login' ? t.auth_login : authTab === 'register' ? t.auth_create : t.auth_reset_password_btn
                   )}
                 </button>
+
+                {authTab === 'register' && (
+                  <p className="text-center text-[11px] text-[#9A9A94] font-light mt-3">
+                    {language === 'FR' ? 'Gratuit · sans carte de crédit · 3 candidatures offertes'
+                      : language === 'IT' ? 'Gratis · senza carta di credito · 3 candidature in regalo'
+                      : language === 'EN' ? 'Free · no credit card · 3 applications on us'
+                      : 'Kostenlos · keine Kreditkarte nötig · 3 Bewerbungen geschenkt'}
+                  </p>
+                )}
 
                 {authTab === 'forgot' && (
                   <div className="flex justify-center mt-4">
