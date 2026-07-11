@@ -415,6 +415,7 @@ interface UserData {
   subscriptionInterval?: 'monthly' | 'annual';
   stripeCustomerId?: string;
   avatarId?: string;
+  newsletterOptIn?: boolean;
 }
 
 // --- UPGRADE PROMPT ---
@@ -1536,6 +1537,11 @@ function StellifyApp() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [avatarHover, setAvatarHover] = useState<string | null>(null);
+  // Admin newsletter composer state
+  const [nlSubject, setNlSubject] = useState('');
+  const [nlMessage, setNlMessage] = useState('');
+  const [nlAudience, setNlAudience] = useState<'all' | 'free' | 'paying'>('all');
+  const [nlSending, setNlSending] = useState(false);
   // Starter checklist on the dashboard — dismissed state survives reloads.
   const [starterDismissed, setStarterDismissed] = useState<boolean>(() => {
     try { return localStorage.getItem('stellify_starter_dismissed') === '1'; } catch { return false; }
@@ -1958,6 +1964,7 @@ function StellifyApp() {
         stripeCustomerId: rawData?.stripe_customer_id || undefined,
         searchUses: rawData?.search_uses || 0,
         avatarId: rawData?.avatar_id || undefined,
+        newsletterOptIn: rawData?.newsletter !== false,
       };
       setUser(newUser);
 
@@ -2010,6 +2017,7 @@ function StellifyApp() {
               role: 'client',
               created_at: new Date().toISOString(),
               ab_hero: getHeroVariant(),
+              newsletter: true,
               free_generations_used: 0,
               tool_uses: 0,
               daily_tool_uses: 0,
@@ -2660,6 +2668,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           role: 'client',
           created_at: new Date().toISOString(),
           ab_hero: getHeroVariant(),
+          newsletter: true,
           cv_context: cvContext || null,
           free_generations_used: 0,
           tool_uses: 0,
@@ -9386,12 +9395,96 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Privacy & account deletion — moved here from the old settings popup */}
                 <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
                   <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-1">{t.data_privacy}</p>
+                  {/* Newsletter opt-out — on by default, one tap to change */}
+                  <div className="flex items-center justify-between gap-4 p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Newsletter</p>
+                      <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">
+                        {language === 'FR' ? 'Conseils et nouveautés de Stellify par e-mail. Désactivable à tout moment.'
+                          : language === 'IT' ? 'Consigli e novità di Stellify via e-mail. Disattivabile in ogni momento.'
+                          : language === 'EN' ? 'Tips and news from Stellify by email. Switch off anytime.'
+                          : 'Tipps und Neuigkeiten von Stellify per E-Mail. Jederzeit abschaltbar.'}
+                      </p>
+                    </div>
+                    <button
+                      role="switch"
+                      aria-checked={user.newsletterOptIn !== false}
+                      onClick={async () => {
+                        const next = !(user.newsletterOptIn !== false);
+                        try {
+                          await updateDoc(doc(db, 'users', user.id), { newsletter: next });
+                          setUser({ ...user, newsletterOptIn: next });
+                          showToast(next
+                            ? (language === 'FR' ? 'Newsletter activée' : language === 'IT' ? 'Newsletter attivata' : language === 'EN' ? 'Newsletter on' : 'Newsletter aktiviert')
+                            : (language === 'FR' ? 'Newsletter désactivée' : language === 'IT' ? 'Newsletter disattivata' : language === 'EN' ? 'Newsletter off' : 'Newsletter abgeschaltet'));
+                        } catch { showToast('Fehler', 'error'); }
+                      }}
+                      className={`shrink-0 w-11 h-6 rounded-full transition-colors relative ${user.newsletterOptIn !== false ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'}`}
+                    >
+                      <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${user.newsletterOptIn !== false ? 'left-[22px]' : 'left-0.5'}`} />
+                    </button>
+                  </div>
                   <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
                     {t.settings_privacy_desc}
                   </p>
                   <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors">{t.settings_delete_account}</button>
-                
+
                 </div>
+
+                {/* Admin only: send a newsletter to the chosen audience */}
+                {user.email === 'support.stellify@gmail.com' && (
+                  <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-[#D4A852]/40 space-y-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B8860B] mb-1">Newsletter versenden (nur für dich sichtbar)</p>
+                    <input
+                      type="text"
+                      value={nlSubject}
+                      onChange={(e) => setNlSubject(e.target.value)}
+                      placeholder="Betreff, z.B. Neu bei Stellify: ..."
+                      className="w-full bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2.5 text-sm outline-none focus:border-[#004225]/40"
+                    />
+                    <textarea
+                      value={nlMessage}
+                      onChange={(e) => setNlMessage(e.target.value)}
+                      rows={6}
+                      placeholder={'Nachricht. Leerzeile = neuer Absatz.\n\nDer Abmelde-Hinweis wird automatisch angehängt.'}
+                      className="w-full bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2.5 text-sm outline-none focus:border-[#004225]/40 resize-y"
+                    />
+                    <div className="flex flex-wrap items-center gap-3">
+                      <select
+                        value={nlAudience}
+                        onChange={(e) => setNlAudience(e.target.value as 'all' | 'free' | 'paying')}
+                        className="bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2.5 text-sm outline-none"
+                      >
+                        <option value="all">An alle mit Newsletter an</option>
+                        <option value="free">Nur Gratis-Nutzer</option>
+                        <option value="paying">Nur zahlende Kunden</option>
+                      </select>
+                      <button
+                        disabled={nlSending || !nlSubject.trim() || !nlMessage.trim()}
+                        onClick={async () => {
+                          if (!window.confirm(`Newsletter "${nlSubject}" wirklich an die Zielgruppe senden?`)) return;
+                          setNlSending(true);
+                          try {
+                            const r = await authFetch('/api/admin/send-newsletter', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ subject: nlSubject.trim(), message: nlMessage.trim(), audience: nlAudience }),
+                            });
+                            const d = await r.json();
+                            if (!r.ok) throw new Error(d.error || 'Fehler');
+                            showToast(`Newsletter an ${d.sent} Empfänger gesendet`);
+                            setNlSubject(''); setNlMessage('');
+                          } catch (e: any) { showToast(e.message || 'Versand fehlgeschlagen', 'error'); }
+                          finally { setNlSending(false); }
+                        }}
+                        className="px-6 py-2.5 bg-[#004225] text-white text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all disabled:opacity-50"
+                      >
+                        {nlSending ? 'Wird gesendet…' : 'Jetzt senden'}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-[#9A9A94] font-light">Empfänger sind nur Konten, bei denen der Newsletter-Schalter an ist. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
+                  </div>
+                )}
 
                 {/* Tool activity */}
                 <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">

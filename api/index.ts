@@ -1690,6 +1690,54 @@ function onboardingCopy(day: 1 | 3 | 7, name: string, lang: Lang) {
   return C[day][lang] || C[day].DE;
 }
 
+// ── Admin newsletter ─────────────────────────────────────────────────────────
+// Sends a hand-written newsletter to every account whose newsletter switch is
+// on (default), optionally filtered to free or paying users. Owner-only.
+app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, res) => {
+  try {
+    const uid = (req as any).uid as string;
+    const { adminAuth, adminDb } = getAdminServices();
+    const requester = await adminAuth.getUser(uid);
+    if ((requester.email || '').toLowerCase() !== 'support.stellify@gmail.com') {
+      return res.status(403).json({ error: 'Nur der Inhaber darf Newsletter versenden.' });
+    }
+    const { subject, message, audience } = req.body as { subject?: string; message?: string; audience?: string };
+    if (!subject?.trim() || !message?.trim()) {
+      return res.status(400).json({ error: 'Betreff und Nachricht erforderlich.' });
+    }
+    const lines = message.trim().split(/\n{2,}/).map(s => s.replace(/\n/g, '<br />'));
+    const optOut: Record<Lang, string> = {
+      DE: 'Du erhältst diese Mail, weil der Newsletter in deinem Stellify-Profil aktiviert ist. Abschalten kannst du ihn jederzeit dort unter Datenschutz.',
+      FR: 'Tu reçois cet e-mail parce que la newsletter est activée dans ton profil Stellify. Tu peux la désactiver à tout moment sous Confidentialité.',
+      IT: 'Ricevi questa e-mail perché la newsletter è attivata nel tuo profilo Stellify. Puoi disattivarla in ogni momento sotto Privacy.',
+      EN: 'You receive this mail because the newsletter is switched on in your Stellify profile. You can switch it off there anytime under privacy.',
+    };
+    const site = process.env.SITE_URL || 'https://stellify.ch';
+    const snap = await adminDb.collection('users').limit(2000).get();
+    let sent = 0;
+    for (const d of snap.docs) {
+      const u = d.data() as any;
+      if (!u.email || u.newsletter === false) continue;
+      const paying = u.role === 'pro' || u.role === 'unlimited';
+      if (audience === 'free' && paying) continue;
+      if (audience === 'paying' && !paying) continue;
+      const lang = (['DE','FR','IT','EN'].includes(String(u.language || '').toUpperCase()) ? String(u.language).toUpperCase() : 'DE') as Lang;
+      await sendEmail({
+        to: u.email,
+        subject: subject.trim(),
+        html: buildEmailHtml(subject.trim(), [...lines, `<span style="font-size:12px;color:#8a8a85">${optOut[lang]}</span>`], 'Zu Stellify', site + '/', lang),
+        text: message.trim() + '\n\n' + optOut[lang].replace(/<[^>]+>/g, ''),
+      }).catch((e) => console.error('[NEWSLETTER] send failed for', u.email, e.message));
+      sent++;
+    }
+    console.log(`[NEWSLETTER] "${subject.trim()}" sent to ${sent} recipients (audience=${audience || 'all'})`);
+    res.json({ ok: true, sent });
+  } catch (e: any) {
+    console.error('[NEWSLETTER]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get("/api/cron/onboarding", async (req, res) => {
   const secret = process.env.CRON_SECRET;
   if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
@@ -1718,6 +1766,7 @@ app.get("/api/cron/onboarding", async (req, res) => {
       for (const d of snap.docs) {
         const u = d.data() as any;
         if (!u.email || u[st.flag]) continue;
+        if (u.newsletter === false) continue;
         if (st.day === 7 && u.role !== 'client') continue;
         const lang = (String(u.language || 'DE').toUpperCase() as Lang);
         const copy = onboardingCopy(st.day, u.first_name || '', ['DE','FR','IT','EN'].includes(lang) ? lang : 'DE');
