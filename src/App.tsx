@@ -2253,6 +2253,17 @@ function StellifyApp() {
       .then(snap => { if (!snap.empty) setToolHistory(snap.docs.map(d => ({ id: d.id, ...d.data() }))); });
   }, [user]);
 
+  // Starter checklist, step 2: "created" must mean a REAL saved application
+  // document — usage counters can survive account re-creation (free-quota
+  // ledger) and would tick the step off for someone who did nothing yet.
+  const [hasGeneratedApp, setHasGeneratedApp] = useState(false);
+  useEffect(() => {
+    if (!user) { setHasGeneratedApp(false); return; }
+    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), limit(1)))
+      .then(snap => setHasGeneratedApp(!snap.empty))
+      .catch(() => { /* leave false — the step simply stays open */ });
+  }, [user]);
+
   const [careerRoadmap, setCareerRoadmap] = useState<string[]>([]);
   const [latestAnalysis, setLatestAnalysis] = useState<any | null>(null);
   const [salaryCalculations, setSalaryCalculations] = useState<any[]>([]);
@@ -8327,7 +8338,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       action: () => fileInputRef.current?.click(),
                     },
                     {
-                      done: (user.toolUses || 0) > 0 || (user.freeGenerationsUsed || 0) > 0,
+                      done: hasGeneratedApp || toolHistory.some((h: any) => h.tool_id === 'bewerbungs-gen'),
                       label: language === 'FR' ? 'Crée ta première candidature' : language === 'IT' ? 'Crea la tua prima candidatura' : language === 'EN' ? 'Create your first application' : 'Erstelle deine erste Bewerbung',
                       hint: language === 'FR' ? '3 essais gratuits, 60 secondes' : language === 'IT' ? '3 prove gratuite, 60 secondi' : language === 'EN' ? '3 free tries, 60 seconds' : '3 Gratis-Versuche, 60 Sekunden',
                       action: () => handleToolClick('bewerbungs-gen'),
