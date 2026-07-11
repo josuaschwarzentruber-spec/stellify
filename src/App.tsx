@@ -483,8 +483,8 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { 
           </div>
           <button
             onClick={onPricing}
-            className="w-full py-4 text-white text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:opacity-95"
-            style={{ background: 'linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%)' }}
+            className="w-full py-4 text-[#1A1A18] text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:brightness-105 shadow-lg shadow-[#D4AF37]/25"
+            style={{ background: 'linear-gradient(135deg, #E8C766 0%, #D4AF37 60%, #C9A02E 100%)' }}
           >
             {L('Pläne ansehen', 'Voir les plans', 'Vedi i piani', 'See the plans')}
           </button>
@@ -8577,7 +8577,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {!paid && (
                               <button
                                 onClick={() => navigate('pricing')}
-                                className="mt-3 w-full py-2 border border-[#004225]/20 dark:border-[#00A854]/30 text-[9px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-all"
+                                className="mt-3 w-full py-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#1A1A18] hover:brightness-105 transition-all shadow-sm"
+                                style={{ background: 'linear-gradient(135deg, #E8C766 0%, #D4AF37 60%, #C9A02E 100%)' }}
                               >
                                 {language === 'FR' ? 'Découvrir Karriere+' : language === 'IT' ? 'Scopri Karriere+' : language === 'EN' ? 'Discover Karriere+' : 'Karriere+ entdecken'}
                               </button>
@@ -11213,7 +11214,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <button
                 onClick={() => handleSubscription('ultimate')}
                 disabled={isSubscribing}
-                className="relative w-full py-4 bg-white text-[#004225] hover:bg-[#FAFAF8] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl"
+                className="relative w-full py-4 text-[#1A1A18] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl hover:brightness-105"
+                style={{ background: 'linear-gradient(135deg, #E8C766 0%, #D4AF37 60%, #C9A02E 100%)' }}
               >
                 {isSubscribing ? '...' : t.pricing_cta_ultimate}
               </button>
@@ -13380,15 +13382,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               className="relative w-full max-w-md overflow-hidden text-white shadow-2xl"
               style={{ background: 'linear-gradient(135deg, #00331d 0%, #004225 55%, #0a5233 100%)' }}
             >
-              <svg viewBox="0 0 100 100" className="absolute -right-5 -top-5 w-32 h-32 opacity-[0.14]" aria-hidden="true">
+              <svg viewBox="0 0 100 100" className="absolute -left-6 -bottom-6 w-32 h-32 opacity-[0.12]" aria-hidden="true">
                 <path d="M50 16 Q55 42 80 52 Q56 56 48 84 Q45 58 20 46 Q46 42 50 16 Z" fill="#6FCF97" />
               </svg>
               <button
                 onClick={() => setShowExitIntent(false)}
-                className="absolute top-3 right-3 p-2 text-white/60 hover:text-white transition-colors"
+                className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-black/25 border border-white/20 text-white/85 hover:text-white hover:bg-black/40 transition-all"
                 aria-label={language === 'FR' ? 'Fermer' : language === 'IT' ? 'Chiudi' : language === 'EN' ? 'Close' : 'Schliessen'}
               >
-                <X size={18} />
+                <X size={16} />
               </button>
               <div className="relative p-7 sm:p-9">
                 <h3 className="text-2xl font-serif mb-3">
