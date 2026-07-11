@@ -483,8 +483,8 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { 
           </div>
           <button
             onClick={onPricing}
-            className="w-full py-4 text-[#1A1A18] text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:brightness-105 shadow-lg shadow-[#D4AF37]/25"
-            style={{ background: 'linear-gradient(135deg, #E8C766 0%, #D4AF37 60%, #C9A02E 100%)' }}
+            className="w-full py-4 text-white text-[11px] font-bold uppercase tracking-[0.2em] transition-all hover:opacity-95"
+            style={{ background: 'linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%)' }}
           >
             {L('Pläne ansehen', 'Voir les plans', 'Vedi i piani', 'See the plans')}
           </button>
@@ -8577,8 +8577,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {!paid && (
                               <button
                                 onClick={() => navigate('pricing')}
-                                className="mt-3 w-full py-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#1A1A18] hover:brightness-105 transition-all shadow-sm"
-                                style={{ background: 'linear-gradient(135deg, #E8C766 0%, #D4AF37 60%, #C9A02E 100%)' }}
+                                className="mt-3 w-full py-2 border border-[#004225]/20 dark:border-[#00A854]/30 text-[9px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:bg-[#004225] hover:text-white dark:hover:bg-[#00A854] dark:hover:text-[#1A1A18] transition-all"
                               >
                                 {language === 'FR' ? 'Découvrir Karriere+' : language === 'IT' ? 'Scopri Karriere+' : language === 'EN' ? 'Discover Karriere+' : 'Karriere+ entdecken'}
                               </button>
@@ -9403,10 +9402,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Newsletter</p>
                       <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">
-                        {language === 'FR' ? 'Conseils, nouveautés et offres sur les plans Stellify par e-mail. Désactivable à tout moment.'
-                          : language === 'IT' ? 'Consigli, novità e offerte sui piani Stellify via e-mail. Disattivabile in ogni momento.'
-                          : language === 'EN' ? 'Tips, news and offers on the Stellify plans by email. Switch off anytime.'
-                          : 'Tipps, Neuigkeiten und Angebote zu den Stellify-Plänen per E-Mail. Jederzeit abschaltbar.'}
+                        {language === 'FR' ? 'De temps en temps des conseils et nouveautés de Stellify par e-mail. Désactivable à tout moment.'
+                          : language === 'IT' ? 'Di tanto in tanto consigli e novità da Stellify via e-mail. Disattivabile in ogni momento.'
+                          : language === 'EN' ? 'Occasional tips and news from Stellify by email. Switch off anytime.'
+                          : 'Ab und zu Tipps und Neuigkeiten von Stellify per E-Mail. Jederzeit abschaltbar.'}
                       </p>
                     </div>
                     <button
@@ -11214,8 +11213,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <button
                 onClick={() => handleSubscription('ultimate')}
                 disabled={isSubscribing}
-                className="relative w-full py-4 text-[#1A1A18] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl hover:brightness-105"
-                style={{ background: 'linear-gradient(135deg, #E8C766 0%, #D4AF37 60%, #C9A02E 100%)' }}
+                className="relative w-full py-4 bg-white text-[#004225] hover:bg-[#FAFAF8] shadow-xl shadow-black/30 transition-all text-[11px] font-bold uppercase tracking-[0.25em] disabled:opacity-50 min-h-[52px] group-hover:shadow-2xl"
               >
                 {isSubscribing ? '...' : t.pricing_cta_ultimate}
               </button>
