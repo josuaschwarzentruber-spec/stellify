@@ -8350,13 +8350,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <div className="flex items-start justify-between gap-4 mb-1">
                         <div>
                           <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854]">
-                            {language === 'FR' ? 'Ton départ avec Stellify' : language === 'IT' ? 'Il tuo inizio con Stellify' : language === 'EN' ? 'Your start with Stellify' : 'Dein Start mit Stellify'}
+                            {language === 'FR' ? 'Notre conseil pour bien démarrer' : language === 'IT' ? 'Il nostro consiglio per iniziare' : language === 'EN' ? 'Our tip for a great start' : 'Unser Tipp für den besten Start'}
                           </p>
                           <p className="text-xs text-[#9A9A94] font-light mt-1">
-                            {language === 'FR' ? 'Trois étapes et tout est prêt. Cette liste disparaît toute seule dès que tout est fait.'
-                              : language === 'IT' ? 'Tre passi e tutto è pronto. Questa lista sparisce da sola quando è tutto fatto.'
-                              : language === 'EN' ? 'Three steps and you are set. This list disappears by itself once everything is done.'
-                              : 'Drei Schritte, dann ist alles eingerichtet. Diese Liste verschwindet von selbst, sobald alles erledigt ist.'}
+                            {language === 'FR' ? 'Tout est facultatif, mais avec ces trois étapes tu profites au maximum de Stellify. La liste disparaît toute seule.'
+                              : language === 'IT' ? 'Tutto è facoltativo, ma con questi tre passi sfrutti al massimo Stellify. La lista sparisce da sola.'
+                              : language === 'EN' ? 'Everything is optional, but these three steps get the most out of Stellify. The list disappears by itself.'
+                              : 'Alles freiwillig, aber mit diesen drei Schritten holst du am meisten aus Stellify heraus. Die Liste verschwindet von selbst.'}
                           </p>
                         </div>
                         <button
@@ -13196,48 +13196,45 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- AUTH MODAL --- */}
       <AnimatePresence>
         {isAuthModalOpen && (
-          <div
-            className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center"
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="fixed inset-0 z-[200] overflow-y-auto custom-scrollbar bg-[#FDFCFB] dark:bg-[#1A1A18]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="auth-modal-title"
           >
+            {/* Quiet aurora backdrop — the sign-in is a full page now, so it
+                gets the same premium ambience as the landing hero. */}
+            <div className="pointer-events-none fixed inset-0" aria-hidden="true">
+              <div className="absolute top-[-25%] left-[-10%] w-[60vw] h-[60vw] rounded-full opacity-[0.5] dark:opacity-25"
+                   style={{ background: 'radial-gradient(circle, rgba(0,168,84,0.16) 0%, rgba(0,168,84,0.05) 35%, transparent 70%)', filter: 'blur(60px)' }} />
+              <div className="absolute bottom-[-30%] right-[-10%] w-[55vw] h-[55vw] rounded-full opacity-[0.4] dark:opacity-20"
+                   style={{ background: 'radial-gradient(circle, rgba(108,240,161,0.14) 0%, rgba(0,168,84,0.05) 40%, transparent 70%)', filter: 'blur(60px)' }} />
+            </div>
+            <div className="relative min-h-full flex flex-col items-center justify-start sm:justify-center px-4 py-8 sm:py-12">
+              {/* Brand mark above the card — this is a page, not a popup */}
+              <div className="flex items-center gap-2 mb-6 text-[#1A1A18] dark:text-[#FAFAF8]">
+                <svg width="22" height="22" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854]" aria-hidden="true">
+                  <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
+                </svg>
+                <span className="text-2xl font-serif tracking-tight">Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
+              </div>
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-md z-10"
-              aria-hidden="true"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
+              exit={{ opacity: 0, y: 16 }}
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
               className="
-                relative z-20 w-full sm:max-w-md
-                bg-white dark:bg-[#1A1A18] text-[#1A1A18] dark:text-[#FAFAF8]
-                shadow-2xl border border-black/10 dark:border-white/10
-                overflow-y-auto custom-scrollbar
-                /* Mobile: bottom-sheet style, fills width, max 90vh, respects safe area */
-                rounded-t-2xl sm:rounded-none
-                max-h-[92vh] sm:max-h-[calc(100vh-3rem)]
+                relative w-full sm:max-w-md
+                bg-white dark:bg-[#22221F] text-[#1A1A18] dark:text-[#FAFAF8]
+                shadow-xl border border-black/8 dark:border-white/8
                 px-5 pt-6 sm:p-8 md:p-10
                 pb-[max(1.5rem,env(safe-area-inset-bottom))]
-                /* Soft glass tint on backdrop */
-                backdrop-blur-2xl
               "
-              style={{
-                // iOS Safari: dynamic viewport unit (`100dvh`) where supported
-                ['--auth-modal-min' as any]: 'auto',
-              }}
             >
-              {/* Mobile-only grab handle for the bottom-sheet feel */}
-              <div className="sm:hidden flex justify-center mb-3 -mt-1" aria-hidden="true">
-                <span className="block w-10 h-1 rounded-full bg-black/15 dark:bg-white/15" />
-              </div>
               <button
                 onClick={() => { setIsAuthModalOpen(false); setConfirmPassword(''); setAuthError(''); }}
                 aria-label={language === 'FR' ? 'Fermer' : language === 'IT' ? 'Chiudi' : language === 'EN' ? 'Close' : 'Schliessen'}
@@ -13261,13 +13258,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
 
               <div className="text-center mb-8">
-                <span className="text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] inline-flex items-center gap-2">
-                  <svg width="22" height="22" viewBox="0 0 32 32" className="text-[#004225] dark:text-[#00A854] shrink-0" aria-hidden="true">
-                    <path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/>
-                  </svg>
-                  <span>Stell<span className="text-[#004225] dark:text-[#00A854]">ify</span></span>
-                </span>
-                <h3 id="auth-modal-title" className="text-xl font-medium mt-4">
+                <h3 id="auth-modal-title" className="text-xl font-medium mt-2">
                   {authTab === 'login'
                     ? (language === 'FR' ? 'Bon retour chez Stellify' : language === 'IT' ? 'Bentornato su Stellify' : language === 'EN' ? 'Welcome back to Stellify' : 'Willkommen zurück bei Stellify')
                     : authTab === 'register'
@@ -13555,7 +13546,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               </motion.form>
             </motion.div>
-          </div>
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
 
