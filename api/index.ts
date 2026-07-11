@@ -1660,6 +1660,85 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
   }
 });
 
+// ── Onboarding email series (Vercel Cron, daily) ────────────────────────────
+// Three gentle touches in the first week: day 1 a tip, day 3 the example,
+// day 7 a soft upgrade nudge (skipped for paying users). Every mail is sent
+// once, tracked by a flag on the user document.
+function onboardingCopy(day: 1 | 3 | 7, name: string, lang: Lang) {
+  const n = name || (lang === 'DE' ? 'du' : lang === 'FR' ? 'toi' : lang === 'IT' ? 'tu' : 'there');
+  const site = process.env.SITE_URL || 'https://stellify.ch';
+  const C: Record<number, Record<Lang, { subject: string; title: string; lines: string[]; cta: string; url: string }>> = {
+    1: {
+      DE: { subject: 'Der eine Tipp, der Stellify magisch macht', title: `Ein Tipp für dich, ${name || 'Willkommen'}`, lines: [`Hallo ${n},`, 'der schnellste Weg zur perfekten Bewerbung: Lade einmal deinen <strong>Lebenslauf</strong> hoch und füge dann einfach den <strong>Link eines Stelleninserats</strong> ein. Stellify liest die Stelle, nutzt deine Stärken und baut daraus in 60 Sekunden ein versandbereites Dokument.', 'Deine 3 Gratis-Bewerbungen warten auf dich.'], cta: 'Jetzt ausprobieren', url: site + '/' },
+      FR: { subject: "L'astuce qui rend Stellify magique", title: `Une astuce pour toi`, lines: [`Bonjour ${n},`, "le chemin le plus rapide vers la candidature parfaite : télécharge une fois ton <strong>CV</strong>, puis colle simplement le <strong>lien d'une annonce</strong>. Stellify lit l'offre, utilise tes points forts et crée en 60 secondes un document prêt à envoyer.", 'Tes 3 candidatures gratuites t\'attendent.'], cta: 'Essayer maintenant', url: site + '/' },
+      IT: { subject: 'Il consiglio che rende Stellify magico', title: 'Un consiglio per te', lines: [`Ciao ${n},`, 'la via più rapida alla candidatura perfetta: carica una volta il tuo <strong>CV</strong> e poi incolla semplicemente il <strong>link di un annuncio</strong>. Stellify legge l\'offerta, usa i tuoi punti di forza e crea in 60 secondi un documento pronto per l\'invio.', 'Le tue 3 candidature gratuite ti aspettano.'], cta: 'Prova ora', url: site + '/' },
+      EN: { subject: 'The one tip that makes Stellify magic', title: 'A tip for you', lines: [`Hello ${n},`, 'the fastest way to a perfect application: upload your <strong>CV</strong> once, then simply paste the <strong>link of a job ad</strong>. Stellify reads the posting, uses your strengths and builds a ready-to-send document in 60 seconds.', 'Your 3 free applications are waiting.'], cta: 'Try it now', url: site + '/' },
+    },
+    3: {
+      DE: { subject: 'Sieh dir an, was Stellify aus einer Bewerbung macht', title: 'Dein Beispiel wartet', lines: [`Hallo ${n},`, 'noch nicht dazu gekommen? Im Generator gibt es den Knopf <strong>„Mit Beispiel ausprobieren"</strong>: ein Klick, und du siehst eine komplette Schweizer Bewerbung mit Foto, fertig formatiert als PDF und Word. Ganz ohne eigene Daten.', 'Und im kostenlosen <strong>Ratgeber</strong> findest du vier Leitfäden, vom Lebenslauf bis zur Lohnverhandlung.'], cta: 'Beispiel ansehen', url: site + '/tools' },
+      FR: { subject: 'Regarde ce que Stellify fait d\'une candidature', title: 'Ton exemple t\'attend', lines: [`Bonjour ${n},`, 'pas encore eu le temps ? Dans le générateur, le bouton <strong>« Essayer avec un exemple »</strong> te montre en un clic une candidature suisse complète avec photo, formatée en PDF et Word. Sans aucune donnée personnelle.', 'Et le <strong>guide gratuit</strong> contient quatre dossiers, du CV à la négociation salariale.'], cta: 'Voir l\'exemple', url: site + '/tools' },
+      IT: { subject: 'Guarda cosa fa Stellify con una candidatura', title: 'Il tuo esempio ti aspetta', lines: [`Ciao ${n},`, 'non hai ancora avuto tempo? Nel generatore il pulsante <strong>«Prova con un esempio»</strong> ti mostra con un clic una candidatura svizzera completa con foto, formattata in PDF e Word. Senza dati personali.', 'E nella <strong>guida gratuita</strong> trovi quattro dossier, dal CV alla negoziazione dello stipendio.'], cta: 'Vedi l\'esempio', url: site + '/tools' },
+      EN: { subject: 'See what Stellify makes of an application', title: 'Your example is waiting', lines: [`Hello ${n},`, 'not had time yet? In the generator, the <strong>"Try with example"</strong> button shows you a complete Swiss application with photo in one click, formatted as PDF and Word. No personal data needed.', 'And the free <strong>guides</strong> cover everything from the CV to salary negotiation.'], cta: 'See the example', url: site + '/tools' },
+    },
+    7: {
+      DE: { subject: 'Deine 3 Gratis-Bewerbungen waren erst der Anfang', title: 'Bereit für mehr?', lines: [`Hallo ${n},`, 'eine Woche Stellify! Wenn du gerade aktiv am Bewerben bist: Mit <strong>Pro</strong> bekommst du 50 Generierungen pro Monat, den Stellen-Import per Link und alle Standard-Designs, für <strong>CHF 19.90 pro Monat, jederzeit kündbar</strong>.', 'Der Bewerbungs-Tracker bleibt für dich sowieso für immer gratis.', 'Das war die letzte Mail unserer kleinen Starthilfe. Danach hörst du von uns nur noch bei wichtigen Konto-Themen.'], cta: 'Pläne ansehen', url: site + '/pricing' },
+      FR: { subject: 'Tes 3 candidatures gratuites n\'étaient que le début', title: 'Prêt pour la suite ?', lines: [`Bonjour ${n},`, 'une semaine avec Stellify ! Si tu postules activement : avec <strong>Pro</strong>, tu obtiens 50 générations par mois, l\'import d\'annonces par lien et tous les designs standard, pour <strong>CHF 19.90 par mois, résiliable à tout moment</strong>.', 'Le tracker de candidatures reste gratuit pour toujours.', 'C\'était le dernier e-mail de notre petit coup de pouce. Ensuite, tu n\'entendras parler de nous que pour des sujets importants liés à ton compte.'], cta: 'Voir les plans', url: site + '/pricing' },
+      IT: { subject: 'Le tue 3 candidature gratuite erano solo l\'inizio', title: 'Pronto per di più?', lines: [`Ciao ${n},`, 'una settimana con Stellify! Se ti stai candidando attivamente: con <strong>Pro</strong> ottieni 50 generazioni al mese, l\'import degli annunci da link e tutti i design standard, per <strong>CHF 19.90 al mese, disdicibile in ogni momento</strong>.', 'Il tracker delle candidature resta gratuito per sempre.', 'Questa era l\'ultima e-mail del nostro piccolo aiuto iniziale. Poi ci sentirai solo per temi importanti del tuo account.'], cta: 'Vedi i piani', url: site + '/pricing' },
+      EN: { subject: 'Your 3 free applications were just the start', title: 'Ready for more?', lines: [`Hello ${n},`, 'one week with Stellify! If you are actively applying: <strong>Pro</strong> gives you 50 generations per month, job-ad import by link and every standard design, for <strong>CHF 19.90 per month, cancel anytime</strong>.', 'The application tracker stays free for you forever.', 'This was the last mail of our little starter series. After this you will only hear from us about important account matters.'], cta: 'See plans', url: site + '/pricing' },
+    },
+  };
+  return C[day][lang] || C[day].DE;
+}
+
+app.get("/api/cron/onboarding", async (req, res) => {
+  const secret = process.env.CRON_SECRET;
+  if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  try {
+    const { adminDb } = getAdminServices();
+    const dayMs = 86400000;
+    const now = Date.now();
+    const stages = [
+      { day: 1 as const, flag: 'ob_mail_1' },
+      { day: 3 as const, flag: 'ob_mail_3' },
+      { day: 7 as const, flag: 'ob_mail_7' },
+    ];
+    let sent = 0;
+    for (const st of stages) {
+      // Window is generously wide (2 days) so a missed cron run cannot skip
+      // anyone; the per-user flag guarantees single delivery anyway.
+      const startIso = new Date(now - (st.day + 2) * dayMs).toISOString();
+      const endIso = new Date(now - st.day * dayMs).toISOString();
+      const snap = await adminDb.collection('users')
+        .where('created_at', '>=', startIso)
+        .where('created_at', '<=', endIso)
+        .limit(300)
+        .get();
+      for (const d of snap.docs) {
+        const u = d.data() as any;
+        if (!u.email || u[st.flag]) continue;
+        if (st.day === 7 && u.role !== 'client') continue;
+        const lang = (String(u.language || 'DE').toUpperCase() as Lang);
+        const copy = onboardingCopy(st.day, u.first_name || '', ['DE','FR','IT','EN'].includes(lang) ? lang : 'DE');
+        await sendEmail({
+          to: u.email,
+          subject: copy.subject,
+          html: buildEmailHtml(copy.title, copy.lines, copy.cta, copy.url, lang),
+          text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + '\n\nStellify',
+        }).catch((e) => console.error('[CRON ONBOARDING] send failed:', e.message));
+        await d.ref.update({ [st.flag]: true });
+        sent++;
+      }
+    }
+    console.log(`[CRON ONBOARDING] sent ${sent} mails`);
+    res.json({ ok: true, sent });
+  } catch (e: any) {
+    console.error('[CRON ONBOARDING]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ── Welcome Email ─────────────────────────────────────────────────────────────
 app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
   const { email, firstName, language } = req.body;

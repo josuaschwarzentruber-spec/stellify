@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "crons": [
+    { "path": "/api/cron/onboarding", "schedule": "30 8 * * *" }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",

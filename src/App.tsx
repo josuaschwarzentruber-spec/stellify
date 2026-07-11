@@ -570,6 +570,30 @@ class ErrorBoundary extends React.Component<any, any> {
   }
 }
 
+// A/B test for the hero subline. Assigned once per browser, persisted, and
+// written onto the user doc at registration so conversion per variant can be
+// compared straight in Firestore (counts are comparable at a 50/50 split).
+// Google blocks OAuth inside embedded in-app browsers (Instagram, TikTok,
+// Facebook, Snapchat and friends) with a 403 disallowed_useragent. Detect
+// those so the sign-in page can explain it instead of dead-ending people.
+function isInAppBrowser(): boolean {
+  try {
+    const ua = navigator.userAgent || '';
+    return /FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|Snapchat|Line\/|MicroMessenger|GSA\/|; wv\)/i.test(ua);
+  } catch { return false; }
+}
+
+function getHeroVariant(): 'a' | 'b' {
+  try {
+    let v = localStorage.getItem('stellify_hero_variant');
+    if (v !== 'a' && v !== 'b') {
+      v = Math.random() < 0.5 ? 'a' : 'b';
+      localStorage.setItem('stellify_hero_variant', v);
+    }
+    return v as 'a' | 'b';
+  } catch { return 'a'; }
+}
+
 function handleDbError(error: unknown, operation: string, path: string | null) {
   console.error(`DB Error (non-fatal) [${operation}] ${path}:`, error instanceof Error ? error.message : String(error));
 }
@@ -1983,6 +2007,8 @@ function StellifyApp() {
               email: firebaseUser.email || '',
               first_name: formattedName,
               role: 'client',
+              created_at: new Date().toISOString(),
+              ab_hero: getHeroVariant(),
               free_generations_used: 0,
               tool_uses: 0,
               daily_tool_uses: 0,
@@ -2288,6 +2314,32 @@ function StellifyApp() {
     };
     checkBackend();
   }, []);
+
+  // Report the assigned hero variant to Vercel Analytics (no-op until Web
+  // Analytics is enabled in the Vercel dashboard).
+  useEffect(() => {
+    try { (window as any).va?.('event', { name: 'hero_variant', data: { variant: getHeroVariant() } }); } catch { /* ignore */ }
+  }, []);
+
+  // Exit intent on the pricing view — one gentle second-chance nudge per
+  // session for visitors without a paid plan, desktop only (mouse leaving
+  // through the top of the viewport).
+  const [showExitIntent, setShowExitIntent] = useState(false);
+  useEffect(() => {
+    if (activeView !== 'pricing') return;
+    if (user && user.role !== 'client') return;
+    try { if (sessionStorage.getItem('stellify_exit_intent') === '1') return; } catch { /* ignore */ }
+    const onOut = (e: MouseEvent) => {
+      if (e.relatedTarget || e.clientY > 0) return;
+      try {
+        if (sessionStorage.getItem('stellify_exit_intent') === '1') return;
+        sessionStorage.setItem('stellify_exit_intent', '1');
+      } catch { /* ignore */ }
+      setShowExitIntent(true);
+    };
+    document.addEventListener('mouseout', onOut);
+    return () => document.removeEventListener('mouseout', onOut);
+  }, [activeView, user]);
 
   const generateRoadmap = async () => {
     if (!cvContext || isGeneratingRoadmap) return;
@@ -2605,6 +2657,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           email: userCredential.user.email || '',
           first_name: formattedName,
           role: 'client',
+          created_at: new Date().toISOString(),
+          ab_hero: getHeroVariant(),
           cv_context: cvContext || null,
           free_generations_used: 0,
           tool_uses: 0,
@@ -9648,7 +9702,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_accent || t.hero_title.split(' ').pop()}</span>
             </h1>
             <p className="text-base sm:text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-lg">
-              {t.hero_desc}
+              {getHeroVariant() === 'b'
+                ? (language === 'FR' ? "La candidature qui te mène à l'entretien : prête en 60 secondes, au standard suisse, avec ton CV et ta photo."
+                  : language === 'IT' ? 'La candidatura che ti porta al colloquio: pronta in 60 secondi, secondo lo standard svizzero, con il tuo CV e la tua foto.'
+                  : language === 'EN' ? 'The application that gets you the interview: ready in 60 seconds, Swiss standard, with your CV and photo.'
+                  : 'Die Bewerbung, die dich zum Interview bringt: in 60 Sekunden fertig, im Schweizer Standard, mit deinem Lebenslauf und Foto.')
+                : t.hero_desc}
             </p>
             {/* The real four-step journey, identical in every language —
                 the hero must only promise what V1 actually delivers. */}
@@ -13216,6 +13275,59 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         )}
       </AnimatePresence>
 
+      {/* --- EXIT INTENT (pricing) --- */}
+      <AnimatePresence>
+        {showExitIntent && (
+          <div className="fixed inset-0 z-[350] flex items-center justify-center p-4 sm:p-6 bg-black/50 backdrop-blur-sm" onClick={() => setShowExitIntent(false)}>
+            <motion.div
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.98 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md overflow-hidden text-white shadow-2xl"
+              style={{ background: 'linear-gradient(135deg, #00331d 0%, #004225 55%, #0a5233 100%)' }}
+            >
+              <svg viewBox="0 0 100 100" className="absolute -right-5 -top-5 w-32 h-32 opacity-[0.14]" aria-hidden="true">
+                <path d="M50 16 Q55 42 80 52 Q56 56 48 84 Q45 58 20 46 Q46 42 50 16 Z" fill="#6FCF97" />
+              </svg>
+              <button
+                onClick={() => setShowExitIntent(false)}
+                className="absolute top-3 right-3 p-2 text-white/60 hover:text-white transition-colors"
+                aria-label={language === 'FR' ? 'Fermer' : language === 'IT' ? 'Chiudi' : language === 'EN' ? 'Close' : 'Schliessen'}
+              >
+                <X size={18} />
+              </button>
+              <div className="relative p-7 sm:p-9">
+                <h3 className="text-2xl font-serif mb-3">
+                  {language === 'FR' ? 'Encore en train de réfléchir ?' : language === 'IT' ? 'Ci stai ancora pensando?' : language === 'EN' ? 'Still thinking it over?' : 'Noch am Überlegen?'}
+                </h3>
+                <p className="text-sm text-white/80 font-light leading-relaxed mb-6">
+                  {language === 'FR' ? 'Commence gratuitement et décide plus tard. 3 candidatures offertes, sans carte de crédit, résiliable à tout moment.'
+                    : language === 'IT' ? 'Inizia gratis e decidi dopo. 3 candidature in regalo, senza carta di credito, disdicibile in ogni momento.'
+                    : language === 'EN' ? 'Start free and decide later. 3 applications on us, no credit card, cancel anytime.'
+                    : 'Starte gratis und entscheide später. 3 Bewerbungen geschenkt, keine Kreditkarte nötig, jederzeit kündbar.'}
+                </p>
+                <button
+                  onClick={() => {
+                    setShowExitIntent(false);
+                    if (user) { handleToolClick('bewerbungs-gen'); }
+                    else { setAuthTab('register'); setIsAuthModalOpen(true); }
+                  }}
+                  className="w-full py-3.5 bg-white text-[#004225] text-xs font-bold uppercase tracking-[0.2em] hover:bg-[#E8F3EC] transition-colors"
+                >
+                  {language === 'FR' ? 'Commencer gratuitement' : language === 'IT' ? 'Inizia gratis' : language === 'EN' ? 'Start for free' : 'Gratis starten'}
+                </button>
+                <button
+                  onClick={() => setShowExitIntent(false)}
+                  className="w-full mt-2.5 py-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/60 hover:text-white transition-colors"
+                >
+                  {language === 'FR' ? 'Continuer à regarder' : language === 'IT' ? 'Continua a guardare' : language === 'EN' ? 'Keep browsing' : 'Weiter schauen'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       {/* --- AUTH MODAL --- */}
       <AnimatePresence>
         {isAuthModalOpen && (
@@ -13528,6 +13640,18 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                        language === 'IT' ? 'Accedi con Google' :
                        'Sign in with Google'}
                     </button>
+
+                    {isInAppBrowser() && (
+                      <div className="flex items-start gap-2.5 p-3 bg-[#004225]/6 dark:bg-[#00A854]/10 border border-[#004225]/20 dark:border-[#00A854]/25">
+                        <Info size={14} className="shrink-0 mt-0.5 text-[#004225] dark:text-[#00A854]" />
+                        <p className="text-[11px] text-[#4A4A45] dark:text-[#B5B5AF] font-light leading-relaxed">
+                          {language === 'FR' ? "Tu es dans le navigateur intégré d'une app. Google y bloque la connexion. Ouvre stellify.ch dans Safari ou Chrome, ou inscris-toi ici par e-mail, ça fonctionne parfaitement."
+                            : language === 'IT' ? "Sei nel browser integrato di un'app. Google vi blocca l'accesso. Apri stellify.ch in Safari o Chrome, oppure registrati qui via e-mail, funziona perfettamente."
+                            : language === 'EN' ? 'You are inside an in-app browser. Google blocks sign-in here. Open stellify.ch in Safari or Chrome, or sign up right here with email, which works perfectly.'
+                            : 'Du bist im integrierten Browser einer App. Google blockiert die Anmeldung dort. Öffne stellify.ch in Safari oder Chrome, oder registriere dich hier direkt per E-Mail, das funktioniert einwandfrei.'}
+                        </p>
+                      </div>
+                    )}
 
                   </>
                 )}
