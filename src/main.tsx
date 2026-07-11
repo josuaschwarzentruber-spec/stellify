@@ -1,6 +1,12 @@
 import React, {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
+import { inject } from '@vercel/analytics';
 import './index.css';
+
+// Vercel Web Analytics — pageviews plus the custom events the app fires
+// (hero A/B variant). Harmless no-op until analytics is enabled for the
+// project in the Vercel dashboard.
+try { inject(); } catch { /* analytics must never break the app */ }
 
 // Ensure process.env is available in the browser
 if (typeof (window as any).process === 'undefined') {

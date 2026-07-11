@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
+import { track as vaTrack } from '@vercel/analytics';
 import { useDropzone } from 'react-dropzone';
 import {
   DndContext, useSensor, useSensors, PointerSensor, TouchSensor, KeyboardSensor,
@@ -2318,7 +2319,7 @@ function StellifyApp() {
   // Report the assigned hero variant to Vercel Analytics (no-op until Web
   // Analytics is enabled in the Vercel dashboard).
   useEffect(() => {
-    try { (window as any).va?.('event', { name: 'hero_variant', data: { variant: getHeroVariant() } }); } catch { /* ignore */ }
+    try { vaTrack('hero_variant', { variant: getHeroVariant() }); } catch { /* ignore */ }
   }, []);
 
   // Exit intent on the pricing view — one gentle second-chance nudge per
