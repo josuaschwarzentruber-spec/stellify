@@ -1794,6 +1794,45 @@ app.post("/api/create-checkout-session", express.json(), requireAuth, async (req
     const isAnnual = billingCycle === 'yearly';
     const origin = String(req.headers.origin || process.env.SITE_URL || 'https://stellify.ch');
 
+    // Guard against double subscriptions: if the user already has a running
+    // subscription, a second checkout would bill them twice. Instead we swap
+    // the price on the EXISTING subscription (up- or downgrade with
+    // proration) and never create a parallel one.
+    try {
+      const { adminDb } = getAdminServices();
+      const userSnap = await adminDb.collection('users').doc(userId).get();
+      const customerId = (userSnap.data() || {}).stripe_customer_id as string | undefined;
+      if (customerId) {
+        const subs = await stripeClient.subscriptions.list({ customer: customerId, status: 'active', limit: 5 });
+        const active = subs.data[0];
+        if (active) {
+          const item = active.items.data[0];
+          if (item?.price?.id === priceId) {
+            return res.status(400).json({ error: 'Dieser Plan ist bereits aktiv.' });
+          }
+          const updated = await stripeClient.subscriptions.update(active.id, {
+            items: [{ id: item.id, price: priceId }],
+            proration_behavior: 'always_invoice',
+            cancel_at_period_end: false,
+            metadata: { planId, billingCycle },
+          });
+          const periodEnd = (updated as any).current_period_end as number | undefined;
+          await adminDb.collection('users').doc(userId).update({
+            role: normaliseRole(planId),
+            subscription_interval: isAnnual ? 'annual' : 'monthly',
+            ...(periodEnd ? { subscription_expires_at: new Date(periodEnd * 1000).toISOString() } : {}),
+          });
+          console.log(`[STRIPE] plan switched in place for ${userId}: ${item?.price?.id} -> ${priceId}`);
+          return res.json({ success: true, upgraded: true, planId });
+        }
+      }
+    } catch (guardErr: any) {
+      // If the guard itself fails we must NOT fall through to a second
+      // subscription — that is the exact bug this exists to prevent.
+      console.error('[STRIPE] double-subscription guard failed:', guardErr.message);
+      return res.status(500).json({ error: 'Planwechsel momentan nicht möglich. Bitte versuch es später erneut.' });
+    }
+
     // Premium positioning: no discount / promo-code field at checkout.
     // (An optional STRIPE_LAUNCH_COUPON can still auto-apply a coupon if
     // ever set, but nothing is shown to the customer by default.)

@@ -3522,7 +3522,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
 
       const data = await res.json().catch(() => ({ error: 'Server-Fehler' }));
       if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-      if (data.url) {
+      if (data.upgraded) {
+        // Existing subscription was switched in place — no checkout needed.
+        showToast(language === 'FR' ? 'Plan mis à jour. Bienvenue !' : language === 'IT' ? 'Piano aggiornato. Benvenuto!' : language === 'EN' ? 'Plan updated. Welcome!' : 'Plan aktualisiert. Willkommen!');
+        setTimeout(() => { window.location.href = window.location.origin + '/dashboard'; }, 1200);
+      } else if (data.url) {
         window.location.href = data.url;
       } else {
         throw new Error(data.error || 'Checkout fehlgeschlagen');
