@@ -1030,7 +1030,7 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
       }
       if (used >= QUOTA.client.lifetime) {
         return res.status(402).json({
-          error: 'Du hast deine 3 kostenlosen Versuche aufgebraucht. Upgrade auf Pro oder Karriere+ für weitere KI-Anfragen.',
+          error: 'Die 3 kostenlosen Generierungen dieser E-Mail-Adresse sind aufgebraucht. Das Gratis-Kontingent gilt pro E-Mail-Adresse und bleibt auch nach dem Löschen eines Kontos verbraucht. Mit Pro erstellst du sofort weiter.',
           upgrade: true,
           remaining: 0,
         });

@@ -353,9 +353,39 @@ const GuidePages = ({ onBack, onOpenTool, language }: { onBack: () => void; onOp
                     </li>
                   ))}
                 </ul>
+                <button onClick={onOpenTool} className="mt-4 pt-3 border-t border-[#004225]/10 dark:border-[#00A854]/15 w-full text-left group">
+                  <span className="text-[13px] font-light text-[#26261F] dark:text-[#C8C8C2]">
+                    {language === 'FR' ? 'Bon à savoir : le générateur Stellify applique tout cela automatiquement, en 60 secondes. '
+                      : language === 'IT' ? 'Da sapere: il generatore Stellify applica tutto questo automaticamente, in 60 secondi. '
+                      : language === 'EN' ? 'Good to know: the Stellify generator applies all of this automatically, in 60 seconds. '
+                      : 'Gut zu wissen: Der Stellify Bewerbungs-Generator setzt genau das automatisch um, in 60 Sekunden. '}
+                  </span>
+                  <span className="text-[13px] font-bold text-[#004225] dark:text-[#00A854] group-hover:underline whitespace-nowrap">
+                    {language === 'FR' ? 'Essayer gratuitement →' : language === 'IT' ? 'Prova gratis →' : language === 'EN' ? 'Try it free →' : 'Gratis ausprobieren →'}
+                  </span>
+                </button>
               </div>
             </article>
           ))}
+        </div>
+
+        {/* Questions & contact — mail first, Instagram second */}
+        <div className="mt-12 p-6 bg-white dark:bg-[#22221F] border border-black/5 dark:border-white/5 rounded-2xl">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854] mb-2">
+            {language === 'FR' ? 'Des questions ?' : language === 'IT' ? 'Domande?' : language === 'EN' ? 'Questions?' : 'Fragen oder Probleme?'}
+          </p>
+          <p className="text-sm text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
+            {language === 'FR' ? 'Écris-nous en premier par e-mail à '
+              : language === 'IT' ? 'Scrivici prima via e-mail a '
+              : language === 'EN' ? 'Write to us first by email at '
+              : 'Schreib uns am besten zuerst per E-Mail an '}
+            <a href="mailto:support.stellify@gmail.com" className="font-medium text-[#004225] dark:text-[#00A854] hover:underline">support.stellify@gmail.com</a>
+            {language === 'FR' ? ', ou pose ta question sur Instagram à '
+              : language === 'IT' ? ', oppure fai la tua domanda su Instagram a '
+              : language === 'EN' ? ', or ask on Instagram at '
+              : ', oder stell deine Frage auf Instagram an '}
+            <a href="https://www.instagram.com/stellify.ch/" target="_blank" rel="noopener noreferrer" className="font-medium text-[#004225] dark:text-[#00A854] hover:underline">@stellify.ch</a>.
+          </p>
         </div>
 
         {/* Soft CTA into the product */}

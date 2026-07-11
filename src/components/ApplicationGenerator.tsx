@@ -482,7 +482,7 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   initialTarget?: { company?: string; position?: string } | null;
   cvContext?: string;
   locked: boolean;
-  onUpgrade: (reason?: 'quota' | 'daily') => void;
+  onUpgrade: (reason?: 'quota' | 'daily', message?: string) => void;
   showToast: (msg: string, type?: string) => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
   /** Called when user picks a CV file inside the generator. Should parse it
@@ -779,7 +779,7 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
         // cases straight to the plans page. Nothing was generated, nothing
         // was counted against the user in these cases.
         if (res.status === 402) {
-          onUpgrade('quota');
+          onUpgrade('quota', data.error);
           return;
         }
         // Daily free ceiling reached (server sends upgrade:true) → same warm

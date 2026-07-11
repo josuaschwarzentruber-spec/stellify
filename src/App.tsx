@@ -422,13 +422,13 @@ interface UserData {
 // A convincing, premium modal shown when a free user runs out of tries
 // ('quota') or the daily free ceiling is reached ('daily'). Turns a hard
 // stop into a warm invitation to upgrade, with the value and the plans.
-const UpgradePrompt = ({ reason, language, onClose, onPricing }: { reason: 'quota' | 'daily'; language: string; onClose: () => void; onPricing: () => void }) => {
+const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { reason: 'quota' | 'daily'; language: string; onClose: () => void; onPricing: () => void; subOverride?: string }) => {
   const L = (de: string, fr: string, it: string, en: string) =>
     language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
   const headline = reason === 'daily'
     ? L('Heute besonders gefragt', 'Très demandé aujourd\'hui', 'Molto richiesto oggi', 'In high demand today')
     : L('Deine 3 Gratis-Bewerbungen sind erstellt', 'Tes 3 candidatures gratuites sont créées', 'Le tue 3 candidature gratuite sono create', 'Your 3 free applications are done');
-  const sub = reason === 'daily'
+  const sub = subOverride ? subOverride : reason === 'daily'
     ? L('Die kostenlosen Generierungen sind für heute ausgeschöpft. Mit Pro geht es sofort weiter, ganz ohne Wartezeit.',
         'Les générations gratuites sont épuisées pour aujourd\'hui. Avec Pro, tu continues tout de suite, sans attendre.',
         'Le generazioni gratuite sono esaurite per oggi. Con Pro continui subito, senza attese.',
@@ -1866,7 +1866,7 @@ function StellifyApp() {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   // Convincing upgrade modal: 'quota' = free tries used up, 'daily' = daily cap hit.
-  const [upgradePrompt, setUpgradePrompt] = useState<'quota' | 'daily' | null>(null);
+  const [upgradePrompt, setUpgradePrompt] = useState<{ reason: 'quota' | 'daily'; message?: string } | null>(null);
   const [expiryBanner, setExpiryBanner] = useState<{ daysLeft: number; interval: 'monthly' | 'annual' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -4189,12 +4189,12 @@ Bewerte in 3 Kategorien (je 0 bis 100%):
       // panel instead of a generic failure, so the user knows what to do.
       if (toolRes.status === 402) {
         setIsProcessingTool(false);
-        setUpgradePrompt('quota');
+        setUpgradePrompt({ reason: 'quota' });
         return;
       }
       if (toolRes.status === 503 && toolData.upgrade) {
         setIsProcessingTool(false);
-        setUpgradePrompt('daily');
+        setUpgradePrompt({ reason: 'daily' });
         return;
       }
       if (!toolRes.ok) throw new Error(toolData.error || 'Tool processing failed');
@@ -8122,7 +8122,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-full bg-black/[0.03] dark:bg-white/[0.04] border border-black/5 dark:border-white/5 text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/10 transition-all uppercase tracking-widest"
               >
-                <Globe size={13} />
+                <svg width="13" height="13" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4L19 14L29 16L19 18L16 28L13 18L3 16L13 14Z" fill="currentColor"/></svg>
                 {language}
                 <ChevronDown size={11} className={`transition-transform duration-200 ${isLangDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -8508,8 +8508,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     },
                     { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
                     {
-                      label: t.dashboard_stat_applications, value: trackerStats?.total ?? 0, icon: <Send size={15} />, num: true,
-                      sub: language === 'FR' ? 'Enregistrées dans le tracker' : language === 'IT' ? 'Registrate nel tracker' : language === 'EN' ? 'Logged in the tracker' : 'Im Tracker erfasst',
+                      label: 'Tracker', value: trackerStats?.total ?? 0, icon: <Layout size={15} />, num: true,
+                      sub: language === 'FR' ? 'Candidatures suivies' : language === 'IT' ? 'Candidature seguite' : language === 'EN' ? 'Applications tracked' : 'Laufende Bewerbungen',
                       action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
                     { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} /> }
@@ -9466,7 +9466,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             });
                             const d = await r.json();
                             if (!r.ok) throw new Error(d.error || 'Fehler');
-                            showToast(`Newsletter an ${d.sent} Empfänger gesendet`);
+                            if (d.sent > 400) {
+                              showToast(`Newsletter an ${d.sent} Empfänger gesendet. Achtung: Nahe am Gmail-Tageslimit (~500). Zeit für einen Versanddienst, melde dich bei Claude.`, 'error');
+                            } else {
+                              showToast(`Newsletter an ${d.sent} Empfänger gesendet`);
+                            }
                             setNlSubject(''); setNlMessage('');
                           } catch (e: any) { showToast(e.message || 'Versand fehlgeschlagen', 'error'); }
                           finally { setNlSending(false); }
@@ -11547,7 +11551,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       <AnimatePresence>
         {upgradePrompt && (
           <UpgradePrompt
-            reason={upgradePrompt}
+            reason={upgradePrompt.reason}
+            subOverride={upgradePrompt.message}
             language={language}
             onClose={() => setUpgradePrompt(null)}
             onPricing={() => { setUpgradePrompt(null); setActiveTool(null); navigate('pricing'); }}
@@ -12377,7 +12382,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         initialTarget={generatorPrefill}
                         cvContext={cvContext}
                         locked={isToolLocked}
-                        onUpgrade={(reason?: 'quota' | 'daily') => setUpgradePrompt(reason || 'quota')}
+                        onUpgrade={(reason?: 'quota' | 'daily', message?: string) => setUpgradePrompt({ reason: reason || 'quota', message })}
                         showToast={showToast}
                         authFetch={authFetch}
                         onUploadCv={processFile}
