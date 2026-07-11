@@ -8509,7 +8509,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500' },
                     {
                       label: t.dashboard_stat_applications, value: trackerStats?.total ?? 0, icon: <Send size={15} />, num: true,
-                      sub: language === 'FR' ? 'Dans ta vue d\'ensemble' : language === 'IT' ? 'Nella tua panoramica' : language === 'EN' ? 'In your overview' : 'In deiner Übersicht',
+                      sub: language === 'FR' ? 'Enregistrées dans le tracker' : language === 'IT' ? 'Registrate nel tracker' : language === 'EN' ? 'Logged in the tracker' : 'Im Tracker erfasst',
                       action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
                     { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} /> }
