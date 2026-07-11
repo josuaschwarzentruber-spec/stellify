@@ -416,6 +416,7 @@ interface UserData {
   stripeCustomerId?: string;
   avatarId?: string;
   newsletterOptIn?: boolean;
+  upgradeMailsOptIn?: boolean;
 }
 
 // --- UPGRADE PROMPT ---
@@ -1540,7 +1541,7 @@ function StellifyApp() {
   // Admin newsletter composer state
   const [nlSubject, setNlSubject] = useState('');
   const [nlMessage, setNlMessage] = useState('');
-  const [nlAudience, setNlAudience] = useState<'all' | 'free' | 'paying'>('all');
+  const [nlAudience, setNlAudience] = useState<'all' | 'free' | 'paying'>('free');
   const [nlSending, setNlSending] = useState(false);
   // Starter checklist on the dashboard — dismissed state survives reloads.
   const [starterDismissed, setStarterDismissed] = useState<boolean>(() => {
@@ -1965,6 +1966,7 @@ function StellifyApp() {
         searchUses: rawData?.search_uses || 0,
         avatarId: rawData?.avatar_id || undefined,
         newsletterOptIn: rawData?.newsletter !== false,
+        upgradeMailsOptIn: rawData?.upgrade_mails !== false,
       };
       setUser(newUser);
 
@@ -2018,6 +2020,7 @@ function StellifyApp() {
               created_at: new Date().toISOString(),
               ab_hero: getHeroVariant(),
               newsletter: true,
+              upgrade_mails: true,
               free_generations_used: 0,
               tool_uses: 0,
               daily_tool_uses: 0,
@@ -2669,6 +2672,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           created_at: new Date().toISOString(),
           ab_hero: getHeroVariant(),
           newsletter: true,
+          upgrade_mails: true,
           cv_context: cvContext || null,
           free_generations_used: 0,
           tool_uses: 0,
@@ -9424,6 +9428,40 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${user.newsletterOptIn !== false ? 'left-[22px]' : 'left-0.5'}`} />
                     </button>
                   </div>
+                  {/* Upgrade offers by mail — free accounts only; paying
+                      customers never receive upgrade pitches anyway. */}
+                  {user.role === 'client' && (
+                    <div className="flex items-center justify-between gap-4 p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">
+                          {language === 'FR' ? 'Offres d\'upgrade par e-mail' : language === 'IT' ? 'Offerte di upgrade via e-mail' : language === 'EN' ? 'Upgrade offers by email' : 'Upgrade-Angebote per E-Mail'}
+                        </p>
+                        <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">
+                          {language === 'FR' ? 'Occasionnellement des infos sur Pro et Karriere+. Jamais pour les clients payants.'
+                            : language === 'IT' ? 'Occasionalmente informazioni su Pro e Karriere+. Mai per i clienti paganti.'
+                            : language === 'EN' ? 'Occasional info about Pro and Karriere+. Paying customers never receive these.'
+                            : 'Gelegentlich Infos zu Pro und Karriere+. Zahlende Kunden erhalten solche Mails nie.'}
+                        </p>
+                      </div>
+                      <button
+                        role="switch"
+                        aria-checked={user.upgradeMailsOptIn !== false}
+                        onClick={async () => {
+                          const next = !(user.upgradeMailsOptIn !== false);
+                          try {
+                            await updateDoc(doc(db, 'users', user.id), { upgrade_mails: next });
+                            setUser({ ...user, upgradeMailsOptIn: next });
+                            showToast(next
+                              ? (language === 'FR' ? 'Offres activées' : language === 'IT' ? 'Offerte attivate' : language === 'EN' ? 'Offers on' : 'Upgrade-Mails aktiviert')
+                              : (language === 'FR' ? 'Offres désactivées' : language === 'IT' ? 'Offerte disattivate' : language === 'EN' ? 'Offers off' : 'Upgrade-Mails abgeschaltet'));
+                          } catch { showToast('Fehler', 'error'); }
+                        }}
+                        className={`shrink-0 w-11 h-6 rounded-full transition-colors relative ${user.upgradeMailsOptIn !== false ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'}`}
+                      >
+                        <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow transition-all ${user.upgradeMailsOptIn !== false ? 'left-[22px]' : 'left-0.5'}`} />
+                      </button>
+                    </div>
+                  )}
                   <p className="text-xs text-[#5C5C58] font-light leading-relaxed">
                     {t.settings_privacy_desc}
                   </p>
@@ -9455,8 +9493,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         onChange={(e) => setNlAudience(e.target.value as 'all' | 'free' | 'paying')}
                         className="bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/10 dark:border-white/10 px-3 py-2.5 text-sm outline-none"
                       >
+                        <option value="free">Nur Gratis-Nutzer (für Upgrade-Werbung)</option>
                         <option value="all">An alle mit Newsletter an</option>
-                        <option value="free">Nur Gratis-Nutzer</option>
                         <option value="paying">Nur zahlende Kunden</option>
                       </select>
                       <button
@@ -9482,7 +9520,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         {nlSending ? 'Wird gesendet…' : 'Jetzt senden'}
                       </button>
                     </div>
-                    <p className="text-[10px] text-[#9A9A94] font-light">Empfänger sind nur Konten, bei denen der Newsletter-Schalter an ist. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
+                    <p className="text-[10px] text-[#9A9A94] font-light">Empfänger sind nur Konten, bei denen der Newsletter-Schalter an ist. Bei "Nur Gratis-Nutzer" wird zusätzlich der Schalter "Upgrade-Angebote per E-Mail" respektiert, ideal für Upgrade-Werbung: Pro und Karriere+ Kunden brauchen die nicht. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
                   </div>
                 )}
 

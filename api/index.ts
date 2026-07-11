@@ -1720,6 +1720,7 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
       if (!u.email || u.newsletter === false) continue;
       const paying = u.role === 'pro' || u.role === 'unlimited';
       if (audience === 'free' && paying) continue;
+      if (audience === 'free' && u.upgrade_mails === false) continue;
       if (audience === 'paying' && !paying) continue;
       const lang = (['DE','FR','IT','EN'].includes(String(u.language || '').toUpperCase()) ? String(u.language).toUpperCase() : 'DE') as Lang;
       await sendEmail({
@@ -1767,7 +1768,7 @@ app.get("/api/cron/onboarding", async (req, res) => {
         const u = d.data() as any;
         if (!u.email || u[st.flag]) continue;
         if (u.newsletter === false) continue;
-        if (st.day === 7 && u.role !== 'client') continue;
+        if (st.day === 7 && (u.role !== 'client' || u.upgrade_mails === false)) continue;
         const lang = (String(u.language || 'DE').toUpperCase() as Lang);
         const copy = onboardingCopy(st.day, u.first_name || '', ['DE','FR','IT','EN'].includes(lang) ? lang : 'DE');
         await sendEmail({
