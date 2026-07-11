@@ -4960,7 +4960,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_fair_use: "Du hast das Fair-Use-Limit für Live-Suchen erreicht. Bitte versuche es morgen wieder oder kontaktiere den Support.",
       dashboard_stat_pro: "Pro",
       dashboard_pro: "Karriere-Profi",
-      dashboard_desc: "Stella hat alles bereit. Erstelle eine neue Bewerbung, optimiere deinen Lebenslauf oder bereite dich auf dein nächstes Vorstellungsgespräch vor.",
+      dashboard_desc: "Stella hat alles bereit. Erstelle in 60 Sekunden eine neue Bewerbung oder behalte deine laufenden Bewerbungen im Tracker im Blick.",
       dashboard_stat_analyses: "Analysen",
       dashboard_stat_cv_status: "Lebenslauf",
       dashboard_stat_ready: "Bereit",
@@ -5622,7 +5622,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Votre limite de recherches en direct (10/mois) est atteinte. Vous en aurez de nouvelles le mois prochain. Passe à Karriere+ pour 300 recherches en direct par mois.",
       tool_limit_search_fair_use: "Vous avez atteint la limite d'utilisation équitable pour les recherches en direct. Veuillez réessayer demain ou contacter le support.",
       dashboard_pro: "Professionnel de carrière",
-      dashboard_desc: "Stella a tout préparé. Crée une nouvelle candidature, optimise ton CV ou prépare-toi pour ton prochain entretien.",
+      dashboard_desc: "Stella a tout préparé. Crée une nouvelle candidature en 60 secondes ou garde un œil sur tes candidatures dans le tracker.",
       dashboard_stat_analyses: "Analyses",
       dashboard_stat_cv_status: "Statut CV",
       dashboard_stat_ready: "Prêt",
@@ -6179,7 +6179,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Il tuo limite di ricerche dal vivo (10/mese) è raggiunto. Il prossimo mese avrai nuove ricerche libere. Passa a Karriere+ per 300 ricerche dal vivo al mese.",
       tool_limit_search_fair_use: "Hai raggiunto il limite di utilizzo corretto per le ricerche dal vivo. Riprova domani o contatta il supporto.",
       dashboard_pro: "Professionista della carriera",
-      dashboard_desc: "Stella ha tutto pronto. Crea una nuova candidatura, ottimizza il tuo CV o preparati per il tuo prossimo colloquio.",
+      dashboard_desc: "Stella ha tutto pronto. Crea una nuova candidatura in 60 secondi o tieni d'occhio le tue candidature nel tracker.",
       dashboard_stat_analyses: "Analisi",
       dashboard_stat_cv_status: "Stato CV",
       dashboard_stat_ready: "Pronto",
@@ -6736,7 +6736,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Your live search limit (10/month) has been reached. You will get new searches next month. Upgrade to Karriere+ for 300 live searches per month.",
       tool_limit_search_fair_use: "You have reached the fair-use limit for live searches. Please try again tomorrow or contact support.",
       dashboard_pro: "Career Professional",
-      dashboard_desc: "Stella has everything ready. Create a new application, optimise your CV, or prepare for your next interview.",
+      dashboard_desc: "Stella has everything ready. Create a new application in 60 seconds or keep an eye on your applications in the tracker.",
       dashboard_stat_analyses: "Analyses",
       dashboard_stat_cv_status: "CV (Resume)",
       dashboard_stat_ready: "Ready",
@@ -9304,22 +9304,22 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
                     const used = Math.min(user.toolUses || 0, limit);
                     return (
-                      <div className="p-6 bg-[#FDFCFB] border border-black/5 space-y-6">
-                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
+                      <div className="p-6 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 space-y-6">
+                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
                           <Activity size={14} />
                           <span>{t.settings_your_usage}</span>
                         </div>
                         <div className="space-y-2">
                           <div className="flex justify-between items-end">
                             <div className="space-y-0.5">
-                              <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18]">{t.settings_apps_tools}</p>
+                              <p className="text-[10px] font-bold uppercase tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.settings_apps_tools}</p>
                               <p className="text-[9px] text-[#9A9A94] uppercase tracking-widest">{used} / {limit} {user.role === 'client' ? t.settings_free_use : t.settings_generations}</p>
                             </div>
-                            <span className="text-xs font-serif text-[#004225]">{limit - used} {t.remaining}</span>
+                            <span className="text-xs font-serif text-[#004225] dark:text-[#00A854]">{limit - used} {t.remaining}</span>
                           </div>
-                          <div className="h-1.5 bg-black/5 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-black/5 dark:bg-white/10 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#004225] transition-all duration-700"
+                              className="h-full bg-[#004225] dark:bg-[#00A854] transition-all duration-700"
                               style={{ width: `${Math.min(100, Math.round((used / limit) * 100))}%` }}
                             />
                           </div>
