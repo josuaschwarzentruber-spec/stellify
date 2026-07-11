@@ -491,14 +491,32 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           const localeMap: Record<Lang, string> = { DE: 'de-CH', FR: 'fr-CH', IT: 'it-CH', EN: 'en-GB' };
           const dateStr = expiresAt.toLocaleDateString(localeMap[userLang] || 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
           const firstName = existingUser.first_name || (userLang === 'DE' ? 'Nutzer' : userLang === 'FR' ? 'utilisateur' : userLang === 'IT' ? 'utente' : 'there');
+          const genCount = planId === 'ultimate' ? '150' : '50';
+          const planPerks: Record<Lang, string> = {
+            DE: planId === 'ultimate'
+              ? `Dir stehen jetzt <strong>${genCount} Generierungen pro Monat</strong>, alle exklusiven Premium-Designs und der persönliche E-Mail-Support offen.`
+              : `Dir stehen jetzt <strong>${genCount} Generierungen pro Monat</strong>, der Stellen-Import per Link und alle Standard-Designs offen.`,
+            FR: planId === 'ultimate'
+              ? `Tu disposes maintenant de <strong>${genCount} générations par mois</strong>, de tous les designs Premium exclusifs et du support e-mail personnel.`
+              : `Tu disposes maintenant de <strong>${genCount} générations par mois</strong>, de l'import d'annonces par lien et de tous les designs standard.`,
+            IT: planId === 'ultimate'
+              ? `Ora hai a disposizione <strong>${genCount} generazioni al mese</strong>, tutti i design Premium esclusivi e il supporto e-mail personale.`
+              : `Ora hai a disposizione <strong>${genCount} generazioni al mese</strong>, l'import degli annunci da link e tutti i design standard.`,
+            EN: planId === 'ultimate'
+              ? `You now have <strong>${genCount} generations per month</strong>, every exclusive premium design and personal email support.`
+              : `You now have <strong>${genCount} generations per month</strong>, job-ad import by link and every standard design.`,
+          };
           const planWelcome: Record<Lang, { subject: string; title: string; lines: string[]; cta: string; signoff: string }> = {
             DE: {
               subject: `Willkommen im ${planLabel}-Plan, dein Stellify-Abo ist aktiv`,
               title:   `Willkommen im ${planLabel}-Plan`,
               lines: [
                 `Hallo ${firstName},`,
-                `vielen Dank, dein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement ist jetzt aktiv.`,
-                `Dein Abo ist gültig bis zum <strong>${dateStr}</strong>.`,
+                `danke für dein Vertrauen. Dein ${isAnnual ? 'Jahres' : 'Monats'}-Abonnement ist ab sofort aktiv.`,
+                planPerks.DE,
+                `Dein Abo verlängert sich automatisch und ist bis zum <strong>${dateStr}</strong> bezahlt. Verwalten oder kündigen kannst du es jederzeit mit einem Klick in deinem Profil unter <strong>Abo verwalten</strong>.`,
+                `Ein Tipp für den Start: Lade deinen Lebenslauf hoch und füge einfach den Link eines Stelleninserats ein, den Rest übernimmt Stellify.`,
+                `Wenn du Fragen hast oder etwas nicht rund läuft, antworte einfach auf diese E-Mail oder schreib an support.stellify@gmail.com. Wir melden uns persönlich.`,
               ],
               cta: 'Zum Dashboard',
               signoff: 'Das Stellify-Team',
@@ -508,8 +526,11 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
               title:   `Bienvenue dans le plan ${planLabel}`,
               lines: [
                 `Bonjour ${firstName},`,
-                `merci, ton abonnement ${isAnnual ? 'annuel' : 'mensuel'} est maintenant actif.`,
-                `Ton abonnement est valable jusqu'au <strong>${dateStr}</strong>.`,
+                `merci pour ta confiance. Ton abonnement ${isAnnual ? 'annuel' : 'mensuel'} est actif dès maintenant.`,
+                planPerks.FR,
+                `Ton abonnement se renouvelle automatiquement et est payé jusqu'au <strong>${dateStr}</strong>. Tu peux le gérer ou le résilier à tout moment en un clic dans ton profil sous <strong>Gérer l'abonnement</strong>.`,
+                `Un conseil pour commencer : télécharge ton CV et colle simplement le lien d'une annonce, Stellify s'occupe du reste.`,
+                `Si tu as des questions, réponds simplement à cet e-mail ou écris à support.stellify@gmail.com. Nous répondons personnellement.`,
               ],
               cta: 'Vers le tableau de bord',
               signoff: 'L\'équipe Stellify',
@@ -519,8 +540,11 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
               title:   `Benvenuto nel piano ${planLabel}`,
               lines: [
                 `Ciao ${firstName},`,
-                `grazie, il tuo abbonamento ${isAnnual ? 'annuale' : 'mensile'} è ora attivo.`,
-                `Il tuo abbonamento è valido fino al <strong>${dateStr}</strong>.`,
+                `grazie per la tua fiducia. Il tuo abbonamento ${isAnnual ? 'annuale' : 'mensile'} è attivo da subito.`,
+                planPerks.IT,
+                `Il tuo abbonamento si rinnova automaticamente ed è pagato fino al <strong>${dateStr}</strong>. Puoi gestirlo o disdirlo in ogni momento con un clic nel tuo profilo sotto <strong>Gestisci abbonamento</strong>.`,
+                `Un consiglio per iniziare: carica il tuo CV e incolla semplicemente il link di un annuncio, al resto pensa Stellify.`,
+                `Se hai domande, rispondi semplicemente a questa e-mail o scrivi a support.stellify@gmail.com. Rispondiamo personalmente.`,
               ],
               cta: 'Vai alla dashboard',
               signoff: 'Il team Stellify',
@@ -530,8 +554,11 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
               title:   `Welcome to the ${planLabel} plan`,
               lines: [
                 `Hello ${firstName},`,
-                `thanks, your ${isAnnual ? 'annual' : 'monthly'} subscription is now active.`,
-                `Your subscription is valid until <strong>${dateStr}</strong>.`,
+                `thank you for your trust. Your ${isAnnual ? 'annual' : 'monthly'} subscription is active right away.`,
+                planPerks.EN,
+                `Your subscription renews automatically and is paid until <strong>${dateStr}</strong>. You can manage or cancel it any time with one click in your profile under <strong>Manage subscription</strong>.`,
+                `A tip to get started: upload your CV and simply paste the link of a job ad, Stellify handles the rest.`,
+                `If you have questions, just reply to this email or write to support.stellify@gmail.com. We answer personally.`,
               ],
               cta: 'Open dashboard',
               signoff: 'The Stellify team',
