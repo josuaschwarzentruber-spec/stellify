@@ -1973,8 +1973,11 @@ function StellifyApp() {
           updateDoc(doc(db, 'users', firebaseUser.uid), { daily_tool_uses: 0, last_daily_reset: today }).catch(console.error);
         }
 
+        // Monthly subscriptions get their quota reset by the Stripe renewal
+        // webhook (exactly on the billing day). Annual subscriptions have no
+        // monthly invoice, so their monthly quota resets per calendar month.
         const currentMonth = new Date().toISOString().substring(0, 7);
-        if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && rawData.last_monthly_reset !== currentMonth) {
+        if ((effectiveRole === 'pro' || effectiveRole === 'unlimited') && rawData.subscription_interval === 'annual' && rawData.last_monthly_reset !== currentMonth) {
           updateDoc(doc(db, 'users', firebaseUser.uid), { tool_uses: 0, free_generations_used: 0, search_uses: 0, last_monthly_reset: currentMonth }).catch(console.error);
         }
 
@@ -8577,7 +8580,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             </div>
                             <p className="text-[9px] font-medium text-[#004225] dark:text-[#00A854]">
                               {left} {t.remaining}
-                              {paid && <span className="text-[#9A9A94] font-light"> · {t.dashboard_reset_monthly}</span>}
+                              {paid && (
+                                <span className="text-[#9A9A94] font-light">
+                                  {' · '}
+                                  {user.subscriptionInterval !== 'annual' && user.subscriptionExpiresAt
+                                    ? (language === 'FR' ? 'renouvelé le ' : language === 'IT' ? 'si rinnova il ' : language === 'EN' ? 'renews ' : 'neu ab ') + new Date(user.subscriptionExpiresAt).toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit' })
+                                    : t.dashboard_reset_monthly}
+                                </span>
+                              )}
                             </p>
                             {!paid && (
                               <button

@@ -483,6 +483,10 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           subscription_interval: isAnnual ? 'annual' : 'monthly',
           subscription_expires_at: expiresAt.toISOString(),
           stripe_customer_id: session.customer || null,
+          // The paid period starts now — the visible monthly counter starts
+          // at zero so the customer gets the full quota from day one.
+          tool_uses: 0,
+          search_uses: 0,
         });
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
         if (existingUser?.email) {
@@ -648,7 +652,12 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           const expiresAt = new Date();
           if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
           else expiresAt.setMonth(expiresAt.getMonth() + 1);
-          await userDoc.ref.update({ subscription_expires_at: expiresAt.toISOString() });
+          await userDoc.ref.update({
+            subscription_expires_at: expiresAt.toISOString(),
+            // A new billing period starts now — the monthly quota starts
+            // fresh with it (annual plans reset per calendar month instead).
+            ...(isAnnual ? {} : { tool_uses: 0, search_uses: 0 }),
+          });
           console.log(`[WEBHOOK] Renewed ${userDoc.id} until ${expiresAt.toISOString()}`);
         }
       } catch (err) {
