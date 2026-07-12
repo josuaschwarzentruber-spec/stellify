@@ -473,11 +473,25 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
         const isAnnual = session.metadata?.interval === 'year';
         const userSnap = await adminDb.collection('users').doc(userId).get();
         const existingUser = userSnap.data();
-        const currentExpiry = existingUser?.subscription_expires_at;
-        const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
-        const expiresAt = new Date(baseDate);
-        if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-        else expiresAt.setMonth(expiresAt.getMonth() + 1);
+        // Prefer the exact period end from the subscription Stripe just
+        // created; only fall back to arithmetic if it cannot be fetched.
+        let expiresAt: Date | null = null;
+        if (session.subscription) {
+          try {
+            const sub = await getStripe().subscriptions.retrieve(String(session.subscription));
+            const periodEnd = (sub as any).current_period_end as number | undefined;
+            if (periodEnd) expiresAt = new Date(periodEnd * 1000);
+          } catch (e: any) {
+            console.error('[WEBHOOK] could not fetch subscription period end:', e.message);
+          }
+        }
+        if (!expiresAt) {
+          const currentExpiry = existingUser?.subscription_expires_at;
+          const baseDate = currentExpiry && new Date(currentExpiry) > new Date() ? new Date(currentExpiry) : new Date();
+          expiresAt = new Date(baseDate);
+          if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+          else expiresAt.setMonth(expiresAt.getMonth() + 1);
+        }
         await adminDb.collection('users').doc(userId).update({
           role: normaliseRole(planId),
           subscription_interval: isAnnual ? 'annual' : 'monthly',
@@ -649,9 +663,14 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           const userDoc = usersSnap.docs[0];
           const u = userDoc.data() as any;
           const isAnnual = u.subscription_interval === 'annual';
-          const expiresAt = new Date();
-          if (isAnnual) expiresAt.setFullYear(expiresAt.getFullYear() + 1);
-          else expiresAt.setMonth(expiresAt.getMonth() + 1);
+          // Stripe knows the exact next billing date (incl. month-end
+          // quirks like Jan 31 -> Feb 28) — never compute it ourselves.
+          const periodEnd = (sub as any).current_period_end as number | undefined;
+          const expiresAt = periodEnd ? new Date(periodEnd * 1000) : (() => {
+            const d = new Date();
+            if (isAnnual) d.setFullYear(d.getFullYear() + 1); else d.setMonth(d.getMonth() + 1);
+            return d;
+          })();
           await userDoc.ref.update({
             subscription_expires_at: expiresAt.toISOString(),
             // A new billing period starts now — the monthly quota starts
