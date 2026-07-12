@@ -8392,14 +8392,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     },
                     {
                       done: hasGeneratedApp || toolHistory.some((h: any) => h.tool_id === 'bewerbungs-gen'),
-                      label: language === 'FR' ? 'Crée ta première candidature' : language === 'IT' ? 'Crea la tua prima candidatura' : language === 'EN' ? 'Create your first application' : 'Erstelle deine erste Bewerbung',
-                      hint: language === 'FR' ? '3 essais gratuits, 60 secondes' : language === 'IT' ? '3 prove gratuite, 60 secondi' : language === 'EN' ? '3 free tries, 60 seconds' : '3 Gratis-Versuche, 60 Sekunden',
+                      label: language === 'FR' ? 'Crée une candidature avec le générateur' : language === 'IT' ? 'Crea una candidatura con il generatore' : language === 'EN' ? 'Create an application with the generator' : 'Erstelle eine Bewerbung mit dem Generator',
+                      hint: language === 'FR' ? '3 essais gratuits, prêt en 60 secondes' : language === 'IT' ? '3 prove gratuite, pronta in 60 secondi' : language === 'EN' ? '3 free tries, ready in 60 seconds' : '3 Gratis-Versuche, fertig in 60 Sekunden',
                       action: () => handleToolClick('bewerbungs-gen'),
                     },
                     {
                       done: applications.length > 0,
-                      label: language === 'FR' ? 'Note ta candidature dans le tracker' : language === 'IT' ? 'Registra la candidatura nel tracker' : language === 'EN' ? 'Log the application in the tracker' : 'Erfasse die Bewerbung im Tracker',
-                      hint: language === 'FR' ? 'Gratuit, avec rappels de relance' : language === 'IT' ? 'Gratis, con promemoria' : language === 'EN' ? 'Free, with follow-up reminders' : 'Gratis, mit Nachfass-Erinnerungen',
+                      label: language === 'FR' ? 'Mets une candidature dans le tracker' : language === 'IT' ? 'Inserisci una candidatura nel tracker' : language === 'EN' ? 'Put an application into the tracker' : 'Trag eine Bewerbung in den Tracker ein',
+                      hint: language === 'FR' ? 'N\'importe laquelle, aussi une déjà envoyée. Gratuit, avec rappels.' : language === 'IT' ? 'Una qualsiasi, anche già inviata. Gratis, con promemoria.' : language === 'EN' ? 'Any one, even an already sent one. Free, with reminders.' : 'Irgendeine, auch eine schon versendete. Gratis, mit Erinnerungen.',
                       action: () => navigate('tracker'),
                     },
                   ];
@@ -8417,10 +8417,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             {language === 'FR' ? 'Notre conseil pour bien démarrer' : language === 'IT' ? 'Il nostro consiglio per iniziare' : language === 'EN' ? 'Our tip for a great start' : 'Unser Tipp für den besten Start'}
                           </p>
                           <p className="text-xs text-[#9A9A94] font-light mt-1">
-                            {language === 'FR' ? 'Tout est facultatif, mais avec ces trois étapes tu profites au maximum de Stellify. La liste disparaît toute seule.'
-                              : language === 'IT' ? 'Tutto è facoltativo, ma con questi tre passi sfrutti al massimo Stellify. La lista sparisce da sola.'
-                              : language === 'EN' ? 'Everything is optional, but these three steps get the most out of Stellify. The list disappears by itself.'
-                              : 'Alles freiwillig, aber mit diesen drei Schritten holst du am meisten aus Stellify heraus. Die Liste verschwindet von selbst.'}
+                            {language === 'FR' ? 'Trois choses indépendantes, dans n\'importe quel ordre, tout est facultatif. La liste disparaît toute seule quand tout est fait.'
+                              : language === 'IT' ? 'Tre cose indipendenti, in qualsiasi ordine, tutto facoltativo. La lista sparisce da sola quando è tutto fatto.'
+                              : language === 'EN' ? 'Three independent things, in any order, all optional. The list disappears by itself once everything is done.'
+                              : 'Drei unabhängige Dinge, in beliebiger Reihenfolge, alles freiwillig. Die Liste verschwindet von selbst, sobald alles erledigt ist.'}
                           </p>
                         </div>
                         <button
