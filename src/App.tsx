@@ -4922,7 +4922,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
       faq_5_a: "Wir unterstützen Deutsch, Englisch, Französisch und Italienisch.",
-      faq_6_q: "Warum Stellify statt einfach ChatGPT?",
+      faq_6_q: "Warum Stellify statt ChatGPT, Claude & Co.?",
       faq_6_a: "Ein Chat gibt dir Text, den du selbst formatieren, prüfen und zusammenbauen musst. Stellify liefert das fertige Resultat: Du fügst das Stelleninserat per Link ein, dein Lebenslauf und dein Foto werden automatisch übernommen, und in 60 Sekunden hältst du ein versandbereites Dokument im Schweizer Standard in der Hand, als PDF und Word, im Design deiner Wahl. Dazu behält der kostenlose Tracker alle deine Bewerbungen, Fristen und Erinnerungen im Blick. Das ist der Unterschied zwischen einem Werkzeug und einem Textfenster.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Einstellungen",
@@ -5585,7 +5585,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
       faq_5_a: "Nous prenons en charge l'allemand, l'anglais, le français et l'italien.",
-      faq_6_q: "Pourquoi Stellify plutôt que ChatGPT ?",
+      faq_6_q: "Pourquoi Stellify plutôt que ChatGPT, Claude & Cie ?",
       faq_6_a: "Un chat te donne du texte que tu dois formater, vérifier et assembler toi-même. Stellify livre le résultat fini : tu colles le lien de l'annonce, ton CV et ta photo sont repris automatiquement, et en 60 secondes tu tiens un document prêt à envoyer au standard suisse, en PDF et Word, dans le design de ton choix. En plus, le tracker gratuit garde toutes tes candidatures, échéances et rappels sous contrôle. C'est la différence entre un outil et une fenêtre de texte.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Paramètres",
@@ -6142,7 +6142,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
       faq_5_a: "Supportiamo tedesco, inglese, francese e italiano.",
-      faq_6_q: "Perché Stellify invece di ChatGPT?",
+      faq_6_q: "Perché Stellify invece di ChatGPT, Claude & Co.?",
       faq_6_a: "Una chat ti dà testo che devi formattare, controllare e assemblare da solo. Stellify consegna il risultato finito: incolli il link dell'annuncio, il tuo CV e la tua foto vengono ripresi automaticamente, e in 60 secondi hai un documento pronto per l'invio secondo lo standard svizzero, in PDF e Word, nel design che preferisci. In più il tracker gratuito tiene sotto controllo tutte le candidature, le scadenze e i promemoria. Questa è la differenza tra uno strumento e una finestra di testo.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Impostazioni",
@@ -6699,7 +6699,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
       faq_5_a: "We support German, English, French, and Italian.",
-      faq_6_q: "Why Stellify instead of just ChatGPT?",
+      faq_6_q: "Why Stellify instead of ChatGPT, Claude & co.?",
       faq_6_a: "A chat gives you text you still have to format, check and assemble yourself. Stellify delivers the finished result: paste the job-ad link, your CV and photo are applied automatically, and in 60 seconds you hold a ready-to-send document in Swiss standard, as PDF and Word, in the design of your choice. On top, the free tracker keeps every application, deadline and reminder in view. That is the difference between a tool and a text box.",
       nav_stella_chat: "Stella Chat",
       nav_settings: "Settings",
@@ -10704,7 +10704,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {language === 'FR' ? 'La grande différence' : language === 'IT' ? 'La grande differenza' : language === 'EN' ? 'The big difference' : 'Der grosse Unterschied'}
             </p>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">
-              {language === 'FR' ? 'Pourquoi pas simplement ChatGPT ?' : language === 'IT' ? 'Perché non semplicemente ChatGPT?' : language === 'EN' ? 'Why not just ChatGPT?' : 'Warum nicht einfach ChatGPT?'}
+              {language === 'FR' ? 'Pourquoi pas simplement ChatGPT & Cie ?' : language === 'IT' ? 'Perché non semplicemente ChatGPT & Co.?' : language === 'EN' ? 'Why not just ChatGPT & co.?' : 'Warum nicht einfach ChatGPT & Co.?'}
             </h2>
             <p className="mt-4 text-lg text-[#5C5C58] dark:text-[#9A9A94] font-light">
               {language === 'FR' ? 'Un chat te donne du texte. Stellify te donne la candidature finie.'
@@ -10716,7 +10716,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           <div className="grid md:grid-cols-2 gap-6 items-stretch">
             {/* Chat AI — the manual way */}
             <div className="p-7 sm:p-9 bg-[#F4F3F0] dark:bg-[#22221F] border border-black/5 dark:border-white/5">
-              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#9A9A94] mb-1">ChatGPT · Claude · Gemini</p>
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#9A9A94] mb-1">{language === "FR" ? "ChatGPT · Claude · Gemini · toute IA de chat" : language === "IT" ? "ChatGPT · Claude · Gemini · ogni chat IA" : language === "EN" ? "ChatGPT · Claude · Gemini · any chat AI" : "ChatGPT · Claude · Gemini · jede Chat-KI"}</p>
               <p className="text-xl font-serif text-[#5C5C58] dark:text-[#9A9A94] mb-6">
                 {language === 'FR' ? 'De bons textes. Ensuite, ton travail commence.' : language === 'IT' ? 'Buoni testi. Poi inizia il tuo lavoro.' : language === 'EN' ? 'Good text. Then your work begins.' : 'Gute Texte. Danach beginnt deine Arbeit.'}
               </p>
@@ -11540,7 +11540,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <span className="text-lg font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-open:text-[#004225] dark:group-open:text-[#00A854] transition-colors">{faq.q}</span>
                   <span className="text-2xl font-light text-[#1A1A18] dark:text-[#FAFAF8] group-open:rotate-45 transition-transform">+</span>
                 </summary>
-                <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed pb-4">{faq.a}</p>
+                <p className="text-[15px] text-[#26261F] dark:text-[#C8C8C2] leading-relaxed pb-4">{faq.a}</p>
               </details>
             ))}
           </div>
