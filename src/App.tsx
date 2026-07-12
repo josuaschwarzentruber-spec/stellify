@@ -3367,7 +3367,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         <div className="w-full space-y-2.5">
           <div className="flex items-center gap-1.5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 rounded-sm px-2 py-1.5 min-w-0">
             <Link2 size={10} className="text-[#9A9A94] shrink-0" />
-            <span className="text-[8.5px] text-[#5C5C58] dark:text-[#9A9A94] truncate font-mono">jobs.ch/stellen/marketing-manager-nestle</span>
+            <span className="flex-1 min-w-0 text-[8.5px] text-[#5C5C58] dark:text-[#9A9A94] truncate font-mono">jobs.ch/stellen/marketing-manager-nestle</span>
             <span className="ml-auto shrink-0 inline-flex items-center gap-1 text-[7.5px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/12 px-1.5 py-0.5 rounded">
               <CheckCircle2 size={8} />{language === 'FR' ? 'Importé' : language === 'IT' ? 'Importato' : language === 'EN' ? 'Imported' : 'Importiert'}
             </span>
@@ -9666,7 +9666,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       className="grid sm:grid-cols-2 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 transition-all group cursor-pointer shadow-sm overflow-hidden"
                     >
                       {/* Left — the tool */}
-                      <div className="p-6 md:p-8 flex flex-col">
+                      <div className="p-6 md:p-8 flex flex-col min-w-0">
                         <div className="flex justify-between items-start mb-5">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854] group-hover:bg-[#004225] group-hover:text-white transition-all">
@@ -9699,7 +9699,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </div>
                       {/* Right — that tool's rich example, framed as a mini
                           app window so every example reads as a real result. */}
-                      <div className="p-5 md:p-7 bg-[#F4F3F0] dark:bg-[#161613] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col justify-center">
+                      <div className="p-5 md:p-7 bg-[#F4F3F0] dark:bg-[#161613] border-t sm:border-t-0 sm:border-l border-black/5 dark:border-white/5 flex flex-col justify-center min-w-0">
                         <div className="rounded-lg overflow-hidden border border-black/10 dark:border-white/10 shadow-lg shadow-black/5 dark:shadow-black/30 bg-[#FDFCFB] dark:bg-[#1F1F1C]">
                           <div className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-[#2A2A26] border-b border-black/6 dark:border-white/6">
                             <span className="w-2 h-2 rounded-full bg-[#E8837B]" />
@@ -10494,7 +10494,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           {/* Step 1: the pasted job-ad link, already imported */}
                           <div className="flex items-center gap-2 bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm px-3 py-2 min-w-0">
                             <Link2 size={12} className="text-[#9A9A94] shrink-0" />
-                            <span className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] truncate font-mono">jobs.ch/stellen/marketing-manager-nestle</span>
+                            <span className="flex-1 min-w-0 text-[11px] text-[#5C5C58] dark:text-[#9A9A94] truncate font-mono">jobs.ch/stellen/marketing-manager-nestle</span>
                             <span className="ml-auto shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/12 px-1.5 py-0.5 rounded">
                               <CheckCircle2 size={9} />{language === 'FR' ? 'Importé' : language === 'IT' ? 'Importato' : language === 'EN' ? 'Imported' : 'Importiert'}
                             </span>
