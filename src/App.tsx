@@ -8509,7 +8509,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     { label: t.dashboard_stat_cv_status, value: cvContext ? t.dashboard_stat_ready : t.dashboard_stat_missing, icon: <FileText size={15} />, color: cvContext ? 'text-[#059669]' : 'text-red-500 dark:text-[#E08585]' },
                     {
                       label: 'Tracker', value: trackerStats?.total ?? 0, icon: <Layout size={15} />, num: true,
-                      sub: language === 'FR' ? 'Candidatures suivies' : language === 'IT' ? 'Candidature seguite' : language === 'EN' ? 'Applications tracked' : 'Laufende Bewerbungen',
+                      sub: (() => {
+                        const open = trackerStats?.inProcess ?? 0;
+                        return language === 'FR' ? `Candidatures · ${open} en cours`
+                          : language === 'IT' ? `Candidature · ${open} in corso`
+                          : language === 'EN' ? `Applications · ${open} open`
+                          : `Bewerbungen · ${open} offen`;
+                      })(),
                       action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
                     { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} /> }
