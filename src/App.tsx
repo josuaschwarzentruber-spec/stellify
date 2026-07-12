@@ -9893,25 +9893,25 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 the hero must only promise what V1 actually delivers. */}
             <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
               {((language === 'FR' ? [
-                ['1', 'Télécharger le CV'],
-                ['2', "Coller le lien de l'annonce"],
-                ['3', 'Candidature en 60 sec.'],
-                ['4', 'Suivre dans le tracker'],
+                ['1', 'CV'],
+                ['2', "Lien de l'annonce"],
+                ['3', 'Candidature en 60 s'],
+                ['4', 'Tracker'],
               ] : language === 'IT' ? [
-                ['1', 'Carica il CV'],
-                ['2', "Incolla il link dell'annuncio"],
-                ['3', 'Candidatura in 60 sec.'],
-                ['4', 'Segui nel tracker'],
+                ['1', 'CV'],
+                ['2', 'Link annuncio'],
+                ['3', 'Candidatura in 60 s'],
+                ['4', 'Tracker'],
               ] : language === 'EN' ? [
-                ['1', 'Upload your CV'],
-                ['2', 'Paste the job-ad link'],
-                ['3', 'Application in 60 sec.'],
-                ['4', 'Track it in the tracker'],
+                ['1', 'CV'],
+                ['2', 'Job-ad link'],
+                ['3', 'Application in 60 s'],
+                ['4', 'Tracker'],
               ] : [
-                ['1', 'Lebenslauf hochladen'],
-                ['2', 'Inserat-Link einfügen'],
+                ['1', 'Lebenslauf'],
+                ['2', 'Inserat-Link'],
                 ['3', 'Bewerbung in 60 Sek.'],
-                ['4', 'Im Tracker verfolgen'],
+                ['4', 'Tracker'],
               ]) as [string, string][]).map(([num, label], i, arr) => (
                 <React.Fragment key={num}>
                   <div className="flex items-center gap-1 flex-shrink-0">
