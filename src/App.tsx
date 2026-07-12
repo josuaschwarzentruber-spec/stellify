@@ -1634,12 +1634,22 @@ function StellifyApp() {
 
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber') => {
+    const prev = activeView;
+    // Reading a guide should not cost the visitor their place on the page:
+    // remember where they were and return there on the way back.
+    if (view === 'ratgeber') {
+      try { sessionStorage.setItem('stellify_ratgeber_return', String(window.scrollY)); } catch { /* ignore */ }
+    }
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
     if (view === 'pricing') {
       // Wait one tick for the section to mount, then smooth-scroll
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
+    } else if (prev === 'ratgeber' && view === 'dashboard') {
+      let y = 0;
+      try { y = parseInt(sessionStorage.getItem('stellify_ratgeber_return') || '0', 10) || 0; sessionStorage.removeItem('stellify_ratgeber_return'); } catch { /* ignore */ }
+      setTimeout(() => window.scrollTo({ top: y }), 60);
     } else if (view === 'about' || view === 'datenschutz' || view === 'impressum' || view === 'agb' || view === 'ratgeber') {
       // Full-page views: jump straight to the top. Smooth-scrolling while
       // the lazy chunk was still mounting read as a glitch.
@@ -10050,8 +10060,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Langues' : language === 'IT' ? 'Lingue' : language === 'EN' ? 'Languages' : 'Sprachen'}</span>
               </div>
               <div>
-                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]"><CountUp to={26} duration={1400} /></span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Cantons' : language === 'IT' ? 'Cantoni' : language === 'EN' ? 'Cantons' : 'Kantone'}</span>
+                <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]"><CountUp to={60} duration={1400} /><span className="text-xl">s</span></span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Jusqu\'à la candidature' : language === 'IT' ? 'Alla candidatura' : language === 'EN' ? 'To your application' : 'Zur fertigen Bewerbung'}</span>
               </div>
             </div>
           </motion.div>
@@ -10859,179 +10869,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
-      {/* --- SWISS COVERAGE MAP ---
-           Network-graph approach (Stripe / Linear / Vercel feel). The
-           Switzerland silhouette path was distorting on render and didn't
-           read as Switzerland; pulled it out entirely. The geographically
-           positioned cyan nodes + connecting lines on a dot-grid canvas
-           already convey the country, modern SaaS style. */}
-      {(!user || activeView === 'dashboard') && (
-      <section id="schweiz" className="px-6 lg:px-12 py-14 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
-        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
-             style={{ background: 'radial-gradient(ellipse at center, rgba(0,168,84,0.10) 0%, transparent 60%)' }} />
-
-        <div className="max-w-6xl mx-auto relative">
-          {/* Headline */}
-          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-[#00A854]/30 bg-[#00A854]/[0.08] text-[#00A854] text-[10px] font-bold tracking-[0.3em] uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00A854] animate-pulse" />
-              {language === 'FR' ? 'Dans chaque canton de Suisse'
-                : language === 'IT' ? 'In ogni cantone della Svizzera'
-                : language === 'EN' ? 'In every canton of Switzerland'
-                : 'In jedem Kanton der Schweiz'}
-            </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-white leading-[1.15]">
-              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#00A854]">toute la Suisse</span></>)
-                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#00A854]">tutta la Svizzera</span></>)
-                : language === 'EN' ? (<>The job platform for <span className="text-[#00A854]">all of Switzerland</span></>)
-                : (<>Die Jobplattform für die <span className="text-[#00A854]">ganze Schweiz</span></>)}
-              <svg
-                viewBox="0 0 32 32"
-                aria-label="Schweiz"
-                className="inline-block align-middle ml-3"
-                style={{ width: '0.9em', height: '0.9em' }}
-              >
-                <rect width="32" height="32" rx="3" fill="#DA291C" />
-                <rect x="13" y="6" width="6" height="20" fill="#FFFFFF" />
-                <rect x="6" y="13" width="20" height="6" fill="#FFFFFF" />
-              </svg>
-            </h2>
-            <p className="mt-4 text-base sm:text-lg text-white/60 font-light">
-              {language === 'FR' ? 'Connecter intelligemment talents et entreprises.'
-                : language === 'IT' ? 'Collegare in modo intelligente talenti e aziende.'
-                : language === 'EN' ? 'Connecting talent and companies intelligently.'
-                : 'Talente und Unternehmen intelligent vernetzen.'}
-            </p>
-            <p className="mt-2 text-sm text-white/40 font-light">
-              {language === 'FR' ? "Aussi pour les talents de l'étranger qui veulent travailler en Suisse."
-                : language === 'IT' ? "Anche per i talenti dall'estero che vogliono lavorare in Svizzera."
-                : language === 'EN' ? 'Open to talent from abroad who want to work in Switzerland, too.'
-                : 'Auch für Talente aus dem Ausland, die in der Schweiz arbeiten möchten.'}
-            </p>
-          </div>
-
-          {/* Preview of the coming job board: a framed mock of what
-              listings will look like, softly locked behind a "Bald" veil,
-              plus the three role cards. Tells the story of where Stellify
-              is heading without pretending the board is live yet. */}
-          {(() => {
-            const jobs = language === 'FR' ? [
-              { role: 'Chef de projet', place: 'Zurich', pay: 'CHF 110 000 bis 130 000' },
-              { role: 'Infirmier/ère dipl.', place: 'Lausanne', pay: 'CHF 85 000 bis 100 000' },
-              { role: 'Employé/e de commerce', place: 'Berne', pay: 'CHF 70 000 bis 85 000' },
-            ] : language === 'IT' ? [
-              { role: 'Project Manager', place: 'Lugano', pay: 'CHF 110 000 bis 130 000' },
-              { role: 'Infermiere/a dipl.', place: 'Bellinzona', pay: 'CHF 85 000 bis 100 000' },
-              { role: 'Impiegato/a di commercio', place: 'Locarno', pay: 'CHF 70 000 bis 85 000' },
-            ] : language === 'EN' ? [
-              { role: 'Project Lead', place: 'Zurich', pay: 'CHF 110 000 bis 130 000' },
-              { role: 'Registered Nurse', place: 'Basel', pay: 'CHF 85 000 bis 100 000' },
-              { role: 'Commercial Clerk', place: 'Bern', pay: 'CHF 70 000 bis 85 000' },
-            ] : [
-              { role: 'Projektleiter/in', place: 'Zürich', pay: 'CHF 110 000 bis 130 000' },
-              { role: 'Pflegefachperson', place: 'Basel', pay: 'CHF 85 000 bis 100 000' },
-              { role: 'Kaufmann/-frau', place: 'Bern', pay: 'CHF 70 000 bis 85 000' },
-            ];
-            const cards = language === 'FR' ? [
-              { Icon: Briefcase, title: 'Pour les employeurs', body: 'Trouve les bons talents plus vite, là où ils préparent déjà leur dossier.' },
-              { Icon: UserIcon, title: 'Pour les candidats', body: 'Postule en un clic, avec une candidature déjà prête grâce à Stella.' },
-              { Icon: MapPin, title: 'Toute la Suisse', body: 'Conçue pour le marché du travail suisse, dans les quatre langues.' },
-            ] : language === 'IT' ? [
-              { Icon: Briefcase, title: 'Per le aziende', body: 'Trova i talenti giusti più in fretta, dove preparano già la candidatura.' },
-              { Icon: UserIcon, title: 'Per i candidati', body: 'Candidati con un clic, con una candidatura già pronta grazie a Stella.' },
-              { Icon: MapPin, title: 'In tutta la Svizzera', body: 'Pensata per il mercato del lavoro svizzero, in quattro lingue.' },
-            ] : language === 'EN' ? [
-              { Icon: Briefcase, title: 'For employers', body: 'Reach the right talent faster, right where they prepare their application.' },
-              { Icon: UserIcon, title: 'For candidates', body: 'Apply in one click with an application already prepared by Stella.' },
-              { Icon: MapPin, title: 'All of Switzerland', body: 'Built for the Swiss job market, in all four national languages.' },
-            ] : [
-              { Icon: Briefcase, title: 'Für Arbeitgeber', body: 'Erreiche die passenden Talente schneller, genau dort, wo sie ihre Bewerbung erstellen.' },
-              { Icon: UserIcon, title: 'Für Bewerber', body: 'Bewirb dich mit einem Klick, mit einer von Stella bereits erstellten Bewerbung.' },
-              { Icon: MapPin, title: 'Ganze Schweiz', body: 'Entwickelt für den Schweizer Arbeitsmarkt, in allen vier Landessprachen.' },
-            ];
-            const soon = language === 'FR' ? 'Bientôt' : language === 'IT' ? 'Presto' : language === 'EN' ? 'Soon' : 'Bald';
-            const applyLbl = language === 'FR' ? 'Postuler' : language === 'IT' ? 'Candidati' : language === 'EN' ? 'Apply' : 'Bewerben';
-            return (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.7 }}
-              >
-                {/* Framed job-board mock */}
-                <div className="relative max-w-2xl mx-auto rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-sm overflow-hidden shadow-2xl shadow-black/40">
-                  {/* Window chrome */}
-                  <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/8 bg-white/[0.02]">
-                    <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-                    <span className="ml-3 text-[9px] font-bold uppercase tracking-[0.25em] text-white/35">stellify.ch/jobs</span>
-                  </div>
-                  {/* Job rows */}
-                  <div className="divide-y divide-white/6">
-                    {jobs.map((j, i) => (
-                      <div key={i} className="flex items-center gap-4 px-5 sm:px-6 py-4">
-                        <div className="w-9 h-9 rounded-lg bg-[#00A854]/12 border border-[#00A854]/25 flex items-center justify-center shrink-0">
-                          <Briefcase size={15} className="text-[#00A854]" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-semibold text-white truncate">{j.role}</p>
-                          <p className="text-[11px] text-white/45 mt-0.5 flex items-center gap-1.5">
-                            <MapPin size={10} /> {j.place} · {j.pay}
-                          </p>
-                        </div>
-                        <span className="shrink-0 text-[9px] font-bold uppercase tracking-widest text-white/30 border border-white/12 rounded-full px-3 py-1.5">{applyLbl}</span>
-                      </div>
-                    ))}
-                  </div>
-                  {/* "Bald" veil over the lower edge */}
-                  <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0a1410] via-[#0a1410]/80 to-transparent" />
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4A852]/15 border border-[#D4A852]/30 text-[#D4A852] text-[10px] font-bold uppercase tracking-[0.25em]">
-                    <span className="relative flex w-1.5 h-1.5">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4A852] opacity-60" />
-                      <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-[#D4A852]" />
-                    </span>
-                    {soon}
-                  </div>
-                </div>
-
-                {/* Three role cards */}
-                <div className="mt-8 grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-                  {cards.map((c, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 12 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-40px' }}
-                      transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
-                      className="p-5 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm"
-                    >
-                      <div className="w-10 h-10 rounded-lg border border-[#00A854]/40 bg-[#00A854]/[0.08] flex items-center justify-center text-[#00A854] mb-3">
-                        <c.Icon size={17} strokeWidth={1.75} />
-                      </div>
-                      <p className="text-sm font-semibold text-white leading-tight">{c.title}</p>
-                      <p className="mt-1.5 text-[13px] text-white/55 font-light leading-relaxed">{c.body}</p>
-                    </motion.div>
-                  ))}
-                </div>
-
-                {/* Employer CTA */}
-                <div className="mt-8 text-center">
-                  <a
-                    href={`mailto:support.stellify@gmail.com?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise : publier des postes sur Stellify' : language === 'IT' ? 'Azienda: pubblicare posizioni su Stellify' : language === 'EN' ? 'Company: list roles on Stellify' : 'Unternehmen: Stellen auf Stellify ausschreiben')}`}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#00A854]/40 text-[#00A854] text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00A854]/10 transition-all"
-                  >
-                    {language === 'FR' ? 'Entreprise ? Écris-nous' : language === 'IT' ? 'Azienda? Scrivici' : language === 'EN' ? 'A company? Get in touch' : 'Unternehmen? Melde dich'}
-                    <ArrowRight size={14} />
-                  </a>
-                </div>
-              </motion.div>
-            );
-          })()}
-
-        </div>
-      </section>
-      )}
       {/* --- PRICING SECTION --- */}
       <section id="pricing" className="px-6 lg:px-12 py-14 lg:py-24 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
@@ -11369,6 +11206,179 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
+      {/* --- SWISS COVERAGE MAP ---
+           Network-graph approach (Stripe / Linear / Vercel feel). The
+           Switzerland silhouette path was distorting on render and didn't
+           read as Switzerland; pulled it out entirely. The geographically
+           positioned cyan nodes + connecting lines on a dot-grid canvas
+           already convey the country, modern SaaS style. */}
+      {(!user || activeView === 'dashboard') && (
+      <section id="schweiz" className="px-6 lg:px-12 py-14 lg:py-32 bg-[#0a1410] text-white overflow-hidden relative">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-60"
+             style={{ background: 'radial-gradient(ellipse at center, rgba(0,168,84,0.10) 0%, transparent 60%)' }} />
+
+        <div className="max-w-6xl mx-auto relative">
+          {/* Headline */}
+          <div className="text-center max-w-3xl mx-auto mb-10 lg:mb-14">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full border border-[#00A854]/30 bg-[#00A854]/[0.08] text-[#00A854] text-[10px] font-bold tracking-[0.3em] uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00A854] animate-pulse" />
+              {language === 'FR' ? "Pour les talents en Suisse et à l'étranger"
+                : language === 'IT' ? "Per talenti in Svizzera e all'estero"
+                : language === 'EN' ? 'For talent in Switzerland and abroad'
+                : 'Für Talente im In- und Ausland'}
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif tracking-tight text-white leading-[1.15]">
+              {language === 'FR' ? (<>La plateforme d'emploi pour <span className="text-[#00A854]">toute la Suisse</span></>)
+                : language === 'IT' ? (<>La piattaforma di lavoro per <span className="text-[#00A854]">tutta la Svizzera</span></>)
+                : language === 'EN' ? (<>The job platform for <span className="text-[#00A854]">all of Switzerland</span></>)
+                : (<>Die Jobplattform für die <span className="text-[#00A854]">ganze Schweiz</span></>)}
+              <svg
+                viewBox="0 0 32 32"
+                aria-label="Schweiz"
+                className="inline-block align-middle ml-3"
+                style={{ width: '0.9em', height: '0.9em' }}
+              >
+                <rect width="32" height="32" rx="3" fill="#DA291C" />
+                <rect x="13" y="6" width="6" height="20" fill="#FFFFFF" />
+                <rect x="6" y="13" width="20" height="6" fill="#FFFFFF" />
+              </svg>
+            </h2>
+            <p className="mt-4 text-base sm:text-lg text-white/60 font-light">
+              {language === 'FR' ? 'Connecter intelligemment talents et entreprises.'
+                : language === 'IT' ? 'Collegare in modo intelligente talenti e aziende.'
+                : language === 'EN' ? 'Connecting talent and companies intelligently.'
+                : 'Talente und Unternehmen intelligent vernetzen.'}
+            </p>
+            <p className="mt-2 text-sm text-white/40 font-light">
+              {language === 'FR' ? "Aussi pour les talents de l'étranger qui veulent travailler en Suisse."
+                : language === 'IT' ? "Anche per i talenti dall'estero che vogliono lavorare in Svizzera."
+                : language === 'EN' ? 'Open to talent from abroad who want to work in Switzerland, too.'
+                : 'Auch für Talente aus dem Ausland, die in der Schweiz arbeiten möchten.'}
+            </p>
+          </div>
+
+          {/* Preview of the coming job board: a framed mock of what
+              listings will look like, softly locked behind a "Bald" veil,
+              plus the three role cards. Tells the story of where Stellify
+              is heading without pretending the board is live yet. */}
+          {(() => {
+            const jobs = language === 'FR' ? [
+              { role: 'Chef de projet', place: 'Zurich', pay: 'CHF 110 000 bis 130 000' },
+              { role: 'Infirmier/ère dipl.', place: 'Lausanne', pay: 'CHF 85 000 bis 100 000' },
+              { role: 'Employé/e de commerce', place: 'Berne', pay: 'CHF 70 000 bis 85 000' },
+            ] : language === 'IT' ? [
+              { role: 'Project Manager', place: 'Lugano', pay: 'CHF 110 000 bis 130 000' },
+              { role: 'Infermiere/a dipl.', place: 'Bellinzona', pay: 'CHF 85 000 bis 100 000' },
+              { role: 'Impiegato/a di commercio', place: 'Locarno', pay: 'CHF 70 000 bis 85 000' },
+            ] : language === 'EN' ? [
+              { role: 'Project Lead', place: 'Zurich', pay: 'CHF 110 000 bis 130 000' },
+              { role: 'Registered Nurse', place: 'Basel', pay: 'CHF 85 000 bis 100 000' },
+              { role: 'Commercial Clerk', place: 'Bern', pay: 'CHF 70 000 bis 85 000' },
+            ] : [
+              { role: 'Projektleiter/in', place: 'Zürich', pay: 'CHF 110 000 bis 130 000' },
+              { role: 'Pflegefachperson', place: 'Basel', pay: 'CHF 85 000 bis 100 000' },
+              { role: 'Kaufmann/-frau', place: 'Bern', pay: 'CHF 70 000 bis 85 000' },
+            ];
+            const cards = language === 'FR' ? [
+              { Icon: Briefcase, title: 'Pour les employeurs', body: 'Trouve les bons talents plus vite, là où ils préparent déjà leur dossier.' },
+              { Icon: UserIcon, title: 'Pour les candidats', body: 'Postule en un clic, avec une candidature déjà prête grâce à Stella.' },
+              { Icon: MapPin, title: 'Toute la Suisse', body: 'Conçue pour le marché du travail suisse, dans les quatre langues.' },
+            ] : language === 'IT' ? [
+              { Icon: Briefcase, title: 'Per le aziende', body: 'Trova i talenti giusti più in fretta, dove preparano già la candidatura.' },
+              { Icon: UserIcon, title: 'Per i candidati', body: 'Candidati con un clic, con una candidatura già pronta grazie a Stella.' },
+              { Icon: MapPin, title: 'In tutta la Svizzera', body: 'Pensata per il mercato del lavoro svizzero, in quattro lingue.' },
+            ] : language === 'EN' ? [
+              { Icon: Briefcase, title: 'For employers', body: 'Reach the right talent faster, right where they prepare their application.' },
+              { Icon: UserIcon, title: 'For candidates', body: 'Apply in one click with an application already prepared by Stella.' },
+              { Icon: MapPin, title: 'All of Switzerland', body: 'Built for the Swiss job market, in all four national languages.' },
+            ] : [
+              { Icon: Briefcase, title: 'Für Arbeitgeber', body: 'Erreiche die passenden Talente schneller, genau dort, wo sie ihre Bewerbung erstellen.' },
+              { Icon: UserIcon, title: 'Für Bewerber', body: 'Bewirb dich mit einem Klick, mit einer von Stella bereits erstellten Bewerbung.' },
+              { Icon: MapPin, title: 'Ganze Schweiz', body: 'Entwickelt für den Schweizer Arbeitsmarkt, in allen vier Landessprachen.' },
+            ];
+            const soon = language === 'FR' ? 'Bientôt' : language === 'IT' ? 'Presto' : language === 'EN' ? 'Soon' : 'Bald';
+            const applyLbl = language === 'FR' ? 'Postuler' : language === 'IT' ? 'Candidati' : language === 'EN' ? 'Apply' : 'Bewerben';
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.7 }}
+              >
+                {/* Framed job-board mock */}
+                <div className="relative max-w-2xl mx-auto rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-sm overflow-hidden shadow-2xl shadow-black/40">
+                  {/* Window chrome */}
+                  <div className="flex items-center gap-1.5 px-4 py-3 border-b border-white/8 bg-white/[0.02]">
+                    <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
+                    <span className="ml-3 text-[10px] font-medium tracking-[0.15em] text-white/70">stellify.ch/jobs</span>
+                  </div>
+                  {/* Job rows */}
+                  <div className="divide-y divide-white/6">
+                    {jobs.map((j, i) => (
+                      <div key={i} className="flex items-center gap-4 px-5 sm:px-6 py-4">
+                        <div className="w-9 h-9 rounded-lg bg-[#00A854]/12 border border-[#00A854]/25 flex items-center justify-center shrink-0">
+                          <Briefcase size={15} className="text-[#00A854]" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-white truncate">{j.role}</p>
+                          <p className="text-[11px] text-white/45 mt-0.5 flex items-center gap-1.5">
+                            <MapPin size={10} /> {j.place} · {j.pay}
+                          </p>
+                        </div>
+                        <span className="shrink-0 text-[9px] font-bold uppercase tracking-widest text-white/30 border border-white/12 rounded-full px-3 py-1.5">{applyLbl}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {/* "Bald" veil over the lower edge */}
+                  <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0a1410] via-[#0a1410]/80 to-transparent" />
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4A852]/15 border border-[#D4A852]/30 text-[#D4A852] text-[10px] font-bold uppercase tracking-[0.25em]">
+                    <span className="relative flex w-1.5 h-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4A852] opacity-60" />
+                      <span className="relative inline-flex rounded-full w-1.5 h-1.5 bg-[#D4A852]" />
+                    </span>
+                    {soon}
+                  </div>
+                </div>
+
+                {/* Three role cards */}
+                <div className="mt-8 grid sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                  {cards.map((c, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 12 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-40px' }}
+                      transition={{ delay: 0.15 + i * 0.1, duration: 0.5 }}
+                      className="p-5 rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm"
+                    >
+                      <div className="w-10 h-10 rounded-lg border border-[#00A854]/40 bg-[#00A854]/[0.08] flex items-center justify-center text-[#00A854] mb-3">
+                        <c.Icon size={17} strokeWidth={1.75} />
+                      </div>
+                      <p className="text-sm font-semibold text-white leading-tight">{c.title}</p>
+                      <p className="mt-1.5 text-[13px] text-white/55 font-light leading-relaxed">{c.body}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Employer CTA */}
+                <div className="mt-8 text-center">
+                  <a
+                    href={`mailto:support.stellify@gmail.com?subject=${encodeURIComponent(language === 'FR' ? 'Entreprise : publier des postes sur Stellify' : language === 'IT' ? 'Azienda: pubblicare posizioni su Stellify' : language === 'EN' ? 'Company: list roles on Stellify' : 'Unternehmen: Stellen auf Stellify ausschreiben')}`}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-[#00A854]/40 text-[#00A854] text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00A854]/10 transition-all"
+                  >
+                    {language === 'FR' ? 'Entreprise ? Écris-nous' : language === 'IT' ? 'Azienda? Scrivici' : language === 'EN' ? 'A company? Get in touch' : 'Unternehmen? Melde dich'}
+                    <ArrowRight size={14} />
+                  </a>
+                </div>
+              </motion.div>
+            );
+          })()}
+
+        </div>
+      </section>
+      )}
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
       {(!user || activeView === 'dashboard') && (
       <section id="story" className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
