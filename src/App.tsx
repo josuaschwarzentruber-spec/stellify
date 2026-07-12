@@ -8575,17 +8575,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 style={{ width: `${Math.min((used / limit) * 100, 100)}%` }}
                               />
                             </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-[9px] font-bold text-[#004225] dark:text-[#00A854]">{left} {t.remaining}</span>
-                              {paid && (
-                                <span className="text-[7px] text-[#004225] dark:text-[#00A854] font-bold uppercase tracking-tighter opacity-60">{t.dashboard_reset_monthly}</span>
-                              )}
-                            </div>
-                            {(user.role === 'unlimited' || user.role === 'admin') && (
-                              <div className="pt-1 text-[8px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
-                                {t.dashboard_usage_unlimited} ✨
-                              </div>
-                            )}
+                            <p className="text-[9px] font-medium text-[#004225] dark:text-[#00A854]">
+                              {left} {t.remaining}
+                              {paid && <span className="text-[#9A9A94] font-light"> · {t.dashboard_reset_monthly}</span>}
+                            </p>
                             {!paid && (
                               <button
                                 onClick={() => navigate('pricing')}
@@ -9450,6 +9443,35 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {user.email === 'support.stellify@gmail.com' && (
                   <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-[#D4A852]/40 space-y-4">
                     <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B8860B] mb-1">Abo-Letter an Gratis-Nutzer versenden (nur für dich sichtbar)</p>
+                    {/* Ready-made letters — one click fills subject and text,
+                        everything stays editable before sending. */}
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        {
+                          n: 'Warum Pro sich lohnt',
+                          s: 'Deine nächste Bewerbung in 60 Sekunden, so oft du willst',
+                          m: 'Hallo\n\nDeine 3 Gratis-Bewerbungen haben dir gezeigt, wie Stellify arbeitet. Mit Pro machst du daraus deinen Standard: 50 Generierungen pro Monat, der Stellen-Import per Link und alle Designs, für CHF 19.90 pro Monat, jederzeit kündbar.\n\nWenn du gerade aktiv auf Stellensuche bist, ist das der günstigste Karriere-Beschleuniger, den du finden wirst.',
+                        },
+                        {
+                          n: 'Tipp + sanfter Hinweis',
+                          s: 'Der Trick mit dem Stellen-Link',
+                          m: 'Hallo\n\nKennst du schon den schnellsten Weg zur fertigen Bewerbung? Kopiere einfach den Link eines Stelleninserats in den Generator, Stellify liest die Stelle und schreibt die Bewerbung passgenau darauf.\n\nMit dem Pro-Plan nutzt du das bis zu 50 Mal pro Monat, jederzeit kündbar.',
+                        },
+                        {
+                          n: 'Karriere+ für Vielbewerber',
+                          s: 'Für alle, die es ernst meinen: Karriere+',
+                          m: 'Hallo\n\nWenn du dich gerade auf mehrere Stellen gleichzeitig bewirbst, ist Karriere+ für dich gebaut: 150 Generierungen pro Monat, alle exklusiven Premium-Designs und persönlicher E-Mail-Support.\n\nDein Bewerbungs-Tracker bleibt wie immer gratis dazu.',
+                        },
+                      ].map((tpl) => (
+                        <button
+                          key={tpl.n}
+                          onClick={() => { setNlSubject(tpl.s); setNlMessage(tpl.m.replace(/\\n/g, String.fromCharCode(10))); }}
+                          className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest border border-[#D4A852]/40 text-[#B8860B] hover:bg-[#D4A852]/10 transition-all"
+                        >
+                          {tpl.n}
+                        </button>
+                      ))}
+                    </div>
                     <input
                       type="text"
                       value={nlSubject}
