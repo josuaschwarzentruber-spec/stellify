@@ -9400,12 +9400,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {user.role === 'client' && (
                   <div className="flex items-center justify-between gap-4 p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Newsletter</p>
+                      <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Abo-Letter</p>
                       <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">
-                        {language === 'FR' ? 'De temps en temps des conseils et nouveautés de Stellify par e-mail. Désactivable à tout moment.'
-                          : language === 'IT' ? 'Di tanto in tanto consigli e novità da Stellify via e-mail. Disattivabile in ogni momento.'
-                          : language === 'EN' ? 'Occasional tips and news from Stellify by email. Switch off anytime.'
-                          : 'Ab und zu Tipps und Neuigkeiten von Stellify per E-Mail. Jederzeit abschaltbar.'}
+                        {language === 'FR' ? 'De temps en temps des avantages et offres sur les plans Stellify par e-mail. Uniquement pour les comptes gratuits. Désactivable à tout moment.'
+                          : language === 'IT' ? 'Di tanto in tanto vantaggi e offerte sui piani Stellify via e-mail. Solo per gli account gratuiti. Disattivabile in ogni momento.'
+                          : language === 'EN' ? 'Occasional perks and offers on the Stellify plans by email. Free accounts only. Switch off anytime.'
+                          : 'Ab und zu Vorteile und Angebote rund um die Stellify-Pläne per E-Mail. Nur für Gratis-Konten. Jederzeit abschaltbar.'}
                       </p>
                     </div>
                     <button
@@ -9417,8 +9417,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           await updateDoc(doc(db, 'users', user.id), { newsletter: next });
                           setUser({ ...user, newsletterOptIn: next });
                           showToast(next
-                            ? (language === 'FR' ? 'Newsletter activée' : language === 'IT' ? 'Newsletter attivata' : language === 'EN' ? 'Newsletter on' : 'Newsletter aktiviert')
-                            : (language === 'FR' ? 'Newsletter désactivée' : language === 'IT' ? 'Newsletter disattivata' : language === 'EN' ? 'Newsletter off' : 'Newsletter abgeschaltet'));
+                            ? (language === 'FR' ? 'Abo-Letter activé' : language === 'IT' ? 'Abo-Letter attivato' : language === 'EN' ? 'Abo-Letter on' : 'Abo-Letter aktiviert')
+                            : (language === 'FR' ? 'Abo-Letter désactivé' : language === 'IT' ? 'Abo-Letter disattivato' : language === 'EN' ? 'Abo-Letter off' : 'Abo-Letter abgeschaltet'));
                         } catch { showToast('Fehler', 'error'); }
                       }}
                       className={`shrink-0 w-11 h-6 rounded-full transition-colors relative ${user.newsletterOptIn !== false ? 'bg-[#004225] dark:bg-[#00A854]' : 'bg-black/15 dark:bg-white/15'}`}
@@ -9437,7 +9437,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 {/* Admin only: send a newsletter to the chosen audience */}
                 {user.email === 'support.stellify@gmail.com' && (
                   <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-[#D4A852]/40 space-y-4">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B8860B] mb-1">Abo-Newsletter an Gratis-Nutzer (nur für dich sichtbar)</p>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#B8860B] mb-1">Abo-Letter an Gratis-Nutzer versenden (nur für dich sichtbar)</p>
                     <input
                       type="text"
                       value={nlSubject}
@@ -9480,7 +9480,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         {nlSending ? 'Wird gesendet…' : 'Jetzt senden'}
                       </button>
                     </div>
-                    <p className="text-[10px] text-[#9A9A94] font-light">Geht ausschliesslich an Gratis-Nutzer mit eingeschaltetem Newsletter. Zahlende Kunden erhalten nie Werbe-Mails. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
+                    <p className="text-[10px] text-[#9A9A94] font-light">Geht ausschliesslich an Gratis-Nutzer mit eingeschaltetem Abo-Letter. Zahlende Kunden erhalten nie Werbe-Mails. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
                   </div>
                 )}
 

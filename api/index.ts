@@ -1707,10 +1707,10 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
     }
     const lines = message.trim().split(/\n{2,}/).map(s => s.replace(/\n/g, '<br />'));
     const optOut: Record<Lang, string> = {
-      DE: 'Du erhältst diese Mail, weil der Newsletter in deinem Stellify-Profil aktiviert ist. Abschalten kannst du ihn jederzeit dort unter Datenschutz.',
-      FR: 'Tu reçois cet e-mail parce que la newsletter est activée dans ton profil Stellify. Tu peux la désactiver à tout moment sous Confidentialité.',
-      IT: 'Ricevi questa e-mail perché la newsletter è attivata nel tuo profilo Stellify. Puoi disattivarla in ogni momento sotto Privacy.',
-      EN: 'You receive this mail because the newsletter is switched on in your Stellify profile. You can switch it off there anytime under privacy.',
+      DE: 'Du erhältst diese Mail, weil der Abo-Letter in deinem Stellify-Profil aktiviert ist. Abschalten kannst du ihn jederzeit dort unter Datenschutz.',
+      FR: "Tu reçois cet e-mail parce que l'Abo-Letter est activé dans ton profil Stellify. Tu peux le désactiver à tout moment sous Confidentialité.",
+      IT: "Ricevi questa e-mail perché l'Abo-Letter è attivato nel tuo profilo Stellify. Puoi disattivarlo in ogni momento sotto Privacy.",
+      EN: 'You receive this mail because the Abo-Letter is switched on in your Stellify profile. You can switch it off there anytime under privacy.',
     };
     const site = process.env.SITE_URL || 'https://stellify.ch';
     const snap = await adminDb.collection('users').limit(2000).get();
