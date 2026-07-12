@@ -97,3 +97,12 @@ html { scroll-behavior: smooth; }
 .tracker-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 66, 37, 0.25);
 }
+
+/* ── Readability fix (light mode only) ──────────────────────────────────────
+   The muted gray #9A9A94 measures 2.76:1 against our light backgrounds and
+   fails WCAG AA (4.5:1) — secondary text was genuinely hard to read. In
+   light mode it is remapped to #6F6F69 (4.93:1). Dark mode keeps the
+   original value, where it sits on near-black and reads fine. */
+html:not(.dark) .text-\[\#9A9A94\] {
+  color: #6F6F69;
+}
