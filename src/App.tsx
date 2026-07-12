@@ -8580,14 +8580,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             </div>
                             <p className="text-[9px] font-medium text-[#004225] dark:text-[#00A854]">
                               {left} {t.remaining}
-                              {paid && (
-                                <span className="text-[#9A9A94] font-light">
-                                  {' · '}
-                                  {user.subscriptionInterval !== 'annual' && user.subscriptionExpiresAt
-                                    ? (language === 'FR' ? 'renouvelé le ' : language === 'IT' ? 'si rinnova il ' : language === 'EN' ? 'renews ' : 'neu ab ') + new Date(user.subscriptionExpiresAt).toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit' })
-                                    : t.dashboard_reset_monthly}
-                                </span>
-                              )}
+                              {paid && (() => {
+                                // Say only what is certainly true for THIS account:
+                                // monthly with a known billing date → that date;
+                                // annual → calendar-month reset; anything else
+                                // (e.g. manually granted plans) → no claim at all.
+                                const dateLocale = language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH';
+                                if (user.subscriptionInterval === 'monthly' && user.subscriptionExpiresAt) {
+                                  const d = new Date(user.subscriptionExpiresAt).toLocaleDateString(dateLocale, { day: '2-digit', month: '2-digit', year: 'numeric' });
+                                  return <span className="text-[#9A9A94] font-light"> · {language === 'FR' ? `${limit} nouvelles le ${d}` : language === 'IT' ? `${limit} nuove il ${d}` : language === 'EN' ? `${limit} new on ${d}` : `${limit} neue am ${d}`}</span>;
+                                }
+                                if (user.subscriptionInterval === 'annual') {
+                                  return <span className="text-[#9A9A94] font-light"> · {language === 'FR' ? `${limit} nouvelles chaque 1er du mois` : language === 'IT' ? `${limit} nuove ogni 1° del mese` : language === 'EN' ? `${limit} new on the 1st of each month` : `${limit} neue jeweils am 1. des Monats`}</span>;
+                                }
+                                return null;
+                              })()}
                             </p>
                             {!paid && (
                               <button
