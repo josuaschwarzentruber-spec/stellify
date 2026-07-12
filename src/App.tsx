@@ -8512,15 +8512,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       sub: (() => {
                         const open = trackerStats?.inProcess ?? 0;
                         if (open > 0) {
-                          return language === 'FR' ? `Tout en vue · ${open} encore en course`
-                            : language === 'IT' ? `Tutto sotto controllo · ${open} ancora in corsa`
-                            : language === 'EN' ? `All in view · ${open} still in the running`
-                            : `Alles im Blick · ${open} noch im Rennen`;
+                          return language === 'FR' ? `Tout en vue · ${open} encore ouverte${open > 1 ? 's' : ''}`
+                            : language === 'IT' ? `Tutto sotto controllo · ${open} ancora apert${open > 1 ? 'e' : 'a'}`
+                            : language === 'EN' ? `All in view · ${open} still open`
+                            : `Alles im Blick · ${open} noch offen`;
                         }
-                        return language === 'FR' ? 'Tout en vue · rien en attente'
-                          : language === 'IT' ? 'Tutto sotto controllo · niente in sospeso'
-                          : language === 'EN' ? 'All in view · nothing pending'
-                          : 'Alles im Blick · nichts offen';
+                        return language === 'FR' ? 'Tout en vue · toutes clôturées'
+                          : language === 'IT' ? 'Tutto sotto controllo · tutte concluse'
+                          : language === 'EN' ? 'All in view · all wrapped up'
+                          : 'Alles im Blick · alle abgeschlossen';
                       })(),
                       action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
