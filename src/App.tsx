@@ -9479,6 +9479,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       >
                         {nlSending ? 'Wird gesendet…' : 'Jetzt senden'}
                       </button>
+                      <button
+                        disabled={nlSending || !nlSubject.trim() || !nlMessage.trim()}
+                        onClick={async () => {
+                          setNlSending(true);
+                          try {
+                            const r = await authFetch('/api/admin/send-newsletter', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ subject: nlSubject.trim(), message: nlMessage.trim(), testOnly: true }),
+                            });
+                            const d = await r.json();
+                            if (!r.ok) throw new Error(d.error || 'Fehler');
+                            showToast('Test-Mail an support.stellify@gmail.com gesendet');
+                          } catch (e: any) { showToast(e.message || 'Test fehlgeschlagen', 'error'); }
+                          finally { setNlSending(false); }
+                        }}
+                        className="px-5 py-2.5 border border-[#004225]/25 text-[#004225] text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-[#004225]/5 transition-all disabled:opacity-50"
+                      >
+                        Test an mich
+                      </button>
                     </div>
                     <p className="text-[10px] text-[#9A9A94] font-light">Geht ausschliesslich an Gratis-Nutzer mit eingeschaltetem Abo-Letter. Zahlende Kunden erhalten nie Werbe-Mails. Jede Mail enthält automatisch den Hinweis, wie man abbestellt.</p>
                   </div>

@@ -1701,7 +1701,7 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
     if ((requester.email || '').toLowerCase() !== 'support.stellify@gmail.com') {
       return res.status(403).json({ error: 'Nur der Inhaber darf Newsletter versenden.' });
     }
-    const { subject, message } = req.body as { subject?: string; message?: string };
+    const { subject, message, testOnly } = req.body as { subject?: string; message?: string; testOnly?: boolean };
     if (!subject?.trim() || !message?.trim()) {
       return res.status(400).json({ error: 'Betreff und Nachricht erforderlich.' });
     }
@@ -1713,6 +1713,17 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
       EN: 'You receive this mail because the Abo-Letter is switched on in your Stellify profile. You can switch it off there anytime under privacy.',
     };
     const site = process.env.SITE_URL || 'https://stellify.ch';
+    const lines0 = message.trim().split(/\n{2,}/).map(s => s.replace(/\n/g, '<br />'));
+    // Test run: deliver the exact letter only to the owner mailbox.
+    if (testOnly) {
+      await sendEmail({
+        to: 'support.stellify@gmail.com',
+        subject: `[TEST] ${subject.trim()}`,
+        html: buildEmailHtml(subject.trim(), [...lines0, `<span style="font-size:12px;color:#8a8a85">${optOut.DE}</span>`], 'Zu Stellify', site + '/', 'DE'),
+        text: message.trim(),
+      });
+      return res.json({ ok: true, sent: 1, test: true });
+    }
     const snap = await adminDb.collection('users').limit(2000).get();
     let sent = 0;
     for (const d of snap.docs) {
