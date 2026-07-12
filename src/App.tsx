@@ -8511,10 +8511,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       label: 'Tracker', value: trackerStats?.total ?? 0, icon: <Layout size={15} />, num: true,
                       sub: (() => {
                         const open = trackerStats?.inProcess ?? 0;
-                        return language === 'FR' ? `Candidatures · ${open} en cours`
-                          : language === 'IT' ? `Candidature · ${open} in corso`
-                          : language === 'EN' ? `Applications · ${open} open`
-                          : `Bewerbungen · ${open} offen`;
+                        if (open > 0) {
+                          return language === 'FR' ? `Tout en vue · ${open} encore en course`
+                            : language === 'IT' ? `Tutto sotto controllo · ${open} ancora in corsa`
+                            : language === 'EN' ? `All in view · ${open} still in the running`
+                            : `Alles im Blick · ${open} noch im Rennen`;
+                        }
+                        return language === 'FR' ? 'Tout en vue · rien en attente'
+                          : language === 'IT' ? 'Tutto sotto controllo · niente in sospeso'
+                          : language === 'EN' ? 'All in view · nothing pending'
+                          : 'Alles im Blick · nichts offen';
                       })(),
                       action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
