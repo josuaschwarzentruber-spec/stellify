@@ -99,10 +99,17 @@ html { scroll-behavior: smooth; }
 }
 
 /* ── Readability fix (light mode only) ──────────────────────────────────────
-   The muted gray #9A9A94 measures 2.76:1 against our light backgrounds and
-   fails WCAG AA (4.5:1) — secondary text was genuinely hard to read. In
-   light mode it is remapped to #6F6F69 (4.93:1). Dark mode keeps the
-   original value, where it sits on near-black and reads fine. */
+   The muted grays were too faint on light backgrounds (the lightest one
+   measured 2.76:1, WCAG demands 4.5:1). In light mode all three secondary
+   grays are pulled towards black while keeping a visible hierarchy below
+   the #1A1A18 headings. Dark mode keeps the original tones, where they sit
+   on near-black surfaces and read fine. */
 html:not(.dark) .text-\[\#9A9A94\] {
-  color: #6F6F69;
+  color: #4A4A45; /* was 2.76:1, now 8.6:1 */
+}
+html:not(.dark) .text-\[\#5C5C58\] {
+  color: #3F3F3A; /* was 6.55:1, now 10.3:1 */
+}
+html:not(.dark) .text-\[\#6B6B66\] {
+  color: #46463F;
 }
