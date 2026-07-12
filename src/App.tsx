@@ -8527,7 +8527,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       })(),
                       action: { label: language === 'FR' ? 'Ouvrir' : language === 'IT' ? 'Apri' : language === 'EN' ? 'Open' : 'Öffnen', onClick: () => navigate('tracker') },
                     },
-                    { label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} /> }
+                    {
+                      label: t.dashboard_stat_plan, value: user.role === 'unlimited' || user.role === 'admin' ? t.dashboard_stat_unlimited : (user.role === 'pro' ? t.dashboard_stat_pro : t.dashboard_stat_free), icon: <Star size={15} />,
+                      // Dashboard shows status only — managing the plan lives
+                      // in the profile, one click away.
+                      action: (user.role === 'pro' || user.role === 'unlimited' || user.role === 'admin')
+                        ? { label: language === 'FR' ? 'Gérer' : language === 'IT' ? 'Gestisci' : language === 'EN' ? 'Manage' : 'Verwalten', onClick: () => navigate('profile') }
+                        : undefined,
+                    }
                   ] as any[]).map((stat, i) => (
                     <motion.div
                       key={i}
