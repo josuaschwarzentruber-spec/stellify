@@ -105,11 +105,20 @@ html { scroll-behavior: smooth; }
    the #1A1A18 headings. Dark mode keeps the original tones, where they sit
    on near-black surfaces and read fine. */
 html:not(.dark) .text-\[\#9A9A94\] {
-  color: #4A4A45; /* was 2.76:1, now 8.6:1 */
+  color: #3A3A36;
 }
 html:not(.dark) .text-\[\#5C5C58\] {
-  color: #3F3F3A; /* was 6.55:1, now 10.3:1 */
+  color: #2E2E2A;
 }
 html:not(.dark) .text-\[\#6B6B66\] {
-  color: #46463F;
+  color: #33332F;
+}
+html:not(.dark) .text-\[\#4A4A45\] {
+  color: #2E2E2A;
+}
+
+/* Thin (300) type reads washed out at small sizes and shimmers on many
+   screens — normalize every font-light to regular weight. */
+.font-light {
+  font-weight: 400 !important;
 }
