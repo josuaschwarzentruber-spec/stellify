@@ -10192,9 +10192,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <div className="bg-white border border-black/10 dark:border-white/15 shadow-2xl shadow-black/15 dark:shadow-black/40 overflow-hidden">
                 <div className="flex text-[#26261F]">
                   <div className="w-[36%] bg-[#004225] text-white p-5 sm:p-6 flex flex-col">
-                    <div className="aspect-[4/5] w-full bg-white/5 border border-dashed border-white/35 rounded-sm flex flex-col items-center justify-center mb-4 text-white/70">
-                      <UserIcon size={30} strokeWidth={1.25} />
-                      <p className="mt-1.5 text-[8px] sm:text-[9px] font-bold uppercase tracking-[1.5px]">Foto</p>
+                    {/* Same illustrated portrait as every other example —
+                        one consistent sample person across the whole site. */}
+                    <div className="aspect-[4/5] w-full rounded-sm overflow-hidden border border-white/25 mb-4 flex items-end justify-center" style={{ backgroundColor: '#DCE9E2' }}>
+                      <PresetAvatar id={previewAvatarId} className="w-[130%] h-auto -mb-[15%]" />
                     </div>
                     <p className="font-serif text-[15px] sm:text-[18px] font-bold leading-tight break-words hyphens-auto">{previewIdentity.name}</p>
                     <p className="text-[9px] sm:text-[11px] opacity-75 mt-1">Marketing Manager</p>
@@ -10324,12 +10325,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-6 max-w-lg">
               {language === 'FR'
-                ? 'Choisis un design, colle l\'URL de l\'offre, Stella écrit la lettre, optimise le CV et prépare l\'entretien. Téléchargeable en PDF et Word.'
+                ? 'Choisis un design, colle l\'URL de l\'offre, Stella écrit la lettre et le profil assortis. Téléchargeable en PDF et Word.'
                 : language === 'IT'
-                ? 'Scegli un design, incolla l\'URL dell\'annuncio, Stella scrive la lettera, ottimizza il CV e prepara il colloquio. Scaricabile in PDF e Word.'
+                ? 'Scegli un design, incolla l\'URL dell\'annuncio, Stella scrive la lettera e il profilo su misura. Scaricabile in PDF e Word.'
                 : language === 'EN'
-                ? 'Pick a design, paste the job URL, Stella writes the cover letter, polishes the CV and preps the interview. Export to PDF and Word.'
-                : 'Design wählen, Stellen-URL einfügen, Stella schreibt das Anschreiben, optimiert den Lebenslauf und bereitet das Interview vor. Als PDF und Word exportierbar.'}
+                ? 'Pick a design, paste the job URL, Stella writes the matching cover letter and profile. Export to PDF and Word.'
+                : 'Design wählen, Stellen-URL einfügen, Stella schreibt das passende Anschreiben und Kurzprofil. Als PDF und Word exportierbar.'}
             </p>
             <ul className="space-y-2.5 mb-8">
               {[
