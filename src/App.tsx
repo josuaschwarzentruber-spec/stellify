@@ -1024,7 +1024,40 @@ function CompanyMonogram({ name, size = 'w-7 h-7 text-[11px]' }: { name?: string
   );
 }
 
-function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange, onCreateApplication, onToggleFavorite }: any) {
+// Inline-editable table cell — the whole tracker list is editable in place,
+// no pencil needed. Looks like plain text, reveals a field on hover/focus,
+// saves on blur or Enter, reverts on Escape. `format` lets a raw stored value
+// (e.g. a salary) display nicely while it isn't being edited.
+function EditableCell({ value, onSave, placeholder, className, ariaLabel, inputMode, format }: any) {
+  const [val, setVal] = useState<string>(value ?? '');
+  const [focused, setFocused] = useState(false);
+  useEffect(() => { if (!focused) setVal(value ?? ''); }, [value, focused]);
+  // While not editing, an optional formatter makes the raw stored value read
+  // nicely (e.g. a salary as "CHF 120'000"); on focus the raw value returns.
+  const shown = !focused && format && val ? format(val) : val;
+  return (
+    <input
+      value={shown}
+      inputMode={inputMode}
+      placeholder={placeholder}
+      aria-label={ariaLabel}
+      onChange={(e) => setVal(e.target.value)}
+      onFocus={(e) => { setFocused(true); const el = e.target; requestAnimationFrame(() => el.select()); }}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
+        else if (e.key === 'Escape') { setVal(value ?? ''); requestAnimationFrame(() => (document.activeElement as HTMLElement)?.blur()); }
+      }}
+      onBlur={() => {
+        setFocused(false);
+        const trimmed = val.trim();
+        if ((value ?? '') !== trimmed) onSave(trimmed);
+      }}
+      className={`w-full bg-transparent border border-transparent rounded px-1.5 py-1 -ml-1.5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] hover:border-black/10 dark:hover:border-white/15 focus:bg-white dark:focus:bg-[#1A1A18] focus:border-[#004225]/50 dark:focus:border-[#00A854]/50 focus:outline-none transition-colors cursor-text ${className || ''}`}
+    />
+  );
+}
+
+function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange, onCreateApplication, onToggleFavorite, onFieldSave }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: app.id });
   const style: React.CSSProperties = {
     transform: DndCSS.Transform.toString(transform),
@@ -1057,11 +1090,19 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
       <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">
         <div className="flex items-center gap-2.5">
           <CompanyMonogram name={app.company} />
-          <span className="truncate">{capFirst(app.company)}</span>
+          {onFieldSave ? (
+            <EditableCell value={capFirst(app.company)} onSave={(v: string) => onFieldSave(app.id, 'company', v)} ariaLabel={t.tracker_col_company} className="font-bold text-[#1A1A18] dark:text-[#FAFAF8]" />
+          ) : (
+            <span className="truncate">{capFirst(app.company)}</span>
+          )}
           {app.favorite && <Star size={11} className="shrink-0 text-[#D4A852] fill-[#D4A852]" aria-hidden="true" />}
         </div>
       </td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#B5B5AF]">{capFirst(app.position)}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#B5B5AF]">
+        {onFieldSave ? (
+          <EditableCell value={capFirst(app.position)} onSave={(v: string) => onFieldSave(app.id, 'position', v)} ariaLabel={t.tracker_col_position} className="text-[#5C5C58] dark:text-[#B5B5AF]" />
+        ) : capFirst(app.position)}
+      </td>
       <td className="px-4 py-3">
         <select
           value={app.status}
@@ -1075,8 +1116,16 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           <option value="Rejected">{t.tracker_rejected}</option>
         </select>
       </td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{app.location ? capFirst(app.location) : '-'}</td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">{salaryFmt || '-'}</td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">
+        {onFieldSave ? (
+          <EditableCell value={capFirst(app.location)} onSave={(v: string) => onFieldSave(app.id, 'location', v)} placeholder={language === 'FR' ? 'Lieu' : language === 'IT' ? 'Luogo' : language === 'EN' ? 'Location' : 'Ort'} ariaLabel={t.tracker_col_location} className="text-[#5C5C58] dark:text-[#9A9A94]" />
+        ) : (app.location ? capFirst(app.location) : '-')}
+      </td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94] hidden md:table-cell">
+        {onFieldSave ? (
+          <EditableCell value={app.salary ? String(app.salary) : ''} onSave={(v: string) => onFieldSave(app.id, 'salary', v)} placeholder="CHF" inputMode="numeric" ariaLabel={t.tracker_col_salary} className="text-[#5C5C58] dark:text-[#9A9A94] tabular-nums" format={(raw: string) => { const num = raw.replace(/[^\d.]/g, ''); if (!num) return raw; const n = parseFloat(num); return isNaN(n) ? raw : `CHF ${n.toLocaleString('de-CH', { maximumFractionDigits: 0 })}`; }} />
+        ) : (salaryFmt || '-')}
+      </td>
       <td className="px-4 py-3 text-[#9A9A94] font-mono text-xs hidden lg:table-cell">
         <span className="inline-flex items-center gap-2">
           {updatedDate ? updatedDate.toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '-'}
@@ -3011,6 +3060,20 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     if (!user) return;
     try {
       await updateDoc(doc(db, 'applications', appId), { status: newStatus, updated_at: new Date().toISOString() });
+    } catch (e: any) {
+      handleDbError(e, 'db', `applications/${appId}`);
+      showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
+    }
+  };
+
+  // Inline edit of a single tracker field (company/position/location/salary)
+  // straight from the list, no edit dialog. Text fields get capFirst so the
+  // list stays consistent with rows created via the form.
+  const updateApplicationField = async (appId: string, field: string, rawValue: string) => {
+    if (!user) return;
+    const value = (field === 'company' || field === 'position' || field === 'location') ? capFirst(rawValue) : rawValue;
+    try {
+      await updateDoc(doc(db, 'applications', appId), { [field]: value, updated_at: new Date().toISOString() });
     } catch (e: any) {
       handleDbError(e, 'db', `applications/${appId}`);
       showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
@@ -7923,6 +7986,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                     onDelete={deleteApplication}
                                     onStatusChange={updateApplicationStatus}
                                     onToggleFavorite={toggleApplicationFavorite}
+                                    onFieldSave={updateApplicationField}
                                     onCreateApplication={(a: any) => {
                                       setGeneratorPrefill({ company: a.company || '', position: a.position || '' });
                                       handleToolClick('bewerbungs-gen');
