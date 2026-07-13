@@ -1838,25 +1838,25 @@ app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
     DE: {
       subject: 'Willkommen bei Stellify, deine KI-Bewerbung für die Schweiz',
       title: `Willkommen bei Stellify, ${name}!`,
-      lines: [`Hallo ${name},`, 'dein Konto ist erstellt. Schön, dass du da bist.', 'Mit dem <strong>Gratis-Plan</strong> hast du <strong>3 Generierungen</strong>, um Stellify auszuprobieren: Erstelle mit dem <strong>Bewerbungs-Generator</strong> eine vollständige, auf die Stelle zugeschnittene Bewerbung als PDF und Word, und plane mit der <strong>Bewerbungs-Strategie</strong> deinen nächsten Schritt.', 'Lade deinen Lebenslauf hoch, damit alles noch persönlicher wird. Wann immer du mehr brauchst, wechselst du zu Pro oder Karriere+.'],
+      lines: [`Hallo ${name},`, 'dein Konto ist erstellt. Schön, dass du da bist.', 'Mit dem <strong>Gratis-Plan</strong> hast du <strong>3 Generierungen</strong>, um Stellify auszuprobieren: Erstelle mit dem <strong>Bewerbungs-Generator</strong> eine vollständige, auf die Stelle zugeschnittene Bewerbung als PDF und Word. Der <strong>Bewerbungs-Tracker</strong> ist dauerhaft gratis und behält alle deine Bewerbungen im Blick.', 'Lade deinen Lebenslauf hoch, damit alles noch persönlicher wird. Wann immer du mehr brauchst, wechselst du zu Pro oder Karriere+.'],
       cta: 'Jetzt loslegen',
     },
     FR: {
       subject: 'Bienvenue sur Stellify, ton IA de candidature pour la Suisse',
       title: `Bienvenue sur Stellify, ${name}!`,
-      lines: [`Bonjour ${name},`, 'ton compte est créé. Ravis de t\'accueillir.', 'Avec le <strong>plan gratuit</strong>, tu as <strong>3 générations</strong> pour essayer Stellify : crée une candidature complète et sur mesure en PDF et Word avec le <strong>Générateur de candidatures</strong>, et prépare ton prochain pas avec la <strong>Stratégie de candidature</strong>.', 'Télécharge ton CV pour un résultat encore plus personnel. Quand tu en as besoin, passe à Pro ou Karriere+.'],
+      lines: [`Bonjour ${name},`, 'ton compte est créé. Ravis de t\'accueillir.', 'Avec le <strong>plan gratuit</strong>, tu as <strong>3 générations</strong> pour essayer Stellify : crée une candidature complète et sur mesure en PDF et Word avec le <strong>Générateur de candidatures</strong>. Le <strong>Suivi des candidatures</strong> est gratuit pour toujours et garde toutes tes candidatures en vue.', 'Télécharge ton CV pour un résultat encore plus personnel. Quand tu en as besoin, passe à Pro ou Karriere+.'],
       cta: 'Commencer maintenant',
     },
     IT: {
       subject: 'Benvenuto su Stellify, la tua IA di candidatura per la Svizzera',
       title: `Benvenuto su Stellify, ${name}!`,
-      lines: [`Ciao ${name},`, 'il tuo account è stato creato. Felici di averti qui.', 'Con il <strong>piano gratuito</strong> hai <strong>3 generazioni</strong> per provare Stellify: crea una candidatura completa e su misura in PDF e Word con il <strong>Generatore di candidature</strong> e pianifica il prossimo passo con la <strong>Strategia di candidatura</strong>.', 'Carica il tuo CV per un risultato ancora più personale. Quando ti serve, passa a Pro o Karriere+.'],
+      lines: [`Ciao ${name},`, 'il tuo account è stato creato. Felici di averti qui.', 'Con il <strong>piano gratuito</strong> hai <strong>3 generazioni</strong> per provare Stellify: crea una candidatura completa e su misura in PDF e Word con il <strong>Generatore di candidature</strong>. Il <strong>Tracker candidature</strong> è gratuito per sempre e tiene d\'occhio tutte le tue candidature.', 'Carica il tuo CV per un risultato ancora più personale. Quando ti serve, passa a Pro o Karriere+.'],
       cta: 'Inizia ora',
     },
     EN: {
       subject: 'Welcome to Stellify, your application AI for Switzerland',
       title: `Welcome to Stellify, ${name}!`,
-      lines: [`Hello ${name},`, 'your account is ready. Great to have you.', 'On the <strong>free plan</strong> you have <strong>3 generations</strong> to try Stellify: create a complete, job-tailored application as PDF and Word with the <strong>Application Generator</strong>, and plan your next move with the <strong>Application Strategy</strong>.', 'Upload your CV to make everything even more personal. Whenever you need more, switch to Pro or Karriere+.'],
+      lines: [`Hello ${name},`, 'your account is ready. Great to have you.', 'On the <strong>free plan</strong> you have <strong>3 generations</strong> to try Stellify: create a complete, job-tailored application as PDF and Word with the <strong>Application Generator</strong>. The <strong>Application Tracker</strong> is free forever and keeps every application in view.', 'Upload your CV to make everything even more personal. Whenever you need more, switch to Pro or Karriere+.'],
       cta: 'Get started now',
     },
   };
