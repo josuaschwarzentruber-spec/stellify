@@ -1001,7 +1001,30 @@ function CardActionButton({ onClick, label, icon, className }: { onClick: () => 
 }
 
 // Sortable table row — drag handle on the left, rest of the row stays clickable.
-function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange, onCreateApplication }: any) {
+// Status → readable colors in BOTH themes. The old single dark-green tone
+// disappeared on the dark background and made the whole row look broken.
+function statusSelectClasses(status: string): string {
+  switch (status) {
+    case 'Interview': return 'text-[#B8862F] dark:text-[#D4A852] border-[#D4A852]/50';
+    case 'Offer': return 'text-[#004225] dark:text-[#00A854] border-[#004225]/35 dark:border-[#00A854]/45';
+    case 'Rejected': return 'text-[#B0413E] dark:text-[#E08585] border-[#C0504D]/40';
+    case 'Wishlist': return 'text-[#4A4A45] dark:text-[#B5B5AF] border-black/15 dark:border-white/20';
+    default: return 'text-[#1A1A18] dark:text-[#EBEBEB] border-black/15 dark:border-white/25'; // Applied
+  }
+}
+
+// Company monogram — a company entry without a logo looked like nothing, so
+// the first letter becomes a small logo-style tile.
+function CompanyMonogram({ name, size = 'w-7 h-7 text-[11px]' }: { name?: string; size?: string }) {
+  const letter = (name || '?').trim().charAt(0).toUpperCase() || '?';
+  return (
+    <span className={`${size} shrink-0 rounded-md bg-[#004225]/[0.08] dark:bg-[#00A854]/15 border border-[#004225]/15 dark:border-[#00A854]/25 text-[#004225] dark:text-[#00A854] flex items-center justify-center font-bold font-serif`} aria-hidden="true">
+      {letter}
+    </span>
+  );
+}
+
+function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onArchive, onDelete, onStatusChange, onCreateApplication, onToggleFavorite }: any) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: app.id });
   const style: React.CSSProperties = {
     transform: DndCSS.Transform.toString(transform),
@@ -1031,13 +1054,19 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           </svg>
         </button>
       </td>
-      <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">{capFirst(app.company)}</td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#9A9A94]">{capFirst(app.position)}</td>
+      <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">
+        <div className="flex items-center gap-2.5">
+          <CompanyMonogram name={app.company} />
+          <span className="truncate">{capFirst(app.company)}</span>
+          {app.favorite && <Star size={11} className="shrink-0 text-[#D4A852] fill-[#D4A852]" aria-hidden="true" />}
+        </div>
+      </td>
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#B5B5AF]">{capFirst(app.position)}</td>
       <td className="px-4 py-3">
         <select
           value={app.status}
           onChange={(e) => onStatusChange(app.id, e.target.value)}
-          className="text-[11px] font-medium text-[#004225] bg-transparent border border-[#004225]/20 hover:border-[#004225]/50 focus:border-[#004225] focus:outline-none px-2 py-1 cursor-pointer transition-all"
+          className={`text-[11px] font-medium bg-white dark:bg-[#1A1A18] border rounded-sm hover:border-[#004225]/60 dark:hover:border-[#00A854]/60 focus:outline-none px-2 py-1 cursor-pointer transition-all ${statusSelectClasses(app.status)}`}
         >
           <option value="Wishlist">{t.tracker_wishlist}</option>
           <option value="Applied">{t.tracker_applied}</option>
@@ -1064,12 +1093,15 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
       </td>
       <td className="px-4 py-3">
         <div className="flex gap-1 justify-end">
-          {onCreateApplication && (
-            <button onClick={() => onCreateApplication(app)} title={language === 'FR' ? 'Créer la candidature avec Stella' : language === 'IT' ? 'Crea la candidatura con Stella' : language === 'EN' ? 'Create the application with Stella' : 'Bewerbung mit Stella erstellen'} className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"><Sparkles size={12} /></button>
+          {onToggleFavorite && (
+            <button onClick={() => onToggleFavorite(app.id, !app.favorite)} title={app.favorite ? (language === 'FR' ? 'Retirer des favoris' : language === 'IT' ? 'Rimuovi dai preferiti' : language === 'EN' ? 'Remove from favorites' : 'Favorit entfernen') : (language === 'FR' ? 'Marquer comme favori' : language === 'IT' ? 'Segna come preferito' : language === 'EN' ? 'Mark as favorite' : 'Als Favorit markieren')} className={`p-1.5 rounded transition-all ${app.favorite ? 'text-[#D4A852] hover:bg-[#D4A852]/10' : 'text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#D4A852]'}`}><Star size={13} className={app.favorite ? 'fill-[#D4A852]' : ''} /></button>
           )}
-          <button onClick={() => onEdit(app)} title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'} className="p-1.5 text-[#004225]/60 hover:bg-[#004225]/10 hover:text-[#004225] rounded transition-all"><Edit2 size={12} /></button>
-          <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="p-1.5 text-[#5C5C58] hover:bg-black/5 hover:text-[#1A1A18] rounded transition-all">{app.archived ? <ArchiveRestore size={12} /> : <Archive size={12} />}</button>
-          <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500 dark:text-[#E08585] hover:bg-red-50 dark:hover:bg-red-500/10 rounded transition-all"><Trash2 size={12} /></button>
+          {onCreateApplication && (
+            <button onClick={() => onCreateApplication(app)} title={language === 'FR' ? 'Créer la candidature avec Stella' : language === 'IT' ? 'Crea la candidatura con Stella' : language === 'EN' ? 'Create the application with Stella' : 'Bewerbung mit Stella erstellen'} className="p-1.5 text-[#004225]/70 dark:text-[#00A854]/80 hover:bg-[#004225]/10 dark:hover:bg-[#00A854]/10 hover:text-[#004225] dark:hover:text-[#00A854] rounded transition-all"><Sparkles size={13} /></button>
+          )}
+          <button onClick={() => onEdit(app)} title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'} className="p-1.5 text-[#5C5C58] dark:text-[#B5B5AF] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] rounded transition-all"><Edit2 size={13} /></button>
+          <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="p-1.5 text-[#5C5C58] dark:text-[#B5B5AF] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] rounded transition-all">{app.archived ? <ArchiveRestore size={13} /> : <Archive size={13} />}</button>
+          <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500/80 dark:text-[#E08585]/80 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-[#E08585] rounded transition-all"><Trash2 size={13} /></button>
         </div>
       </td>
     </tr>
@@ -1077,7 +1109,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
 }
 
 // Cross-platform draggable card (desktop, mobile, iPad) via @dnd-kit
-function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onStatusChange, isDragging }: any) {
+function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onStatusChange, onToggleFavorite, isDragging }: any) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: app.id });
   const style: React.CSSProperties = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 50, touchAction: 'none' }
@@ -1096,6 +1128,14 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         className="absolute top-2 right-2 z-10 flex gap-0.5 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity"
         onPointerDown={(e) => e.stopPropagation()}
       >
+        {onToggleFavorite && (
+          <CardActionButton
+            onClick={() => onToggleFavorite(app.id, !app.favorite)}
+            label={app.favorite ? (language === 'FR' ? 'Retirer des favoris' : language === 'IT' ? 'Rimuovi dai preferiti' : language === 'EN' ? 'Remove from favorites' : 'Favorit entfernen') : (language === 'FR' ? 'Marquer comme favori' : language === 'IT' ? 'Segna come preferito' : language === 'EN' ? 'Mark as favorite' : 'Als Favorit markieren')}
+            className={app.favorite ? 'text-[#D4A852] hover:bg-[#D4A852]/10' : 'text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#D4A852]'}
+            icon={<Star size={12} className={app.favorite ? 'fill-[#D4A852]' : ''} />}
+          />
+        )}
         <CardActionButton
           onClick={() => onEdit(app)}
           label={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'}
@@ -1116,7 +1156,11 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
         />
       </div>
       <div className="space-y-2">
-        <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate group-hover:pr-20 transition-all" title={app.company}>{capFirst(app.company)}</p>
+        <div className="flex items-center gap-2 group-hover:pr-20 transition-all">
+          <CompanyMonogram name={app.company} size="w-6 h-6 text-[10px]" />
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#9A9A94] truncate" title={app.company}>{capFirst(app.company)}</p>
+          {app.favorite && <Star size={10} className="shrink-0 text-[#D4A852] fill-[#D4A852]" aria-hidden="true" />}
+        </div>
         <p className="text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug truncate" title={app.position}>{capFirst(app.position)}</p>
         {app.location && (
           <div className="flex items-center gap-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94]">
@@ -1192,9 +1236,12 @@ function DraggableAppCard({ app, t, language, onEdit, onDelete, onArchive, onSta
   );
 }
 
-function DroppableStatusColumn({ status, t, language, applications, activeId, onEdit, onDelete, onArchive, onStatusChange }: any) {
+function DroppableStatusColumn({ status, t, language, applications, activeId, onEdit, onDelete, onArchive, onStatusChange, onToggleFavorite }: any) {
   const { setNodeRef, isOver } = useDroppable({ id: status });
-  const filtered = applications.filter((a: any) => a.status === status);
+  // Favorites first within each column, the rest keeps its existing order.
+  const filtered = applications
+    .filter((a: any) => a.status === status)
+    .sort((a: any, b: any) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
   return (
     <div className="space-y-4 sm:min-w-[260px] lg:min-w-0 sm:flex-shrink-0 sm:snap-start sm:w-[260px] lg:w-auto">
       <div className="flex items-center justify-between px-1">
@@ -1222,6 +1269,7 @@ function DroppableStatusColumn({ status, t, language, applications, activeId, on
             onDelete={onDelete}
             onArchive={onArchive}
             onStatusChange={onStatusChange}
+            onToggleFavorite={onToggleFavorite}
             isDragging={activeId === app.id}
           />
         ))}
@@ -1427,7 +1475,11 @@ function StellifyApp() {
   const [showArchived, setShowArchived] = useState(false);
   // Main view list — affected only by the archive toggle.
   const viewApplications = useMemo(
-    () => applications.filter((a) => showArchived || !a.archived),
+    // Favorites pin to the top; within each group the stable sort keeps the
+    // existing (manual/date) order untouched.
+    () => applications
+      .filter((a) => showArchived || !a.archived)
+      .sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0)),
     [applications, showArchived],
   );
   // Search hits — feed the dropdown under the search input. Scans every
@@ -2240,7 +2292,7 @@ function StellifyApp() {
         { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Karriere+. Résiliable à tout moment.' : language === 'IT' ? 'Piani Gratuito, Pro e Karriere+. Disdicibile in ogni momento.' : language === 'EN' ? 'Free, Pro and Karriere+ plans. Cancel anytime.' : 'Gratis-, Pro- und Karriere+-Plan. Jederzeit kündbar.' },
         { view: 'datenschutz', keys: ['datenschutz','privacy','dsgvo','dsg','privacidad','vie privée'], title: language === 'FR' ? 'Politique de confidentialité' : language === 'IT' ? 'Informativa sulla privacy' : language === 'EN' ? 'Privacy Policy' : 'Datenschutz', content: language === 'FR' ? 'Comment nous traitons tes données personnelles selon LPD et RGPD.' : language === 'IT' ? 'Come trattiamo i tuoi dati personali secondo LPD e GDPR.' : language === 'EN' ? 'How we process your personal data under Swiss DPA and GDPR.' : 'Wie wir deine persönlichen Daten gemäss DSG und DSGVO bearbeiten.' },
         { view: 'agb',         keys: ['agb','terms','bedingungen','widerruf','kündigung'], title: language === 'FR' ? 'CGV' : language === 'IT' ? 'Termini' : language === 'EN' ? 'Terms' : 'AGB', content: language === 'FR' ? 'Conditions générales, paiement et droit de rétractation.' : language === 'IT' ? 'Condizioni generali, pagamento e diritto di recesso.' : language === 'EN' ? 'Terms, payment and right of withdrawal.' : 'Geschäftsbedingungen, Zahlung und Widerrufsrecht.' },
-        { view: 'impressum',   keys: ['impressum','kontakt','contact','imprint','jtsp','zug','firma'], title: language === 'FR' ? 'Mentions légales' : language === 'IT' ? 'Informazioni legali' : language === 'EN' ? 'Imprint' : 'Impressum', content: language === 'FR' ? "Coordonnées de l'exploitant et juridiction." : language === 'IT' ? 'Dati del gestore e giurisdizione.' : language === 'EN' ? 'Operator details and jurisdiction.' : 'Betreiber-Angaben und Gerichtsstand.' },
+        { view: 'impressum',   keys: ['impressum','kontakt','contact','imprint','jtsp','luzern','firma'], title: language === 'FR' ? 'Mentions légales' : language === 'IT' ? 'Informazioni legali' : language === 'EN' ? 'Imprint' : 'Impressum', content: language === 'FR' ? "Coordonnées de l'exploitant et juridiction." : language === 'IT' ? 'Dati del gestore e giurisdizione.' : language === 'EN' ? 'Operator details and jurisdiction.' : 'Betreiber-Angaben und Gerichtsstand.' },
       ];
       const filteredPages = pages
         .filter(p => p.keys.some(k => k.includes(q)) || p.title.toLowerCase().includes(q) || p.content.toLowerCase().includes(q))
@@ -2965,6 +3017,18 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     }
   };
 
+  // Favorite pin — deliberately does NOT touch updated_at, since starring is
+  // not real movement in the application and must not reset the stale nudge.
+  const toggleApplicationFavorite = async (appId: string, favorite: boolean) => {
+    if (!user) return;
+    try {
+      await updateDoc(doc(db, 'applications', appId), { favorite });
+    } catch (e: any) {
+      handleDbError(e, 'db', `applications/${appId}`);
+      showToast(language === 'FR' ? `Erreur: ${e?.message || 'inconnue'}` : language === 'IT' ? `Errore: ${e?.message || 'sconosciuto'}` : language === 'EN' ? `Error: ${e?.message || 'unknown'}` : `Fehler: ${e?.message || 'unbekannt'}`, 'error');
+    }
+  };
+
   // Persist a new manual order: every row gets a sort_index matching its
   // position in `orderedIds`. Optimistically reorder the local state so the
   // drag feels instant; revert if Firestore fails.
@@ -3526,9 +3590,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         { l: 'Interview', c: '#D4A852', items: ['Swisscom'] },
         { l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot', c: '#004225', items: ['Nestlé'] },
       ];
+      // Numbers add up to what the columns below actually show
+      // (2 applied + 1 interview + 1 offer), anything else reads as a bug.
       const stats = [
-        { n: '8', l: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
-        { n: '3', l: 'Interviews' },
+        { n: '4', l: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
+        { n: '1', l: 'Interview' },
         { n: '1', l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot' },
       ];
       return (
@@ -4787,9 +4853,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_page_title: "Bewerbungs-Tracker",
       tracker_page_desc: "Alle Bewerbungen, synchron mit dem Dashboard. Sortiere per Drag & Drop, ändere Status oder archiviere.",
       tracker_page_kicker: "Dein Pipeline-Überblick",
-      profile_title: "Dein Profil",
-      profile_desc: "Verwalte deinen Lebenslauf, deine Roadmap und Stellas Wissen über dich an einem Ort.",
-      profile_kicker: "Über dich",
+      profile_title: "Konto & Einstellungen",
+      profile_desc: "Dein Profil, dein Lebenslauf, dein Abo und alle Einstellungen an einem Ort.",
+      profile_kicker: "Dein Bereich",
       dashboard_kicker: "Dein Arbeitsbereich",
       profile_account: "Konto",
       profile_account_name: "Name",
@@ -5237,10 +5303,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_popular: "Beliebteste Wahl",
       value_title: "Was Stellify dir spart",
       value_items: [
-        { icon: "Coins", title: "CHF 200 bis 400", desc: "kostet eine einzige Karriereberatung. Stellify deckt das ganze Jahr ab." },
-        { icon: "Clock", title: "3 bis 5 Stunden", desc: "weniger Arbeit pro Bewerbung. Mehr Zeit für die Stellen, die zählen." },
-        { icon: "Target", title: "Mehr Einladungen", desc: "Ein guter Lebenslauf kommt durch jede Bewerbungs-Software." },
-        { icon: "TrendingUp", title: "Schnell amortisiert", desc: "Eine bessere Stelle bezahlt das Abo vielfach zurück." }
+        { icon: "Coins", title: "CHF 200 bis 400", desc: "kostet eine einzige Karriereberatung. Stellify Pro kostet weniger als CHF 20 pro Monat." },
+        { icon: "Clock", title: "3 bis 5 Stunden", desc: "sparst du pro Bewerbung. Mehr Zeit für die Stellen, die wirklich zählen." },
+        { icon: "Target", title: "Mehr Einladungen", desc: "Eine Bewerbung, die genau zur Stelle passt, fällt positiv auf." },
+        { icon: "TrendingUp", title: "Zahlt sich schnell aus", desc: "Schon eine einzige Zusage bringt dir viel mehr, als das Abo kostet." }
       ],
       tools_data: {
         'cv-optimizer': {
@@ -5450,9 +5516,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_page_title: "Suivi des candidatures",
       tracker_page_desc: "Toutes tes candidatures, synchronisées avec le tableau de bord. Trie par glisser-déposer, change de statut ou archive.",
       tracker_page_kicker: "Ton aperçu de pipeline",
-      profile_title: "Ton profil",
-      profile_desc: "Gère ton CV, ta roadmap et ce que Stella sait de toi au même endroit.",
-      profile_kicker: "À ton sujet",
+      profile_title: "Compte & réglages",
+      profile_desc: "Ton profil, ton CV, ton abonnement et tous les réglages au même endroit.",
+      profile_kicker: "Ton espace",
       dashboard_kicker: "Ton espace de travail",
       profile_account: "Compte",
       profile_account_name: "Nom",
@@ -5900,10 +5966,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_popular: "Choix le plus populaire",
       value_title: "Ce que Stellify te fait économiser",
       value_items: [
-        { icon: "Coins", title: "CHF 200 à 400", desc: "coûte une seule séance de coaching. Stellify couvre toute l'année." },
-        { icon: "Clock", title: "3 à 5 heures", desc: "de travail en moins par candidature. Plus de temps pour les bons postes." },
-        { icon: "Target", title: "Plus d'entretiens", desc: "Un CV optimisé passe chaque filtre ATS." },
-        { icon: "TrendingUp", title: "Vite rentabilisé", desc: "Un meilleur poste rembourse l'abonnement plusieurs fois." }
+        { icon: "Coins", title: "CHF 200 à 400", desc: "coûte une seule séance de coaching. Stellify Pro coûte moins de CHF 20 par mois." },
+        { icon: "Clock", title: "3 à 5 heures", desc: "gagnées par candidature. Plus de temps pour les postes qui comptent vraiment." },
+        { icon: "Target", title: "Plus d'invitations", desc: "Une candidature qui correspond exactement au poste se démarque." },
+        { icon: "TrendingUp", title: "Vite gagnant", desc: "Une seule réponse positive te rapporte bien plus que le prix de l'abonnement." }
       ],
       tools_data: {
         'cv-optimizer': { title: 'Optimiseur de CV', desc: 'Analyse votre CV selon les standards suisses et optimise la formulation.', input_label: 'Quelle section optimiser ?', input_placeholder: 'ex: Expérience professionnelle...' },
@@ -6007,9 +6073,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_page_title: "Tracker candidature",
       tracker_page_desc: "Tutte le tue candidature, sincronizzate con la dashboard. Riordina con trascinamento, cambia stato o archivia.",
       tracker_page_kicker: "La tua panoramica della pipeline",
-      profile_title: "Il tuo profilo",
-      profile_desc: "Gestisci il tuo CV, la tua roadmap e ciò che Stella sa di te in un unico posto.",
-      profile_kicker: "Su di te",
+      profile_title: "Account e impostazioni",
+      profile_desc: "Il tuo profilo, il tuo CV, il tuo abbonamento e tutte le impostazioni in un unico posto.",
+      profile_kicker: "Il tuo spazio",
       dashboard_kicker: "La tua area di lavoro",
       profile_account: "Account",
       profile_account_name: "Nome",
@@ -6457,10 +6523,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_popular: "Scelta più popolare",
       value_title: "Cosa ti fa risparmiare Stellify",
       value_items: [
-        { icon: "Coins", title: "CHF 200 a 400", desc: "costa una sola sessione di coaching. Stellify copre tutto l'anno." },
-        { icon: "Clock", title: "3 a 5 ore", desc: "di lavoro in meno per candidatura. Più tempo per i posti che contano." },
-        { icon: "Target", title: "Più colloqui", desc: "Un CV ottimizzato supera ogni filtro ATS." },
-        { icon: "TrendingUp", title: "Si ripaga in fretta", desc: "Un lavoro migliore restituisce l'abbonamento molte volte." }
+        { icon: "Coins", title: "CHF 200 a 400", desc: "costa una sola consulenza di carriera. Stellify Pro costa meno di CHF 20 al mese." },
+        { icon: "Clock", title: "3 a 5 ore", desc: "risparmiate per candidatura. Più tempo per i posti che contano davvero." },
+        { icon: "Target", title: "Più inviti", desc: "Una candidatura che corrisponde esattamente al posto si fa notare." },
+        { icon: "TrendingUp", title: "Si ripaga subito", desc: "Una sola risposta positiva vale molto più del costo dell'abbonamento." }
       ],
       tools_data: {
         'cv-optimizer': { title: 'Ottimizzatore CV', desc: 'Analizza il tuo CV secondo gli standard svizzeri e ottimizza la formulazione.', input_label: 'Quale sezione ottimizzare?', input_placeholder: 'es. Esperienza professionale...' },
@@ -6564,9 +6630,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tracker_page_title: "Application Tracker",
       tracker_page_desc: "Every application, synced with your dashboard. Drag to reorder, change status, or archive.",
       tracker_page_kicker: "Your pipeline overview",
-      profile_title: "Your profile",
-      profile_desc: "Manage your CV, your roadmap and what Stella knows about you in one place.",
-      profile_kicker: "About you",
+      profile_title: "Account & settings",
+      profile_desc: "Your profile, your CV, your subscription and all settings in one place.",
+      profile_kicker: "Your space",
       dashboard_kicker: "Your workspace",
       profile_account: "Account",
       profile_account_name: "Name",
@@ -7014,10 +7080,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_popular: "Most Popular",
       value_title: "What Stellify saves you",
       value_items: [
-        { icon: "Coins", title: "CHF 200 to 400", desc: "for a single coaching session. Stellify covers the whole year." },
-        { icon: "Clock", title: "3 to 5 hours", desc: "of work per application. More time for the roles that matter." },
-        { icon: "Target", title: "More interviews", desc: "An optimized CV gets through every ATS filter." },
-        { icon: "TrendingUp", title: "Pays off quickly", desc: "A better job repays the subscription many times over." }
+        { icon: "Coins", title: "CHF 200 to 400", desc: "is the price of a single career coaching session. Stellify Pro is under CHF 20 per month." },
+        { icon: "Clock", title: "3 to 5 hours", desc: "saved per application. More time for the roles that really matter." },
+        { icon: "Target", title: "More invitations", desc: "An application that truly fits the role stands out." },
+        { icon: "TrendingUp", title: "Pays for itself fast", desc: "A single yes is worth far more than the subscription costs." }
       ],
       tools_data: {
         'cv-optimizer': { title: 'CV Optimizer', desc: 'Analyzes your CV for Swiss standards & optimizes wording.', input_label: 'Which section to optimize?', input_placeholder: 'e.g. Work experience...' },
@@ -7856,6 +7922,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                     onArchive={setApplicationArchived}
                                     onDelete={deleteApplication}
                                     onStatusChange={updateApplicationStatus}
+                                    onToggleFavorite={toggleApplicationFavorite}
                                     onCreateApplication={(a: any) => {
                                       setGeneratorPrefill({ company: a.company || '', position: a.position || '' });
                                       handleToolClick('bewerbungs-gen');
@@ -9473,6 +9540,29 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
                 </div>
 
+                {/* Contact — the same help offer the public guides show, so
+                    logged-in users also know how to reach us. Mail first,
+                    Instagram second. */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-3">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">
+                    {language === 'FR' ? 'Une question ?' : language === 'IT' ? 'Una domanda?' : language === 'EN' ? 'Questions?' : 'Fragen oder Anliegen?'}
+                  </p>
+                  <p className="text-sm text-[#26261F] dark:text-[#C8C8C2] font-light leading-relaxed">
+                    {language === 'FR' ? 'Écris-nous, nous répondons personnellement et rapidement:'
+                      : language === 'IT' ? 'Scrivici, rispondiamo personalmente e rapidamente:'
+                      : language === 'EN' ? 'Write to us, we answer personally and quickly:'
+                      : 'Schreib uns, wir antworten persönlich und schnell:'}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <a href="mailto:support.stellify@gmail.com" className="inline-flex items-center gap-2 text-sm font-medium text-[#004225] dark:text-[#00A854] hover:underline">
+                      <Mail size={14} /> support.stellify@gmail.com
+                    </a>
+                    <a href="https://www.instagram.com/stellify.ch/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-medium text-[#26261F] dark:text-[#C8C8C2] hover:text-[#E1306C] dark:hover:text-[#E1306C] transition-colors">
+                      <Instagram size={14} /> @stellify.ch
+                    </a>
+                  </div>
+                </div>
+
                 {/* Admin only: send a newsletter to the chosen audience */}
                 {user.email === 'support.stellify@gmail.com' && (
                   <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-[#D4A852]/40 space-y-4">
@@ -10639,8 +10729,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <div className="space-y-3">
                           <div className="grid grid-cols-3 gap-2.5">
                             {[
-                              { n: '8', l: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
-                              { n: '3', l: 'Interviews' },
+                              { n: '4', l: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
+                              { n: '1', l: 'Interview' },
                               { n: '1', l: language === 'FR' ? 'Offre' : language === 'IT' ? 'Offerta' : language === 'EN' ? 'Offer' : 'Angebot' },
                             ].map((s, i) => (
                               <div key={i} className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-sm px-2 py-2.5 text-center">

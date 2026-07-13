@@ -23,6 +23,22 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
     <span className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-1 rounded font-mono text-xs">{text}</span>
   );
 
+  // The provider list is legally required but felt too prominent as an open
+  // wall of foreign company names. Collapsed by default, still one click away.
+  const ProviderDetails = ({ summary, providers }: { summary: string; providers: string[][] }) => (
+    <details className="mt-3 group">
+      <summary className="cursor-pointer list-none flex items-center gap-2 text-sm font-medium text-[#004225] dark:text-[#00A854] select-none">
+        <ArrowLeft size={14} className="-rotate-90 group-open:-rotate-[270deg] transition-transform" />
+        {summary}
+      </summary>
+      <div className="mt-3 space-y-4">
+        {providers.map(([name, desc]) => (
+          <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
+        ))}
+      </div>
+    </details>
+  );
+
   return (
     <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
       {/* Gentle page entrance — the content used to pop in hard after the
@@ -88,12 +104,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="5. Weitergabe an Dritte">
-                <p>Wir geben deine Daten nur an folgende Drittdienstleister weiter, die als Auftragsverarbeiter tätig sind:</p>
-                <div className="mt-3 space-y-4">
-                  {[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Zweck: Primäre KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: China. Es werden nur die für die jeweilige Anfrage nötigen Inhalte übermittelt; keine Kontodaten, keine Zahlungsdaten.'],['KI-Dienst (Google LLC, Gemini)', 'Zweck: KI-Verarbeitung als Ausweichdienst. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']].map(([name, desc]) => (
-                    <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
-                  ))}
-                </div>
+                <p>Wir geben deine Daten nur an sorgfältig ausgewählte Dienstleister weiter, die als Auftragsverarbeiter für uns tätig sind (Anmeldung, KI-Verarbeitung, Zahlung, Hosting). Wir verkaufen deine Daten nicht.</p>
+                <ProviderDetails summary="Liste der Dienstleister anzeigen" providers={[['Authentifizierungsdienst (Google LLC)', 'Zweck: Authentifizierung, Datenbankhosting. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs).'],['KI-Dienst (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Zweck: Primäre KI-gestützte Verarbeitung von Nutzeranfragen und Lebenslauf-Inhalten. Sitz: China. Es werden nur die für die jeweilige Anfrage nötigen Inhalte übermittelt; keine Kontodaten, keine Zahlungsdaten.'],['KI-Dienst (Google LLC, Gemini)', 'Zweck: KI-Verarbeitung als Ausweichdienst. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln (SCCs). Eingabedaten werden nicht zum Training genutzt.'],['Stripe Inc.', 'Zweck: Zahlungsabwicklung. Sitz: USA. Stripe ist PCI-DSS-zertifiziert.'],['Cloud-Hosting-Anbieter (Vercel Inc.)', 'Zweck: Hosting der Web-Applikation. Sitz: USA. Schutzinstrument: EU-Standardvertragsklauseln.']]} />
               </Section>
               <Section title="6. Cookies und lokale Speicherung">
                 <div className="mt-3 space-y-3">
@@ -143,12 +155,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="5. Transfert à des tiers">
-                <p>Nous ne transmettons vos données qu'aux sous-traitants suivants :</p>
-                <div className="mt-3 space-y-4">
-                  {[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Finalité : traitement IA principal des requêtes et du contenu du CV. Siège : Chine. Seuls les contenus nécessaires à la requête sont transmis; ni données de compte ni données de paiement.'],['Service IA (Google LLC, Gemini)', 'Finalité : traitement IA de secours. Siège : USA. Protection : clauses contractuelles types UE. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']].map(([name, desc]) => (
-                    <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
-                  ))}
-                </div>
+                <p>Nous ne transmettons vos données qu'à des prestataires soigneusement choisis, agissant comme sous-traitants pour nous (connexion, traitement IA, paiement, hébergement). Nous ne vendons pas vos données.</p>
+                <ProviderDetails summary="Afficher la liste des prestataires" providers={[['Service d\'authentification (Google LLC)', 'Finalité : authentification, hébergement de base de données. Siège : USA. Protection : clauses contractuelles types UE (CCT).'],['Service IA (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Finalité : traitement IA principal des requêtes et du contenu du CV. Siège : Chine. Seuls les contenus nécessaires à la requête sont transmis; ni données de compte ni données de paiement.'],['Service IA (Google LLC, Gemini)', 'Finalité : traitement IA de secours. Siège : USA. Protection : clauses contractuelles types UE. Les données ne sont pas utilisées pour l\'entraînement.'],['Stripe Inc.', 'Finalité : traitement des paiements. Siège : USA. Stripe est certifié PCI-DSS.'],['Hébergeur cloud (Vercel Inc.)', 'Finalité : hébergement de l\'application web. Siège : USA. Protection : clauses contractuelles types UE.']]} />
               </Section>
               <Section title="6. Cookies et stockage local">
                 <div className="mt-3 space-y-3">
@@ -194,12 +202,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="5. Trasferimento a terzi">
-                <p>Trasferiamo i dati solo ai seguenti responsabili del trattamento:</p>
-                <div className="mt-3 space-y-4">
-                  {[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Finalità: elaborazione IA principale delle richieste e del contenuto del CV. Sede: Cina. Vengono trasmessi solo i contenuti necessari alla richiesta; nessun dato del conto né di pagamento.'],['Servizio IA (Google LLC, Gemini)', 'Finalità: elaborazione IA di riserva. Sede: USA. Strumento: clausole contrattuali tipo UE. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']].map(([name, desc]) => (
-                    <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
-                  ))}
-                </div>
+                <p>Trasferiamo i tuoi dati solo a fornitori accuratamente selezionati che operano come responsabili del trattamento per noi (accesso, elaborazione IA, pagamento, hosting). Non vendiamo i tuoi dati.</p>
+                <ProviderDetails summary="Mostra l'elenco dei fornitori" providers={[['Servizio di autenticazione (Google LLC)', 'Finalità: autenticazione, hosting database. Sede: USA. Strumento di protezione: clausole contrattuali tipo UE (SCC).'],['Servizio IA (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Finalità: elaborazione IA principale delle richieste e del contenuto del CV. Sede: Cina. Vengono trasmessi solo i contenuti necessari alla richiesta; nessun dato del conto né di pagamento.'],['Servizio IA (Google LLC, Gemini)', 'Finalità: elaborazione IA di riserva. Sede: USA. Strumento: clausole contrattuali tipo UE. I dati non vengono usati per il training.'],['Stripe Inc.', 'Finalità: elaborazione pagamenti. Sede: USA. Stripe è certificato PCI-DSS.'],['Provider hosting cloud (Vercel Inc.)', 'Finalità: hosting dell\'applicazione web. Sede: USA. Strumento: clausole contrattuali tipo UE.']]} />
               </Section>
               <Section title="6. Cookie e memorizzazione locale">
                 <div className="mt-3 space-y-3">
@@ -245,12 +249,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 </ul>
               </Section>
               <Section title="5. Third-Party Data Sharing">
-                <p>We only share data with the following processors:</p>
-                <div className="mt-3 space-y-4">
-                  {[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Purpose: Primary AI processing of user requests and CV content. Location: China. Only the content required for the request is transmitted; no account or payment data.'],['AI Service (Google LLC, Gemini)', 'Purpose: AI processing as fallback. Location: USA. Safeguard: EU Standard Contractual Clauses. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']].map(([name, desc]) => (
-                    <div key={name} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name}</p><p className="text-xs mt-1">{desc}</p></div>
-                  ))}
-                </div>
+                <p>We only share your data with carefully selected providers acting as processors on our behalf (sign-in, AI processing, payment, hosting). We do not sell your data.</p>
+                <ProviderDetails summary="Show the list of providers" providers={[['Authentication Service (Google LLC)', 'Purpose: Authentication, database hosting. Location: USA. Safeguard: EU Standard Contractual Clauses (SCCs).'],['AI Service (DeepSeek / Hangzhou DeepSeek AI Co., Ltd.)', 'Purpose: Primary AI processing of user requests and CV content. Location: China. Only the content required for the request is transmitted; no account or payment data.'],['AI Service (Google LLC, Gemini)', 'Purpose: AI processing as fallback. Location: USA. Safeguard: EU Standard Contractual Clauses. Input data is not used for model training.'],['Stripe Inc.', 'Purpose: Payment processing. Location: USA. Stripe is PCI-DSS certified.'],['Cloud Hosting Provider (Vercel Inc.)', 'Purpose: Web application hosting. Location: USA. Safeguard: EU Standard Contractual Clauses.']]} />
               </Section>
               <Section title="6. Cookies and Local Storage">
                 <div className="mt-3 space-y-3">
@@ -306,7 +306,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </Section>
 
             <Section title={isDE ? 'Anwendbares Recht' : isFR ? 'Droit applicable' : isIT ? 'Diritto applicabile' : 'Applicable Law'}>
-              <p>{isDE ? 'Es gilt ausschliesslich Schweizer Recht. Gerichtsstand ist Zug, Schweiz.' : isFR ? 'Le droit suisse est exclusivement applicable. Le for juridique est Zoug, Suisse.' : isIT ? 'Si applica esclusivamente il diritto svizzero. Il foro competente è Zugo, Svizzera.' : 'Swiss law applies exclusively. Place of jurisdiction is Zug, Switzerland.'}</p>
+              <p>{isDE ? 'Es gilt ausschliesslich Schweizer Recht. Gerichtsstand ist Luzern, Schweiz.' : isFR ? 'Le droit suisse est exclusivement applicable. Le for juridique est Lucerne, Suisse.' : isIT ? 'Si applica esclusivamente il diritto svizzero. Il foro competente è Lucerna, Svizzera.' : 'Swiss law applies exclusively. Place of jurisdiction is Lucerne, Switzerland.'}</p>
             </Section>
           </article>
         )}
@@ -329,7 +329,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             {isDE ? <>
               <Section title="1. Vertragsgegenstand und Geltungsbereich">
                 <p>Diese AGB gelten für alle Nutzungsverträge zwischen dem Anbieter JTSP, Betreiber der Plattform Stellify (nachfolgend „Stellify") und registrierten Nutzern der Plattform stellify.ch.</p>
-                <p className="mt-2">Stellify bietet eine KI-gestützte Karriereplattform mit Tools zur Lebenslaufoptimierung, Interview-Vorbereitung, Gehaltsanalyse und weiteren Karriere-Diensten an.</p>
+                <p className="mt-2">Stellify bietet eine KI-gestützte Bewerbungsplattform mit zwei Werkzeugen an: dem Bewerbungs-Generator, der aus einem Stelleninserat ein passendes Anschreiben und Kurzprofil erstellt, und dem kostenlosen Bewerbungs-Tracker zur Übersicht über alle Bewerbungen.</p>
               </Section>
               <Section title="2. Vertragsschluss und Kontoregistrierung">
                 <p>Der Vertrag kommt durch die Nutzung der Plattform oder den Abschluss eines Abonnements zustande. Mit der Registrierung oder dem Abschluss eines Abonnements gilt die Zustimmung zu diesen AGB und der Datenschutzrichtlinie als erteilt.</p>
@@ -337,14 +337,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3 KI-Generierungen','Bewerbungs-Generator & Bewerbungs-Übersicht','PDF-Export','Schweizer Karriere-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3 Bewerbungs-Generierungen','Bewerbungs-Tracker (dauerhaft gratis)','PDF- & Word-Export','Schweizer Bewerbungs-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">Alle Preise in CHF, inkl. MwSt. Preisänderungen werden mindestens 30 Tage im Voraus angekündigt.</p>
               </Section>
               <Section title="4. Zahlung und Abrechnung"><p>Zahlung ausschliesslich via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Abrechnung im Voraus, monatlich oder jährlich.</p></Section>
-              <Section title="5. Widerrufsrecht"><p>Stellify bietet eine <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-Tage-Geld-zurück-Garantie</strong> für Erstkäufer. Anfragen an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
+              <Section title="5. Widerruf und Rückerstattung"><p>Bei digitalen Diensten, die sofort bereitstehen, besteht kein gesetzliches Widerrufsrecht. Du kannst dein Abo aber jederzeit kündigen; es endet dann zum Ende der laufenden Abrechnungsperiode und verlängert sich nicht mehr. Rückerstattungen bereits bezahlter Perioden sind nicht vorgesehen, im Einzelfall prüfen wir sie jedoch kulant. Wende dich dafür an <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
               <Section title="6. Laufzeit, Verlängerung und Kündigung">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monatliches Abo:</strong> Läuft 1 Monat ab Kaufdatum und verlängert sich automatisch um jeweils einen weiteren Monat, sofern es nicht gekündigt wird.</li>
@@ -361,7 +361,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro-Plan:</strong> 50 Generierungen pro Monat, max. 15 pro Minute</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 Generierungen pro Monat, max. 30 pro Minute</li>
                 </ul>
-                <p className="mt-2">Monatliche Kontingente werden am 1. des Monats (Europe/Zurich) zurückgesetzt, Tageskontingente täglich um 00:00 Uhr. Die Minuten-Limits dienen ausschliesslich dem Schutz vor Missbrauch und automatisierter Massennutzung.</p>
+                <p className="mt-2">Bei Monatsabos wird das Kontingent zu Beginn jeder Abrechnungsperiode zurückgesetzt, also am jeweiligen Kauf-Stichtag (Beispiel: Kauf am 12. → Reset am 12. jedes Monats). Bei Jahresabos wird das monatliche Kontingent jeweils am 1. des Kalendermonats aufgefrischt. Die Minuten-Limits dienen ausschliesslich dem Schutz vor Missbrauch und automatisierter Massennutzung.</p>
                 <p className="mt-2">Eine <em>Erhöhung</em> der Kontingente ist jederzeit möglich und gilt automatisch zugunsten des Nutzers. Eine <em>Senkung</em> würde nur für nach der Änderung neu abgeschlossene Abonnements wirksam und vorab mit 30 Tagen Frist angekündigt.</p>
               </Section>
               <Section title="8. Geistiges Eigentum"><p>Alle Rechte an Plattform, Code, Design und Marken liegen beim Betreiber. KI-generierte Inhalte dürfen vom Nutzer für eigene Bewerbungsunterlagen verwendet werden.</p></Section>
@@ -376,28 +376,28 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Rechtliche, steuerliche, medizinische oder ähnlich beratungsintensive Aussagen</li>
                 </ul>
                 <p className="mt-2">Falsche oder erfundene Angaben in Bewerbungsunterlagen können <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">arbeitsrechtliche, vertragliche oder strafrechtliche Folgen</strong> haben (z.B. Anfechtung des Arbeitsvertrags, fristlose Kündigung, Urkundenfälschung, Betrug). Diese liegen ausschliesslich beim Nutzer.</p>
-                <p className="mt-2">Stellify haftet ausdrücklich nicht für Schäden, die durch ungeprüftes Verwenden KI-generierter Inhalte entstehen. insbesondere nicht für nicht erfolgreiche Bewerbungen, abgelehnte Stellen, Rückzug von Stellenangeboten, Vertragsverletzungen oder Reputationsschäden. Diese Klausel ergänzt §9 (Haftungsbeschränkung) und gilt vorrangig.</p>
+                <p className="mt-2">Stellify haftet ausdrücklich nicht für Schäden, die durch ungeprüftes Verwenden KI-generierter Inhalte entstehen, insbesondere nicht für nicht erfolgreiche Bewerbungen, abgelehnte Stellen, Rückzug von Stellenangeboten, Vertragsverletzungen oder Reputationsschäden. Diese Klausel ergänzt §9 (Haftungsbeschränkung) und gilt vorrangig.</p>
               </Section>
               <Section title="10. Verfügbarkeit"><p>Keine Garantie auf unterbrechungsfreie Verfügbarkeit. Ausfälle von Firebase, Stripe oder Google AI liegen ausserhalb unseres Einflussbereichs.</p></Section>
               <Section title="11. Änderungen"><p>Anpassungen mit 30 Tagen Frist. Wesentliche Änderungen per E-Mail. Fortgesetzte Nutzung gilt als Zustimmung.</p></Section>
-              <Section title="12. Anwendbares Recht"><p>Ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>. Gerichtsstand: Zug, Schweiz.</p></Section>
+              <Section title="12. Anwendbares Recht"><p>Ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>. Gerichtsstand: Luzern, Schweiz.</p></Section>
               <Section title="13. Streitbeilegung"><p>Kontakt: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU-Schlichtung: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isFR ? <>
-              <Section title="1. Objet et champ d'application"><p>Les présentes CGU régissent tous les contrats d'utilisation entre le fournisseur JTSP, exploitant de la plateforme Stellify (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de carrière assistée par IA.</p></Section>
+              <Section title="1. Objet et champ d'application"><p>Les présentes CGU régissent tous les contrats d'utilisation entre le fournisseur JTSP, exploitant de la plateforme Stellify (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de candidature assistée par IA avec deux outils : le Générateur de candidatures, qui crée à partir d'une annonce une lettre de motivation et un profil court adaptés, et le Suivi des candidatures gratuit.</p></Section>
               <Section title="2. Conclusion du contrat">
                 <p>Le contrat est conclu par l'utilisation de la plateforme ou la souscription d'un abonnement. En s'inscrivant ou en souscrivant un abonnement, l'utilisateur accepte implicitement les présentes CGU et la politique de confidentialité.</p>
                 <p className="mt-2">L'utilisation est autorisée dès l'âge de <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 ans</strong>. Les personnes mineures (moins de 18 ans) doivent obtenir le consentement d'un représentant légal pour souscrire un abonnement payant.</p>
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3 générations IA','Générateur de candidatures & aperçu des candidatures','Export PDF','Standards suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3 générations de candidatures','Suivi des candidatures (gratuit pour toujours)','Export PDF & Word','Standards de candidature suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">Tous les prix en CHF, TVA incluse. Les modifications de prix sont annoncées 30 jours à l'avance.</p>
               </Section>
               <Section title="4. Paiement"><p>Paiement exclusivement via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Facturation en avance, mensuelle ou annuelle.</p></Section>
-              <Section title="5. Droit de rétractation"><p>Stellify offre une <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">garantie de remboursement de 7 jours</strong> pour les premiers acheteurs. Demandes à <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
+              <Section title="5. Rétractation et remboursement"><p>Pour les services numériques disponibles immédiatement, il n'existe pas de droit de rétractation légal. Tu peux toutefois résilier ton abonnement à tout moment ; il prend fin à la fin de la période de facturation en cours et ne se renouvelle plus. Les remboursements de périodes déjà payées ne sont pas prévus, mais nous les examinons au cas par cas à titre de geste commercial. Écris à <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
               <Section title="6. Durée, renouvellement et résiliation">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abonnement mensuel :</strong> Court 1 mois à compter de la date d'achat et se renouvelle automatiquement d'un mois à la fois, sauf résiliation.</li>
@@ -414,7 +414,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Pro :</strong> 50 générations par mois, max. 15 par minute</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ :</strong> 150 générations par mois, max. 30 par minute</li>
                 </ul>
-                <p className="mt-2">Les quotas mensuels sont réinitialisés le 1er du mois (Europe/Zurich), les quotas journaliers à 00h00. Les limites par minute servent exclusivement à prévenir les abus et l'utilisation automatisée de masse.</p>
+                <p className="mt-2">Pour les abonnements mensuels, le quota est réinitialisé au début de chaque période de facturation, c'est-à-dire à la date d'achat (exemple : achat le 12 → réinitialisation le 12 de chaque mois). Pour les abonnements annuels, le quota mensuel est renouvelé le 1er de chaque mois civil. Les limites par minute servent exclusivement à prévenir les abus et l'utilisation automatisée de masse.</p>
                 <p className="mt-2">Une <em>augmentation</em> des quotas est possible à tout moment et s'applique automatiquement en faveur de l'utilisateur. Une <em>diminution</em> ne s'appliquerait qu'aux abonnements souscrits après la modification et serait annoncée 30 jours à l'avance.</p>
               </Section>
               <Section title="8. Propriété intellectuelle"><p>Tous les droits sur la plateforme, le code, le design et les marques appartiennent à l'exploitant. Les contenus générés par IA peuvent être utilisés par l'utilisateur pour ses dossiers de candidature.</p></Section>
@@ -429,28 +429,28 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Affirmations juridiques, fiscales, médicales ou autres nécessitant un conseil professionnel</li>
                 </ul>
                 <p className="mt-2">Des informations fausses ou inventées dans des dossiers de candidature peuvent avoir des <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">conséquences en droit du travail, contractuelles ou pénales</strong> (p. ex. annulation du contrat de travail, licenciement immédiat, faux et usage de faux, escroquerie). Celles-ci incombent exclusivement à l'utilisateur.</p>
-                <p className="mt-2">Stellify n'est expressément pas responsable des dommages résultant de l'utilisation non vérifiée des contenus générés par l'IA. notamment pour des candidatures infructueuses, postes refusés, retraits d'offres d'emploi, violations contractuelles ou atteintes à la réputation. Cette clause complète §9 (Limitation de responsabilité) et prime sur celle-ci.</p>
+                <p className="mt-2">Stellify n'est expressément pas responsable des dommages résultant de l'utilisation non vérifiée des contenus générés par l'IA, notamment pour des candidatures infructueuses, postes refusés, retraits d'offres d'emploi, violations contractuelles ou atteintes à la réputation. Cette clause complète §9 (Limitation de responsabilité) et prime sur celle-ci.</p>
               </Section>
               <Section title="10. Disponibilité"><p>Aucune garantie de disponibilité ininterrompue. Les pannes de Firebase, Stripe ou Google AI échappent à notre contrôle.</p></Section>
               <Section title="11. Modifications"><p>Modifications avec un préavis de 30 jours. Changements importants communiqués par e-mail.</p></Section>
-              <Section title="12. Droit applicable"><p>Le <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">droit suisse</strong> s'applique exclusivement. For juridique : Zoug, Suisse.</p></Section>
+              <Section title="12. Droit applicable"><p>Le <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">droit suisse</strong> s'applique exclusivement. For juridique : Lucerne, Suisse.</p></Section>
               <Section title="13. Règlement des litiges"><p>Contact : <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Plateforme de médiation UE : <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isIT ? <>
-              <Section title="1. Oggetto e ambito di applicazione"><p>Le presenti CGU disciplinano tutti i contratti d'uso tra il fornitore JTSP, gestore della piattaforma Stellify (di seguito «Stellify») e gli utenti registrati della piattaforma stellify.ch.</p></Section>
+              <Section title="1. Oggetto e ambito di applicazione"><p>Le presenti CGU disciplinano tutti i contratti d'uso tra il fornitore JTSP, gestore della piattaforma Stellify (di seguito «Stellify») e gli utenti registrati della piattaforma stellify.ch. Stellify offre una piattaforma di candidatura assistita da IA con due strumenti: il Generatore di candidature, che da un annuncio crea una lettera di motivazione e un profilo breve su misura, e il Tracker candidature gratuito.</p></Section>
               <Section title="2. Conclusione del contratto">
                 <p>Il contratto si conclude con l'utilizzo della piattaforma o la sottoscrizione di un abbonamento. Registrandosi o sottoscrivendo un abbonamento, l'utente accetta implicitamente le presenti CGU e l'informativa sulla privacy.</p>
                 <p className="mt-2">L'utilizzo è consentito a partire dai <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 anni</strong>. I minorenni (sotto i 18 anni) necessitano del consenso di un rappresentante legale per sottoscrivere un abbonamento a pagamento.</p>
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3 generazioni IA','Generatore di candidature & panoramica candidature','Esportazione PDF','Standard svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3 generazioni di candidature','Tracker candidature (gratuito per sempre)','Esportazione PDF & Word','Standard di candidatura svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">Tutti i prezzi in CHF, IVA inclusa. Le modifiche dei prezzi vengono comunicate con 30 giorni di preavviso.</p>
               </Section>
               <Section title="4. Pagamento"><p>Pagamento esclusivamente tramite <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Fatturazione anticipata, mensile o annuale.</p></Section>
-              <Section title="5. Diritto di recesso"><p>Stellify offre una <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">garanzia di rimborso di 7 giorni</strong> per i nuovi acquirenti. Richieste a <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
+              <Section title="5. Recesso e rimborso"><p>Per i servizi digitali disponibili immediatamente non esiste un diritto di recesso legale. Puoi comunque disdire l'abbonamento in qualsiasi momento; termina alla fine del periodo di fatturazione in corso e non si rinnova più. I rimborsi di periodi già pagati non sono previsti, ma li valutiamo caso per caso a titolo di cortesia. Scrivi a <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
               <Section title="6. Durata, rinnovo e disdetta">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Abbonamento mensile:</strong> Dura 1 mese dalla data di acquisto e si rinnova automaticamente di un mese alla volta, salvo disdetta.</li>
@@ -467,7 +467,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Pro:</strong> 50 generazioni al mese, max. 15 al minuto</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 generazioni al mese, max. 30 al minuto</li>
                 </ul>
-                <p className="mt-2">I limiti mensili vengono reimpostati il 1° del mese (Europe/Zurich), i limiti giornalieri alle 00:00. I limiti al minuto servono esclusivamente a prevenire abusi e utilizzo automatizzato di massa.</p>
+                <p className="mt-2">Per gli abbonamenti mensili il contingente viene azzerato all'inizio di ogni periodo di fatturazione, cioè nella data di acquisto (esempio: acquisto il 12 → azzeramento il 12 di ogni mese). Per gli abbonamenti annuali il contingente mensile viene rinnovato il 1° di ogni mese di calendario. I limiti al minuto servono esclusivamente a prevenire abusi e utilizzo automatizzato di massa.</p>
                 <p className="mt-2">Un <em>aumento</em> dei limiti è possibile in qualsiasi momento e si applica automaticamente a favore dell'utente. Una <em>riduzione</em> si applicherebbe solo agli abbonamenti sottoscritti dopo la modifica e verrebbe annunciata con 30 giorni di preavviso.</p>
               </Section>
               <Section title="8. Proprietà intellettuale"><p>Tutti i diritti sulla piattaforma, il codice, il design e i marchi appartengono al gestore. I contenuti generati dall'IA possono essere utilizzati dall'utente per i propri documenti di candidatura.</p></Section>
@@ -482,28 +482,28 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Affermazioni legali, fiscali, mediche o altre che richiedono consulenza professionale</li>
                 </ul>
                 <p className="mt-2">Informazioni false o inventate nei documenti di candidatura possono avere <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">conseguenze giuslavoristiche, contrattuali o penali</strong> (ad es. annullamento del contratto di lavoro, licenziamento immediato, falsificazione di documenti, truffa). Queste ricadono esclusivamente sull'utente.</p>
-                <p className="mt-2">Stellify non è espressamente responsabile dei danni derivanti dall'uso non verificato dei contenuti generati dall'IA. in particolare per candidature non riuscite, posizioni rifiutate, ritiri di offerte di lavoro, violazioni contrattuali o danni reputazionali. Questa clausola integra §9 (Limitazione di responsabilità) e ha precedenza.</p>
+                <p className="mt-2">Stellify non è espressamente responsabile dei danni derivanti dall'uso non verificato dei contenuti generati dall'IA, in particolare per candidature non riuscite, posizioni rifiutate, ritiri di offerte di lavoro, violazioni contrattuali o danni reputazionali. Questa clausola integra §9 (Limitazione di responsabilità) e ha precedenza.</p>
               </Section>
               <Section title="10. Disponibilità"><p>Nessuna garanzia di disponibilità ininterrotta. I guasti di Firebase, Stripe o Google AI esulano dal nostro controllo.</p></Section>
               <Section title="11. Modifiche"><p>Modifiche con 30 giorni di preavviso. Cambiamenti sostanziali comunicati via e-mail.</p></Section>
-              <Section title="12. Diritto applicabile"><p>Si applica esclusivamente il <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">diritto svizzero</strong>. Foro competente: Zugo, Svizzera.</p></Section>
+              <Section title="12. Diritto applicabile"><p>Si applica esclusivamente il <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">diritto svizzero</strong>. Foro competente: Lucerna, Svizzera.</p></Section>
               <Section title="13. Risoluzione delle controversie"><p>Contatto: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. Piattaforma di mediazione UE: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : <>
-              <Section title="1. Subject Matter and Scope"><p>These Terms govern all usage agreements between the provider JTSP, operator of the Stellify platform (hereinafter "Stellify") and registered users of stellify.ch. Stellify offers an AI-powered career platform with CV optimisation, interview preparation, salary analysis and other career services.</p></Section>
+              <Section title="1. Subject Matter and Scope"><p>These Terms govern all usage agreements between the provider JTSP, operator of the Stellify platform (hereinafter "Stellify") and registered users of stellify.ch. Stellify offers an AI-powered application platform with two tools: the Application Generator, which turns a job ad into a tailored cover letter and short profile, and the free Application Tracker.</p></Section>
               <Section title="2. Contract Formation">
                 <p>The contract is formed upon using the platform or subscribing to a plan. By registering or subscribing, users implicitly accept these Terms and the Privacy Policy.</p>
                 <p className="mt-2">Use is permitted from the age of <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 years</strong>. Users under 18 require parental or guardian consent to subscribe to a paid plan. (Legal basis: Swiss CO Art. 19; the minimum age of 14 reflects typical apprenticeship entry age in Switzerland.)</p>
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3 AI generations','Application generator & application overview','PDF export','Swiss career standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3 application generations','Application Tracker (free forever)','PDF & Word export','Swiss application standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
                 <p className="mt-3">All prices in CHF, incl. VAT. Price changes announced at least 30 days in advance.</p>
               </Section>
               <Section title="4. Payment"><p>Payment exclusively via <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Stripe Inc.</strong> Billed in advance, monthly or annually.</p></Section>
-              <Section title="5. Right of Withdrawal"><p>Stellify offers a <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">7-day money-back guarantee</strong> for first-time buyers. Requests to <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
+              <Section title="5. Withdrawal and Refunds"><p>For digital services available immediately there is no statutory right of withdrawal. You can, however, cancel your subscription at any time; it ends at the close of the current billing period and does not renew. Refunds of periods already paid are not provided, but we review them case by case as a goodwill gesture. Contact <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>.</p></Section>
               <Section title="6. Duration, Renewal and Cancellation">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Monthly subscription:</strong> Runs for 1 month from purchase date and renews automatically one month at a time unless cancelled.</li>
@@ -520,7 +520,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro Plan:</strong> 50 generations per month, max. 15 per minute</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 generations per month, max. 30 per minute</li>
                 </ul>
-                <p className="mt-2">Monthly quotas reset on the 1st of each month (Europe/Zurich), daily quotas at 00:00. The per-minute limits serve solely to prevent abuse and automated mass use.</p>
+                <p className="mt-2">For monthly subscriptions the quota resets at the start of each billing period, i.e. on the purchase date (example: bought on the 12th → resets on the 12th each month). For annual subscriptions the monthly quota refreshes on the 1st of each calendar month. The per-minute limits serve solely to prevent abuse and automated mass use.</p>
                 <p className="mt-2">An <em>increase</em> of quotas is possible at any time and applies automatically in favour of the user. A <em>decrease</em> would only apply to subscriptions taken out after the change and would be announced 30 days in advance.</p>
               </Section>
               <Section title="8. Intellectual Property"><p>All rights to the platform, code, design and trademarks belong to the operator. AI-generated content may be used by the user for their own job applications.</p></Section>
@@ -535,11 +535,11 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li>Legal, tax, medical or other statements requiring professional advice</li>
                 </ul>
                 <p className="mt-2">Incorrect or fabricated information in application materials may have <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">employment-law, contractual or criminal consequences</strong> (e.g. rescission of the employment contract, immediate dismissal, document forgery, fraud). These rest exclusively with the user.</p>
-                <p className="mt-2">Stellify is expressly not liable for damages caused by unverified use of AI-generated content. in particular not for unsuccessful applications, rejected positions, withdrawn job offers, breaches of contract or reputational damage. This clause supplements §9 (Limitation of Liability) and takes precedence.</p>
+                <p className="mt-2">Stellify is expressly not liable for damages caused by unverified use of AI-generated content, in particular not for unsuccessful applications, rejected positions, withdrawn job offers, breaches of contract or reputational damage. This clause supplements §9 (Limitation of Liability) and takes precedence.</p>
               </Section>
               <Section title="10. Availability"><p>No guarantee of uninterrupted availability. Outages of Firebase, Stripe or Google AI are outside our control.</p></Section>
               <Section title="11. Changes"><p>Changes to these Terms with 30 days' notice. Material changes communicated by email. Continued use constitutes acceptance.</p></Section>
-              <Section title="12. Applicable Law"><p>Exclusively <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Swiss law</strong> applies. Place of jurisdiction: Zug, Switzerland.</p></Section>
+              <Section title="12. Applicable Law"><p>Exclusively <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Swiss law</strong> applies. Place of jurisdiction: Lucerne, Switzerland.</p></Section>
               <Section title="13. Dispute Resolution"><p>Contact: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU dispute resolution: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </>}
           </article>
@@ -555,7 +555,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             founderAttr: 'Der Gründer',
             whyTitle: 'Warum es Stellify gibt',
             whyP1: 'Die Idee entstand aus persönlicher Erfahrung. Lange Zeit gab es zwar zahlreiche künstliche Intelligenzen am Markt, aber keine, die sich auf die Schweiz spezialisiert hat. Keine, die Schweizer Bewerbungsstandards kennt, Schweizer Gehaltsbänder versteht und mit allen vier Landessprachen arbeitet.',
-            whyP2: 'Stellify füllt diese Lücke. Eine KI, die nicht mit Standard-Antworten arbeitet, sondern den Schweizer Berufsalltag wirklich kennt. Mit präzisen Werkzeugen für jede Phase deiner Karriere: vom Lebenslauf optimieren über Bewerbungen erstellen bis zur Vorbereitung auf das Vorstellungsgespräch.',
+            whyP2: 'Stellify füllt diese Lücke. Eine KI, die nicht mit Standard-Antworten arbeitet, sondern den Schweizer Berufsalltag wirklich kennt. Mit zwei klaren Werkzeugen: dem Bewerbungs-Generator, der aus einem Stelleninserat in rund 60 Sekunden eine komplette, passende Bewerbung macht, und dem dauerhaft kostenlosen Bewerbungs-Tracker, der alle deine Bewerbungen im Blick behält.',
             whyP3: 'Das Versprechen ist einfach. Schweizer Exzellenz, automatisiert. Für jeden zugänglich.',
             nameTitle: 'Der Name',
             nameIntro: 'Hinter Stellify stehen zwei Bedeutungen, die sich in einem einzigen Wort vereinen.',
@@ -563,14 +563,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             ifyDesc: 'Vom lateinischen stellificare. Das bedeutet so viel wie zum Stern werden. Eine alte Vorstellung aus der römischen Mythologie, nach der grosse Persönlichkeiten zu Sternen am Himmel wurden.',
             nameSummary: 'Stellify bedeutet damit wörtlich, jemanden zum Stern zu machen. Eine berufliche Identität, die strahlt.',
             stellaTitle: 'Stella, die KI hinter Stellify',
-            stellaDesc: 'Stella ist der Name unserer KI. Der Begriff kommt aus dem Lateinischen, wo stella schlicht Stern bedeutet. Stella arbeitet im Hintergrund jedes Tools: Sie schreibt deine Bewerbung, optimiert deinen Lebenslauf, analysiert Stellenanzeigen und bereitet dich auf Vorstellungsgespräche vor. Du chattest nicht mit ihr, du nutzt sie. Wie ein Stern, der den Weg leise vorgibt.',
+            stellaDesc: 'Stella ist der Name unserer KI. Der Begriff kommt aus dem Lateinischen, wo stella schlicht Stern bedeutet. Stella arbeitet im Hintergrund: Sie liest das Stelleninserat, nutzt deinen Lebenslauf und schreibt daraus dein Anschreiben und dein Kurzprofil, abgestimmt auf die Stelle. Du chattest nicht mit ihr, du nutzt sie. Wie ein Stern, der den Weg leise vorgibt.',
             statLanguages: 'Sprachen', statAvailable: 'Verfügbar', statHq: 'Schweizer Sitz', statLaw: 'Recht und Datenschutz',
             oneClickTitle: 'Mit einem Klick zum Resultat',
             oneClickLabel: 'Klick',
-            oneClickP1: 'Was früher Stunden gebraucht hat, geschieht heute in Sekunden. Lebenslauf-Analyse, Interview-Vorbereitung, Lohnverhandlungs-Strategie, ATS-Optimierung.',
-            oneClickP2: 'Die KI übernimmt die Recherche, die Formulierung, die Schweizer Marktanalyse. Du bekommst das fertige Resultat. Präzise. Sofort einsatzbereit.',
+            oneClickP1: 'Was früher Stunden gebraucht hat, geschieht heute in rund einer Minute. Link zum Stelleninserat einfügen, Design wählen, fertig: Anschreiben und Kurzprofil als PDF und Word.',
+            oneClickP2: 'Stella übernimmt das Formulieren und stimmt alles auf die Stelle ab. Du bekommst das fertige Resultat. Präzise. Sofort einsatzbereit.',
             swissTitle: 'Made in Switzerland',
-            swissDesc: 'Stellify wurde in der Schweiz gegründet und entwickelt. Wir verbinden Schweizer Sorgfalt, Datenschutz und Präzision mit moderner künstlicher Intelligenz. Unser Sitz ist in Zug, im Herzen der Schweizer Innovation.',
+            swissDesc: 'Stellify wurde in der Schweiz gegründet und entwickelt. Wir verbinden Schweizer Sorgfalt, Datenschutz und Präzision mit moderner künstlicher Intelligenz. Unser Sitz ist in Luzern, im Herzen der Schweiz.',
           } : isFR ? {
             eyebrow: 'Notre histoire', h1: 'À Propos',
             lede: 'Comment deux mots sont devenus une mission.',
@@ -579,7 +579,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             founderAttr: 'Le fondateur',
             whyTitle: 'Pourquoi Stellify existe',
             whyP1: "L'idée est née d'une expérience personnelle. Pendant longtemps, de nombreuses intelligences artificielles existaient déjà sur le marché, mais aucune spécialisée pour la Suisse. Aucune qui connaisse les standards de candidature suisses, comprenne les fourchettes salariales suisses et travaille dans les quatre langues nationales.",
-            whyP2: "Stellify comble ce manque. Une IA qui ne se contente pas de réponses standards, mais qui connaît réellement le quotidien professionnel suisse. Avec des outils précis pour chaque phase de ta carrière : de l'optimisation du CV à la rédaction de candidatures, jusqu'à la préparation aux entretiens.",
+            whyP2: "Stellify comble ce manque. Une IA qui ne se contente pas de réponses standards, mais qui connaît réellement le quotidien professionnel suisse. Avec deux outils clairs : le Générateur de candidatures, qui transforme une annonce en candidature complète en environ 60 secondes, et le Suivi des candidatures, gratuit pour toujours, qui garde toutes tes candidatures en vue.",
             whyP3: "La promesse est simple. L'excellence suisse, automatisée. Accessible à tous.",
             nameTitle: 'Le nom',
             nameIntro: 'Derrière Stellify se rejoignent deux significations dans un seul mot.',
@@ -587,14 +587,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             ifyDesc: "Du latin stellificare. Cela signifie devenir une étoile. Une vieille idée de la mythologie romaine selon laquelle les grandes personnalités devenaient des étoiles dans le ciel.",
             nameSummary: 'Stellify signifie ainsi littéralement transformer quelqu\'un en étoile. Une identité professionnelle qui brille.',
             stellaTitle: 'Stella, l\'IA derrière Stellify',
-            stellaDesc: "Stella est le nom de notre IA. Le terme vient du latin, où stella signifie simplement étoile. Stella travaille en arrière-plan de chaque outil : elle rédige tes candidatures, optimise ton CV, analyse les offres d'emploi et te prépare aux entretiens. Tu ne discutes pas avec elle, tu l'utilises. Comme une étoile qui indique discrètement la voie.",
+            stellaDesc: "Stella est le nom de notre IA. Le terme vient du latin, où stella signifie simplement étoile. Stella travaille en arrière-plan : elle lit l'annonce, utilise ton CV et rédige ta lettre de motivation et ton profil court, adaptés au poste. Tu ne discutes pas avec elle, tu l'utilises. Comme une étoile qui indique discrètement la voie.",
             statLanguages: 'Langues', statAvailable: 'Disponible', statHq: 'Siège suisse', statLaw: 'Droit et confidentialité',
             oneClickTitle: 'En un clic, le résultat',
             oneClickLabel: 'Clic',
-            oneClickP1: "Ce qui prenait des heures se passe désormais en secondes. Analyse de CV, préparation aux entretiens, stratégie de négociation salariale, optimisation ATS.",
-            oneClickP2: "L'IA prend en charge la recherche, la formulation, l'analyse du marché suisse. Tu reçois le résultat fini. Précis. Prêt à l'emploi immédiatement.",
+            oneClickP1: "Ce qui prenait des heures se passe désormais en une minute environ. Coller le lien de l'annonce, choisir le design, terminé : lettre de motivation et profil court en PDF et Word.",
+            oneClickP2: "Stella se charge de la rédaction et adapte tout au poste. Tu reçois le résultat fini. Précis. Prêt à l'emploi immédiatement.",
             swissTitle: 'Made in Switzerland',
-            swissDesc: "Stellify a été fondée et développée en Suisse. Nous allions soin suisse, protection des données et précision avec une IA moderne. Notre siège est à Zoug, au cœur de l'innovation suisse.",
+            swissDesc: "Stellify a été fondée et développée en Suisse. Nous allions soin suisse, protection des données et précision avec une IA moderne. Notre siège est à Lucerne, au cœur de la Suisse.",
           } : isIT ? {
             eyebrow: 'La nostra storia', h1: 'Chi Siamo',
             lede: 'Come due parole sono diventate una missione.',
@@ -603,7 +603,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             founderAttr: 'Il fondatore',
             whyTitle: 'Perché esiste Stellify',
             whyP1: "L'idea è nata da un'esperienza personale. Per molto tempo erano già presenti sul mercato numerose intelligenze artificiali, ma nessuna specializzata per la Svizzera. Nessuna che conoscesse gli standard di candidatura svizzeri, comprendesse le fasce salariali svizzere e lavorasse in tutte e quattro le lingue nazionali.",
-            whyP2: "Stellify colma questa lacuna. Un'IA che non si limita a risposte standard, ma conosce davvero la quotidianità professionale svizzera. Con strumenti precisi per ogni fase della carriera: dall'ottimizzazione del CV alla creazione di candidature, fino alla preparazione ai colloqui.",
+            whyP2: "Stellify colma questa lacuna. Un'IA che non si limita a risposte standard, ma conosce davvero la quotidianità professionale svizzera. Con due strumenti chiari: il Generatore di candidature, che trasforma un annuncio in una candidatura completa in circa 60 secondi, e il Tracker candidature, gratuito per sempre, che tiene d'occhio tutte le tue candidature.",
             whyP3: "La promessa è semplice. L'eccellenza svizzera, automatizzata. Accessibile a tutti.",
             nameTitle: 'Il nome',
             nameIntro: 'Dietro Stellify si incontrano due significati in una sola parola.',
@@ -611,14 +611,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             ifyDesc: "Dal latino stellificare. Significa diventare una stella. Un'antica idea della mitologia romana, secondo cui le grandi personalità diventavano stelle nel cielo.",
             nameSummary: "Stellify significa quindi letteralmente trasformare qualcuno in una stella. Un'identità professionale che brilla.",
             stellaTitle: 'Stella, l\'IA dietro Stellify',
-            stellaDesc: 'Stella è il nome della nostra IA. Il termine viene dal latino, dove stella significa semplicemente stella. Stella lavora in background in ogni strumento: scrive le tue candidature, ottimizza il tuo CV, analizza gli annunci di lavoro e ti prepara ai colloqui. Non chatti con lei, la usi. Come una stella che indica silenziosamente la rotta.',
+            stellaDesc: 'Stella è il nome della nostra IA. Il termine viene dal latino, dove stella significa semplicemente stella. Stella lavora in background: legge l\'annuncio, usa il tuo CV e scrive la tua lettera di motivazione e il tuo profilo breve, su misura per il posto. Non chatti con lei, la usi. Come una stella che indica silenziosamente la rotta.',
             statLanguages: 'Lingue', statAvailable: 'Disponibile', statHq: 'Sede svizzera', statLaw: 'Diritto e privacy',
             oneClickTitle: 'In un click, il risultato',
             oneClickLabel: 'Click',
-            oneClickP1: "Quello che prima richiedeva ore, oggi avviene in secondi. Analisi del CV, preparazione al colloquio, strategia di negoziazione salariale, ottimizzazione ATS.",
-            oneClickP2: "L'IA si occupa della ricerca, della formulazione, dell'analisi del mercato svizzero. Ricevi il risultato finito. Preciso. Pronto all'uso.",
+            oneClickP1: "Quello che prima richiedeva ore, oggi avviene in circa un minuto. Incolla il link dell'annuncio, scegli il design, fatto: lettera di motivazione e profilo breve in PDF e Word.",
+            oneClickP2: "Stella si occupa della scrittura e adatta tutto al posto. Ricevi il risultato finito. Preciso. Pronto all'uso.",
             swissTitle: 'Made in Switzerland',
-            swissDesc: "Stellify è stata fondata e sviluppata in Svizzera. Uniamo cura svizzera, protezione dei dati e precisione con un'IA moderna. La nostra sede è a Zugo, nel cuore dell'innovazione svizzera.",
+            swissDesc: "Stellify è stata fondata e sviluppata in Svizzera. Uniamo cura svizzera, protezione dei dati e precisione con un'IA moderna. La nostra sede è a Lucerna, nel cuore della Svizzera.",
           } : {
             eyebrow: 'Our Story', h1: 'About Us',
             lede: 'How two words became one mission.',
@@ -627,7 +627,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             founderAttr: 'The founder',
             whyTitle: 'Why Stellify exists',
             whyP1: "The idea came from personal experience. For a long time, many artificial intelligences already existed on the market, but none specialised for Switzerland. None that knew Swiss application standards, understood Swiss salary ranges and worked across all four national languages.",
-            whyP2: "Stellify fills that gap. An AI that doesn't rely on stock answers, but truly understands the Swiss working world. With precise tools for every phase of your career: from CV optimisation to application drafting through to interview preparation.",
+            whyP2: "Stellify fills that gap. An AI that doesn't rely on stock answers, but truly understands the Swiss working world. With two clear tools: the Application Generator, which turns a job ad into a complete, tailored application in about 60 seconds, and the free-forever Application Tracker, which keeps every application in view.",
             whyP3: 'The promise is simple. Swiss excellence, automated. Accessible to everyone.',
             nameTitle: 'The name',
             nameIntro: 'Two meanings meet in a single word Stellify.',
@@ -635,14 +635,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             ifyDesc: "From the Latin stellificare. It means becoming a star. An old idea from Roman mythology that great figures would turn into stars in the sky.",
             nameSummary: 'Stellify thus literally means to turn someone into a star. A professional identity that shines.',
             stellaTitle: 'Stella, the AI behind Stellify',
-            stellaDesc: 'Stella is the name of our AI. The word comes from Latin, where stella simply means star. Stella works in the background of every tool: she writes your applications, optimises your CV, analyses job ads and prepares you for interviews. You don\'t chat with her. you use her. Like a star quietly showing the way.',
+            stellaDesc: 'Stella is the name of our AI. The word comes from Latin, where stella simply means star. Stella works in the background: she reads the job ad, uses your CV and writes your cover letter and short profile, tailored to the role. You don\'t chat with her, you use her. Like a star quietly showing the way.',
             statLanguages: 'Languages', statAvailable: 'Available', statHq: 'Swiss HQ', statLaw: 'Law and Privacy',
             oneClickTitle: 'One click. Done.',
             oneClickLabel: 'Click',
-            oneClickP1: 'What used to take hours now happens in seconds. CV analysis, interview preparation, salary negotiation strategy, ATS optimisation.',
-            oneClickP2: 'The AI handles the research, the wording, the Swiss market analysis. You get the finished result. Precise. Ready to use immediately.',
+            oneClickP1: 'What used to take hours now happens in about a minute. Paste the job ad link, pick a design, done: cover letter and short profile as PDF and Word.',
+            oneClickP2: 'Stella handles the wording and tailors everything to the role. You get the finished result. Precise. Ready to use immediately.',
             swissTitle: 'Made in Switzerland',
-            swissDesc: 'Stellify was founded and developed in Switzerland. We combine Swiss care, data protection, and precision with modern AI. Our home is in Zug, at the heart of Swiss innovation.',
+            swissDesc: 'Stellify was founded and developed in Switzerland. We combine Swiss care, data protection, and precision with modern AI. Our home is in Lucerne, at the heart of Switzerland.',
           };
 
           return (
@@ -707,7 +707,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               {/* Two columns: Stell- and -ify */}
               <div className="grid md:grid-cols-2 gap-12 md:gap-20 mb-12">
                 <div>
-                  <p className="font-serif text-5xl md:text-6xl text-[#004225] dark:text-[#00A854] tracking-tight leading-none" style={{paddingBottom: '.18em'}}>Stell<span className="opacity-30">·</span></p>
+                  {/* "Stell" matches the wordmark: neutral (white in dark mode), only "ify" stays green */}
+                  <p className="font-serif text-5xl md:text-6xl text-[#1A1A18] dark:text-[#FAFAF8] tracking-tight leading-none" style={{paddingBottom: '.18em'}}>Stell<span className="opacity-30">·</span></p>
                   <div className="w-12 h-px bg-[#004225]/40 dark:bg-[#00A854]/40 mt-2 mb-6"></div>
                   <p className="text-base md:text-lg text-[#4A4A45] dark:text-[#9A9A94] leading-relaxed font-light">
                     {c.stellDesc}
@@ -764,7 +765,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               {[
                 ['4', c.statLanguages],
                 ['24/7', c.statAvailable],
-                ['Zug', c.statHq],
+                ['Luzern', c.statHq],
                 ['CH', c.statLaw],
               ].map(([num, label], i) => (
                 <div key={i} className="bg-[#FDFCFB] dark:bg-[#1A1A18] p-6 md:p-8">

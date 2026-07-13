@@ -166,7 +166,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
         <!-- Footer -->
         <tr>
           <td class="email-footer" style="padding:20px 32px;border-top:1px solid #E8E6E0;">
-            <p class="email-muted" style="margin:0;font-size:11px;color:#9A9A94;line-height:1.6;">© ${new Date().getFullYear()} Stellify · Zug, Schweiz · <a href="https://stellify.ch" class="email-muted" style="color:#9A9A94;text-decoration:none;">stellify.ch</a></p>
+            <p class="email-muted" style="margin:0;font-size:11px;color:#9A9A94;line-height:1.6;">© ${new Date().getFullYear()} Stellify · Luzern, Schweiz · <a href="https://stellify.ch" class="email-muted" style="color:#9A9A94;text-decoration:none;">stellify.ch</a></p>
           </td>
         </tr>
       </table>
@@ -1819,8 +1819,59 @@ app.get("/api/cron/onboarding", async (req, res) => {
         sent++;
       }
     }
-    console.log(`[CRON ONBOARDING] sent ${sent} mails`);
-    res.json({ ok: true, sent });
+
+    // ── Follow-up reminders from the tracker ────────────────────────────
+    // Users set a reminder date on an application; until now it was only
+    // visible when they happened to open the site. This mails the reminder
+    // on its due day. Service mail tied to a date the user chose, so it is
+    // sent regardless of the Abo-Letter setting. reminder_mailed_for stores
+    // the date that was mailed — editing the date re-arms the reminder.
+    let reminders = 0;
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const windowStart = new Date(now - 3 * dayMs).toISOString().slice(0, 10);
+      const appsSnap = await adminDb.collection('applications')
+        .where('reminder_at', '>=', windowStart)
+        .where('reminder_at', '<=', today)
+        .limit(300)
+        .get();
+      const userCache = new Map<string, any>();
+      for (const d of appsSnap.docs) {
+        const a = d.data() as any;
+        if (!a.user_id || a.archived) continue;
+        if (a.reminder_mailed_for === a.reminder_at) continue;
+        let u = userCache.get(a.user_id);
+        if (u === undefined) {
+          const uDoc = await adminDb.collection('users').doc(a.user_id).get();
+          u = uDoc.exists ? uDoc.data() : null;
+          userCache.set(a.user_id, u);
+        }
+        if (!u || !u.email) continue;
+        const lang = (['DE','FR','IT','EN'].includes(String(u.language || '').toUpperCase()) ? String(u.language).toUpperCase() : 'DE') as Lang;
+        const company = String(a.company || '').trim() || (lang === 'FR' ? 'ton entreprise' : lang === 'IT' ? 'la tua azienda' : lang === 'EN' ? 'your company' : 'deiner Firma');
+        const position = String(a.position || '').trim();
+        const rCopy = {
+          DE: { subject: `Erinnerung: Nachfassen bei ${company}`, title: 'Zeit zum Nachfassen', lines: [`Hallo ${u.first_name || ''},`.trim() + ',', `du wolltest heute bei <strong>${company}</strong>${position ? ` (${position})` : ''} nachfassen. Ein kurzes, freundliches Mail oder ein Anruf zeigt echtes Interesse und hebt dich von anderen ab.`, 'Den aktuellen Stand findest du in deinem Bewerbungs-Tracker.'], cta: 'Tracker öffnen' },
+          FR: { subject: `Rappel: relancer ${company}`, title: 'Le moment de relancer', lines: [`Bonjour ${u.first_name || ''},`.trim() + ',', `tu voulais relancer <strong>${company}</strong>${position ? ` (${position})` : ''} aujourd'hui. Un court message ou un appel montre un vrai intérêt.`, 'Tu trouves l\'état actuel dans ton suivi des candidatures.'], cta: 'Ouvrir le suivi' },
+          IT: { subject: `Promemoria: follow-up con ${company}`, title: 'È il momento del follow-up', lines: [`Ciao ${u.first_name || ''},`.trim() + ',', `volevi fare un follow-up con <strong>${company}</strong>${position ? ` (${position})` : ''} oggi. Un breve messaggio o una chiamata dimostra vero interesse.`, 'Trovi lo stato attuale nel tuo tracker delle candidature.'], cta: 'Apri il tracker' },
+          EN: { subject: `Reminder: follow up with ${company}`, title: 'Time to follow up', lines: [`Hello ${u.first_name || ''},`.trim() + ',', `you wanted to follow up with <strong>${company}</strong>${position ? ` (${position})` : ''} today. A short, friendly email or call shows real interest.`, 'You can find the current status in your application tracker.'], cta: 'Open tracker' },
+        }[lang];
+        await sendEmail({
+          to: u.email,
+          subject: rCopy.subject,
+          html: buildEmailHtml(rCopy.title, rCopy.lines, rCopy.cta, `${process.env.SITE_URL || 'https://stellify.ch'}/`, lang),
+          text: rCopy.lines.join('\n\n').replace(/<[^>]+>/g, '') + '\n\nStellify',
+        }).catch((e) => console.error('[CRON REMINDER] send failed:', e.message));
+        await d.ref.update({ reminder_mailed_for: a.reminder_at });
+        reminders++;
+      }
+    } catch (e: any) {
+      // Reminders must never break the onboarding part of the cron.
+      console.error('[CRON REMINDER]', e.message);
+    }
+
+    console.log(`[CRON ONBOARDING] sent ${sent} mails, ${reminders} follow-up reminders`);
+    res.json({ ok: true, sent, reminders });
   } catch (e: any) {
     console.error('[CRON ONBOARDING]', e.message);
     res.status(500).json({ error: e.message });
