@@ -31,6 +31,7 @@ import {
   ArrowUp,
   ChevronRight,
   CheckCircle2,
+  Check,
   Star,
   Menu,
   User as UserIcon,
@@ -8553,60 +8554,53 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <motion.div
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5"
+                      className="p-5 sm:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 rounded-xl"
                     >
-                      <div className="flex items-start justify-between gap-4 mb-1">
-                        <div>
-                          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854]">
-                            {language === 'FR' ? 'Notre conseil pour bien démarrer' : language === 'IT' ? 'Il nostro consiglio per iniziare' : language === 'EN' ? 'Our tip for a great start' : 'Unser Tipp für den besten Start'}
-                          </p>
-                          <p className="text-xs text-[#9A9A94] font-light mt-1">
-                            {language === 'FR' ? 'Trois choses indépendantes, dans n\'importe quel ordre, tout est facultatif. La liste disparaît toute seule quand tout est fait.'
-                              : language === 'IT' ? 'Tre cose indipendenti, in qualsiasi ordine, tutto facoltativo. La lista sparisce da sola quando è tutto fatto.'
-                              : language === 'EN' ? 'Three independent things, in any order, all optional. The list disappears by itself once everything is done.'
-                              : 'Drei unabhängige Dinge, in beliebiger Reihenfolge, alles freiwillig. Die Liste verschwindet von selbst, sobald alles erledigt ist.'}
-                          </p>
+                      {/* Header: short kicker on the left, step counter and a
+                          discreet close on the right. No long paragraph. */}
+                      <div className="flex items-center justify-between gap-3 mb-4">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854]">
+                          {language === 'FR' ? 'Bien démarrer' : language === 'IT' ? 'Per iniziare' : language === 'EN' ? 'Get started' : 'Gut starten'}
+                        </p>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span className="text-[11px] font-medium text-[#9A9A94] tabular-nums">
+                            {doneCount}/{steps.length}
+                          </span>
+                          <button
+                            onClick={() => { setStarterDismissed(true); try { localStorage.setItem('stellify_starter_dismissed', '1'); } catch { /* ignore */ } }}
+                            title={language === 'FR' ? 'Masquer' : language === 'IT' ? 'Nascondi' : language === 'EN' ? 'Hide' : 'Ausblenden'}
+                            className="p-1 text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors"
+                          >
+                            <X size={15} />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => { setStarterDismissed(true); try { localStorage.setItem('stellify_starter_dismissed', '1'); } catch { /* ignore */ } }}
-                          title={language === 'FR' ? 'Masquer' : language === 'IT' ? 'Nascondi' : language === 'EN' ? 'Hide' : 'Ausblenden'}
-                          className="p-1.5 text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors shrink-0"
-                        >
-                          <X size={14} />
-                        </button>
                       </div>
-                      <div className="flex items-center gap-3 mt-3 mb-4">
-                        <div className="flex-1 h-1.5 bg-black/[0.05] dark:bg-white/[0.07] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#004225] dark:bg-[#00A854] rounded-full transition-all duration-700" style={{ width: `${Math.round((doneCount / steps.length) * 100)}%` }} />
-                        </div>
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] shrink-0">{doneCount} / {steps.length}</span>
-                      </div>
-                      <div className="space-y-2.5">
+                      {/* Clean rows separated by hairlines — calmer than a stack
+                          of individual boxes. Done rows are quietly muted, open
+                          rows invite a tap. */}
+                      <div className="divide-y divide-black/5 dark:divide-white/8 -my-1">
                         {steps.map((s, i) => (
                           s.done ? (
-                            <div key={i} className="w-full flex items-center gap-3 p-3 border border-[#004225]/12 dark:border-[#00A854]/20 bg-[#004225]/[0.04] dark:bg-[#00A854]/[0.06]">
+                            <div key={i} className="flex items-center gap-3.5 py-3">
                               <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-[#004225] dark:bg-[#00A854] text-white">
-                                <CheckCircle2 size={14} />
+                                <Check size={13} strokeWidth={3} />
                               </span>
-                              <span className="min-w-0 flex-1 text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{s.label}</span>
-                              <span className="shrink-0 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854]">
-                                {language === 'FR' ? 'Fait' : language === 'IT' ? 'Fatto' : language === 'EN' ? 'Done' : 'Erledigt'}
-                              </span>
+                              <span className="min-w-0 flex-1 text-sm text-[#9A9A94] line-through decoration-[#9A9A94]/40">{s.label}</span>
                             </div>
                           ) : (
                             <button
                               key={i}
                               onClick={s.action}
-                              className="w-full flex items-center gap-3 p-3 border border-black/8 dark:border-white/10 text-left transition-all hover:border-[#004225]/40 dark:hover:border-[#00A854]/50 hover:bg-[#004225]/[0.03] dark:hover:bg-[#00A854]/[0.06] cursor-pointer"
+                              className="group w-full flex items-center gap-3.5 py-3 text-left cursor-pointer"
                             >
-                              <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border-2 border-[#004225]/30 dark:border-[#00A854]/40 text-[#004225] dark:text-[#00A854] text-[10px] font-bold">
+                              <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border border-[#004225]/25 dark:border-[#00A854]/35 text-[#004225] dark:text-[#00A854] text-[11px] font-bold group-hover:bg-[#004225] group-hover:text-white dark:group-hover:bg-[#00A854] transition-colors">
                                 {i + 1}
                               </span>
                               <span className="min-w-0 flex-1">
-                                <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{s.label}</span>
-                                <span className="block text-[11px] text-[#9A9A94] font-light">{s.hint}</span>
+                                <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{s.label}</span>
+                                <span className="block text-[11px] text-[#9A9A94] font-light mt-0.5">{s.hint}</span>
                               </span>
-                              <ArrowRight size={14} className="shrink-0 text-[#004225] dark:text-[#00A854]" />
+                              <ArrowRight size={15} className="shrink-0 text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] group-hover:translate-x-0.5 transition-all" />
                             </button>
                           )
                         ))}
