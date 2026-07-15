@@ -2006,6 +2006,15 @@ function StellifyApp() {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // Back-to-top button only appears once there is something to scroll back up
+  // to, so it never floats over the top of a page.
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowBackToTop(window.scrollY > 600);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   // Convincing upgrade modal: 'quota' = free tries used up, 'daily' = daily cap hit.
@@ -12056,14 +12065,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </footer>
 
-      {/* Mobile Back-to-Top Button */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-6 left-6 z-50 md:hidden w-11 h-11 bg-[#004225] text-white flex items-center justify-center shadow-lg rounded-full"
-        aria-label="Nach oben"
-      >
-        <ArrowLeft size={18} className="-rotate-90" />
-      </button>
+      {/* Mobile Back-to-Top Button — only after scrolling down, arrow points up */}
+      {showBackToTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 left-6 z-50 md:hidden w-11 h-11 bg-[#004225] text-white flex items-center justify-center shadow-lg rounded-full"
+          aria-label="Nach oben"
+        >
+          <ArrowLeft size={18} className="rotate-90" />
+        </button>
+      )}
 
       {/* --- LOGIN WELCOME MODAL --- */}
       <AnimatePresence>
