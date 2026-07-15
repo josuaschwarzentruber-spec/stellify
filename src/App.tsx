@@ -1026,35 +1026,51 @@ function CompanyMonogram({ name, size = 'w-7 h-7 text-[11px]' }: { name?: string
 }
 
 // Inline-editable table cell — the whole tracker list is editable in place,
-// no pencil needed. Looks like plain text, reveals a field on hover/focus,
-// saves on blur or Enter, reverts on Escape. `format` lets a raw stored value
-// (e.g. a salary) display nicely while it isn't being edited.
+// no pencil needed. While viewing it is plain text that WRAPS (so long
+// company names are never cut off); a tap turns it into a field. Saves on
+// blur or Enter, reverts on Escape. `format` lets a raw stored value (e.g. a
+// salary) display nicely while it isn't being edited.
 function EditableCell({ value, onSave, placeholder, className, ariaLabel, inputMode, format }: any) {
+  const [editing, setEditing] = useState(false);
   const [val, setVal] = useState<string>(value ?? '');
-  const [focused, setFocused] = useState(false);
-  useEffect(() => { if (!focused) setVal(value ?? ''); }, [value, focused]);
-  // While not editing, an optional formatter makes the raw stored value read
-  // nicely (e.g. a salary as "CHF 120'000"); on focus the raw value returns.
-  const shown = !focused && format && val ? format(val) : val;
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => { if (!editing) setVal(value ?? ''); }, [value, editing]);
+  useEffect(() => { if (editing && inputRef.current) { inputRef.current.focus(); inputRef.current.select(); } }, [editing]);
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        value={val}
+        inputMode={inputMode}
+        placeholder={placeholder}
+        aria-label={ariaLabel}
+        onChange={(e) => setVal(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
+          else if (e.key === 'Escape') { setVal(value ?? ''); setEditing(false); }
+        }}
+        onBlur={() => {
+          setEditing(false);
+          const trimmed = val.trim();
+          if ((value ?? '') !== trimmed) onSave(trimmed);
+        }}
+        className={`w-full bg-white dark:bg-[#1A1A18] border border-[#004225]/50 dark:border-[#00A854]/50 rounded px-1.5 py-1 -ml-1.5 focus:outline-none ${className || ''}`}
+      />
+    );
+  }
+  // View mode: a wrapping, full-width text button. Long values wrap onto a
+  // second line instead of being clipped.
+  const shown = format && val ? format(val) : val;
   return (
-    <input
-      value={shown}
-      inputMode={inputMode}
-      placeholder={placeholder}
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
       aria-label={ariaLabel}
-      onChange={(e) => setVal(e.target.value)}
-      onFocus={(e) => { setFocused(true); const el = e.target; requestAnimationFrame(() => el.select()); }}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter') { e.preventDefault(); (e.target as HTMLInputElement).blur(); }
-        else if (e.key === 'Escape') { setVal(value ?? ''); requestAnimationFrame(() => (document.activeElement as HTMLElement)?.blur()); }
-      }}
-      onBlur={() => {
-        setFocused(false);
-        const trimmed = val.trim();
-        if ((value ?? '') !== trimmed) onSave(trimmed);
-      }}
-      className={`w-full bg-transparent border border-transparent rounded px-1.5 py-1 -ml-1.5 hover:bg-black/[0.03] dark:hover:bg-white/[0.05] hover:border-black/10 dark:hover:border-white/15 focus:bg-white dark:focus:bg-[#1A1A18] focus:border-[#004225]/50 dark:focus:border-[#00A854]/50 focus:outline-none transition-colors cursor-text ${className || ''}`}
-    />
+      className={`w-full text-left px-1.5 py-1 -ml-1.5 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors cursor-text break-words leading-snug ${className || ''}`}
+    >
+      {shown || <span className="opacity-40 font-normal">{placeholder || '–'}</span>}
+    </button>
   );
 }
 
