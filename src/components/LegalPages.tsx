@@ -49,12 +49,16 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
         @media (prefers-reduced-motion: reduce) { .stellify-page-in { animation: none; } }
       `}</style>
       <div className={`${activeView === 'about' ? 'max-w-4xl' : 'max-w-3xl'} mx-auto stellify-page-in`}>
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"
-        >
-          <ArrowLeft size={14} /> {isDE ? 'Zurück' : isFR ? 'Retour' : isIT ? 'Indietro' : 'Back'}
-        </button>
+        {/* Clear back control that stays pinned just under the top nav while
+            scrolling, so there is always an obvious way back. */}
+        <div className="sticky top-[72px] z-20 mb-10 -mt-2">
+          <button
+            onClick={onBack}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-[#2A2A26] border border-black/10 dark:border-white/10 shadow-sm text-xs font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:bg-[#004225]/5 dark:hover:bg-[#00A854]/10 transition-colors"
+          >
+            <ArrowLeft size={15} /> {isDE ? 'Zurück' : isFR ? 'Retour' : isIT ? 'Indietro' : 'Back'}
+          </button>
+        </div>
 
         {/* ======= DATENSCHUTZRICHTLINIE ======= */}
         {activeView === 'datenschutz' && (

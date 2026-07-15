@@ -8425,6 +8425,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- MOBILE MENU --- */}
       <AnimatePresence>
         {isMenuOpen && (
+          <>
+          {/* Tap anywhere outside the menu to close it and return to the page. */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsMenuOpen(false)}
+            aria-hidden="true"
+            className="xl:hidden fixed inset-0 top-16 bg-black/20 dark:bg-black/40 z-30"
+          />
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -8496,6 +8506,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
             </div>
           </motion.div>
+          </>
         )}
       </AnimatePresence>
 
