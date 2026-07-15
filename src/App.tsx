@@ -1073,7 +1073,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
   const isStale = !app.archived && staleDays >= 14 && (app.status === 'Wishlist' || app.status === 'Applied' || app.status === 'Interview');
   return (
     <tr ref={setNodeRef} style={style} className={`border-b border-black/5 dark:border-white/5 hover:bg-[#FAFAF8] dark:hover:bg-[#1A1A18] transition-colors ${app.archived ? 'opacity-60' : ''}`}>
-      <td className="pl-2 pr-1 py-3 w-8">
+      <td className="pl-2 pr-1 py-3 w-8 hidden sm:table-cell">
         <button
           {...attributes}
           {...listeners}
@@ -1088,27 +1088,38 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           </svg>
         </button>
       </td>
-      <td className="px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8]">
+      <td className="px-3 sm:px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8] w-full md:w-auto">
         <div className="flex items-center gap-2.5">
           <CompanyMonogram name={app.company} />
-          {onFieldSave ? (
-            <EditableCell value={capFirst(app.company)} onSave={(v: string) => onFieldSave(app.id, 'company', v)} ariaLabel={t.tracker_col_company} className="font-bold text-[#1A1A18] dark:text-[#FAFAF8]" />
-          ) : (
-            <span className="truncate">{capFirst(app.company)}</span>
-          )}
+          <div className="min-w-0 flex-1">
+            {onFieldSave ? (
+              <EditableCell value={capFirst(app.company)} onSave={(v: string) => onFieldSave(app.id, 'company', v)} placeholder={t.tracker_col_company} ariaLabel={t.tracker_col_company} className="font-bold text-[#1A1A18] dark:text-[#FAFAF8]" />
+            ) : (
+              <span className="block truncate">{capFirst(app.company)}</span>
+            )}
+            {/* On mobile the position has no column of its own, so it sits
+                under the company name — both stay fully readable. */}
+            <div className="md:hidden">
+              {onFieldSave ? (
+                <EditableCell value={capFirst(app.position)} onSave={(v: string) => onFieldSave(app.id, 'position', v)} placeholder={t.tracker_col_position} ariaLabel={t.tracker_col_position} className="text-[12px] font-normal text-[#5C5C58] dark:text-[#9A9A94]" />
+              ) : (
+                <span className="block truncate text-[12px] font-normal text-[#5C5C58] dark:text-[#9A9A94]">{capFirst(app.position)}</span>
+              )}
+            </div>
+          </div>
           {app.favorite && <Star size={11} className="shrink-0 text-[#D4A852] fill-[#D4A852]" aria-hidden="true" />}
         </div>
       </td>
-      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#B5B5AF]">
+      <td className="px-4 py-3 text-[#5C5C58] dark:text-[#B5B5AF] hidden md:table-cell">
         {onFieldSave ? (
           <EditableCell value={capFirst(app.position)} onSave={(v: string) => onFieldSave(app.id, 'position', v)} ariaLabel={t.tracker_col_position} className="text-[#5C5C58] dark:text-[#B5B5AF]" />
         ) : capFirst(app.position)}
       </td>
-      <td className="px-4 py-3">
+      <td className="px-2 sm:px-4 py-3">
         <select
           value={app.status}
           onChange={(e) => onStatusChange(app.id, e.target.value)}
-          className={`text-[11px] font-medium bg-white dark:bg-[#1A1A18] border rounded-sm hover:border-[#004225]/60 dark:hover:border-[#00A854]/60 focus:outline-none px-2 py-1 cursor-pointer transition-all ${statusSelectClasses(app.status)}`}
+          className={`text-[11px] font-medium bg-white dark:bg-[#1A1A18] border rounded-sm hover:border-[#004225]/60 dark:hover:border-[#00A854]/60 focus:outline-none px-1.5 sm:px-2 py-1 cursor-pointer transition-all ${statusSelectClasses(app.status)}`}
         >
           <option value="Wishlist">{t.tracker_wishlist}</option>
           <option value="Applied">{t.tracker_applied}</option>
@@ -1141,16 +1152,18 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           )}
         </span>
       </td>
-      <td className="px-4 py-3">
-        <div className="flex gap-1 justify-end">
+      <td className="px-2 sm:px-4 py-3">
+        <div className="flex gap-0.5 sm:gap-1 justify-end">
           {onToggleFavorite && (
             <button onClick={() => onToggleFavorite(app.id, !app.favorite)} title={app.favorite ? (language === 'FR' ? 'Retirer des favoris' : language === 'IT' ? 'Rimuovi dai preferiti' : language === 'EN' ? 'Remove from favorites' : 'Favorit entfernen') : (language === 'FR' ? 'Marquer comme favori' : language === 'IT' ? 'Segna come preferito' : language === 'EN' ? 'Mark as favorite' : 'Als Favorit markieren')} className={`p-1.5 rounded transition-all ${app.favorite ? 'text-[#D4A852] hover:bg-[#D4A852]/10' : 'text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#D4A852]'}`}><Star size={13} className={app.favorite ? 'fill-[#D4A852]' : ''} /></button>
           )}
+          {/* Stella-create and archive are desktop-only to keep the mobile row
+              airy; both stay reachable via the edit dialog / desktop. */}
           {onCreateApplication && (
-            <button onClick={() => onCreateApplication(app)} title={language === 'FR' ? 'Créer la candidature avec Stella' : language === 'IT' ? 'Crea la candidatura con Stella' : language === 'EN' ? 'Create the application with Stella' : 'Bewerbung mit Stella erstellen'} className="p-1.5 text-[#004225]/70 dark:text-[#00A854]/80 hover:bg-[#004225]/10 dark:hover:bg-[#00A854]/10 hover:text-[#004225] dark:hover:text-[#00A854] rounded transition-all"><Sparkles size={13} /></button>
+            <button onClick={() => onCreateApplication(app)} title={language === 'FR' ? 'Créer la candidature avec Stella' : language === 'IT' ? 'Crea la candidatura con Stella' : language === 'EN' ? 'Create the application with Stella' : 'Bewerbung mit Stella erstellen'} className="hidden sm:inline-flex p-1.5 text-[#004225]/70 dark:text-[#00A854]/80 hover:bg-[#004225]/10 dark:hover:bg-[#00A854]/10 hover:text-[#004225] dark:hover:text-[#00A854] rounded transition-all"><Sparkles size={13} /></button>
           )}
           <button onClick={() => onEdit(app)} title={language === 'FR' ? 'Modifier' : language === 'IT' ? 'Modifica' : language === 'EN' ? 'Edit' : 'Bearbeiten'} className="p-1.5 text-[#5C5C58] dark:text-[#B5B5AF] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] rounded transition-all"><Edit2 size={13} /></button>
-          <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="p-1.5 text-[#5C5C58] dark:text-[#B5B5AF] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] rounded transition-all">{app.archived ? <ArchiveRestore size={13} /> : <Archive size={13} />}</button>
+          <button onClick={() => onArchive(app.id, !app.archived)} title={app.archived ? t.tracker_unarchive : t.tracker_archive} className="hidden sm:inline-flex p-1.5 text-[#5C5C58] dark:text-[#B5B5AF] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] rounded transition-all">{app.archived ? <ArchiveRestore size={13} /> : <Archive size={13} />}</button>
           <button onClick={() => onDelete(app.id)} title={language === 'FR' ? 'Supprimer' : language === 'IT' ? 'Elimina' : language === 'EN' ? 'Delete' : 'Löschen'} className="p-1.5 text-red-500/80 dark:text-[#E08585]/80 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-600 dark:hover:text-[#E08585] rounded transition-all"><Trash2 size={13} /></button>
         </div>
       </td>
@@ -7949,10 +7962,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <table className="w-full text-sm">
                           <thead className="bg-[#FAFAF8] dark:bg-[#1A1A18] border-b border-black/10 dark:border-white/10">
                             <tr>
-                              <th className="px-2 py-3 w-8"></th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_position}</th>
-                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
+                              <th className="px-2 py-3 w-8 hidden sm:table-cell"></th>
+                              <th className="text-left px-3 sm:px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_company}</th>
+                              <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_position}</th>
+                              <th className="text-left px-2 sm:px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{t.tracker_col_status}</th>
                               <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_location}</th>
                               <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden md:table-cell">{t.tracker_col_salary}</th>
                               <th className="text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94] hidden lg:table-cell">{t.tracker_col_updated}</th>
@@ -8537,14 +8550,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     },
                     {
                       done: hasGeneratedApp || toolHistory.some((h: any) => h.tool_id === 'bewerbungs-gen'),
-                      label: language === 'FR' ? 'Crée une candidature avec le générateur' : language === 'IT' ? 'Crea una candidatura con il generatore' : language === 'EN' ? 'Create an application with the generator' : 'Erstelle eine Bewerbung mit dem Generator',
-                      hint: language === 'FR' ? '3 essais gratuits, prêt en 60 secondes' : language === 'IT' ? '3 prove gratuite, pronta in 60 secondi' : language === 'EN' ? '3 free tries, ready in 60 seconds' : '3 Gratis-Versuche, fertig in 60 Sekunden',
+                      label: language === 'FR' ? 'Essaie le générateur de candidatures' : language === 'IT' ? 'Prova il generatore di candidature' : language === 'EN' ? 'Try the application generator' : 'Probier den Bewerbungs-Generator',
+                      hint: language === 'FR' ? 'D\'une annonce à une candidature prête, en 60 secondes' : language === 'IT' ? 'Da un annuncio a una candidatura pronta, in 60 secondi' : language === 'EN' ? 'From a job ad to a ready application, in 60 seconds' : 'Aus einem Inserat eine fertige Bewerbung, in 60 Sekunden',
                       action: () => handleToolClick('bewerbungs-gen'),
                     },
                     {
                       done: applications.length > 0,
-                      label: language === 'FR' ? 'Mets une candidature dans le tracker' : language === 'IT' ? 'Inserisci una candidatura nel tracker' : language === 'EN' ? 'Put an application into the tracker' : 'Trag eine Bewerbung in den Tracker ein',
-                      hint: language === 'FR' ? 'N\'importe laquelle, aussi une déjà envoyée. Gratuit, avec rappels.' : language === 'IT' ? 'Una qualsiasi, anche già inviata. Gratis, con promemoria.' : language === 'EN' ? 'Any one, even an already sent one. Free, with reminders.' : 'Irgendeine, auch eine schon versendete. Gratis, mit Erinnerungen.',
+                      label: language === 'FR' ? 'Utilise le suivi des candidatures' : language === 'IT' ? 'Usa il tracker delle candidature' : language === 'EN' ? 'Use the application tracker' : 'Nutze den Bewerbungs-Tracker',
+                      hint: language === 'FR' ? 'Garde toutes tes candidatures en vue, gratuit avec rappels' : language === 'IT' ? 'Tieni d\'occhio tutte le candidature, gratis con promemoria' : language === 'EN' ? 'Keep every application in view, free with reminders' : 'Behalte alle Bewerbungen im Blick, gratis mit Erinnerungen',
                       action: () => navigate('tracker'),
                     },
                   ];
