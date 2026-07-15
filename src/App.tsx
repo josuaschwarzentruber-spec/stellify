@@ -1030,7 +1030,7 @@ function CompanyMonogram({ name, size = 'w-7 h-7 text-[11px]' }: { name?: string
 // company names are never cut off); a tap turns it into a field. Saves on
 // blur or Enter, reverts on Escape. `format` lets a raw stored value (e.g. a
 // salary) display nicely while it isn't being edited.
-function EditableCell({ value, onSave, placeholder, className, ariaLabel, inputMode, format }: any) {
+function EditableCell({ value, onSave, placeholder, className, ariaLabel, inputMode, format, singleLine }: any) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState<string>(value ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -1059,15 +1059,17 @@ function EditableCell({ value, onSave, placeholder, className, ariaLabel, inputM
       />
     );
   }
-  // View mode: a wrapping, full-width text button. Long values wrap onto a
-  // second line instead of being clipped.
+  // View mode: a full-width text button. `singleLine` keeps it on one line and
+  // ends a too-long value with an ellipsis (the full text is one tap away in
+  // edit mode); otherwise the value wraps.
   const shown = format && val ? format(val) : val;
   return (
     <button
       type="button"
       onClick={() => setEditing(true)}
       aria-label={ariaLabel}
-      className={`w-full text-left px-1.5 py-1 -ml-1.5 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors cursor-text break-words leading-snug ${className || ''}`}
+      title={typeof shown === 'string' ? shown : undefined}
+      className={`block w-full text-left px-1.5 py-1 -ml-1.5 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors cursor-text leading-snug ${singleLine ? 'truncate' : 'break-words'} ${className || ''}`}
     >
       {shown || <span className="opacity-40 font-normal">{placeholder || '–'}</span>}
     </button>
@@ -1104,20 +1106,20 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           </svg>
         </button>
       </td>
-      <td className="px-3 sm:px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8] w-full md:w-auto">
-        <div className="flex items-center gap-2.5">
-          <CompanyMonogram name={app.company} />
+      <td className="px-3 sm:px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8] w-full md:w-auto max-w-0">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <CompanyMonogram name={app.company} size="w-6 h-6 text-[10px] sm:w-7 sm:h-7 sm:text-[11px]" />
           <div className="min-w-0 flex-1">
             {onFieldSave ? (
-              <EditableCell value={capFirst(app.company)} onSave={(v: string) => onFieldSave(app.id, 'company', v)} placeholder={t.tracker_col_company} ariaLabel={t.tracker_col_company} className="font-bold text-[#1A1A18] dark:text-[#FAFAF8]" />
+              <EditableCell singleLine value={capFirst(app.company)} onSave={(v: string) => onFieldSave(app.id, 'company', v)} placeholder={t.tracker_col_company} ariaLabel={t.tracker_col_company} className="text-[13px] sm:text-sm font-bold text-[#1A1A18] dark:text-[#FAFAF8]" />
             ) : (
-              <span className="block truncate">{capFirst(app.company)}</span>
+              <span className="block truncate text-[13px] sm:text-sm">{capFirst(app.company)}</span>
             )}
             {/* On mobile the position has no column of its own, so it sits
-                under the company name — both stay fully readable. */}
+                on a second line under the company name, also single-line. */}
             <div className="md:hidden">
               {onFieldSave ? (
-                <EditableCell value={capFirst(app.position)} onSave={(v: string) => onFieldSave(app.id, 'position', v)} placeholder={t.tracker_col_position} ariaLabel={t.tracker_col_position} className="text-[12px] font-normal text-[#5C5C58] dark:text-[#9A9A94]" />
+                <EditableCell singleLine value={capFirst(app.position)} onSave={(v: string) => onFieldSave(app.id, 'position', v)} placeholder={t.tracker_col_position} ariaLabel={t.tracker_col_position} className="text-[12px] font-normal text-[#5C5C58] dark:text-[#9A9A94]" />
               ) : (
                 <span className="block truncate text-[12px] font-normal text-[#5C5C58] dark:text-[#9A9A94]">{capFirst(app.position)}</span>
               )}
