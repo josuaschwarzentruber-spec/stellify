@@ -7963,6 +7963,31 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     </motion.div>
                   )}
 
+                    {applications.length === 0 ? (
+                      /* Friendly empty state instead of a bare table with only
+                         headers — invites the very first entry. */
+                      <div className="bg-white dark:bg-[#2A2A26] border border-dashed border-black/15 dark:border-white/15 rounded-lg px-6 py-14 text-center">
+                        <div className="w-14 h-14 mx-auto mb-5 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-[#004225] dark:text-[#00A854]">
+                          <Layout size={22} />
+                        </div>
+                        <h3 className="font-serif text-xl text-[#1A1A18] dark:text-[#FAFAF8] mb-2">
+                          {language === 'FR' ? 'Ton suivi est encore vide' : language === 'IT' ? 'Il tuo tracker è ancora vuoto' : language === 'EN' ? 'Your tracker is still empty' : 'Dein Tracker ist noch leer'}
+                        </h3>
+                        <p className="text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-md mx-auto mb-6 leading-relaxed">
+                          {language === 'FR' ? 'Ajoute une première candidature, même une déjà envoyée. Tu gardes tout en vue, avec statut et rappels. Gratuit pour toujours.'
+                            : language === 'IT' ? 'Aggiungi una prima candidatura, anche già inviata. Tieni tutto in vista, con stato e promemoria. Gratis per sempre.'
+                            : language === 'EN' ? 'Add a first application, even one already sent. Keep everything in view, with status and reminders. Free forever.'
+                            : 'Trag eine erste Bewerbung ein, auch eine schon versendete. Du behältst alles im Blick, mit Status und Erinnerungen. Dauerhaft gratis.'}
+                        </p>
+                        <button
+                          onClick={() => setIsAddingApp(true)}
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-[#00331d] transition-all"
+                        >
+                          <Plus size={14} />
+                          {language === 'FR' ? 'Première candidature' : language === 'IT' ? 'Prima candidatura' : language === 'EN' ? 'First application' : 'Erste Bewerbung eintragen'}
+                        </button>
+                      </div>
+                    ) : (
                     <DndContext
                       sensors={dndSensors}
                       onDragEnd={(event: DragEndEvent) => {
@@ -8031,6 +8056,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         </table>
                       </div>
                     </DndContext>
+                    )}
                 </div>
   );
 
@@ -8565,11 +8591,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <DesktopTip language={language} className="mt-5" />
                 </header>
 
-                {/* Starter checklist — walks brand-new users through the
-                    three steps that make Stellify click. Checks itself off
-                    from real state and disappears once everything is done
-                    (or when dismissed). */}
-                {!starterDismissed && (() => {
+                {/* Starter checklist — walks brand-new free users through the
+                    three steps that make Stellify click. Paying customers have
+                    clearly onboarded, so they never see it. Checks itself off
+                    from real state and disappears once everything is done (or
+                    when dismissed, which is remembered). */}
+                {!starterDismissed && user?.role === 'client' && (() => {
                   const steps = [
                     {
                       done: !!cvContext,
@@ -10195,10 +10222,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {/* Risk reversal right under the primary CTA — the two doubts
                   that cost sign-ups: does it cost something, is it a trap. */}
               <p className="text-center text-[11px] text-[#9A9A94] font-light -mt-1">
-                {language === 'FR' ? 'Sans carte de crédit · 3 candidatures offertes · résiliable à tout moment'
-                  : language === 'IT' ? 'Senza carta di credito · 3 candidature in regalo · disdicibile in ogni momento'
-                  : language === 'EN' ? 'No credit card · 3 applications on us · cancel anytime'
-                  : 'Keine Kreditkarte nötig · 3 Bewerbungen geschenkt · jederzeit kündbar'}
+                {language === 'FR' ? 'Sans carte de crédit · 3 candidatures offertes · données selon le droit suisse'
+                  : language === 'IT' ? 'Senza carta di credito · 3 candidature in regalo · dati secondo il diritto svizzero'
+                  : language === 'EN' ? 'No credit card · 3 applications on us · data under Swiss law'
+                  : 'Keine Kreditkarte nötig · 3 Bewerbungen geschenkt · Daten nach Schweizer Recht'}
               </p>
 
               {/* Secondary links */}
@@ -12659,6 +12686,27 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         user={user}
                         profile={user ? { firstName: user.firstName, email: user.email } : null}
                         initialTarget={generatorPrefill}
+                        onAddToTracker={async ({ company, position }) => {
+                          if (!user) return false;
+                          const co = capFirst(company.trim());
+                          const po = capFirst(position.trim());
+                          // Skip if the same company+position is already tracked,
+                          // so repeated exports don't create duplicates.
+                          const exists = applications.some((a: any) =>
+                            String(a.company || '').trim().toLowerCase() === co.toLowerCase() &&
+                            String(a.position || '').trim().toLowerCase() === po.toLowerCase());
+                          if (exists) return false;
+                          try {
+                            await addDoc(collection(db, 'applications'), {
+                              company: co, position: po, status: 'Applied', location: '', salary: '', notes: '',
+                              reminder_at: '', user_id: user.id, created_at: new Date().toISOString(),
+                            });
+                            return true;
+                          } catch (e: any) {
+                            handleDbError(e, 'db', 'applications');
+                            return false;
+                          }
+                        }}
                         cvContext={cvContext}
                         locked={isToolLocked}
                         onUpgrade={(reason?: 'quota' | 'daily', message?: string) => setUpgradePrompt({ reason: reason || 'quota', message })}
@@ -13674,10 +13722,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   {language === 'FR' ? 'Encore en train de réfléchir ?' : language === 'IT' ? 'Ci stai ancora pensando?' : language === 'EN' ? 'Still thinking it over?' : 'Noch am Überlegen?'}
                 </h3>
                 <p className="text-sm text-white/80 font-light leading-relaxed mb-6">
-                  {language === 'FR' ? 'Commence gratuitement et décide plus tard. 3 candidatures offertes, sans carte de crédit, résiliable à tout moment.'
-                    : language === 'IT' ? 'Inizia gratis e decidi dopo. 3 candidature in regalo, senza carta di credito, disdicibile in ogni momento.'
-                    : language === 'EN' ? 'Start free and decide later. 3 applications on us, no credit card, cancel anytime.'
-                    : 'Starte gratis und entscheide später. 3 Bewerbungen geschenkt, keine Kreditkarte nötig, jederzeit kündbar.'}
+                  {language === 'FR' ? 'Commence gratuitement et décide plus tard. 3 candidatures offertes, sans carte de crédit.'
+                    : language === 'IT' ? 'Inizia gratis e decidi dopo. 3 candidature in regalo, senza carta di credito.'
+                    : language === 'EN' ? 'Start free and decide later. 3 applications on us, no credit card.'
+                    : 'Starte gratis und entscheide später. 3 Bewerbungen geschenkt, keine Kreditkarte nötig.'}
                 </p>
                 <button
                   onClick={() => {

@@ -474,7 +474,7 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage, initialTarget }: {
+const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage, initialTarget, onAddToTracker }: {
   language: string;
   user: { id: string; email?: string } | null;
   profile?: { firstName?: string; email?: string } | null;
@@ -489,6 +489,9 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
       and hoist the text into the parent's cvContext. */
   onUploadCv?: (file: File) => Promise<void> | void;
   recordUsage?: (entry: { input: string; result: string }) => Promise<void>;
+  /** Add the generated application to the tracker (company + position). Returns
+      true if it was newly added, false if a matching entry already existed. */
+  onAddToTracker?: (entry: { company: string; position: string }) => Promise<boolean> | boolean;
   usage?: { toolUses: number; dailyToolUses: number; isPro: boolean; isUnlimited: boolean };
 }) => {
   const s = STR[language] || STR.DE;
@@ -513,6 +516,9 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   const [isFetchingJob, setIsFetchingJob] = useState(false);
   const [useCv, setUseCv] = useState(true);
   const [isUploadingCv, setIsUploadingCv] = useState(false);
+  const [trackerAdded, setTrackerAdded] = useState(false);
+  // A fresh generation (or a changed target) re-arms the "add to tracker" button.
+  useEffect(() => { setTrackerAdded(false); }, [gen, form.targetCompany, form.targetPosition]);
 
   // Each step starts from the top so the URL importer (and stepper) are
   // always immediately visible after navigation.
@@ -1373,6 +1379,33 @@ ${bodyText}
                       </button>
                     </div>
                   </div>
+
+                  {/* Connect the two tools: drop this application straight into
+                      the free tracker so it never gets lost. Only when a letter
+                      exists and a company/position are set. */}
+                  {onAddToTracker && gen && form.targetCompany && form.targetPosition && (
+                    <div className="mx-auto max-w-[560px] mt-3">
+                      <button
+                        onClick={async () => {
+                          if (trackerAdded) return;
+                          const added = await onAddToTracker({ company: form.targetCompany, position: form.targetPosition });
+                          setTrackerAdded(true);
+                          showToast(
+                            added
+                              ? (language === 'FR' ? 'Ajouté au suivi des candidatures' : language === 'IT' ? 'Aggiunto al tracker delle candidature' : language === 'EN' ? 'Added to the application tracker' : 'Zum Bewerbungs-Tracker hinzugefügt')
+                              : (language === 'FR' ? 'Déjà dans le suivi' : language === 'IT' ? 'Già nel tracker' : language === 'EN' ? 'Already in the tracker' : 'Ist bereits im Tracker'),
+                            'success',
+                          );
+                        }}
+                        className={`w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-[10px] font-bold uppercase tracking-widest transition-all ${trackerAdded ? 'bg-[#004225]/8 dark:bg-[#00A854]/12 text-[#004225] dark:text-[#00A854] cursor-default' : 'border border-black/10 dark:border-white/10 text-[#5C5C58] dark:text-[#9A9A94] hover:border-[#004225]/40 dark:hover:border-[#00A854]/50 hover:text-[#004225] dark:hover:text-[#00A854] hover:bg-[#004225]/[0.03] dark:hover:bg-[#00A854]/[0.06]'}`}
+                      >
+                        {trackerAdded ? <Check size={13} strokeWidth={3} /> : <ListChecks size={13} />}
+                        {trackerAdded
+                          ? (language === 'FR' ? 'Dans le suivi des candidatures' : language === 'IT' ? 'Nel tracker delle candidature' : language === 'EN' ? 'In the application tracker' : 'Im Bewerbungs-Tracker')
+                          : (language === 'FR' ? 'Ajouter au suivi des candidatures' : language === 'IT' ? 'Aggiungi al tracker delle candidature' : language === 'EN' ? 'Add to the application tracker' : 'In den Bewerbungs-Tracker übernehmen')}
+                      </button>
+                    </div>
+                  )}
 
                   {/* Inline letter editor */}
                   <AnimatePresence>
