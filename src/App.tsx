@@ -1069,7 +1069,7 @@ function EditableCell({ value, onSave, placeholder, className, ariaLabel, inputM
       onClick={() => setEditing(true)}
       aria-label={ariaLabel}
       title={typeof shown === 'string' ? shown : undefined}
-      className={`block w-full text-left px-1.5 py-1 -ml-1.5 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors cursor-text leading-snug ${singleLine ? 'truncate' : 'break-words'} ${className || ''}`}
+      className={`block w-full text-left px-1.5 py-1 -ml-1.5 rounded hover:bg-black/[0.03] dark:hover:bg-white/[0.05] transition-colors cursor-text leading-snug ${singleLine ? 'truncate md:overflow-visible md:whitespace-normal md:break-words' : 'break-words'} ${className || ''}`}
     >
       {shown || <span className="opacity-40 font-normal">{placeholder || '–'}</span>}
     </button>
@@ -1106,7 +1106,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           </svg>
         </button>
       </td>
-      <td className="px-3 sm:px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8] w-full md:w-auto max-w-0">
+      <td className="px-3 sm:px-4 py-3 font-bold text-[#1A1A18] dark:text-[#FAFAF8] w-full md:w-auto max-w-0 md:max-w-none">
         <div className="flex items-center gap-2 sm:gap-2.5">
           <CompanyMonogram name={app.company} size="w-6 h-6 text-[10px] sm:w-7 sm:h-7 sm:text-[11px]" />
           <div className="min-w-0 flex-1">
