@@ -8628,15 +8628,20 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   ];
                   const doneCount = steps.filter(s => s.done).length;
                   if (doneCount === steps.length) return null;
+                  // Open steps first (numbered 1..n as the next things to do),
+                  // finished steps sink to the bottom with just a quiet check.
+                  const pending = steps.filter(s => !s.done).map((s, i) => ({ ...s, num: i + 1 }));
+                  const finished = steps.filter(s => s.done).map(s => ({ ...s, num: null as number | null }));
+                  const ordered = [...pending, ...finished];
                   return (
                     <motion.div
                       initial={{ opacity: 0, y: 12 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-5 sm:p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 rounded-xl"
+                      className="px-5 py-4 sm:px-6 sm:py-5 bg-[#004225]/[0.025] dark:bg-white/[0.025] border border-[#004225]/10 dark:border-[#00A854]/15 rounded-xl"
                     >
                       {/* Header: short kicker on the left, step counter and a
                           discreet close on the right. No long paragraph. */}
-                      <div className="flex items-center justify-between gap-3 mb-4">
+                      <div className="flex items-center justify-between gap-3 mb-2">
                         <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854]">
                           {language === 'FR' ? 'Bien démarrer' : language === 'IT' ? 'Per iniziare' : language === 'EN' ? 'Get started' : 'Gut starten'}
                         </p>
@@ -8653,17 +8658,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </button>
                         </div>
                       </div>
-                      {/* Clean rows separated by hairlines — calmer than a stack
-                          of individual boxes. Done rows are quietly muted, open
-                          rows invite a tap. */}
-                      <div className="divide-y divide-black/5 dark:divide-white/8 -my-1">
-                        {steps.map((s, i) => (
+                      {/* Clean rows separated by hairlines. Open rows invite a
+                          tap; finished rows sit quietly at the bottom, no
+                          strike-through. */}
+                      <div className="divide-y divide-[#004225]/8 dark:divide-white/8">
+                        {ordered.map((s, i) => (
                           s.done ? (
                             <div key={i} className="flex items-center gap-3.5 py-3">
                               <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-[#004225] dark:bg-[#00A854] text-white">
                                 <Check size={13} strokeWidth={3} />
                               </span>
-                              <span className="min-w-0 flex-1 text-sm text-[#9A9A94] line-through decoration-[#9A9A94]/40">{s.label}</span>
+                              <span className="min-w-0 flex-1 text-sm text-[#6B6B66] dark:text-[#9A9A94]">{s.label}</span>
                             </div>
                           ) : (
                             <button
@@ -8672,7 +8677,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               className="group w-full flex items-center gap-3.5 py-3 text-left cursor-pointer"
                             >
                               <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border border-[#004225]/25 dark:border-[#00A854]/35 text-[#004225] dark:text-[#00A854] text-[11px] font-bold group-hover:bg-[#004225] group-hover:text-white dark:group-hover:bg-[#00A854] transition-colors">
-                                {i + 1}
+                                {s.num}
                               </span>
                               <span className="min-w-0 flex-1">
                                 <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{s.label}</span>
