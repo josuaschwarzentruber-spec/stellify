@@ -293,7 +293,7 @@ const StrategyDemo = ({ language }: { language: string }) => {
           <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
           <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
           <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94]">
-            {L('Bewerbungs-Strategie · Live', 'Stratégie · Live', 'Strategia · Live', 'Strategy · Live')}
+            {L('Bewerbungs-Tracker · Live', 'Suivi · Live', 'Tracker · Live', 'Tracker · Live')}
           </span>
           <span className="ml-auto inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#00A854]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00A854] animate-pulse" />
@@ -2379,7 +2379,7 @@ function StellifyApp() {
       // Pages (Über uns, AGB, Datenschutz, Impressum, Preise) — always discoverable
       const pages = [
         { view: 'about',       keys: ['über uns','about','geschichte','story','team','founder','gründer'], title: language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns', content: language === 'FR' ? 'Notre histoire, le fondateur et le sens du nom Stellify.' : language === 'IT' ? 'La nostra storia, il fondatore e il significato del nome Stellify.' : language === 'EN' ? 'Our story, the founder and the meaning behind the name Stellify.' : 'Unsere Geschichte, der Gründer und die Bedeutung des Namens Stellify.' },
-        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Karriere+. Résiliable à tout moment.' : language === 'IT' ? 'Piani Gratuito, Pro e Karriere+. Disdicibile in ogni momento.' : language === 'EN' ? 'Free, Pro and Karriere+ plans. Cancel anytime.' : 'Gratis-, Pro- und Karriere+-Plan. Jederzeit kündbar.' },
+        { view: 'pricing',     keys: ['preis','pricing','abo','plan','kosten','tarif','prezzo','prix'], title: t.pricing, content: language === 'FR' ? 'Plans Gratuit, Pro et Karriere+.' : language === 'IT' ? 'Piani Gratuito, Pro e Karriere+.' : language === 'EN' ? 'Free, Pro and Karriere+ plans.' : 'Gratis-, Pro- und Karriere+-Plan.' },
         { view: 'datenschutz', keys: ['datenschutz','privacy','dsgvo','dsg','privacidad','vie privée'], title: language === 'FR' ? 'Politique de confidentialité' : language === 'IT' ? 'Informativa sulla privacy' : language === 'EN' ? 'Privacy Policy' : 'Datenschutz', content: language === 'FR' ? 'Comment nous traitons tes données personnelles selon LPD et RGPD.' : language === 'IT' ? 'Come trattiamo i tuoi dati personali secondo LPD e GDPR.' : language === 'EN' ? 'How we process your personal data under Swiss DPA and GDPR.' : 'Wie wir deine persönlichen Daten gemäss DSG und DSGVO bearbeiten.' },
         { view: 'agb',         keys: ['agb','terms','bedingungen','widerruf','kündigung'], title: language === 'FR' ? 'CGV' : language === 'IT' ? 'Termini' : language === 'EN' ? 'Terms' : 'AGB', content: language === 'FR' ? 'Conditions générales, paiement et droit de rétractation.' : language === 'IT' ? 'Condizioni generali, pagamento e diritto di recesso.' : language === 'EN' ? 'Terms, payment and right of withdrawal.' : 'Geschäftsbedingungen, Zahlung und Widerrufsrecht.' },
         { view: 'impressum',   keys: ['impressum','kontakt','contact','imprint','jtsp','luzern','firma'], title: language === 'FR' ? 'Mentions légales' : language === 'IT' ? 'Informazioni legali' : language === 'EN' ? 'Imprint' : 'Impressum', content: language === 'FR' ? "Coordonnées de l'exploitant et juridiction." : language === 'IT' ? 'Dati del gestore e giurisdizione.' : language === 'EN' ? 'Operator details and jurisdiction.' : 'Betreiber-Angaben und Gerichtsstand.' },
@@ -5007,7 +5007,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Erinnerungen fürs Nachfassen zur richtigen Zeit",
       tools_tracker_f3: "Statistiken, die zeigen, was funktioniert",
       tools_cta_title: "Überzeug dich selbst. Die ersten 3 Bewerbungen aus dem Generator sind geschenkt.",
-      tools_cta_sub: "Der Bewerbungs-Tracker ist komplett kostenlos, für immer. Zum Ausprobieren brauchst du kein Abo. Danach ab CHF 19.90 pro Monat, jederzeit kündbar.",
+      tools_cta_sub: "Der Bewerbungs-Tracker ist komplett kostenlos, für immer. Zum Ausprobieren brauchst du kein Abo. Danach ab CHF 19.90 pro Monat.",
       tools_cta_btn: "Jetzt gratis testen",
       tools_cta_btn2: "Pläne ansehen",
       tools_badge: "Karriere-Tools",
@@ -5670,7 +5670,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Rappels de relance au bon moment",
       tools_tracker_f3: "Des statistiques qui montrent ce qui marche",
       tools_cta_title: "Convaincs-toi. Les 3 premières candidatures du générateur sont offertes.",
-      tools_cta_sub: "Le suivi des candidatures est entièrement gratuit, pour toujours. Aucun abonnement pour essayer. Ensuite dès CHF 19.90 par mois, résiliable à tout moment.",
+      tools_cta_sub: "Le suivi des candidatures est entièrement gratuit, pour toujours. Aucun abonnement pour essayer. Ensuite dès CHF 19.90 par mois.",
       tools_cta_btn: "Essayer gratuitement",
       tools_cta_btn2: "Voir les plans",
       tools_badge: "Outils de carrière",
@@ -6227,7 +6227,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Promemoria per il follow-up al momento giusto",
       tools_tracker_f3: "Statistiche che mostrano cosa funziona",
       tools_cta_title: "Convinciti. Le prime 3 candidature del generatore sono in regalo.",
-      tools_cta_sub: "Il tracker delle candidature è completamente gratuito, per sempre. Nessun abbonamento per provare. Poi da CHF 19.90 al mese, disdicibile in ogni momento.",
+      tools_cta_sub: "Il tracker delle candidature è completamente gratuito, per sempre. Nessun abbonamento per provare. Poi da CHF 19.90 al mese.",
       tools_cta_btn: "Prova gratis",
       tools_cta_btn2: "Vedi i piani",
       tools_badge: "Strumenti di carriera",
@@ -6784,7 +6784,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Follow-up reminders at the right moment",
       tools_tracker_f3: "Statistics that show what works",
       tools_cta_title: "See for yourself. Your first 3 generator applications are on us.",
-      tools_cta_sub: "The application tracker is completely free, forever. No subscription needed to try. Then from CHF 19.90 per month, cancel anytime.",
+      tools_cta_sub: "The application tracker is completely free, forever. No subscription needed to try. Then from CHF 19.90 per month.",
       tools_cta_btn: "Try for free",
       tools_cta_btn2: "See plans",
       tools_badge: "Career Tools",
@@ -9715,12 +9715,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         {
                           n: 'Warum Pro sich lohnt',
                           s: 'Deine nächste Bewerbung in 60 Sekunden, so oft du willst',
-                          m: 'Hallo\n\nDeine 3 Gratis-Bewerbungen haben dir gezeigt, wie Stellify arbeitet. Mit Pro machst du daraus deinen Standard: 50 Generierungen pro Monat, der Stellen-Import per Link und alle Designs, für CHF 19.90 pro Monat, jederzeit kündbar.\n\nWenn du gerade aktiv auf Stellensuche bist, ist das der günstigste Karriere-Beschleuniger, den du finden wirst.',
+                          m: 'Hallo\n\nDeine 3 Gratis-Bewerbungen haben dir gezeigt, wie Stellify arbeitet. Mit Pro machst du daraus deinen Standard: 50 Generierungen pro Monat, der Stellen-Import per Link und alle Designs, für CHF 19.90 pro Monat.\n\nWenn du gerade aktiv auf Stellensuche bist, ist das der günstigste Karriere-Beschleuniger, den du finden wirst.',
                         },
                         {
                           n: 'Tipp + sanfter Hinweis',
                           s: 'Der Trick mit dem Stellen-Link',
-                          m: 'Hallo\n\nKennst du schon den schnellsten Weg zur fertigen Bewerbung? Kopiere einfach den Link eines Stelleninserats in den Generator, Stellify liest die Stelle und schreibt die Bewerbung passgenau darauf.\n\nMit dem Pro-Plan nutzt du das bis zu 50 Mal pro Monat, jederzeit kündbar.',
+                          m: 'Hallo\n\nKennst du schon den schnellsten Weg zur fertigen Bewerbung? Kopiere einfach den Link eines Stelleninserats in den Generator, Stellify liest die Stelle und schreibt die Bewerbung passgenau darauf.\n\nMit dem Pro-Plan nutzt du das bis zu 50 Mal pro Monat.',
                         },
                         {
                           n: 'Karriere+ für Vielbewerber',
