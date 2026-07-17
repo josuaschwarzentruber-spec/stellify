@@ -790,10 +790,10 @@ const DesktopTip = ({ language, className = '' }: { language: string; className?
           {language === 'FR' ? 'Astuce' : language === 'IT' ? 'Suggerimento' : language === 'EN' ? 'Tip' : 'Tipp'}
         </p>
         <p className="text-[12.5px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
-          {language === 'FR' ? "Sur ordinateur, tu vis Stellify au mieux : éditeur et aperçu côte à côte, encore plus de vue d'ensemble."
-            : language === 'IT' ? 'Sul computer vivi Stellify al meglio: editor e anteprima affiancati, ancora più panoramica.'
-            : language === 'EN' ? 'On a laptop Stellify is at its best: editor and preview side by side, even more overview.'
-            : 'Am Laptop erlebst du Stellify am schönsten: Editor und Vorschau nebeneinander, noch mehr Überblick.'}
+          {language === 'FR' ? "Sur un ordinateur, c'est encore plus pratique : tu vois le formulaire et l'aperçu de ta candidature côte à côte."
+            : language === 'IT' ? 'Su un computer è ancora più comodo: vedi il modulo e l\'anteprima della candidatura uno accanto all\'altra.'
+            : language === 'EN' ? 'On a laptop it is even easier: you see the form and the preview of your application side by side.'
+            : 'Am Laptop ist es noch praktischer: Du siehst das Formular und die Vorschau deiner Bewerbung nebeneinander.'}
         </p>
       </div>
     </div>
@@ -2011,6 +2011,16 @@ function StellifyApp() {
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+  // Closing the tool overlay returns the page to the top. Without this,
+  // opening a tool from a footer link left users stranded at the very
+  // bottom of the page when they pressed the X.
+  const prevActiveToolRef = useRef<any>(null);
+  useEffect(() => {
+    if (prevActiveToolRef.current && !activeTool) {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+    }
+    prevActiveToolRef.current = activeTool;
+  }, [activeTool]);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   // Convincing upgrade modal: 'quota' = free tries used up, 'daily' = daily cap hit.
@@ -5139,7 +5149,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_fair_use: "Du hast das Fair-Use-Limit für Live-Suchen erreicht. Bitte versuche es morgen wieder oder kontaktiere den Support.",
       dashboard_stat_pro: "Pro",
       dashboard_pro: "Karriere-Profi",
-      dashboard_desc: "Stella hat alles bereit. Erstelle in 60 Sekunden eine neue Bewerbung oder behalte deine laufenden Bewerbungen im Tracker im Blick.",
+      dashboard_desc: "Erstelle in 60 Sekunden eine neue Bewerbung oder behalte deine laufenden Bewerbungen im Tracker im Blick.",
       dashboard_stat_analyses: "Analysen",
       dashboard_stat_cv_status: "Lebenslauf",
       dashboard_stat_ready: "Bereit",
@@ -5801,7 +5811,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Votre limite de recherches en direct (10/mois) est atteinte. Vous en aurez de nouvelles le mois prochain. Passe à Karriere+ pour 300 recherches en direct par mois.",
       tool_limit_search_fair_use: "Vous avez atteint la limite d'utilisation équitable pour les recherches en direct. Veuillez réessayer demain ou contacter le support.",
       dashboard_pro: "Professionnel de carrière",
-      dashboard_desc: "Stella a tout préparé. Crée une nouvelle candidature en 60 secondes ou garde un œil sur tes candidatures dans le tracker.",
+      dashboard_desc: "Crée une nouvelle candidature en 60 secondes ou garde un œil sur tes candidatures dans le tracker.",
       dashboard_stat_analyses: "Analyses",
       dashboard_stat_cv_status: "Statut CV",
       dashboard_stat_ready: "Prêt",
@@ -6358,7 +6368,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Il tuo limite di ricerche dal vivo (10/mese) è raggiunto. Il prossimo mese avrai nuove ricerche libere. Passa a Karriere+ per 300 ricerche dal vivo al mese.",
       tool_limit_search_fair_use: "Hai raggiunto il limite di utilizzo corretto per le ricerche dal vivo. Riprova domani o contatta il supporto.",
       dashboard_pro: "Professionista della carriera",
-      dashboard_desc: "Stella ha tutto pronto. Crea una nuova candidatura in 60 secondi o tieni d'occhio le tue candidature nel tracker.",
+      dashboard_desc: "Crea una nuova candidatura in 60 secondi o tieni d'occhio le tue candidature nel tracker.",
       dashboard_stat_analyses: "Analisi",
       dashboard_stat_cv_status: "Stato CV",
       dashboard_stat_ready: "Pronto",
@@ -6915,7 +6925,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tool_limit_search_pro: "Your live search limit (10/month) has been reached. You will get new searches next month. Upgrade to Karriere+ for 300 live searches per month.",
       tool_limit_search_fair_use: "You have reached the fair-use limit for live searches. Please try again tomorrow or contact support.",
       dashboard_pro: "Career Professional",
-      dashboard_desc: "Stella has everything ready. Create a new application in 60 seconds or keep an eye on your applications in the tracker.",
+      dashboard_desc: "Create a new application in 60 seconds or keep an eye on your applications in the tracker.",
       dashboard_stat_analyses: "Analyses",
       dashboard_stat_cv_status: "CV (Resume)",
       dashboard_stat_ready: "Ready",
@@ -10510,12 +10520,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-6 max-w-lg">
               {language === 'FR'
-                ? 'Choisis un design, colle l\'URL de l\'offre, Stella écrit la lettre et le profil assortis. Téléchargeable en PDF et Word.'
+                ? 'Choisis un design, colle l\'URL de l\'offre, et notre IA Stella écrit la lettre et le profil assortis. Téléchargeable en PDF et Word.'
                 : language === 'IT'
-                ? 'Scegli un design, incolla l\'URL dell\'annuncio, Stella scrive la lettera e il profilo su misura. Scaricabile in PDF e Word.'
+                ? 'Scegli un design, incolla l\'URL dell\'annuncio e la nostra IA Stella scrive la lettera e il profilo su misura. Scaricabile in PDF e Word.'
                 : language === 'EN'
-                ? 'Pick a design, paste the job URL, Stella writes the matching cover letter and profile. Export to PDF and Word.'
-                : 'Design wählen, Stellen-URL einfügen, Stella schreibt das passende Anschreiben und Kurzprofil. Als PDF und Word exportierbar.'}
+                ? 'Pick a design, paste the job URL, and our AI Stella writes the matching cover letter and profile. Export to PDF and Word.'
+                : 'Design wählen, Stellen-URL einfügen, und unsere KI Stella schreibt das passende Anschreiben und Kurzprofil. Als PDF und Word exportierbar.'}
             </p>
             <ul className="space-y-2.5 mb-8">
               {[
