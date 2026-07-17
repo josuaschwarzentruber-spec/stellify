@@ -341,7 +341,7 @@ const RENEWAL_COPY: Record<Lang, {
         title: `Your ${cycle} plan is about to expire`,
         lines: [
           `Hello ${n},`,
-          `your ${cycle} Stellify subscription expires in <strong>${d} day${d === 1 ? '' : 's'}</strong>. Your account will automatically switch to the free plan — no action needed from you.`,
+          `your ${cycle} Stellify subscription expires in <strong>${d} day${d === 1 ? '' : 's'}</strong>. Your account will automatically switch to the free plan, no action needed from you.`,
           `Want to keep all features? Renew now and your access extends seamlessly for another ${next}.`,
         ],
         cta: 'Renew now',
@@ -811,7 +811,7 @@ async function deepseekChat(opts: {
       if (r.status === 402 || /insufficient\s*balance/i.test(body)) {
         alertOwnerOncePerDay(
           'empty_balance',
-          '🔴 Stellify: DeepSeek-Guthaben aufgebraucht – bitte aufladen',
+          '🔴 Stellify: DeepSeek-Guthaben aufgebraucht, bitte aufladen',
           `<p>Dein DeepSeek-Guthaben ist <b>leer</b>. Die KI läuft gerade über die Ersatz-Lösung (Google Gemini) weiter, aber bitte lade bald auf:</p>
            <p><a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
         ).catch(() => {});
@@ -2338,10 +2338,10 @@ app.post("/api/send-job-email", emailLimiter, requireAuth, async (req, res) => {
     EN: { badge: 'Application', tagline: 'Created with',               defaultFromName: 'Stellify Application',  htmlLang: 'en' },
   };
   const taglineSuffix: Record<Lang, string> = {
-    DE: '– Schweizer KI-Karriere-Plattform',
-    FR: '– la plateforme suisse de carrière par IA',
-    IT: '– la piattaforma svizzera di carriera AI',
-    EN: '– the Swiss AI career platform',
+    DE: '· Schweizer KI-Karriere-Plattform',
+    FR: '· la plateforme suisse de carrière par IA',
+    IT: '· la piattaforma svizzera di carriera AI',
+    EN: '· the Swiss AI career platform',
   };
   const copy = jobCopy[lang] || jobCopy.DE;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';

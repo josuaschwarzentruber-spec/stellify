@@ -12062,19 +12062,35 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 className="absolute top-0 left-0 h-0.5 bg-[#004225]"
               />
 
-              {/* Header */}
+              {/* Header — the avatar pops in like the Netflix profile moment */}
               <div className="px-8 pt-10 pb-6 border-b border-black/5 dark:border-white/5">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] mb-2">
-                      {t.welcome}
-                    </p>
-                    <h2 className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">
-                      {user.firstName}
-                    </h2>
-                    <p className="mt-1 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">
-                      {t.welcome_modal_subtitle}
-                    </p>
+                  <div className="flex items-center gap-5 min-w-0">
+                    <motion.div
+                      initial={{ scale: 0.4, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.15 }}
+                      className="shrink-0"
+                    >
+                      {user.avatarId ? (
+                        <PresetAvatar id={user.avatarId} className="w-16 h-16 rounded-2xl border border-black/10 dark:border-white/10 shadow-md" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-2xl bg-[#004225]/8 dark:bg-[#00A854]/15 flex items-center justify-center text-2xl font-serif text-[#004225] dark:text-[#00A854] border border-black/10 dark:border-white/10 shadow-md">
+                          {(user.firstName || '?').charAt(0).toUpperCase()}
+                        </div>
+                      )}
+                    </motion.div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] mb-2">
+                        {t.welcome}
+                      </p>
+                      <h2 className="text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate">
+                        {user.firstName}
+                      </h2>
+                      <p className="mt-1 text-sm text-[#5C5C58] dark:text-[#9A9A94] font-light">
+                        {t.welcome_modal_subtitle}
+                      </p>
+                    </div>
                   </div>
                   <button
                     onClick={() => setShowLoginWelcome(false)}
