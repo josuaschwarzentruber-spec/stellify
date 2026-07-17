@@ -1818,7 +1818,21 @@ function StellifyApp() {
       if (view) {
         setActiveView(view);
         setActiveTool(null);
-        if (view === 'pricing') {
+        // The browser back button honours the same return spot as in-app
+        // navigation: landing back on the view you left restores the exact
+        // scroll position (e.g. the footer you clicked Preise from).
+        let returnY: number | null = null;
+        try {
+          const raw = sessionStorage.getItem('stellify_return_spot');
+          if (raw) {
+            const spot = JSON.parse(raw) as { view?: string; y?: number };
+            if (spot.view === view && typeof spot.y === 'number') returnY = spot.y;
+          }
+        } catch { /* ignore */ }
+        if (returnY !== null) {
+          const y = returnY;
+          setTimeout(() => window.scrollTo({ top: y }), 60);
+        } else if (view === 'pricing') {
           setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'auto' }), 100);
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
