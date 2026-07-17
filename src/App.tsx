@@ -1096,7 +1096,7 @@ function SortableAppRow({ app, t, language, statusLabel, salaryFmt, onEdit, onAr
           {...attributes}
           {...listeners}
           aria-label={language === 'FR' ? 'Réorganiser' : language === 'IT' ? 'Riordina' : language === 'EN' ? 'Reorder' : 'Sortieren'}
-          title={language === 'FR' ? 'Ziehen zum Verschieben' : language === 'IT' ? 'Trascina per riordinare' : language === 'EN' ? 'Drag to reorder' : 'Zum Verschieben ziehen'}
+          title={language === 'FR' ? 'Glisser pour déplacer' : language === 'IT' ? 'Trascina per riordinare' : language === 'EN' ? 'Drag to reorder' : 'Zum Verschieben ziehen'}
           className="text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] cursor-grab active:cursor-grabbing touch-none p-1 -m-1"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" aria-hidden="true">
@@ -1674,10 +1674,6 @@ function StellifyApp() {
   const [nlSubject, setNlSubject] = useState('');
   const [nlMessage, setNlMessage] = useState('');
   const [nlSending, setNlSending] = useState(false);
-  // Starter checklist on the dashboard — dismissed state survives reloads.
-  const [starterDismissed, setStarterDismissed] = useState<boolean>(() => {
-    try { return localStorage.getItem('stellify_starter_dismissed') === '1'; } catch { return false; }
-  });
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber'>('dashboard');
@@ -8600,97 +8596,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <DesktopTip language={language} className="mt-5" />
                 </header>
 
-                {/* Starter checklist — walks brand-new free users through the
-                    three steps that make Stellify click. Paying customers have
-                    clearly onboarded, so they never see it. Checks itself off
-                    from real state and disappears once everything is done (or
-                    when dismissed, which is remembered). */}
-                {!starterDismissed && user?.role === 'client' && (() => {
-                  const steps = [
-                    {
-                      done: !!cvContext,
-                      label: language === 'FR' ? 'Télécharge ton CV' : language === 'IT' ? 'Carica il tuo CV' : language === 'EN' ? 'Upload your CV' : 'Lade deinen Lebenslauf hoch',
-                      hint: language === 'FR' ? 'Stella l\'utilise pour chaque candidature' : language === 'IT' ? 'Stella lo usa per ogni candidatura' : language === 'EN' ? 'Stella uses it for every application' : 'Stella nutzt ihn für jede Bewerbung',
-                      action: () => fileInputRef.current?.click(),
-                    },
-                    {
-                      done: hasGeneratedApp || toolHistory.some((h: any) => h.tool_id === 'bewerbungs-gen'),
-                      label: language === 'FR' ? 'Essaie le générateur de candidatures' : language === 'IT' ? 'Prova il generatore di candidature' : language === 'EN' ? 'Try the application generator' : 'Probier den Bewerbungs-Generator',
-                      hint: language === 'FR' ? 'D\'une annonce à une candidature prête, en 60 secondes' : language === 'IT' ? 'Da un annuncio a una candidatura pronta, in 60 secondi' : language === 'EN' ? 'From a job ad to a ready application, in 60 seconds' : 'Aus einem Inserat eine fertige Bewerbung, in 60 Sekunden',
-                      action: () => handleToolClick('bewerbungs-gen'),
-                    },
-                    {
-                      done: applications.length > 0,
-                      label: language === 'FR' ? 'Utilise le suivi des candidatures' : language === 'IT' ? 'Usa il tracker delle candidature' : language === 'EN' ? 'Use the application tracker' : 'Nutze den Bewerbungs-Tracker',
-                      hint: language === 'FR' ? 'Garde toutes tes candidatures en vue, gratuit avec rappels' : language === 'IT' ? 'Tieni d\'occhio tutte le candidature, gratis con promemoria' : language === 'EN' ? 'Keep every application in view, free with reminders' : 'Behalte alle Bewerbungen im Blick, gratis mit Erinnerungen',
-                      action: () => navigate('tracker'),
-                    },
-                  ];
-                  const doneCount = steps.filter(s => s.done).length;
-                  if (doneCount === steps.length) return null;
-                  // Open steps first (numbered 1..n as the next things to do),
-                  // finished steps sink to the bottom with just a quiet check.
-                  const pending = steps.filter(s => !s.done).map((s, i) => ({ ...s, num: i + 1 }));
-                  const finished = steps.filter(s => s.done).map(s => ({ ...s, num: null as number | null }));
-                  const ordered = [...pending, ...finished];
-                  return (
-                    <motion.div
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="px-5 py-4 sm:px-6 sm:py-5 bg-[#004225]/[0.025] dark:bg-white/[0.025] border border-[#004225]/10 dark:border-[#00A854]/15 rounded-xl"
-                    >
-                      {/* Header: short kicker on the left, step counter and a
-                          discreet close on the right. No long paragraph. */}
-                      <div className="flex items-center justify-between gap-3 mb-2">
-                        <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#004225] dark:text-[#00A854]">
-                          {language === 'FR' ? 'Bien démarrer' : language === 'IT' ? 'Per iniziare' : language === 'EN' ? 'Get started' : 'Gut starten'}
-                        </p>
-                        <div className="flex items-center gap-3 shrink-0">
-                          <span className="text-[11px] font-medium text-[#9A9A94] tabular-nums">
-                            {doneCount}/{steps.length}
-                          </span>
-                          <button
-                            onClick={() => { setStarterDismissed(true); try { localStorage.setItem('stellify_starter_dismissed', '1'); } catch { /* ignore */ } }}
-                            title={language === 'FR' ? 'Masquer' : language === 'IT' ? 'Nascondi' : language === 'EN' ? 'Hide' : 'Ausblenden'}
-                            className="p-1 text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] transition-colors"
-                          >
-                            <X size={15} />
-                          </button>
-                        </div>
-                      </div>
-                      {/* Clean rows separated by hairlines. Open rows invite a
-                          tap; finished rows sit quietly at the bottom, no
-                          strike-through. */}
-                      <div className="divide-y divide-[#004225]/8 dark:divide-white/8">
-                        {ordered.map((s, i) => (
-                          s.done ? (
-                            <div key={i} className="flex items-center gap-3.5 py-3">
-                              <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center bg-[#004225] dark:bg-[#00A854] text-white">
-                                <Check size={13} strokeWidth={3} />
-                              </span>
-                              <span className="min-w-0 flex-1 text-sm text-[#6B6B66] dark:text-[#9A9A94]">{s.label}</span>
-                            </div>
-                          ) : (
-                            <button
-                              key={i}
-                              onClick={s.action}
-                              className="group w-full flex items-center gap-3.5 py-3 text-left cursor-pointer"
-                            >
-                              <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border border-[#004225]/25 dark:border-[#00A854]/35 text-[#004225] dark:text-[#00A854] text-[11px] font-bold group-hover:bg-[#004225] group-hover:text-white dark:group-hover:bg-[#00A854] transition-colors">
-                                {s.num}
-                              </span>
-                              <span className="min-w-0 flex-1">
-                                <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{s.label}</span>
-                                <span className="block text-[11px] text-[#9A9A94] font-light mt-0.5">{s.hint}</span>
-                              </span>
-                              <ArrowRight size={15} className="shrink-0 text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] group-hover:translate-x-0.5 transition-all" />
-                            </button>
-                          )
-                        ))}
-                      </div>
-                    </motion.div>
-                  );
-                })()}
 
                 {/* Quick access: the two tools, front and centre. The
                     dashboard's job is orientation — open a tool in one
@@ -9679,6 +9584,55 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </p>
                   <button onClick={() => { setIsDeleteAccountOpen(true); setDeletePassword(''); setDeleteError(''); }} className="text-[10px] font-bold uppercase tracking-widest text-red-500 dark:text-[#E08585] hover:text-red-700 dark:hover:text-[#F0A6A6] transition-colors">{t.settings_delete_account}</button>
 
+                </div>
+
+                {/* First steps — a calm, always-available mini guide. Lives in
+                    the account settings instead of the dashboard: no progress
+                    logic, no checkmarks, nothing that can look broken. */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">
+                    {language === 'FR' ? 'Premiers pas' : language === 'IT' ? 'Primi passi' : language === 'EN' ? 'First steps' : 'Erste Schritte'}
+                  </p>
+                  <p className="text-sm text-[#26261F] dark:text-[#C8C8C2] font-light leading-relaxed">
+                    {language === 'FR' ? 'Comment tirer le meilleur de Stellify:'
+                      : language === 'IT' ? 'Come ottenere il massimo da Stellify:'
+                      : language === 'EN' ? 'How to get the most out of Stellify:'
+                      : 'So holst du am meisten aus Stellify heraus:'}
+                  </p>
+                  <div className="divide-y divide-black/5 dark:divide-white/8">
+                    {[
+                      {
+                        label: language === 'FR' ? 'Télécharge ton CV' : language === 'IT' ? 'Carica il tuo CV' : language === 'EN' ? 'Upload your CV' : 'Lade deinen Lebenslauf hoch',
+                        hint: language === 'FR' ? "Stella l'utilise pour chaque candidature" : language === 'IT' ? 'Stella lo usa per ogni candidatura' : language === 'EN' ? 'Stella uses it for every application' : 'Stella nutzt ihn für jede Bewerbung',
+                        action: () => fileInputRef.current?.click(),
+                      },
+                      {
+                        label: language === 'FR' ? 'Ouvre le générateur de candidatures' : language === 'IT' ? 'Apri il generatore di candidature' : language === 'EN' ? 'Open the application generator' : 'Öffne den Bewerbungs-Generator',
+                        hint: language === 'FR' ? "D'une annonce à une candidature prête, en 60 secondes" : language === 'IT' ? 'Da un annuncio a una candidatura pronta, in 60 secondi' : language === 'EN' ? 'From a job ad to a ready application, in 60 seconds' : 'Aus einem Inserat eine fertige Bewerbung, in 60 Sekunden',
+                        action: () => handleToolClick('bewerbungs-gen'),
+                      },
+                      {
+                        label: language === 'FR' ? 'Ouvre le suivi des candidatures' : language === 'IT' ? 'Apri il tracker delle candidature' : language === 'EN' ? 'Open the application tracker' : 'Öffne den Bewerbungs-Tracker',
+                        hint: language === 'FR' ? 'Toutes tes candidatures en vue, gratuit pour toujours' : language === 'IT' ? 'Tutte le candidature sotto controllo, gratis per sempre' : language === 'EN' ? 'Every application in view, free forever' : 'Alle Bewerbungen im Blick, dauerhaft gratis',
+                        action: () => navigate('tracker'),
+                      },
+                    ].map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={s.action}
+                        className="group w-full flex items-center gap-3.5 py-3 text-left cursor-pointer"
+                      >
+                        <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border border-[#004225]/25 dark:border-[#00A854]/35 text-[#004225] dark:text-[#00A854] text-[11px] font-bold group-hover:bg-[#004225] group-hover:text-white dark:group-hover:bg-[#00A854] transition-colors">
+                          {i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{s.label}</span>
+                          <span className="block text-[11px] text-[#9A9A94] font-light mt-0.5">{s.hint}</span>
+                        </span>
+                        <ArrowRight size={15} className="shrink-0 text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] group-hover:translate-x-0.5 transition-all" />
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Contact — the same help offer the public guides show, so
@@ -12070,14 +12024,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </footer>
 
-      {/* Mobile Back-to-Top Button — only after scrolling down, arrow points up */}
+      {/* Mobile Back-to-Top Button — only after scrolling down, arrow points
+          up. Small and translucent so it never hides the content below it. */}
       {showBackToTop && (
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="fixed bottom-6 left-6 z-50 md:hidden w-11 h-11 bg-[#004225] text-white flex items-center justify-center shadow-lg rounded-full"
+          className="fixed bottom-5 left-4 z-50 md:hidden w-9 h-9 bg-[#004225]/70 backdrop-blur-sm text-white flex items-center justify-center shadow-md rounded-full active:bg-[#004225]"
           aria-label="Nach oben"
         >
-          <ArrowLeft size={18} className="rotate-90" />
+          <ArrowLeft size={15} className="rotate-90" />
         </button>
       )}
 
