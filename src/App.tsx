@@ -2011,16 +2011,24 @@ function StellifyApp() {
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-  // Closing the tool overlay returns the page to the top. Without this,
-  // opening a tool from a footer link left users stranded at the very
-  // bottom of the page when they pressed the X.
+  // Closing the tool overlay returns the page to EXACTLY where it was when
+  // the tool was opened: footer browsers land back at the footer links,
+  // top-of-page users back at the top. If closing also navigated to another
+  // view (e.g. upgrade → pricing), that navigation owns the scroll instead.
   const prevActiveToolRef = useRef<any>(null);
+  const toolOpenSpotRef = useRef<{ y: number; view: string } | null>(null);
   useEffect(() => {
-    if (prevActiveToolRef.current && !activeTool) {
-      window.scrollTo({ top: 0, behavior: 'auto' });
+    if (!prevActiveToolRef.current && activeTool) {
+      toolOpenSpotRef.current = { y: window.scrollY, view: activeView };
+    } else if (prevActiveToolRef.current && !activeTool) {
+      const spot = toolOpenSpotRef.current;
+      if (spot && spot.view === activeView) {
+        window.scrollTo({ top: spot.y, behavior: 'auto' });
+      }
+      toolOpenSpotRef.current = null;
     }
     prevActiveToolRef.current = activeTool;
-  }, [activeTool]);
+  }, [activeTool, activeView]);
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   // Convincing upgrade modal: 'quota' = free tries used up, 'daily' = daily cap hit.
