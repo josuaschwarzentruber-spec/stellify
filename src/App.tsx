@@ -1764,21 +1764,27 @@ function StellifyApp() {
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber') => {
     const prev = activeView;
-    // Reading a guide should not cost the visitor their place on the page:
-    // remember where they were and return there on the way back.
-    if (view === 'ratgeber') {
-      try { sessionStorage.setItem('stellify_ratgeber_return', String(window.scrollY)); } catch { /* ignore */ }
-    }
+    // Direct round trips (A to B and back to A) return to the EXACT spot the
+    // visitor left A from — footer browsers land back at the footer, guide
+    // readers back at the teaser. Any other route scrolls fresh.
+    let returnY: number | null = null;
+    try {
+      const raw = sessionStorage.getItem('stellify_return_spot');
+      if (raw) {
+        const spot = JSON.parse(raw) as { view?: string; y?: number };
+        if (spot.view === view && typeof spot.y === 'number') returnY = spot.y;
+      }
+      sessionStorage.setItem('stellify_return_spot', JSON.stringify({ view: prev, y: window.scrollY }));
+    } catch { /* ignore */ }
     setActiveView(view);
     setActiveTool(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
-    if (view === 'pricing') {
+    if (returnY !== null) {
+      const y = returnY;
+      setTimeout(() => window.scrollTo({ top: y }), 60);
+    } else if (view === 'pricing') {
       // Wait one tick for the section to mount, then smooth-scroll
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
-    } else if (prev === 'ratgeber' && view === 'dashboard') {
-      let y = 0;
-      try { y = parseInt(sessionStorage.getItem('stellify_ratgeber_return') || '0', 10) || 0; sessionStorage.removeItem('stellify_ratgeber_return'); } catch { /* ignore */ }
-      setTimeout(() => window.scrollTo({ top: y }), 60);
     } else if (view === 'about' || view === 'datenschutz' || view === 'impressum' || view === 'agb' || view === 'ratgeber') {
       // Full-page views: jump straight to the top. Smooth-scrolling while
       // the lazy chunk was still mounting read as a glitch.
