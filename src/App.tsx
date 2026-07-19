@@ -8446,8 +8446,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </button>
 
               <button
-                onClick={() => navigate('profile')}
-                title={t.profile_nav}
+                onClick={() => {
+                  // The avatar button has its own job: it jumps straight to
+                  // the avatar picker, while the gear opens the account top.
+                  navigate('profile');
+                  setTimeout(() => document.getElementById('avatar-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 180);
+                }}
+                title={language === 'FR' ? 'Choisir ton avatar' : language === 'IT' ? 'Scegli il tuo avatar' : language === 'EN' ? 'Choose your avatar' : 'Avatar auswählen'}
                 className="shrink-0 w-8 h-8 rounded-full overflow-hidden border border-black/10 dark:border-white/10 hover:ring-2 hover:ring-[#004225]/30 dark:hover:ring-[#00A854]/40 transition-all"
               >
                 {user.avatarId ? (
@@ -9278,8 +9283,66 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">{t.profile_desc}</p>
                 </header>
 
+                {/* First steps — a calm, always-available mini guide. Lives in
+                    the account settings instead of the dashboard: no progress
+                    logic, no checkmarks, nothing that can look broken. */}
+                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">
+                    {language === 'FR' ? 'Premiers pas' : language === 'IT' ? 'Primi passi' : language === 'EN' ? 'First steps' : 'Erste Schritte'}
+                  </p>
+                  <p className="text-sm text-[#26261F] dark:text-[#C8C8C2] font-light leading-relaxed">
+                    {language === 'FR' ? 'Comment tirer le meilleur de Stellify:'
+                      : language === 'IT' ? 'Come ottenere il massimo da Stellify:'
+                      : language === 'EN' ? 'How to get the most out of Stellify:'
+                      : 'So holst du am meisten aus Stellify heraus:'}
+                  </p>
+                  <div className="divide-y divide-black/5 dark:divide-white/8">
+                    {[
+                      {
+                        label: language === 'FR' ? 'Télécharge ton CV' : language === 'IT' ? 'Carica il tuo CV' : language === 'EN' ? 'Upload your CV' : 'Lade deinen Lebenslauf hoch',
+                        hint: language === 'FR' ? "Stella l'utilise pour chaque candidature" : language === 'IT' ? 'Stella lo usa per ogni candidatura' : language === 'EN' ? 'Stella uses it for every application' : 'Stella nutzt ihn für jede Bewerbung',
+                        action: () => fileInputRef.current?.click(),
+                      },
+                      {
+                        label: language === 'FR' ? 'Ouvre le générateur de candidatures' : language === 'IT' ? 'Apri il generatore di candidature' : language === 'EN' ? 'Open the application generator' : 'Öffne den Bewerbungs-Generator',
+                        hint: language === 'FR' ? "D'une annonce à une candidature prête, en 60 secondes" : language === 'IT' ? 'Da un annuncio a una candidatura pronta, in 60 secondi' : language === 'EN' ? 'From a job ad to a ready application, in 60 seconds' : 'Aus einem Inserat eine fertige Bewerbung, in 60 Sekunden',
+                        action: () => handleToolClick('bewerbungs-gen'),
+                      },
+                      {
+                        label: language === 'FR' ? 'Ouvre le suivi des candidatures' : language === 'IT' ? 'Apri il tracker delle candidature' : language === 'EN' ? 'Open the application tracker' : 'Öffne den Bewerbungs-Tracker',
+                        hint: language === 'FR' ? 'Toutes tes candidatures en vue, gratuit pour toujours' : language === 'IT' ? 'Tutte le candidature sotto controllo, gratis per sempre' : language === 'EN' ? 'Every application in view, free forever' : 'Alle Bewerbungen im Blick, dauerhaft gratis',
+                        action: () => navigate('tracker'),
+                      },
+                    ].map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={s.action}
+                        className="group w-full flex items-center gap-3.5 py-3 text-left cursor-pointer"
+                      >
+                        <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border border-[#004225]/25 dark:border-[#00A854]/35 text-[#004225] dark:text-[#00A854] text-[11px] font-bold group-hover:bg-[#004225] group-hover:text-white dark:group-hover:bg-[#00A854] transition-colors">
+                          {i + 1}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{s.label}</span>
+                          <span className="block text-[11px] text-[#9A9A94] font-light mt-0.5">{s.hint}</span>
+                        </span>
+                        <ArrowRight size={15} className="shrink-0 text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] group-hover:translate-x-0.5 transition-all" />
+                      </button>
+                    ))}
+                  </div>
+                  {/* Replay the intro tutorial anytime — it only showed once
+                      on first login before this. */}
+                  <button
+                    onClick={() => setIsTutorialOpen(true)}
+                    className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] hover:underline"
+                  >
+                    <RefreshCw size={12} />
+                    {language === 'FR' ? 'Revoir le tutoriel' : language === 'IT' ? 'Rivedi il tutorial' : language === 'EN' ? 'Watch the tutorial again' : 'Tutorial nochmals ansehen'}
+                  </button>
+                </div>
+
                 {/* Avatar picker */}
-                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5">
+                <div id="avatar-section" className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 scroll-mt-24">
                   <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94] mb-5">{t.profile_photo}</p>
                   <div className="flex items-center gap-5 sm:gap-6 mb-6">
                     <div className="shrink-0">
@@ -9624,54 +9687,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
                 </div>
 
-                {/* First steps — a calm, always-available mini guide. Lives in
-                    the account settings instead of the dashboard: no progress
-                    logic, no checkmarks, nothing that can look broken. */}
-                <div className="p-6 sm:p-8 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 space-y-4">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#9A9A94]">
-                    {language === 'FR' ? 'Premiers pas' : language === 'IT' ? 'Primi passi' : language === 'EN' ? 'First steps' : 'Erste Schritte'}
-                  </p>
-                  <p className="text-sm text-[#26261F] dark:text-[#C8C8C2] font-light leading-relaxed">
-                    {language === 'FR' ? 'Comment tirer le meilleur de Stellify:'
-                      : language === 'IT' ? 'Come ottenere il massimo da Stellify:'
-                      : language === 'EN' ? 'How to get the most out of Stellify:'
-                      : 'So holst du am meisten aus Stellify heraus:'}
-                  </p>
-                  <div className="divide-y divide-black/5 dark:divide-white/8">
-                    {[
-                      {
-                        label: language === 'FR' ? 'Télécharge ton CV' : language === 'IT' ? 'Carica il tuo CV' : language === 'EN' ? 'Upload your CV' : 'Lade deinen Lebenslauf hoch',
-                        hint: language === 'FR' ? "Stella l'utilise pour chaque candidature" : language === 'IT' ? 'Stella lo usa per ogni candidatura' : language === 'EN' ? 'Stella uses it for every application' : 'Stella nutzt ihn für jede Bewerbung',
-                        action: () => fileInputRef.current?.click(),
-                      },
-                      {
-                        label: language === 'FR' ? 'Ouvre le générateur de candidatures' : language === 'IT' ? 'Apri il generatore di candidature' : language === 'EN' ? 'Open the application generator' : 'Öffne den Bewerbungs-Generator',
-                        hint: language === 'FR' ? "D'une annonce à une candidature prête, en 60 secondes" : language === 'IT' ? 'Da un annuncio a una candidatura pronta, in 60 secondi' : language === 'EN' ? 'From a job ad to a ready application, in 60 seconds' : 'Aus einem Inserat eine fertige Bewerbung, in 60 Sekunden',
-                        action: () => handleToolClick('bewerbungs-gen'),
-                      },
-                      {
-                        label: language === 'FR' ? 'Ouvre le suivi des candidatures' : language === 'IT' ? 'Apri il tracker delle candidature' : language === 'EN' ? 'Open the application tracker' : 'Öffne den Bewerbungs-Tracker',
-                        hint: language === 'FR' ? 'Toutes tes candidatures en vue, gratuit pour toujours' : language === 'IT' ? 'Tutte le candidature sotto controllo, gratis per sempre' : language === 'EN' ? 'Every application in view, free forever' : 'Alle Bewerbungen im Blick, dauerhaft gratis',
-                        action: () => navigate('tracker'),
-                      },
-                    ].map((s, i) => (
-                      <button
-                        key={i}
-                        onClick={s.action}
-                        className="group w-full flex items-center gap-3.5 py-3 text-left cursor-pointer"
-                      >
-                        <span className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center border border-[#004225]/25 dark:border-[#00A854]/35 text-[#004225] dark:text-[#00A854] text-[11px] font-bold group-hover:bg-[#004225] group-hover:text-white dark:group-hover:bg-[#00A854] transition-colors">
-                          {i + 1}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-sm font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug">{s.label}</span>
-                          <span className="block text-[11px] text-[#9A9A94] font-light mt-0.5">{s.hint}</span>
-                        </span>
-                        <ArrowRight size={15} className="shrink-0 text-[#9A9A94] group-hover:text-[#004225] dark:group-hover:text-[#00A854] group-hover:translate-x-0.5 transition-all" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
 
                 {/* Contact — the same help offer the public guides show, so
                     logged-in users also know how to reach us. Mail first,
