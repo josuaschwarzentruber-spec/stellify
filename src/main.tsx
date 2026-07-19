@@ -105,6 +105,17 @@ const RecoveryScreen = () => {
   );
 };
 
+// Report through the earliest-layer beacon defined in index.html, so every
+// crash path (boot failure, module error, render error) reaches the server.
+function reportBootError(error: unknown) {
+  try {
+    (window as any).__stellifyReportError?.(
+      (error as any)?.message || String(error),
+      (error as any)?.stack || '',
+    );
+  } catch { /* never throw while reporting */ }
+}
+
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean }> {
   constructor(props: { children: React.ReactNode }) {
     super(props);
@@ -113,6 +124,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   static getDerivedStateFromError() { return { hasError: true }; }
   componentDidCatch(error: unknown) {
     console.error('[STELLIFY ERROR BOUNDARY]', error);
+    reportBootError(error);
     removeSplash();
     // A crash during initial mount can also be a stale-deploy issue; one
     // automatic reload often fixes it without the user noticing.
@@ -142,6 +154,7 @@ import('./App.tsx')
   })
   .catch((err) => {
     console.error('[STELLIFY BOOT]', err);
+    reportBootError(err);
     if (isChunkLoadError(String(err?.message || '')) && reloadOnceForNewDeploy()) return;
     if (autoRecoverOnce()) return;
     removeSplash();

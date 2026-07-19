@@ -445,6 +445,42 @@
         } catch (e) { /* polyfills must never break modern browsers */ }
       })();
     </script>
+    <script>
+      /* Earliest-possible crash reporter. Lives in the HTML itself so it
+         works even when the app bundle fails to parse or load (the exact
+         case where the in-app reporter can never run). First error per
+         page load only. */
+      (function () {
+        var sent = false;
+        function report(msg, stack) {
+          if (sent) return; sent = true;
+          try {
+            var body = JSON.stringify({
+              message: String(msg || 'unknown').slice(0, 500),
+              stack: String(stack || '').slice(0, 1500),
+              url: String(location.href).slice(0, 300),
+              ua: String(navigator.userAgent).slice(0, 200)
+            });
+            if (navigator.sendBeacon) {
+              navigator.sendBeacon('/api/client-error', new Blob([body], { type: 'application/json' }));
+            } else {
+              var x = new XMLHttpRequest();
+              x.open('POST', '/api/client-error', true);
+              x.setRequestHeader('Content-Type', 'application/json');
+              x.send(body);
+            }
+          } catch (e) { /* reporting must never throw */ }
+        }
+        window.__stellifyReportError = report;
+        window.addEventListener('error', function (e) {
+          report(e.message || (e.error && e.error.message) || 'window error', e.error && e.error.stack);
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = (e && e.reason) || {};
+          report(r.message || String(r), r.stack);
+        });
+      })();
+    </script>
   </head>
   <body style="background-color:#030806;margin:0" class="stellify-splashing">
 
