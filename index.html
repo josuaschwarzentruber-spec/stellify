@@ -346,7 +346,8 @@
       #stellify-splash .ch { width:14px; height:14px; border:1px solid rgba(0,168,84,0.36); border-radius:3px; position:relative; }
       #stellify-splash .ch::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:8px; height:1.4px; background:rgba(0,168,84,0.7); }
       #stellify-splash .ch::after  { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:1.4px; height:8px; background:rgba(0,168,84,0.7); }
-      #stellify-splash .footer-txt { color:rgba(220,245,230,0.35); font-size:9px; letter-spacing:4.5px; font-weight: 500; }
+      #stellify-splash .footer-txt { color:rgba(220,245,230,0.35); font-size:9px; letter-spacing:4.5px; font-weight: 500; white-space: nowrap; line-height: 1; }
+      @media (max-width: 360px) { #stellify-splash .footer-txt { font-size: 8px; letter-spacing: 3px; } }
 
       /* Fade-out */
       #stellify-splash.stellify-removing {

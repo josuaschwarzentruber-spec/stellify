@@ -433,6 +433,32 @@ const generalLimiter = rateLimit({
 });
 app.use(generalLimiter);
 
+// Client-side crash reports — the app's error boundary posts here so we can
+// SEE what broke on a visitor's device instead of guessing from screenshots.
+// Public on purpose (crashes can hit logged-out visitors); the general rate
+// limiter above already bounds abuse, payload is capped and sanitised.
+app.post('/api/client-error', express.json({ limit: '8kb' }), async (req, res) => {
+  try {
+    const b = (req.body || {}) as Record<string, unknown>;
+    const esc = (v: unknown, n: number) => String(v ?? '').slice(0, n).replace(/</g, '&lt;');
+    const message = esc(b.message, 500);
+    const url = esc(b.url, 300);
+    const ua = esc(b.ua, 200);
+    const stack = esc(b.stack, 1500);
+    console.error('[CLIENT ERROR]', message, '| url:', url, '| ua:', ua, '| stack:', stack);
+    alertOwnerOncePerDay(
+      'client_error',
+      '🟠 Stellify: Ein Besucher hat die Fehlerseite gesehen',
+      `<p>Bei einem Besucher ist die App abgestürzt und die Fehlerseite erschien (die Seite lädt sich einmal automatisch neu, bevor sie sichtbar wird).</p>
+       <p><b>Fehler:</b> ${message || 'unbekannt'}</p>
+       <p><b>Seite:</b> ${url}</p>
+       <p><b>Browser:</b> ${ua}</p>
+       <p>Alle weiteren Fälle von heute stehen in den Vercel-Logs unter "CLIENT ERROR".</p>`
+    ).catch(() => {});
+  } catch { /* reporting must never fail loudly */ }
+  res.json({ ok: true });
+});
+
 // Firebase token verification middleware
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;

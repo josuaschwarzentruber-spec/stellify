@@ -502,7 +502,7 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { 
 class ErrorBoundary extends React.Component<any, any> {
   constructor(props: any) {
     super(props);
-    (this as any).state = { hasError: false, error: null, errorInfo: null };
+    (this as any).state = { hasError: false, error: null, errorInfo: null, recovering: false };
   }
   static getDerivedStateFromError(error: any) { return { hasError: true, error }; }
   componentDidCatch(error: any, errorInfo: any) {
@@ -520,13 +520,40 @@ class ErrorBoundary extends React.Component<any, any> {
       });
       localStorage.setItem(key, payload);
     } catch { /* swallow logging errors */ }
+    // Tell the server what broke on the visitor's device — without this we
+    // only ever see screenshots, never the actual error.
+    try {
+      fetch('/api/client-error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: String(error?.message || error).slice(0, 500),
+          stack: String(error?.stack || '').slice(0, 1500),
+          url: window.location.href.slice(0, 300),
+          ua: navigator.userAgent.slice(0, 200),
+        }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch { /* never let reporting throw */ }
+    // Self-heal FIRST: one silent reload per session fixes the usual causes
+    // (stale deploy, interrupted chunk, flaky mobile network) before any
+    // visitor ever sees the error screen.
+    try {
+      if (sessionStorage.getItem('stellify_eb_recover') !== '1') {
+        sessionStorage.setItem('stellify_eb_recover', '1');
+        (this as any).setState({ recovering: true });
+        window.location.reload();
+        return;
+      }
+    } catch { /* fall through to the error screen */ }
     (this as any).setState({ errorInfo });
   }
   render() {
+    if ((this as any).state.recovering) return null;
     if ((this as any).state.hasError) {
       const lang = (() => { try { return localStorage.getItem('language') || 'DE'; } catch { return 'DE'; } })();
       const title = lang === 'FR' ? 'Une erreur inattendue s\'est produite.' : lang === 'IT' ? 'Si è verificato un errore imprevisto.' : lang === 'EN' ? 'An unexpected error has occurred.' : 'Ein unerwarteter Fehler ist aufgetreten.';
-      const desc = lang === 'FR' ? 'Wir arbeiten daran. Versuche es bitte erneut oder gehe zurück zur Startseite.' : lang === 'IT' ? 'Ci scusiamo. Riprova o torna alla pagina iniziale.' : lang === 'EN' ? 'We apologise. Please try again or go back to the homepage.' : 'Bitte entschuldige. Versuche es erneut oder gehe zurück zur Startseite.';
+      const desc = lang === 'FR' ? 'Toutes nos excuses. Réessaie ou retourne à la page d\'accueil.' : lang === 'IT' ? 'Ci scusiamo. Riprova o torna alla pagina iniziale.' : lang === 'EN' ? 'We apologise. Please try again or go back to the homepage.' : 'Bitte entschuldige. Versuche es erneut oder gehe zurück zur Startseite.';
       const btn = lang === 'FR' ? 'Recharger la page' : lang === 'IT' ? 'Ricarica la pagina' : lang === 'EN' ? 'Reload page' : 'Seite neu laden';
       const home = lang === 'FR' ? 'Accueil' : lang === 'IT' ? 'Home' : lang === 'EN' ? 'Home' : 'Startseite';
       const supportLabel = lang === 'FR' ? 'Contacter le support' : lang === 'IT' ? 'Contatta il supporto' : lang === 'EN' ? 'Contact support' : 'Support kontaktieren';
