@@ -459,6 +459,24 @@ app.post('/api/client-error', express.json({ limit: '8kb' }), async (req, res) =
   res.json({ ok: true });
 });
 
+// Self-test for the crash-alert pipeline: open this URL in a browser and a
+// test mail goes to the owner (its own once-per-day key, so it works even if
+// a real crash alert already fired today). Harmless if strangers call it:
+// worst case is one test mail per day to ourselves.
+app.get('/api/client-error/test', async (_req, res) => {
+  try {
+    await alertOwnerOncePerDay(
+      'client_error_test',
+      '🟢 Stellify: Test der Fehler-Meldekette',
+      `<p>Dieser Test wurde über /api/client-error/test ausgelöst.</p>
+       <p>Wenn du diese Mail liest, funktioniert die Meldekette. Echte Abstürze von Besuchern kommen mit dem Betreff <b>"Ein Besucher hat die Fehlerseite gesehen"</b> (maximal eine Mail pro Tag, weitere Fälle stehen in den Vercel-Logs unter "CLIENT ERROR").</p>`
+    );
+    res.json({ ok: true, info: 'Testmail angefordert. Prüfe support.stellify@gmail.com, auch den Spam-Ordner. Pro Tag wird höchstens eine Testmail verschickt.' });
+  } catch (e: any) {
+    res.json({ ok: false, error: String(e?.message || e) });
+  }
+});
+
 // Firebase token verification middleware
 const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   const header = req.headers.authorization;
