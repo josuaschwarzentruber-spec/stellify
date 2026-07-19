@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 /**
@@ -291,8 +291,16 @@ const CONTENT: Record<string, Article[]> = {
   ],
 };
 
-const GuidePages = ({ onBack, onOpenTool, language }: { onBack: () => void; onOpenTool: () => void; language: string }) => {
+const GuidePages = ({ onBack, onOpenTool, language, slug, onOpenArticle, onBackToList }: { onBack: () => void; onOpenTool: () => void; language: string; slug?: string | null; onOpenArticle?: (slug: string) => void; onBackToList?: () => void }) => {
   const articles = CONTENT[language] || CONTENT.DE;
+  // Single-article mode: every guide has its own URL (/ratgeber/<slug>) so
+  // search engines can list each one as a separate result.
+  const active = slug ? articles.find((a) => a.id === slug) || null : null;
+  const shown = active ? [active] : articles;
+
+  useEffect(() => {
+    if (active) document.title = `Stellify - ${active.title}`;
+  }, [active]);
 
   return (
     <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
@@ -303,12 +311,15 @@ const GuidePages = ({ onBack, onOpenTool, language }: { onBack: () => void; onOp
       `}</style>
       <div className="max-w-3xl mx-auto stellify-page-in">
         <button
-          onClick={onBack}
+          onClick={active && onBackToList ? onBackToList : onBack}
           className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors mb-12"
         >
-          <ArrowLeft size={14} /> {language === 'FR' ? 'Retour' : language === 'IT' ? 'Indietro' : language === 'EN' ? 'Back' : 'Zurück'}
+          <ArrowLeft size={14} /> {active
+            ? (language === 'FR' ? 'Tous les guides' : language === 'IT' ? 'Tutte le guide' : language === 'EN' ? 'All guides' : 'Alle Ratgeber')
+            : (language === 'FR' ? 'Retour' : language === 'IT' ? 'Indietro' : language === 'EN' ? 'Back' : 'Zurück')}
         </button>
 
+        {!active && (
         <header className="mb-14">
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-[#004225] dark:text-[#00A854] mb-4">
             {language === 'FR' ? 'Guides' : language === 'IT' ? 'Guide' : language === 'EN' ? 'Guides' : 'Ratgeber'}
@@ -323,18 +334,31 @@ const GuidePages = ({ onBack, onOpenTool, language }: { onBack: () => void; onOp
               : 'Praktische Leitfäden für den Schweizer Arbeitsmarkt, damit deine nächste Bewerbung sitzt.'}
           </p>
         </header>
+        )}
 
-        {/* Table of contents — internal links help both readers and Google. */}
-        <nav className="mb-14 border-l-2 border-[#004225]/20 dark:border-[#00A854]/30 pl-5 space-y-2">
-          {articles.map((a) => (
-            <a key={a.id} href={`#${a.id}`} className="block text-sm text-[#4A4A45] dark:text-[#9A9A94] hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-light">
-              {a.title}
-            </a>
-          ))}
-        </nav>
+        {/* Overview: one card per guide, each opening its own page/URL. */}
+        {!active && onOpenArticle && (
+          <div className="mb-14 grid gap-4">
+            {articles.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => onOpenArticle(a.id)}
+                className="group text-left p-6 bg-white dark:bg-[#22221F] border border-black/5 dark:border-white/5 rounded-2xl hover:border-[#004225]/30 dark:hover:border-[#00A854]/40 hover:shadow-md transition-all"
+              >
+                <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854] mb-2">{a.kicker}</p>
+                <h2 className="text-xl md:text-2xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-2 leading-tight">{a.title}</h2>
+                <p className="text-[14px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed mb-3">{a.lede}</p>
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#004225] dark:text-[#00A854] group-hover:underline">
+                  {language === 'FR' ? 'Lire' : language === 'IT' ? 'Leggi' : language === 'EN' ? 'Read' : 'Lesen'}
+                  <ArrowRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="space-y-16">
-          {articles.map((a) => (
+          {(onOpenArticle ? (active ? shown : []) : articles).map((a) => (
             <article key={a.id} id={a.id} className="scroll-mt-24">
               <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#004225] dark:text-[#00A854] mb-3">{a.kicker}</p>
               <h2 className="text-2xl md:text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-tight">{a.title}</h2>
@@ -368,6 +392,27 @@ const GuidePages = ({ onBack, onOpenTool, language }: { onBack: () => void; onOp
             </article>
           ))}
         </div>
+
+        {/* On an article page: cross-links to the other guides keep readers
+            (and crawlers) moving through the whole set. */}
+        {active && onOpenArticle && (
+          <nav className="mt-14 pt-8 border-t border-black/8 dark:border-white/8">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#9A9A94] mb-4">
+              {language === 'FR' ? 'Autres guides' : language === 'IT' ? 'Altre guide' : language === 'EN' ? 'More guides' : 'Weitere Ratgeber'}
+            </p>
+            <div className="space-y-2">
+              {articles.filter((a) => a.id !== active.id).map((a) => (
+                <button
+                  key={a.id}
+                  onClick={() => onOpenArticle(a.id)}
+                  className="block text-left text-[15px] text-[#26261F] dark:text-[#C8C8C2] font-light hover:text-[#004225] dark:hover:text-[#00A854] hover:underline transition-colors"
+                >
+                  {a.title}
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
 
         {/* Questions & contact — mail first, Instagram second */}
         <div className="mt-12 p-6 bg-white dark:bg-[#22221F] border border-black/5 dark:border-white/5 rounded-2xl">

@@ -1704,6 +1704,8 @@ function StellifyApp() {
   const [showPassword, setShowPassword] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [activeView, setActiveView] = useState<'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber'>('dashboard');
+  // Open guide article (/ratgeber/<slug>); null shows the guide overview.
+  const [guideSlug, setGuideSlug] = useState<string | null>(null);
   const [generatedApp, setGeneratedApp] = useState<string | null>(null);
   const [isGeneratingApp, setIsGeneratingApp] = useState(false);
   const [language, setLanguage] = useState<'DE' | 'FR' | 'IT' | 'EN'>(() => {
@@ -1805,6 +1807,7 @@ function StellifyApp() {
     } catch { /* ignore */ }
     setActiveView(view);
     setActiveTool(null);
+    setGuideSlug(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
     if (returnY !== null) {
       const y = returnY;
@@ -1819,6 +1822,16 @@ function StellifyApp() {
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  // Open a single guide article under its own URL (/ratgeber/<slug>) —
+  // one indexable page per guide.
+  const openGuide = (slug: string) => {
+    setActiveView('ratgeber');
+    setActiveTool(null);
+    setGuideSlug(slug);
+    window.history.pushState({ view: 'ratgeber', guideSlug: slug }, '', `/ratgeber/${slug}`);
+    window.scrollTo(0, 0);
   };
 
   // Preload the legal/about chunk once the app is idle so the first click
@@ -1837,7 +1850,13 @@ function StellifyApp() {
       if (!slug) return 'dashboard';
       // Backwards-compat: /ueber-uns still routes to about
       if (slug === 'ueber-uns') return 'about';
+      // Guide articles live under /ratgeber/<slug>
+      if (slug.startsWith('ratgeber/')) return 'ratgeber';
       return (validViews as string[]).includes(slug) ? (slug as RouteView) : null;
+    };
+    const guideSlugFromPath = (path: string): string | null => {
+      const slug = path.replace(/^\/+/, '').replace(/\/+$/, '');
+      return slug.startsWith('ratgeber/') ? decodeURIComponent(slug.slice('ratgeber/'.length)) : null;
     };
 
     const onPop = (e: PopStateEvent) => {
@@ -1845,6 +1864,7 @@ function StellifyApp() {
       if (view) {
         setActiveView(view);
         setActiveTool(null);
+        setGuideSlug((e.state?.guideSlug as string | undefined) ?? guideSlugFromPath(window.location.pathname));
         // The browser back button honours the same return spot as in-app
         // navigation: landing back on the view you left restores the exact
         // scroll position (e.g. the footer you clicked Preise from).
@@ -1881,8 +1901,14 @@ function StellifyApp() {
       if (initial && initial !== activeView) {
         setActiveView(initial);
       }
+      const initialGuide = guideSlugFromPath(window.location.pathname);
+      if (initialGuide) setGuideSlug(initialGuide);
       const target = initial ?? activeView;
-      window.history.replaceState({ view: target }, '', target === 'dashboard' ? '/' : `/${target}`);
+      window.history.replaceState(
+        { view: target, guideSlug: initialGuide || undefined },
+        '',
+        initialGuide ? `/ratgeber/${initialGuide}` : (target === 'dashboard' ? '/' : `/${target}`),
+      );
     }
     return () => window.removeEventListener('popstate', onPop);
   }, []);
@@ -8640,6 +8666,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             onBack={() => navigate('dashboard')}
             onOpenTool={() => { if (user) { const tl = tools.find((x: any) => x.id === 'bewerbungs-gen'); if (tl) setActiveTool(tl); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }}
             language={language}
+            slug={guideSlug}
+            onOpenArticle={openGuide}
+            onBackToList={() => navigate('ratgeber')}
           />
         </Suspense>
       )}
@@ -11771,7 +11800,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ]).map((g, i) => (
               <button
                 key={i}
-                onClick={() => navigate('ratgeber')}
+                onClick={() => openGuide(['bewerbung-schreiben-schweiz', 'lebenslauf-schweizer-standard', 'motivationsschreiben', 'lohn-verhandeln-schweiz'][i])}
                 className="group text-left p-6 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 hover:border-[#004225]/25 dark:hover:border-[#00A854]/40 hover:shadow-lg transition-all flex flex-col gap-4"
               >
                 <span className="w-10 h-10 bg-[#004225]/8 dark:bg-[#00A854]/12 text-[#004225] dark:text-[#00A854] flex items-center justify-center group-hover:bg-[#004225] group-hover:text-white transition-all">
