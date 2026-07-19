@@ -390,6 +390,61 @@
         #stellify-splash .shoot { display: none; }
       }
     </style>
+    <script>
+      /* Polyfills for older Safari (iOS <15.4 lacks Object.hasOwn,
+         structuredClone, crypto.randomUUID, Array findLast). The bundle
+         uses them via dependencies; without these shims the app crashes
+         deterministically at boot on those devices and visitors only ever
+         see the error screen. Runs BEFORE any module script. */
+      (function () {
+        try {
+          if (!Object.hasOwn) {
+            Object.defineProperty(Object, 'hasOwn', {
+              value: function (o, k) { return Object.prototype.hasOwnProperty.call(Object(o), k); },
+              writable: true, configurable: true
+            });
+          }
+          if (typeof structuredClone === 'undefined') {
+            window.structuredClone = function (v) { return v === undefined ? v : JSON.parse(JSON.stringify(v)); };
+          }
+          if (window.crypto && !window.crypto.randomUUID) {
+            window.crypto.randomUUID = function () {
+              var b = new Uint8Array(16); window.crypto.getRandomValues(b);
+              b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+              var h = Array.prototype.map.call(b, function (x) { return ('0' + x.toString(16)).slice(-2); }).join('');
+              return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+            };
+          }
+          if (!Array.prototype.findLast) {
+            Object.defineProperty(Array.prototype, 'findLast', {
+              value: function (fn, thisArg) { for (var i = this.length - 1; i >= 0; i--) { if (fn.call(thisArg, this[i], i, this)) return this[i]; } return undefined; },
+              writable: true, configurable: true
+            });
+          }
+          if (!Array.prototype.findLastIndex) {
+            Object.defineProperty(Array.prototype, 'findLastIndex', {
+              value: function (fn, thisArg) { for (var i = this.length - 1; i >= 0; i--) { if (fn.call(thisArg, this[i], i, this)) return i; } return -1; },
+              writable: true, configurable: true
+            });
+          }
+          if (!Array.prototype.at) {
+            Object.defineProperty(Array.prototype, 'at', {
+              value: function (n) { n = Math.trunc(n) || 0; if (n < 0) n += this.length; if (n < 0 || n >= this.length) return undefined; return this[n]; },
+              writable: true, configurable: true
+            });
+          }
+          if (!String.prototype.replaceAll) {
+            Object.defineProperty(String.prototype, 'replaceAll', {
+              value: function (s, r) {
+                if (s && typeof s === 'object' && s.global) return this.replace(s, r);
+                return this.split(String(s)).join(typeof r === 'function' ? r(String(s)) : String(r));
+              },
+              writable: true, configurable: true
+            });
+          }
+        } catch (e) { /* polyfills must never break modern browsers */ }
+      })();
+    </script>
   </head>
   <body style="background-color:#030806;margin:0" class="stellify-splashing">
 
