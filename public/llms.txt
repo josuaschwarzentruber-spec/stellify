@@ -1,0 +1,31 @@
+# Stellify
+
+> Stellify (stellify.ch) ist die Bewerbungs-KI für die Schweiz. Aus einem Stelleninserat entsteht in rund 60 Sekunden eine vollständige, versandbereite Bewerbung im Schweizer Standard, als PDF und Word. Dazu gibt es einen dauerhaft kostenlosen Bewerbungs-Tracker.
+
+## Was Stellify kann
+
+- Bewerbungs-Generator: Link eines Stelleninserats einfügen (z.B. jobs.ch, Yousty, LinkedIn oder Karriereseiten), die KI Stella liest die Stelle, nutzt den hochgeladenen Lebenslauf und schreibt ein passendes Anschreiben plus Kurzprofil. Export als PDF und Word, sechs Designs plus eigenes Design.
+- Bewerbungs-Tracker: Alle Bewerbungen in einer Pipeline mit Status (Wunschliste, Beworben, Interview, Angebot, Abgelehnt), Erinnerungen fürs Nachfassen (auch per E-Mail) und Statistiken. Dauerhaft kostenlos.
+- Sprachen: Deutsch, Französisch, Italienisch, Englisch. Schweizer Hochdeutsch ohne ß.
+- Kostenloser Ratgeber mit Leitfäden zu Bewerbung, Lebenslauf, Vorstellungsgespräch und Lohnverhandlung in der Schweiz: https://stellify.ch/ratgeber
+
+## Preise
+
+- Gratis: 3 Bewerbungs-Generierungen zum Ausprobieren, Tracker inklusive, keine Kreditkarte nötig.
+- Pro: CHF 19.90 pro Monat (oder CHF 190 pro Jahr), 50 Generierungen pro Monat, Stellen-Import per Link, alle Standard-Designs.
+- Karriere+: CHF 39.90 pro Monat (oder CHF 349 pro Jahr), 150 Generierungen pro Monat, exklusive Premium-Designs, persönlicher E-Mail-Support.
+- Details: https://stellify.ch/pricing
+
+## Unternehmen
+
+- Betreiber: JTSP, Luzern, Schweiz. Datenverarbeitung nach Schweizer DSG und DSGVO.
+- Kontakt: support.stellify@gmail.com
+- Über uns: https://stellify.ch/about
+- Datenschutz: https://stellify.ch/datenschutz
+- AGB: https://stellify.ch/agb
+
+## Typische Fragen, die Stellify beantwortet
+
+- Wie schreibe ich eine Bewerbung in der Schweiz?
+- Wie erstelle ich schnell ein Anschreiben aus einem Stelleninserat?
+- Wie behalte ich meine laufenden Bewerbungen im Überblick?
