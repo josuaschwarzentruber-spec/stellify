@@ -609,7 +609,7 @@ class ErrorBoundary extends React.Component<any, any> {
 function isInAppBrowser(): boolean {
   try {
     const ua = navigator.userAgent || '';
-    return /FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|Snapchat|Line\/|MicroMessenger|GSA\/|; wv\)/i.test(ua);
+    return /FBAN|FBAV|FB_IAB|Instagram|TikTok|musical_ly|Snapchat|Line\/|MicroMessenger|GSA\/|LinkedInApp|; wv\)/i.test(ua);
   } catch { return false; }
 }
 
@@ -14161,10 +14161,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       <div className="flex items-start gap-2.5 p-3 bg-[#004225]/6 dark:bg-[#00A854]/10 border border-[#004225]/20 dark:border-[#00A854]/25">
                         <Info size={14} className="shrink-0 mt-0.5 text-[#004225] dark:text-[#00A854]" />
                         <p className="text-[11px] text-[#4A4A45] dark:text-[#B5B5AF] font-light leading-relaxed">
-                          {language === 'FR' ? "Cette page s'est ouverte dans le mini-navigateur d'une app (par exemple Instagram ou l'app Google). Google n'y autorise pas sa connexion, sur aucun site. Deux solutions simples: ouvre stellify.ch dans un vrai navigateur (Safari, Chrome, Edge, Firefox), où le bouton Google fonctionne normalement, ou inscris-toi ici directement par e-mail, ça marche parfaitement, même ici."
-                            : language === 'IT' ? "Questa pagina si è aperta nel mini-browser di un'app (per esempio Instagram o l'app Google). Google non permette lì il suo accesso, su nessun sito. Due soluzioni semplici: apri stellify.ch in un vero browser (Safari, Chrome, Edge, Firefox), dove il pulsante Google funziona normalmente, oppure registrati qui direttamente via e-mail, funziona perfettamente anche qui."
-                            : language === 'EN' ? 'This page opened inside the mini browser of an app (for example Instagram or the Google app). Google does not allow its sign-in there, on any website. Two easy fixes: open stellify.ch in a real browser (Safari, Chrome, Edge, Firefox), where the Google button works normally, or sign up right here with your email, which works perfectly even here.'
-                            : 'Diese Seite wurde im Mini-Browser einer App geöffnet (zum Beispiel Instagram oder der Google-App). Google erlaubt seine Anmeldung dort nicht, auf keiner Webseite. Zwei einfache Lösungen: Öffne stellify.ch in einem richtigen Browser (Safari, Chrome, Edge, Firefox), dort funktioniert der Google-Knopf normal. Oder registriere dich gleich hier per E-Mail, das klappt auch hier einwandfrei.'}
+                          {language === 'FR' ? "Tu es dans le mini-navigateur d'une app (Instagram, LinkedIn ou l'app Google par exemple). Google y bloque sa connexion par sécurité, sur tous les sites. Le plus simple: inscris-toi ici par e-mail, ça marche parfaitement. Ou ouvre stellify.ch dans Safari, Chrome ou Edge, où le bouton Google fonctionne."
+                            : language === 'IT' ? "Sei nel mini-browser di un'app (per esempio Instagram, LinkedIn o l'app Google). Google vi blocca il suo accesso per sicurezza, su tutti i siti. La via più semplice: registrati qui via e-mail, funziona perfettamente. Oppure apri stellify.ch in Safari, Chrome o Edge, dove il pulsante Google funziona."
+                            : language === 'EN' ? 'You are in the mini browser of an app (for example Instagram, LinkedIn or the Google app). For security, Google blocks its sign-in there on every website. Easiest fix: sign up right here with your email, it works perfectly. Or open stellify.ch in Safari, Chrome or Edge, where the Google button works.'
+                            : 'Du bist im Mini-Browser einer App (zum Beispiel Instagram, LinkedIn oder der Google-App). Google blockiert seine Anmeldung dort aus Sicherheitsgründen, auf jeder Webseite. Am einfachsten: Registriere dich gleich hier per E-Mail, das klappt einwandfrei. Oder öffne stellify.ch in Safari, Chrome oder Edge, dort funktioniert auch der Google-Knopf.'}
                         </p>
                       </div>
                     )}
