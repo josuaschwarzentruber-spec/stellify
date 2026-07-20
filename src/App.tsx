@@ -2010,6 +2010,21 @@ function StellifyApp() {
     document.title = page ? `Stellify - ${page}` : `Stellify - ${tagline}`;
   }, [activeView, activeTool, language]);
 
+  // Canonical + og:url follow the current page. The static tags in
+  // index.html point at the homepage, which told Google that /pricing and
+  // every guide article were mere duplicates of / — with this, each page
+  // declares its own address and becomes indexable in its own right.
+  useEffect(() => {
+    const path = guideSlug
+      ? `/ratgeber/${guideSlug}`
+      : (activeView === 'dashboard' ? '/' : `/${activeView}`);
+    const url = `https://stellify.ch${path}`;
+    try {
+      document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+      document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+    } catch { /* metadata updates must never break the app */ }
+  }, [activeView, guideSlug]);
+
   const [toolInput, setToolInput] = useState<any>({});
   const [toolResult, setToolResult] = useState<string | null>(null);
   const [toolResultEditable, setToolResultEditable] = useState<string>('');
