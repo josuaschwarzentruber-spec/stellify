@@ -8906,7 +8906,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <div className="mb-6">{renderPipelineFunnel(true)}</div>
 
                 {user?.email === 'support.stellify@gmail.com' && (
-                  <div className="p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
+                  <div className="mb-10 p-6 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 border border-[#004225]/20 dark:border-[#FAFAF8]/20 space-y-4 transition-colors">
                     <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#FAFAF8]">
                       <Shield size={12} />
                       Admin Tools
