@@ -13863,10 +13863,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       <AnimatePresence>
         {isAuthModalOpen && (
           <motion.div
-            initial={{ opacity: 0 }}
+            /* No opacity fade-in: a translucent full-page overlay let the
+               landing shine through mid-animation (ghosted double image).
+               The page appears solid instantly; only the card animates. */
+            initial={false}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
             className="fixed inset-0 z-[200] overflow-y-auto custom-scrollbar bg-[#FDFCFB] dark:bg-[#1A1A18]"
             role="dialog"
             aria-modal="true"
