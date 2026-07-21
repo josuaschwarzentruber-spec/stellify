@@ -8,6 +8,13 @@
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     },
+    { "source": "/pricing", "destination": "/pricing.html" },
+    { "source": "/about", "destination": "/about.html" },
+    { "source": "/ratgeber", "destination": "/ratgeber.html" },
+    { "source": "/ratgeber/bewerbung-schreiben-schweiz", "destination": "/ratgeber/bewerbung-schreiben-schweiz.html" },
+    { "source": "/ratgeber/lebenslauf-schweizer-standard", "destination": "/ratgeber/lebenslauf-schweizer-standard.html" },
+    { "source": "/ratgeber/motivationsschreiben", "destination": "/ratgeber/motivationsschreiben.html" },
+    { "source": "/ratgeber/lohn-verhandeln-schweiz", "destination": "/ratgeber/lohn-verhandeln-schweiz.html" },
     {
       "source": "/((?!.*\\.).*)",
       "destination": "/index.html"
