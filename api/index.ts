@@ -1486,33 +1486,53 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   } catch { /* if the guard itself fails, fall through — don't block the user */ }
 
   try {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 12_000);
-    let html = '';
-    try {
-      const r = await fetch(parsed.toString(), {
-        signal: ctrl.signal,
-        redirect: 'follow',
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
-          'Accept': 'text/html,application/xhtml+xml',
-          'Accept-Language': 'de-CH,de;q=0.9,en;q=0.8',
-        },
-      });
-      if (!r.ok) {
-        clearTimeout(timer);
-        return res.status(422).json({
-          error: isLinkedIn ? linkedInHint : `Seite nicht erreichbar (${r.status})`,
-          needsManual: true,
-        });
-      }
-      html = await r.text();
-    } finally { clearTimeout(timer); }
+    let text = '';
 
-    const text = htmlToText(html).slice(0, 7000);
+    // 1) Direct fetch with browser-like headers. Works for Yousty, many company
+    //    career pages and some portals.
+    try {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 12_000);
+      try {
+        const r = await fetch(parsed.toString(), {
+          signal: ctrl.signal,
+          redirect: 'follow',
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'de-CH,de;q=0.9,en;q=0.8',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Upgrade-Insecure-Requests': '1',
+          },
+        });
+        if (r.ok) text = htmlToText(await r.text()).slice(0, 7000);
+      } finally { clearTimeout(timer); }
+    } catch { /* blocked or timed out — fall through to the reader */ }
+
+    // 2) Fallback: a reader proxy that renders the page and returns clean text.
+    //    This gets past many portals (e.g. jobs.ch) that answer a plain server
+    //    fetch with 403. LinkedIn's login wall usually defeats it too, so its
+    //    tailored hint still applies. The URL is a public job posting, so
+    //    sending it on is fine.
+    if (text.length < 120) {
+      try {
+        const ctrl2 = new AbortController();
+        const timer2 = setTimeout(() => ctrl2.abort(), 15_000);
+        try {
+          const rr = await fetch('https://r.jina.ai/' + parsed.toString(), {
+            signal: ctrl2.signal,
+            headers: { 'Accept': 'text/plain', 'X-Return-Format': 'text' },
+          });
+          if (rr.ok) text = (await rr.text()).slice(0, 7000);
+        } finally { clearTimeout(timer2); }
+      } catch { /* reader failed too — fall through to the manual hint */ }
+    }
+
     if (text.length < 120) {
       return res.status(422).json({
-        error: isLinkedIn ? linkedInHint : 'Konnte den Stelleninhalt nicht lesen. Bitte Text manuell einfügen.',
+        error: isLinkedIn ? linkedInHint : 'Diese Seite liess sich nicht automatisch lesen (die Jobseite blockiert das). Öffne die Anzeige, kopiere den Text und füge ihn unten bei den Anforderungen ein, oder nutze einen Yousty- oder jobs.ch-Link.',
         needsManual: true,
       });
     }
