@@ -10498,8 +10498,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
               {/* Document body */}
               <div className="px-7 py-6">
-                <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{previewIdentity.name}</p>
-                <p className="text-[10px] text-[#9A9A94] mt-0.5">Bahnhofstrasse 12 · 8001 Zürich · {previewIdentity.emailMask}</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-[68px] rounded-sm overflow-hidden shrink-0 border border-black/10 dark:border-white/15 flex items-end justify-center" style={{ backgroundColor: '#DCE9E2' }}>
+                    <PresetAvatar id={previewAvatarId} className="w-[130%] h-auto -mb-[15%]" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-serif text-lg text-[#1A1A18] dark:text-[#FAFAF8] leading-tight">{previewIdentity.name}</p>
+                    <p className="text-[10px] text-[#004225] dark:text-[#6FCF97] font-semibold mt-0.5">Marketing Manager</p>
+                    <p className="text-[10px] text-[#9A9A94] mt-0.5 truncate">Bahnhofstrasse 12 · 8001 Zürich · {previewIdentity.emailMask}</p>
+                  </div>
+                </div>
 
                 <div className="my-5 h-px bg-black/8 dark:bg-white/8" />
 
@@ -10525,6 +10533,15 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       : language === 'EN'
                       ? 'I am applying with great interest for the Marketing Manager position at UBS. Over the past three years I have led the brand strategy of a Swiss financial services provider and measurably strengthened client loyalty.'
                       : 'mit grossem Interesse bewerbe ich mich als Marketing Manager bei der UBS. In den letzten drei Jahren habe ich die Markenstrategie eines Schweizer Finanzdienstleisters geführt und die Kundenbindung messbar gestärkt.'}
+                  </p>
+                  <p>
+                    {language === 'FR'
+                      ? 'Mon point fort est d\'allier une réflexion analytique à une gestion de marque créative. Grâce à mon trilinguisme (allemand, français, anglais) et à mon expérience des campagnes DACH, je corresponds précisément à vos exigences.'
+                      : language === 'IT'
+                      ? 'Il mio punto di forza è unire pensiero analitico e gestione creativa del marchio. Grazie al mio trilinguismo (tedesco, francese, inglese) e all\'esperienza in campagne DACH, corrispondo esattamente ai vostri requisiti.'
+                      : language === 'EN'
+                      ? 'My strength lies in combining analytical thinking with creative brand management. With my trilingual fluency (German, French, English) and DACH campaign experience, I match your requirements precisely.'
+                      : 'Meine Stärke liegt in der Verbindung von analytischem Denken und kreativer Markenführung. Mit meiner Dreisprachigkeit (Deutsch, Französisch, Englisch) und meiner Erfahrung mit DACH-Kampagnen passe ich genau zu Ihren Anforderungen.'}
                   </p>
                   <p>
                     {language === 'FR'
