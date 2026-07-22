@@ -99,7 +99,7 @@ const STR: Record<string, Record<string, string>> = {
     motivation_placeholder: 'Dein Bewerbungstext erscheint hier. Fülle das Formular aus, dein Motivations-Text bildet den Kern des Anschreibens. Im nächsten Schritt verfeinert die KI daraus ein vollständiges, professionelles Anschreiben.',
     profile_title: 'Profil', skills_title: 'Fähigkeiten', exp_title: 'Erfahrung', edu_title: 'Ausbildung',
     locked_title: 'Pro-Tool', locked_text: 'Der Bewerbungs-Generator ist Teil des Pro-Plans.', locked_cta: 'Pläne ansehen',
-    required_hint: 'Vorname, Nachname, Zielfirma und Stelle ausfüllen, um fortzufahren.',
+    required_hint: 'Vorname, Nachname, Zielfirma und Stelle ausfüllen, um fortzufahren.', required_missing_prefix: 'Bitte noch ausfüllen:',
     generate: 'Mit KI generieren', regenerate: 'Neu generieren', generating: 'KI schreibt deine Bewerbung…',
     empty_preview_hint: 'Fast geschafft. Klicke jetzt auf "Mit KI generieren", dann schreibt die KI in wenigen Sekunden deine vollständige Bewerbung mit Kurzprofil, passenden Skills und Interview-Vorbereitung.',
     gen_error: 'Generierung fehlgeschlagen. Bitte versuche es erneut.',
@@ -149,7 +149,7 @@ const STR: Record<string, Record<string, string>> = {
     motivation_placeholder: 'Ton texte de candidature apparaîtra ici. Remplis le formulaire, ton texte de motivation forme le cœur de la lettre. À l\'étape suivante, l\'IA en fera une lettre complète et professionnelle.',
     profile_title: 'Profil', skills_title: 'Compétences', exp_title: 'Expérience', edu_title: 'Formation',
     locked_title: 'Outil Pro', locked_text: 'Le générateur de candidature fait partie du plan Pro.', locked_cta: 'Voir les plans',
-    required_hint: 'Remplis prénom, nom, entreprise et poste pour continuer.',
+    required_hint: 'Remplis prénom, nom, entreprise et poste pour continuer.', required_missing_prefix: 'À compléter encore :',
     generate: 'Générer avec l\'IA', regenerate: 'Régénérer', generating: 'L\'IA rédige ta candidature…',
     empty_preview_hint: 'Presque fini. Clique sur "Générer avec l\'IA" et l\'IA rédige en quelques secondes ta candidature complète, avec profil court, compétences et préparation à l\'entretien.',
     gen_error: 'Échec de la génération. Réessaie.',
@@ -199,7 +199,7 @@ const STR: Record<string, Record<string, string>> = {
     motivation_placeholder: 'Il tuo testo di candidatura apparirà qui. Compila il modulo: il testo di motivazione è il cuore della lettera. Al prossimo passo l\'IA lo trasformerà in una lettera completa e professionale.',
     profile_title: 'Profilo', skills_title: 'Competenze', exp_title: 'Esperienza', edu_title: 'Formazione',
     locked_title: 'Strumento Pro', locked_text: 'Il generatore di candidature fa parte del piano Pro.', locked_cta: 'Vedi i piani',
-    required_hint: 'Compila nome, cognome, azienda e posizione per continuare.',
+    required_hint: 'Compila nome, cognome, azienda e posizione per continuare.', required_missing_prefix: 'Da completare ancora:',
     generate: 'Genera con l\'IA', regenerate: 'Rigenera', generating: 'L\'IA scrive la tua candidatura…',
     empty_preview_hint: 'Quasi fatto. Clicca su "Genera con l\'IA" e l\'IA scrive in pochi secondi la tua candidatura completa, con profilo breve, competenze e preparazione al colloquio.',
     gen_error: 'Generazione non riuscita. Riprova.',
@@ -249,7 +249,7 @@ const STR: Record<string, Record<string, string>> = {
     motivation_placeholder: 'Your application text will appear here. Fill in the form. your motivation text forms the core of the letter. In the next step, the AI turns it into a complete, professional cover letter.',
     profile_title: 'Profile', skills_title: 'Skills', exp_title: 'Experience', edu_title: 'Education',
     locked_title: 'Pro Tool', locked_text: 'The application generator is part of the Pro plan.', locked_cta: 'See plans',
-    required_hint: 'Fill in first name, last name, company and position to continue.',
+    required_hint: 'Fill in first name, last name, company and position to continue.', required_missing_prefix: 'Please still fill in:',
     generate: 'Generate with AI', regenerate: 'Regenerate', generating: 'The AI is writing your application…',
     empty_preview_hint: 'Almost there. Click "Generate with AI" and in a few seconds the AI writes your full application, with a short profile, matching skills and interview preparation.',
     gen_error: 'Generation failed. Please try again.',
@@ -686,6 +686,39 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
     } catch { resolve(''); }
   });
 
+  // A ready-made sample result so the example shows a COMPLETE application
+  // instantly, with zero AI cost. Clicking "Try with example" must never spend
+  // one of the visitor's free generations — that would burn their quota on a
+  // demo that is not even their own application.
+  const sampleGen = (): GeneratedContent => {
+    const L = (de: string, fr: string, it: string, en: string) => language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
+    return {
+      coverLetter: L(
+        `mit grossem Interesse bewerbe ich mich als Marketing Manager bei der Nestlé Suisse SA. Ihre Verbindung aus Schweizer Wurzeln und globaler Reichweite entspricht genau dem Umfeld, in dem ich Verantwortung übernehmen und nachhaltiges Markenwachstum gestalten möchte.\n\nIn den letzten Jahren habe ich als Senior Brand Manager bei einem Schweizer FMCG-Unternehmen die Markenführung mit einem Budget von rund CHF 1,2 Mio. verantwortet. Dabei konnte ich die Brand Awareness um 28 Prozent steigern und zwei Produkt-Launches im DACH-Raum erfolgreich begleiten. Zuvor baute ich bei einer Westschweizer Konsumgütermarke die Social-Media-Strategie sowie ein CRM-Programm mit 80'000 aktiven Kunden auf.\n\nMeine Stärke liegt in der Verbindung von analytischem Denken und kreativer Markenführung. Ich arbeite datengetrieben, treffe Entscheidungen auf Basis klarer Kennzahlen und verstehe es zugleich, eine Marke emotional aufzuladen. Meine Dreisprachigkeit (Deutsch als Muttersprache, Französisch und Englisch auf C1-Niveau) erlaubt mir, im DACH- und im Westschweizer Markt gleichermassen zu wirken.\n\nBesonders reizt mich an Nestlé, für eine weltweit gehörte Marke lokale Verantwortung zu übernehmen und mit nachhaltigem, datengetriebenem Marketing echten Mehrwert zu schaffen. Ich bin überzeugt, mit meiner Erfahrung, meiner Sorgfalt und meinem Engagement einen wertvollen Beitrag zu Ihrem Team zu leisten.\n\nÜber die Gelegenheit zu einem persönlichen Gespräch freue ich mich sehr.`,
+        `c'est avec un grand intérêt que je postule au poste de Marketing Manager chez Nestlé Suisse SA. Votre alliance entre racines suisses et rayonnement mondial correspond exactement à l'environnement dans lequel je souhaite prendre des responsabilités et faire croître une marque durablement.\n\nCes dernières années, en tant que Senior Brand Manager dans une entreprise suisse de biens de consommation, j'ai piloté une marque avec un budget d'environ CHF 1,2 mio. J'ai augmenté la notoriété de 28 pour cent et mené deux lancements de produits dans la région DACH. Auparavant, j'ai bâti la stratégie réseaux sociaux et un programme CRM de 80'000 clients actifs pour une marque romande.\n\nMa force réside dans l'alliance entre esprit analytique et gestion créative de la marque. Je travaille de manière axée sur les données et sais aussi charger une marque d'émotion. Mon trilinguisme (allemand langue maternelle, français et anglais niveau C1) me permet d'agir aussi bien en Suisse alémanique qu'en Suisse romande.\n\nCe qui m'attire chez Nestlé, c'est de porter une responsabilité locale pour une marque mondiale et de créer une vraie valeur par un marketing durable et fondé sur les données. Je me réjouis de l'occasion d'un entretien personnel.`,
+        `è con grande interesse che mi candido come Marketing Manager presso Nestlé Suisse SA. Il vostro legame tra radici svizzere e portata globale corrisponde esattamente all'ambiente in cui desidero assumere responsabilità e far crescere un marchio in modo sostenibile.\n\nNegli ultimi anni, come Senior Brand Manager in un'azienda svizzera di beni di consumo, ho gestito un marchio con un budget di circa CHF 1,2 mln. Ho aumentato la brand awareness del 28 per cento e seguito due lanci di prodotto nell'area DACH. In precedenza ho costruito la strategia social e un programma CRM con 80'000 clienti attivi per un marchio romando.\n\nIl mio punto di forza è unire pensiero analitico e gestione creativa del marchio. Lavoro in modo orientato ai dati e so anche caricare un marchio di emozione. Il mio trilinguismo (tedesco madrelingua, francese e inglese a livello C1) mi permette di agire sia nel mercato DACH sia in quello romando.\n\nDi Nestlé mi attrae in particolare assumere una responsabilità locale per un marchio noto in tutto il mondo e creare valore reale con un marketing sostenibile e basato sui dati. Sarei lieto di un colloquio personale.`,
+        `I am applying with great interest for the position of Marketing Manager at Nestlé Suisse SA. Your blend of Swiss roots and global reach is exactly the environment in which I want to take responsibility and grow a brand sustainably.\n\nIn recent years, as Senior Brand Manager at a Swiss FMCG company, I led a brand with a budget of around CHF 1.2 million. I raised brand awareness by 28 percent and delivered two product launches across the DACH region. Before that, I built the social media strategy and a CRM programme with 80,000 active customers for a Romandy consumer brand.\n\nMy strength lies in combining analytical thinking with creative brand management. I work in a data-driven way and also know how to give a brand emotional weight. My trilingual fluency (German native, French and English at C1) lets me operate across both the DACH and the French-speaking Swiss markets.\n\nWhat draws me to Nestlé is taking local responsibility for a globally known brand and creating real value through sustainable, data-driven marketing. I would welcome the opportunity of a personal conversation.`,
+      ),
+      cvSummary: L(
+        'Mehrsprachiger Marketing-Manager mit fundierter Erfahrung in Markenführung, CRM und Performance Marketing im Schweizer FMCG-Umfeld. Datengetrieben, kreativ und stark in der Zusammenarbeit mit Stakeholdern.',
+        'Marketing manager multilingue avec une solide expérience en gestion de marque, CRM et performance marketing dans le secteur suisse des biens de consommation. Axé sur les données, créatif et à l\'aise avec les parties prenantes.',
+        'Marketing manager multilingue con solida esperienza in brand management, CRM e performance marketing nel settore svizzero dei beni di consumo. Orientato ai dati, creativo e a suo agio con gli stakeholder.',
+        'Multilingual marketing manager with solid experience in brand management, CRM and performance marketing in the Swiss FMCG sector. Data-driven, creative and strong with stakeholders.',
+      ),
+      skills: L('Brand Strategy·CRM·Social Media·Performance Marketing·Analytics·Stakeholder Management·Deutsch (Muttersprache)·Französisch (C1)',
+        'Brand Strategy·CRM·Réseaux sociaux·Performance Marketing·Analytics·Gestion des parties prenantes·Allemand (langue maternelle)·Français (C1)',
+        'Brand Strategy·CRM·Social Media·Performance Marketing·Analytics·Stakeholder Management·Tedesco (madrelingua)·Francese (C1)',
+        'Brand Strategy·CRM·Social Media·Performance Marketing·Analytics·Stakeholder Management·German (native)·French (C1)').split('·'),
+      interview: [1, 2, 3, 4, 5].map(n => ({
+        q: L(`Beispiel-Frage ${n}: Warum möchten Sie zu Nestlé?`, `Question exemple ${n} : pourquoi Nestlé ?`, `Domanda esempio ${n}: perché Nestlé?`, `Sample question ${n}: why Nestlé?`),
+        a: L('Dies ist eine Muster-Antwort. Bei deiner echten Bewerbung erstellt die KI 10 passende Fragen mit Antwortvorschlägen, zugeschnitten auf die Stelle.',
+          'Ceci est une réponse exemple. Pour ta vraie candidature, l\'IA crée 10 questions adaptées avec des propositions de réponse.',
+          'Questa è una risposta di esempio. Per la tua candidatura reale, l\'IA crea 10 domande su misura con proposte di risposta.',
+          'This is a sample answer. For your real application, the AI creates 10 tailored questions with suggested answers.'),
+      })),
+    };
+  };
+
   const loadExample = () => {
     const sample: ApplicationForm = {
       firstName: (form.firstName || profile?.firstName || 'Anna').trim(),
@@ -707,6 +740,10 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
       photo: form.photo || '',
     };
     setForm(sample);
+    // Show a ready-made result immediately — NO AI call, NO quota spent. This
+    // is a new example session, so it is not tied to any saved document.
+    setGen(sampleGen());
+    setLoadedDocId(null);
     setStep(2);
     // Attach the illustrated portrait when the user has no own photo yet —
     // async so the step switch stays instant.
@@ -1133,11 +1170,11 @@ ${bodyText}
         {steps.map((label, i) => (
           <div key={label} className="flex items-center gap-2 min-w-0">
             {(() => {
-              // A step is navigable if it is at or behind the current one, or if
-              // the application is already far enough along: once the required
-              // fields are filled (canProceed) or a letter exists (gen), every
-              // step can be jumped to directly from the top — no forced "Weiter".
-              const navigable = i <= step || canProceed || !!gen;
+              // Design (0) and Daten (1) are always reachable — moving between
+              // them needs no generation. Vorschau (2) opens once the required
+              // fields are filled (canProceed) or a letter already exists (gen).
+              // So a finished application never forces the bottom "Weiter".
+              const navigable = i < 2 || canProceed || !!gen;
               const doneBehind = i < step;
               return (
             <button
@@ -1356,8 +1393,8 @@ ${bodyText}
                       )}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="space-y-1.5"><label className={labelCls}>{s.f_firstName} *</label><input className={inputCls} value={form.firstName} onChange={set('firstName')} /></div>
-                      <div className="space-y-1.5"><label className={labelCls}>{s.f_lastName} *</label><input className={inputCls} value={form.lastName} onChange={set('lastName')} /></div>
+                      <div className="space-y-1.5"><label className={labelCls}>{s.f_firstName} *</label><input id="gen-req-firstName" className={inputCls} value={form.firstName} onChange={set('firstName')} /></div>
+                      <div className="space-y-1.5"><label className={labelCls}>{s.f_lastName} *</label><input id="gen-req-lastName" className={inputCls} value={form.lastName} onChange={set('lastName')} /></div>
                       <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_address}</label><input className={inputCls} value={form.address} onChange={set('address')} /></div>
                       <div className="space-y-1.5"><label className={labelCls}>{s.f_phone}</label><input className={inputCls} type="tel" value={form.phone} onChange={set('phone')} /></div>
                       <div className="space-y-1.5"><label className={labelCls}>{s.f_email}</label><input className={inputCls} type="email" value={form.email} onChange={set('email')} /></div>
@@ -1369,8 +1406,8 @@ ${bodyText}
                 <section>
                   <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_job}</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_targetCompany} *</label><input className={inputCls} value={form.targetCompany} onChange={set('targetCompany')} /></div>
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_targetPosition} *</label><input className={inputCls} value={form.targetPosition} onChange={set('targetPosition')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_targetCompany} *</label><input id="gen-req-targetCompany" className={inputCls} value={form.targetCompany} onChange={set('targetCompany')} /></div>
+                    <div className="space-y-1.5"><label className={labelCls}>{s.f_targetPosition} *</label><input id="gen-req-targetPosition" className={inputCls} value={form.targetPosition} onChange={set('targetPosition')} /></div>
                     <div className="space-y-1.5 sm:col-span-2"><label className={labelCls}>{s.f_jobDescription}</label><textarea className={`${inputCls} min-h-[90px]`} placeholder={s.ph_jobDescription} value={form.jobDescription} onChange={set('jobDescription')} /></div>
                   </div>
                 </section>
@@ -1403,9 +1440,26 @@ ${bodyText}
                   <ChevronLeft size={14} />{s.back}
                 </button>
                 <button
-                  onClick={() => canProceed && setStep(2)}
-                  disabled={!canProceed}
-                  className={`inline-flex items-center gap-2 px-7 py-3 text-[11px] font-bold uppercase tracking-widest transition-all ${canProceed ? 'bg-[#004225] text-white hover:bg-[#00331d]' : 'bg-black/10 dark:bg-white/10 text-[#9A9A94] cursor-not-allowed'}`}
+                  onClick={() => {
+                    if (canProceed) { setStep(2); return; }
+                    // Point clearly at what is missing instead of a dead button:
+                    // name the empty required fields and jump to the first one.
+                    const missing: [string, string][] = [
+                      [form.firstName, 'gen-req-firstName'],
+                      [form.lastName, 'gen-req-lastName'],
+                      [form.targetCompany, 'gen-req-targetCompany'],
+                      [form.targetPosition, 'gen-req-targetPosition'],
+                    ].filter(([v]) => !String(v || '').trim()) as any;
+                    const labels: Record<string, string> = { 'gen-req-firstName': s.f_firstName, 'gen-req-lastName': s.f_lastName, 'gen-req-targetCompany': s.f_targetCompany, 'gen-req-targetPosition': s.f_targetPosition };
+                    showToast(`${s.required_missing_prefix} ${missing.map(([, id]) => labels[id]).join(', ')}`, 'error');
+                    const first = missing[0]?.[1];
+                    if (first) {
+                      const el = document.getElementById(first) as HTMLInputElement | null;
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setTimeout(() => el?.focus(), 350);
+                    }
+                  }}
+                  className={`inline-flex items-center gap-2 px-7 py-3 text-[11px] font-bold uppercase tracking-widest transition-all ${canProceed ? 'bg-[#004225] text-white hover:bg-[#00331d]' : 'bg-[#004225]/30 text-white hover:bg-[#004225]/45'}`}
                 >
                   <Eye size={14} />{s.to_preview}
                 </button>
