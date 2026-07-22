@@ -3671,10 +3671,10 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         ['Posizioni adatte · Top 3', '92% · Datenanalyst/in · UBS', '87% · Leiter Datenanalyse · Swiss Re', '81% · Leiter Berichtswesen · PostFinance'],
         ['Matching roles · Top 3', '92% · Datenanalyst/in · UBS', '87% · Leiter Datenanalyse · Swiss Re', '81% · Leiter Berichtswesen · PostFinance']) },
       'tracker': { score: null, L: pick(
-        ['Bewerbungs-Tracker · live', '20 Bewerbungen im Überblick', 'Interview-Quote: 40%', 'Erfolgsquote: 13%'],
-        ['Suivi candidatures · live', '20 candidatures en vue', 'Taux d\'entretiens : 40%', 'Taux d\'offres : 13%'],
-        ['Tracker candidature · live', '20 candidature in vista', 'Tasso colloqui: 40%', 'Tasso offerte: 13%'],
-        ['Application tracker · live', '20 applications in view', 'Interview rate: 40%', 'Offer rate: 13%']) },
+        ['Bewerbungs-Tracker · live', '20 Bewerbungen im Überblick', '5 im Interview', '2 Angebote'],
+        ['Suivi candidatures · live', '20 candidatures en vue', '5 en entretien', '2 offres'],
+        ['Tracker candidature · live', '20 candidature in vista', '5 in colloquio', '2 offerte'],
+        ['Application tracker · live', '20 applications in view', '5 in interview', '2 offers']) },
     };
     return M[id] || M['bewerbungs-gen'];
   };
@@ -10245,7 +10245,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </section>
       ) : (
-        <section className="relative px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl 2xl:max-w-[1500px] mx-auto transition-colors overflow-hidden">
+        <section className="relative px-4 sm:px-6 lg:px-12 py-14 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl 2xl:max-w-[1500px] mx-auto transition-colors overflow-hidden">
           {/* Premium ambient backdrop — slow aurora + subtle drift, matches splash */}
           <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden" aria-hidden="true">
             <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full opacity-[0.55] dark:opacity-30"
@@ -10595,7 +10595,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right). */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* A4 preview of a finished application — what the generator outputs.
               Real paragraph text (not gray skeleton lines) so visitors can
@@ -10838,7 +10838,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- TRACKER SHOWCASE --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
@@ -10926,8 +10926,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="bg-white dark:bg-[#1A1A18] border border-black/8 dark:border-white/8 shadow-sm grid grid-cols-3 divide-x divide-black/5 dark:divide-white/5">
               {[
                 { value: '20', color: 'text-[#1A1A18] dark:text-[#FAFAF8]', label: language === 'FR' ? 'Candidatures' : language === 'IT' ? 'Candidature' : language === 'EN' ? 'Applications' : 'Bewerbungen' },
-                { value: '40%', color: 'text-[#D4A852]', label: language === 'FR' ? 'Taux d\'entretiens' : language === 'IT' ? 'Tasso colloqui' : language === 'EN' ? 'Interview rate' : 'Interview-Quote' },
-                { value: '13%', color: 'text-[#004225] dark:text-[#00A854]', label: language === 'FR' ? 'Taux d\'offres' : language === 'IT' ? 'Tasso offerte' : language === 'EN' ? 'Offer rate' : 'Erfolgsquote' },
+                { value: '5', color: 'text-[#D4A852]', label: language === 'FR' ? 'En entretien' : language === 'IT' ? 'In colloquio' : language === 'EN' ? 'In interview' : 'Im Interview' },
+                { value: '2', color: 'text-[#004225] dark:text-[#00A854]', label: language === 'FR' ? 'Offres' : language === 'IT' ? 'Offerte' : language === 'EN' ? 'Offers' : 'Angebote' },
               ].map((stat, i) => (
                 <div key={i} className="py-4 px-2 text-center">
                   <p className={`text-2xl sm:text-3xl font-serif leading-none ${stat.color}`}>{stat.value}</p>
@@ -10949,7 +10949,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            readable example inside a mini app window. Replaces the old thin
            multi-tool grid; sits after both showcases as the action step. */}
       {(!user || activeView === 'dashboard') && (
-      <section id="tools" className="px-6 lg:px-12 py-14 lg:py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section id="tools" className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{t.tools_badge}</p>
@@ -11122,7 +11122,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            a chat gives you text, Stellify hands you the finished
            application. Honest, concrete, side by side. */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors">
+      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">
@@ -11238,7 +11238,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
       {/* --- WHY STELLIFY SECTION --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
+      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
         <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
@@ -11295,7 +11295,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- PRICING SECTION --- */}
-      <section id="pricing" className="px-6 lg:px-12 py-14 lg:py-24 bg-[#0a1410] text-white relative overflow-hidden">
+      <section id="pricing" className="px-6 lg:px-12 py-12 lg:py-20 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#0a1d12] via-[#0a1410] to-[#030806]" />
@@ -11817,7 +11817,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
       {/* --- ABOUT / BRAND STORY PREVIEW --- */}
       {(!user || activeView === 'dashboard') && (
-      <section id="story" className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section id="story" className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
             {/* Left — wordmark + etymology */}
@@ -11892,7 +11892,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- RATGEBER TEASER --- Free Swiss career guides, surfaced on the
            landing page so the knowledge section actually gets found. */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
+      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
             <div>
@@ -11960,7 +11960,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       )}
       {/* --- FAQ SECTION --- */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-14 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
+      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-3xl mx-auto">
           <div className="text-left mb-10 lg:mb-12">
             <div className="flex items-center gap-3 mb-4">
