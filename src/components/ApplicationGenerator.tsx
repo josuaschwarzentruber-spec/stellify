@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { db } from '../firebase';
 import {
-  collection, addDoc, getDocs, query, where, orderBy, limit,
+  collection, addDoc, getDocs, query, where, limit,
   deleteDoc, doc, updateDoc,
 } from 'firebase/firestore';
 
@@ -921,12 +921,24 @@ ${bodyText}
     if (!user) return;
     // Practical caps that never bite a real user (no plan-imposed limit).
     // Pagination can be added later if someone genuinely passes these.
-    getDocs(query(collection(db, 'application_designs'), where('user_id', '==', user.id), orderBy('created_at', 'desc'), limit(100)))
-      .then(snap => setCustomDesigns(snap.docs.map(d => ({ ...(d.data().config as DesignConfig), custom: true, name: d.data().name, id: `custom-${d.id}`, docId: d.id }))))
+    getDocs(query(collection(db, 'application_designs'), where('user_id', '==', user.id), limit(100)))
+      .then(snap => setCustomDesigns(
+        snap.docs
+          .map(d => ({ config: d.data().config as DesignConfig, name: d.data().name, docId: d.id, created_at: d.data().created_at }))
+          .sort((a: any, b: any) => String(b.created_at || '').localeCompare(String(a.created_at || '')))
+          .map(d => ({ ...(d.config), custom: true, name: d.name, id: `custom-${d.docId}`, docId: d.docId }))
+      ))
       .catch(() => {});
-    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), orderBy('updated_at', 'desc'), limit(200)))
+    // Filter only by user_id (automatic single-field index) and sort in the
+    // browser. A where+orderBy query needs a composite index that may not
+    // exist — if it is missing the query throws and the saved application never
+    // loads, so the dashboard click could not jump into the preview. Sorting
+    // client-side removes that dependency entirely.
+    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), limit(200)))
       .then(snap => {
-        const apps = snap.docs.map(d => ({ docId: d.id, ...(d.data() as any) }));
+        const apps = snap.docs
+          .map(d => ({ docId: d.id, ...(d.data() as any) }))
+          .sort((a: any, b: any) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || '')));
         setSavedApps(apps);
         // Opened from the dashboard "recent documents": jump straight into that
         // saved application so the customer can review, edit and re-save it.
@@ -1158,7 +1170,7 @@ ${bodyText}
 
           {/* ── STEP 2: FORM ─────────────────────────────────────────────── */}
           {step === 1 && (
-            <motion.div key="form" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="max-w-3xl">
+            <motion.div key="form" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }} className="max-w-4xl mx-auto">
               <div className="space-y-8">
                 {/* ── Job URL importer ─────────────────────────────────────── */}
                 <section className="relative p-5 bg-gradient-to-br from-[#004225]/[0.06] to-[#00A854]/[0.04] dark:from-[#00A854]/[0.10] dark:to-[#004225]/[0.06] border border-[#004225]/25 dark:border-[#00A854]/30 rounded-lg shadow-sm">
