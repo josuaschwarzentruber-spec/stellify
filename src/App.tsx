@@ -810,30 +810,6 @@ const capFirst = (s: string) => {
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
 };
 
-// Gentle desktop hint — mobile only, shown on the dashboard and the landing.
-// Stellify works fully on the phone; the split editor/preview simply has more
-// room on a laptop. Premium framing, positive, no nag.
-const DesktopTip = ({ language, className = '' }: { language: string; className?: string }) => (
-  <div className={`lg:hidden ${className}`}>
-    <div className="flex items-start gap-3.5 p-4 rounded-2xl border border-[#004225]/12 dark:border-[#00A854]/20 bg-gradient-to-br from-[#004225]/[0.06] via-[#004225]/[0.03] to-[#00A854]/[0.02]">
-      <div className="w-9 h-9 rounded-xl bg-white dark:bg-[#1A1A18] shadow-sm border border-[#004225]/10 dark:border-[#00A854]/20 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0">
-        <Monitor size={16} strokeWidth={1.75} />
-      </div>
-      <div className="min-w-0">
-        <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-[#004225] dark:text-[#00A854] mb-1">
-          {language === 'FR' ? 'Astuce' : language === 'IT' ? 'Suggerimento' : language === 'EN' ? 'Tip' : 'Tipp'}
-        </p>
-        <p className="text-[12.5px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
-          {language === 'FR' ? "Sur un ordinateur, c'est encore plus pratique : tu vois le formulaire et l'aperçu de ta candidature côte à côte."
-            : language === 'IT' ? 'Su un computer è ancora più comodo: vedi il modulo e l\'anteprima della candidatura uno accanto all\'altra.'
-            : language === 'EN' ? 'On a laptop it is even easier: you see the form and the preview of your application side by side.'
-            : 'Am Laptop ist es noch praktischer: Du siehst das Formular und die Vorschau deiner Bewerbung nebeneinander.'}
-        </p>
-      </div>
-    </div>
-  </div>
-);
-
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
     {src ? (
@@ -8777,7 +8753,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl">
                     {t.dashboard_desc}
                   </p>
-                  <DesktopTip language={language} className="mt-5" />
                 </header>
 
 
@@ -9290,8 +9265,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
               </div>
 
-              <div className="space-y-6">
-                {/* Job Tracker / Kanban Board */}
+              <div className="space-y-6 mt-12 lg:mt-16">
+                {/* Job Tracker / Kanban Board — clear separation from the grid
+                    above so the title never sticks to the Stella Insights card. */}
                 {trackerSection}
 
                 {/* Quick Tools */}
@@ -10962,7 +10938,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
           </div>
 
-          <DesktopTip language={language} className="max-w-md mx-auto mb-8" />
 
           <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {tools.map((tool: any) => (
