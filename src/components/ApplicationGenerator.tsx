@@ -318,9 +318,9 @@ export const ApplicationDocument = memo(({ design, form, s, generatedText, edita
   };
 
   const Body = () => (
-    <div style={{ fontFamily: bodyFont, fontSize: 11.5, lineHeight: 2.05, color: '#26261F' }}>
+    <div style={{ fontFamily: bodyFont, fontSize: 12, lineHeight: 2.0, color: '#26261F' }}>
       <p style={{ marginBottom: 16, color: '#6B6B66' }}>{today}</p>
-      <p style={{ fontWeight: 700, marginBottom: 20, color: a, fontSize: 12 }}>
+      <p style={{ fontWeight: 700, marginBottom: 20, color: a, fontSize: 12.5 }}>
         {s.subject} {form.targetPosition || '…'}{form.targetCompany ? ` · ${form.targetCompany}` : ''}
       </p>
       <p style={{ marginBottom: 16 }}>{s.greeting}</p>
@@ -820,9 +820,9 @@ TONALITÄT: ${toneLabel(form.tone)}
 
 AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
-  "coverLetter": "Vollständiges Bewerbungsanschreiben, 430-500 Wörter (5 bis 6 gehaltvolle Absätze, sodass die A4-Seite gut gefüllt ist und unten möglichst wenig Leerraum bleibt), ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross), Absätze mit \\n\\n getrennt",
-  "cvSummary": "Optimiertes Kurzprofil für den Lebenslauf, 3-4 Sätze",
-  "skills": ["6-8 passende Skills als kurze Stichworte"],
+  "coverLetter": "Ein vollständiges, professionelles Bewerbungsanschreiben nach Schweizer Standard, 450-540 Wörter in 5 bis 6 gut ausgebauten Absätzen, sodass eine A4-Seite sauber gefüllt ist und unten kaum Leerraum bleibt. AUFBAU: (1) Starker Einstieg mit konkretem Bezug zu Firma und Stelle, warum genau hier. (2) Beruflicher Hintergrund: aktuelle Situation, relevante Erfahrung und Ausbildung. (3) Konkrete Fähigkeiten und Stärken, fachliche UND persönliche Kompetenzen, verbunden mit den Anforderungen der Stelle, wenn möglich mit einem greifbaren Beispiel oder Ergebnis. (4) Passung und Mehrwert: was der Bewerber konkret beiträgt. (5) Ehrliche Motivation für genau diese Firma. (6) Selbstbewusster Abschluss mit Freude auf ein persönliches Gespräch. WICHTIG: Nutze ausschliesslich die gegebenen Angaben aus Lebenslauf, Erfahrung und Fähigkeiten. Erfinde KEINE konkreten Fakten wie Firmennamen, Zahlen, Titel oder Zertifikate, die nicht vorkommen; fehlen Details, formuliere professionell etwas allgemeiner statt zu erfinden. Schreibe in derselben Sprache wie die Stellen- und Lebenslauf-Angaben. Ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross). Absätze mit \\n\\n getrennt",
+  "cvSummary": "Optimiertes, überzeugendes Kurzprofil für den Lebenslauf, 3-4 Sätze, das die wichtigsten Stärken auf den Punkt bringt",
+  "skills": ["6-8 passende, konkrete Fähigkeiten (Mischung aus fachlichen und persönlichen) als kurze Stichworte"],
   "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
 }
 Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
@@ -958,7 +958,7 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
     const headerHtml = design.layout === 'sidebar' || design.layout === 'block'
       ? `<table width="100%" cellpadding="0" cellspacing="0" style="background:${a};color:#fff"><tr><td style="padding:18pt 22pt"><div style="font-family:${headFont};font-size:18pt;font-weight:bold">${fullName}</div><div style="font-size:8pt;margin-top:4pt;opacity:.85">${contact}</div></td></tr></table>`
       : `<div style="text-align:${design.layout === 'minimal' || design.layout === 'executive' ? 'left' : 'center'};border-bottom:${design.layout === 'executive' ? `3pt solid ${a}` : `0.5pt solid ${a}`};padding-bottom:10pt;margin-bottom:6pt"><div style="font-family:${headFont};font-size:16pt;${design.layout === 'elegant' ? 'font-style:italic;' : ''}color:#1A1A18">${fullName}</div><div style="font-size:8pt;color:#6B6B66;margin-top:3pt">${contact}</div></div>`;
-    const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><style>@page{size:A4;margin:2cm 2.2cm}body{font-family:${bodyFont};font-size:10.5pt;line-height:1.65;color:#26261F}p{margin:0 0 8pt 0}</style></head><body>
+    const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word'><head><meta charset='utf-8'><style>@page{size:A4;margin:2cm 2.2cm}body{font-family:${bodyFont};font-size:11.5pt;line-height:1.8;color:#26261F}p{margin:0 0 11pt 0}</style></head><body>
 ${headerHtml}
 <p style="color:#6B6B66;margin-top:14pt">${today}</p>
 <p style="font-weight:bold;color:${a};margin-top:10pt">${esc(s.subject)} ${esc(form.targetPosition)}${form.targetCompany ? ` · ${esc(form.targetCompany)}` : ''}</p>
