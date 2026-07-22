@@ -318,30 +318,30 @@ export const ApplicationDocument = memo(({ design, form, s, generatedText, edita
   };
 
   const Body = () => (
-    <div style={{ fontFamily: bodyFont, fontSize: 11, lineHeight: 1.9, color: '#26261F' }}>
-      <p style={{ marginBottom: 12, color: '#6B6B66' }}>{today}</p>
-      <p style={{ fontWeight: 700, marginBottom: 16, color: a, fontSize: 11.5 }}>
+    <div style={{ fontFamily: bodyFont, fontSize: 11.5, lineHeight: 2.05, color: '#26261F' }}>
+      <p style={{ marginBottom: 16, color: '#6B6B66' }}>{today}</p>
+      <p style={{ fontWeight: 700, marginBottom: 20, color: a, fontSize: 12 }}>
         {s.subject} {form.targetPosition || '…'}{form.targetCompany ? ` · ${form.targetCompany}` : ''}
       </p>
-      <p style={{ marginBottom: 12 }}>{s.greeting}</p>
+      <p style={{ marginBottom: 16 }}>{s.greeting}</p>
       {editable && generatedText ? (
         <p
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => onBodyChange?.((e.currentTarget as HTMLElement).innerText)}
           className="stellify-letter-edit"
-          style={{ whiteSpace: 'pre-wrap', marginBottom: 16, outline: 'none', cursor: 'text', borderRadius: 3, padding: '3px 5px', margin: '0 -5px 16px' }}
+          style={{ whiteSpace: 'pre-wrap', marginBottom: 20, outline: 'none', cursor: 'text', borderRadius: 3, padding: '3px 5px', margin: '0 -5px 20px' }}
         >
           {bodyText}
         </p>
       ) : (
-        <p style={{ whiteSpace: 'pre-wrap', marginBottom: 16, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
+        <p style={{ whiteSpace: 'pre-wrap', marginBottom: 20, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
           {bodyText}
         </p>
       )}
       <p style={{ marginBottom: 4 }}>{s.closing}</p>
       <p style={{ fontWeight: 600 }}>{fullName}</p>
-      <p style={{ marginTop: 16, fontSize: 9, color: '#9A9A94' }}>{s.attachment_note}</p>
+      <p style={{ marginTop: 22, fontSize: 9, color: '#9A9A94' }}>{s.attachment_note}</p>
     </div>
   );
 
@@ -820,7 +820,7 @@ TONALITÄT: ${toneLabel(form.tone)}
 
 AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
-  "coverLetter": "Vollständiges Bewerbungsanschreiben, 340-430 Wörter (4 bis 5 gehaltvolle Absätze, damit die Seite gut gefüllt ist), ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross), Absätze mit \\n\\n getrennt",
+  "coverLetter": "Vollständiges Bewerbungsanschreiben, 430-500 Wörter (5 bis 6 gehaltvolle Absätze, sodass die A4-Seite gut gefüllt ist und unten möglichst wenig Leerraum bleibt), ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross), Absätze mit \\n\\n getrennt",
   "cvSummary": "Optimiertes Kurzprofil für den Lebenslauf, 3-4 Sätze",
   "skills": ["6-8 passende Skills als kurze Stichworte"],
   "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
@@ -902,7 +902,7 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
       // Encode ONCE — re-encoding the full canvas per page wasted CPU/memory
       // on long documents for identical bytes.
       const imgData = canvas.toDataURL('image/jpeg', 0.92);
-      if (imgH <= pageH * 1.12) {
+      if (imgH <= pageH * 1.18) {
         // Fits on (or only just over) one page. A short letter must never spill
         // a few millimetres onto a near-empty second page, so shrink the whole
         // page proportionally to fit exactly one A4 and centre it horizontally.
