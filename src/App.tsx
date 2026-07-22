@@ -2010,9 +2010,20 @@ function StellifyApp() {
       : language === 'IT' ? "L'assistente di carriera AI svizzero"
       : language === 'EN' ? 'The Swiss AI career assistant'
       : 'Der Schweizer KI-Karriereassistent';
-    const page = activeTool?.title || map[activeView]?.[language] || map[activeView]?.EN || '';
-    document.title = page ? `Stellify - ${page}` : `Stellify - ${tagline}`;
-  }, [activeView, activeTool, language]);
+    // Logged-out landing page (the marketing "/" that Google indexes) must NOT
+    // be titled "Dashboard" — that word means nothing to a searcher. Give it the
+    // keyword-rich marketing title instead, matching the static <title>.
+    const landingTitle = language === 'FR' ? 'Stellify | Le générateur de candidatures IA pour la Suisse'
+      : language === 'IT' ? 'Stellify | Il generatore di candidature IA per la Svizzera'
+      : language === 'EN' ? 'Stellify | The Swiss AI job-application tool'
+      : 'Stellify | Die Bewerbungs-KI für die Schweiz';
+    if (!user && activeView === 'dashboard' && !activeTool) {
+      document.title = landingTitle;
+    } else {
+      const page = activeTool?.title || map[activeView]?.[language] || map[activeView]?.EN || '';
+      document.title = page ? `Stellify - ${page}` : `Stellify - ${tagline}`;
+    }
+  }, [activeView, activeTool, language, user]);
 
   // Canonical + og:url follow the current page. The static tags in
   // index.html point at the homepage, which told Google that /pricing and
