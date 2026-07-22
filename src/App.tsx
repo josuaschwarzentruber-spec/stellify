@@ -13841,7 +13841,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </svg>
               <button
                 onClick={() => setShowExitIntent(false)}
-                className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-black/25 border border-white/20 text-white/85 hover:text-white hover:bg-black/40 transition-all"
+                className="absolute top-3 right-3 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-black/25 border border-white/20 text-white/85 hover:text-white hover:bg-black/40 transition-all"
                 aria-label={language === 'FR' ? 'Fermer' : language === 'IT' ? 'Chiudi' : language === 'EN' ? 'Close' : 'Schliessen'}
               >
                 <X size={16} />
