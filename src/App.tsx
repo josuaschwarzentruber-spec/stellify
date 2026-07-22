@@ -1945,6 +1945,10 @@ function StellifyApp() {
   // Prefill for the generator when it is opened from a tracker row
   // ("Bewerbung mit Stella erstellen"): company + position travel along.
   const [generatorPrefill, setGeneratorPrefill] = useState<{ company?: string; position?: string } | null>(null);
+  // When a saved application is opened from the dashboard, the generator mounts
+  // straight into that document so the customer can edit it. Cleared whenever
+  // the generator is not the active tool, so a normal open starts blank.
+  const [generatorInitialDocId, setGeneratorInitialDocId] = useState<string | null>(null);
   useEffect(() => { if (!activeTool) setGeneratorPrefill(null); }, [activeTool]);
   // "So funktioniert's" explainer inside the tool modal (question mark).
   const [showToolHelp, setShowToolHelp] = useState(false);
@@ -2563,12 +2567,36 @@ function StellifyApp() {
   // document — usage counters can survive account re-creation (free-quota
   // ledger) and would tick the step off for someone who did nothing yet.
   const [hasGeneratedApp, setHasGeneratedApp] = useState(false);
+  // Saved applications for the dashboard "Deine letzten Dokumente" list. Live,
+  // so a freshly saved application appears without a reload. This is the same
+  // collection the generator writes to (generated_applications) — the earlier
+  // bug was that the dashboard only ever read tool_results, so saved
+  // applications never showed up here.
+  const [savedApplications, setSavedApplications] = useState<any[]>([]);
   useEffect(() => {
-    if (!user) { setHasGeneratedApp(false); return; }
-    getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), limit(1)))
-      .then(snap => setHasGeneratedApp(!snap.empty))
-      .catch(() => { /* leave false — the step simply stays open */ });
+    if (!user) { setHasGeneratedApp(false); setSavedApplications([]); return; }
+    // Filter only by user_id (an automatic single-field index) and sort in the
+    // browser — this never depends on a composite index, so the list can never
+    // silently stay empty because an index is missing.
+    const unsub = onSnapshot(
+      query(collection(db, 'generated_applications'), where('user_id', '==', user.id), limit(50)),
+      snap => {
+        const docs = snap.docs
+          .map(d => ({ id: d.id, ...(d.data() as any) }))
+          .sort((a, b) => String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || '')))
+          .slice(0, 10);
+        setSavedApplications(docs);
+        setHasGeneratedApp(snap.size > 0);
+      },
+      () => { /* offline: leave list empty, step stays open */ }
+    );
+    return () => unsub();
   }, [user]);
+  // A normal open of the generator starts blank; only a click on a saved
+  // document (which sets the id right before opening) carries a doc in.
+  useEffect(() => {
+    if (activeTool?.id !== 'bewerbungs-gen') setGeneratorInitialDocId(null);
+  }, [activeTool]);
 
   const [careerRoadmap, setCareerRoadmap] = useState<string[]>([]);
   const [latestAnalysis, setLatestAnalysis] = useState<any | null>(null);
@@ -9320,10 +9348,37 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     <button className="text-[10px] font-bold uppercase tracking-widest text-[#004225] border-b border-[#004225]/20 pb-1">{t.view_all}</button>
                   </div>
                   <div className="grid gap-4">
-                    {toolHistory.length > 0 ? (
-                      toolHistory.map((item) => (
-                        <div 
-                          key={item.id} 
+                    {(savedApplications.length > 0 || toolHistory.length > 0) ? (
+                      <>
+                      {/* Saved applications from the generator — clicking one
+                          reopens it in the generator, ready to edit and re-save. */}
+                      {savedApplications.map((app) => (
+                        <div
+                          key={app.id}
+                          className="p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#00A854]/30 transition-all flex items-center justify-between group cursor-pointer"
+                          onClick={() => {
+                            setGeneratorInitialDocId(app.id);
+                            const tool = tools.find(t => t.id === 'bewerbungs-gen');
+                            if (tool) setActiveTool(tool);
+                          }}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-[#004225] dark:text-[#00A854]">
+                              <FileText size={20} />
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{app.title || (language === 'FR' ? 'Candidature' : language === 'IT' ? 'Candidatura' : language === 'EN' ? 'Application' : 'Bewerbung')}</h4>
+                              <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">
+                                {app.updated_at ? new Date(app.updated_at).toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : t.time_just_now}
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronRight size={16} className="text-[#9A9A94] group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      ))}
+                      {toolHistory.map((item) => (
+                        <div
+                          key={item.id}
                           className="p-6 bg-white dark:bg-[#2A2A26] border border-black/5 dark:border-white/5 hover:border-[#004225]/20 dark:hover:border-[#00A854]/30 transition-all flex items-center justify-between group cursor-pointer"
                           onClick={() => {
                             const tool = tools.find(t => t.id === item.toolId);
@@ -9347,7 +9402,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           </div>
                           <ChevronRight size={16} className="text-[#9A9A94] group-hover:translate-x-1 transition-transform" />
                         </div>
-                      ))
+                      ))}
+                      </>
                     ) : (
                       <div className="p-12 bg-white dark:bg-[#2A2A26] border border-dashed border-black/10 dark:border-white/10 text-center space-y-4 transition-colors">
                         <div className="w-12 h-12 bg-[#FDFCFB] dark:bg-[#1A1A18] flex items-center justify-center text-2xl mx-auto opacity-30">📄</div>
@@ -12815,6 +12871,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         user={user}
                         profile={user ? { firstName: user.firstName, email: user.email } : null}
                         initialTarget={generatorPrefill}
+                        initialDocId={generatorInitialDocId}
                         onAddToTracker={async ({ company, position }) => {
                           if (!user) return false;
                           const co = capFirst(company.trim());

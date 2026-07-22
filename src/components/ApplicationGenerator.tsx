@@ -478,12 +478,14 @@ const DesignThumb = ({ design }: { design: DesignConfig }) => {
 
 /* ── Main component ──────────────────────────────────────────────────────── */
 
-const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage, initialTarget, onAddToTracker }: {
+const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUpgrade, showToast, authFetch, onUploadCv, recordUsage, usage, initialTarget, initialDocId, onAddToTracker }: {
   language: string;
   user: { id: string; email?: string } | null;
   profile?: { firstName?: string; email?: string } | null;
   /** Prefill for company/position when opened from a tracker row. */
   initialTarget?: { company?: string; position?: string } | null;
+  /** Open straight into this saved application (from the dashboard list). */
+  initialDocId?: string | null;
   cvContext?: string;
   locked: boolean;
   onUpgrade: (reason?: 'quota' | 'daily', message?: string) => void;
@@ -919,7 +921,22 @@ ${bodyText}
       .then(snap => setCustomDesigns(snap.docs.map(d => ({ ...(d.data().config as DesignConfig), custom: true, name: d.data().name, id: `custom-${d.id}`, docId: d.id }))))
       .catch(() => {});
     getDocs(query(collection(db, 'generated_applications'), where('user_id', '==', user.id), orderBy('updated_at', 'desc'), limit(200)))
-      .then(snap => setSavedApps(snap.docs.map(d => ({ docId: d.id, ...d.data() }))))
+      .then(snap => {
+        const apps = snap.docs.map(d => ({ docId: d.id, ...(d.data() as any) }));
+        setSavedApps(apps);
+        // Opened from the dashboard "recent documents": jump straight into that
+        // saved application so the customer can review, edit and re-save it.
+        if (initialDocId) {
+          const match = apps.find((a: any) => a.docId === initialDocId);
+          if (match) {
+            setForm({ ...EMPTY_FORM, ...match.form });
+            if (match.design) setDesign(match.design);
+            setGen(match.generated || null);
+            setLoadedDocId(match.docId);
+            setStep(2);
+          }
+        }
+      })
       .catch(() => {});
   }, [user]);
 
