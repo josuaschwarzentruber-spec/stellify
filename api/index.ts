@@ -853,11 +853,15 @@ async function deepseekChat(opts: {
       const body = await r.text().catch(() => '');
       // Out of credits → privately alert the owner to top up (once/day).
       if (r.status === 402 || /insufficient\s*balance/i.test(body)) {
+        const fallbackOn = process.env.GEMINI_TEXT_FALLBACK === '1' || process.env.GEMINI_TEXT_FALLBACK === 'true';
         alertOwnerOncePerDay(
           'empty_balance',
-          '🔴 Stellify: DeepSeek-Guthaben aufgebraucht, bitte aufladen',
-          `<p>Dein DeepSeek-Guthaben ist <b>leer</b>. Die KI läuft gerade über die Ersatz-Lösung (Google Gemini) weiter, aber bitte lade bald auf:</p>
-           <p><a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
+          '🔴 Stellify: DeepSeek-Guthaben leer, Kunden können nicht generieren',
+          fallbackOn
+            ? `<p>Dein DeepSeek-Guthaben ist <b>leer</b>. Die KI läuft gerade über die Ersatz-Lösung (Google Gemini) weiter, aber bitte lade bald auf:</p>
+               <p><a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
+            : `<p><b>Dringend:</b> Dein DeepSeek-Guthaben ist <b>leer</b> und es gibt kein Ersatz-System (Gemini ist ausgeschaltet). <b>Kunden können gerade keine Bewerbungen erstellen.</b></p>
+               <p>Bitte sofort aufladen: <a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
         ).catch(() => {});
       }
       throw new Error(`DeepSeek HTTP ${r.status}: ${body.slice(0, 200)}`);
@@ -871,8 +875,13 @@ async function deepseekChat(opts: {
   }
 }
 
-// Try DeepSeek first, fall back to Gemini for plain text generation.
+// DeepSeek is the only text generator. The Gemini fallback is OFF by default
+// (per product decision) and re-armed instantly by setting the Vercel env
+// GEMINI_TEXT_FALLBACK=1 — no code change needed. With the fallback off, a
+// DeepSeek failure surfaces as a clear error to the user and (on an empty
+// balance) an immediate owner alert, so top-ups happen fast.
 // (Bild-/Vision- und Google-Search-Endpoints umgehen diesen Helper bewusst.)
+const GEMINI_TEXT_FALLBACK = process.env.GEMINI_TEXT_FALLBACK === '1' || process.env.GEMINI_TEXT_FALLBACK === 'true';
 async function generateText(opts: {
   systemInstruction?: string;
   history?: ChatHistoryMsg[];
@@ -886,8 +895,13 @@ async function generateText(opts: {
       const text = await deepseekChat(opts);
       return { text, provider: 'deepseek' };
     } catch (err: any) {
+      // Fallback disabled → let the caller handle the error (clear message
+      // to the user); the empty-balance owner alert already fired in deepseekChat.
+      if (!GEMINI_TEXT_FALLBACK) throw err;
       console.warn('[DEEPSEEK→GEMINI fallback]', (err?.message || err).toString().slice(0, 200));
     }
+  } else if (!GEMINI_TEXT_FALLBACK) {
+    throw new Error('DEEPSEEK_API_KEY fehlt und der Gemini-Fallback ist deaktiviert');
   }
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('Weder DEEPSEEK_API_KEY noch GEMINI_API_KEY ist gesetzt');
