@@ -888,8 +888,11 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
 
   /* Export: capture the offscreen A4-width render of ApplicationDocument so
      the chosen design IS the exported layout (multi-page if needed). */
+  const needLetterMsg = () => (language === 'FR' ? 'Génère d\'abord la lettre.' : language === 'IT' ? 'Genera prima la lettera.' : language === 'EN' ? 'Generate the letter first.' : 'Bitte generiere zuerst die Bewerbung.');
+  const exportFailMsg = (kind: string) => (language === 'FR' ? `Le ${kind} n'a pas pu être créé. Réessaie dans un instant.` : language === 'IT' ? `Impossibile creare il ${kind}. Riprova tra un attimo.` : language === 'EN' ? `The ${kind} could not be created. Please try again.` : `Das ${kind} konnte nicht erstellt werden. Bitte versuche es gleich nochmals.`);
   const exportPdf = async () => {
     if (!exportRef.current) return;
+    if (!gen?.coverLetter) { showToast(needLetterMsg(), 'error'); return; }
     setIsExporting(true);
     try {
       const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
@@ -922,7 +925,7 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
       pdf.save(`bewerbung-${(form.targetCompany || 'stellify').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`);
     } catch (e: any) {
       console.error('[EXPORT PDF]', e);
-      showToast(e?.message || 'Export error', 'error');
+      showToast(exportFailMsg('PDF'), 'error');
     } finally { setIsExporting(false); }
   };
 
@@ -931,14 +934,19 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
     // PDF only) — route free users to the plans with the correct "Word is Pro"
     // message, NOT the misleading "3 free applications used up" quota message.
     if (usage && !usage.isPro) { onUpgrade('feature'); return; }
+    if (!gen?.coverLetter) { showToast(needLetterMsg(), 'error'); return; }
+    try {
     /* Word renders HTML: same letter, design approximated (accent colour,
        font pairing, simplified layout. sidebar becomes a table). */
     // Escape EVERY user-entered value before interpolating into the Word
     // HTML — an '&', '<' or '"' in a name/company would otherwise corrupt
-    // the document or break inline styles.
-    const esc = (v: string) => v
+    // the document or break inline styles. String() guards against a
+    // non-string ever reaching esc (would throw on .replace).
+    const esc = (v: any) => String(v ?? '')
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-    const a = design.accent;
+    // Accent goes into a raw CSS value, so only allow a hex/rgb colour — never
+    // arbitrary text that could break out of the style attribute.
+    const a = /^#[0-9a-fA-F]{3,8}$|^rgba?\([\d.,\s%]+\)$/.test(String(design.accent || '')) ? design.accent : '#004225';
     const serif = "Georgia, 'Times New Roman', serif";
     const sans = "Helvetica, Arial, sans-serif";
     const bodyFont = design.font === 'serif' ? serif : sans;
@@ -960,12 +968,22 @@ ${bodyText}
 <p style="font-weight:bold">${fullName}</p>
 <p style="font-size:8pt;color:#9A9A94;margin-top:12pt">${esc(s.attachment_note)}</p>
 </body></html>`;
+    // Blob download (not a data: URI): a long letter can exceed the browser's
+    // URL-length limit and silently fail as a data URI. The BOM makes Word read
+    // the UTF-8 correctly so accents and umlauts are never mangled.
+    const blob = new Blob([String.fromCharCode(0xFEFF) + html], { type: 'application/msword;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
     const aEl = document.createElement('a');
-    aEl.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    aEl.href = url;
     aEl.download = `bewerbung-${(form.targetCompany || 'stellify').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.doc`;
     document.body.appendChild(aEl);
     aEl.click();
     document.body.removeChild(aEl);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    } catch (e: any) {
+      console.error('[EXPORT WORD]', e);
+      showToast(exportFailMsg('Word'), 'error');
+    }
   };
 
   const designName = (d: DesignConfig) => d.custom ? (d.name || s.own_design) : (s as any)[`d_${d.id}`] || d.id;
