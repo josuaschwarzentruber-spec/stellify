@@ -3360,7 +3360,7 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
       a.salary || '',
       a.reminder_at || '',
       a.notes || '',
-      a.created_at ? new Date(a.created_at).toLocaleDateString('de-CH') : '',
+      a.created_at ? new Date(a.created_at).toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '',
       a.archived ? 'Ja' : 'Nein',
     ].map(escape).join(','));
     const csv = '﻿' + [headers.map(escape).join(','), ...rows].join('\n');
@@ -4850,7 +4850,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
     doc.setTextColor(255, 255, 255);
     doc.text("STELLIFY | SCHWEIZER KARRIERE-CO-PILOT", margin, 9);
     doc.setFont("helvetica", "normal");
-    doc.text(new Date().toLocaleDateString('de-CH'), pageWidth - margin, 9, { align: 'right' });
+    doc.text(new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }), pageWidth - margin, 9, { align: 'right' });
 
     // Title
     doc.setFont("times", "bold");
@@ -9262,7 +9262,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <div key={calc.id} className="p-4 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 space-y-2 group hover:border-[#004225]/20 dark:hover:border-[#00A854]/30 transition-all">
                           <div className="flex justify-between items-start">
                             <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A18] dark:text-[#FAFAF8] truncate pr-4">{calc.jobTitle}</h4>
-                            <span className="text-[8px] font-mono text-[#9A9A94]">{calc.createdAt?.toDate ? calc.createdAt.toDate().toLocaleDateString('de-CH') : ''}</span>
+                            <span className="text-[8px] font-mono text-[#9A9A94]">{calc.createdAt?.toDate ? calc.createdAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}</span>
                           </div>
                           <div className="flex items-center gap-2 text-[9px] text-[#6B6B66] dark:text-[#9A9A94]">
                             <span>{calc.industry}</span>
@@ -9388,7 +9388,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <div>
                               <h4 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{app.title || (language === 'FR' ? 'Candidature' : language === 'IT' ? 'Candidatura' : language === 'EN' ? 'Application' : 'Bewerbung')}</h4>
                               <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">
-                                {app.updated_at ? new Date(app.updated_at).toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : t.time_just_now}
+                                {app.updated_at ? new Date(app.updated_at).toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : t.time_just_now}
                               </p>
                             </div>
                           </div>
@@ -9415,7 +9415,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <div>
                               <h4 className="font-medium text-[#1A1A18] dark:text-[#FAFAF8] group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tools.find(t => t.id === item.toolId)?.title || item.toolTitle}</h4>
                               <p className="text-[10px] text-[#9A9A94] uppercase tracking-widest">
-                                {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH') : t.time_just_now}
+                                {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : t.time_just_now}
                               </p>
                             </div>
                           </div>
@@ -9997,7 +9997,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                               <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] truncate group-hover:text-[#004225] dark:group-hover:text-[#00A854] transition-colors">{tool?.title || item.toolTitle}</p>
                             </div>
                             <span className="text-[10px] font-mono text-[#9A9A94] shrink-0">
-                              {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH') : ''}
+                              {item.createdAt?.toDate ? item.createdAt.toDate().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' }) : ''}
                             </span>
                           </button>
                         );
@@ -13422,7 +13422,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             </div>
                             <div className="min-w-0">
                               <h4 className="text-[15px] font-semibold text-[#1A1A18] dark:text-[#FAFAF8] leading-tight truncate">{activeTool.title}</h4>
-                              <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</p>
+                              <p className="text-[11px] text-[#9A9A94] font-light mt-0.5">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                             </div>
                           </div>
                           <div className="hidden sm:flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-widest text-[#004225]/70 dark:text-[#6FCF97]/70 shrink-0">
@@ -13619,7 +13619,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                 <FileText size={12} /> PDF
                               </button>
                               <div className="flex-1" />
-                              <span className="text-[11px] text-[#b0c2b3] dark:text-[#5C5C58]">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</span>
+                              <span className="text-[11px] text-[#b0c2b3] dark:text-[#5C5C58]">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' })}</span>
                               <button
                                 onClick={() => { setToolResultEditable(toolResult); setIsEditingToolResult(true); }}
                                 className="flex items-center gap-1.5 px-4 py-2 text-[11px] font-semibold rounded-md bg-[#004225] text-white hover:bg-[#00331d] shadow-sm transition-colors"
@@ -13877,7 +13877,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-xl font-serif text-[#1A1A18] leading-tight truncate">{t.generated_app_title}</h3>
-                    <p className="text-[10px] text-[#9A9A94] font-light mt-0.5">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH')}</p>
+                    <p className="text-[10px] text-[#9A9A94] font-light mt-0.5">Stella · {new Date().toLocaleDateString(language === 'FR' ? 'fr-CH' : language === 'IT' ? 'it-CH' : language === 'EN' ? 'en-GB' : 'de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' })}</p>
                   </div>
                 </div>
                 <button onClick={() => setGeneratedApp(null)} className="p-2 shrink-0 hover:bg-black/5 rounded-full transition-colors text-[#5C5C58] hover:text-[#1A1A18]">
