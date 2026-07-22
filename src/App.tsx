@@ -3103,11 +3103,22 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
   const handleGoogleAuth = async () => {
     setAuthError('');
     setIsAuthLoading(true);
+    // Firebase can take 10-30s to reject signInWithPopup after the user closes
+    // the Google window, so the spinner would keep turning. Detect the cancel
+    // ourselves: the moment our window regains focus (the popup is gone), give a
+    // short grace for a real sign-in to land, then stop the spinner if it hasn't.
+    let settled = false;
+    const onFocus = () => {
+      window.setTimeout(() => { if (!settled) setIsAuthLoading(false); }, 1200);
+    };
+    window.addEventListener('focus', onFocus, { once: true });
     try {
       justLoggedIn.current = true;
       await signInWithPopup(auth, new GoogleAuthProvider());
+      settled = true;
       setIsAuthModalOpen(false);
     } catch (err: any) {
+      settled = true;
       if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
         await signInWithRedirect(auth, new GoogleAuthProvider());
       } else if (err.code !== 'auth/popup-closed-by-user') {
@@ -3117,6 +3128,8 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         showToast(msg, 'error');
       }
     } finally {
+      settled = true;
+      window.removeEventListener('focus', onFocus);
       setIsAuthLoading(false);
     }
   };
