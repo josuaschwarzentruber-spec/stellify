@@ -541,10 +541,16 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           subscription_interval: isAnnual ? 'annual' : 'monthly',
           subscription_expires_at: expiresAt.toISOString(),
           stripe_customer_id: session.customer || null,
-          // The paid period starts now — the visible monthly counter starts
-          // at zero so the customer gets the full quota from day one.
+          // The paid period starts now — reset BOTH the visible client counters
+          // and the authoritative server counters so the customer really gets
+          // the full monthly quota from day one, including after a cancel and
+          // re-subscribe within the same calendar month.
           tool_uses: 0,
           search_uses: 0,
+          ai_calls_month: 0,
+          ai_calls_month_key: monthKey(),
+          ai_calls_today: 0,
+          ai_calls_today_date: todayKey(),
         });
         console.log(`[WEBHOOK] Role updated to ${normaliseRole(planId)} for ${userId}, expires ${expiresAt.toISOString()}`);
         if (existingUser?.email) {
@@ -717,9 +723,10 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           })();
           await userDoc.ref.update({
             subscription_expires_at: expiresAt.toISOString(),
-            // A new billing period starts now — the monthly quota starts
-            // fresh with it (annual plans reset per calendar month instead).
-            ...(isAnnual ? {} : { tool_uses: 0, search_uses: 0 }),
+            // A new billing period starts now — the monthly quota (client AND
+            // server counters) starts fresh with it. Annual plans reset per
+            // calendar month instead, handled by the month-key rollover.
+            ...(isAnnual ? {} : { tool_uses: 0, search_uses: 0, ai_calls_month: 0, ai_calls_month_key: monthKey() }),
           });
           console.log(`[WEBHOOK] Renewed ${userDoc.id} until ${expiresAt.toISOString()}`);
         }
@@ -1082,6 +1089,16 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
       }
     }
 
+    // Admin (the owner) has no AI limits. Set the context recordAIUsage needs,
+    // then let the request through instead of falling to the "unknown role"
+    // rejection at the end of this middleware.
+    if (role === 'admin') {
+      (req as any).quotaRole = role;
+      (req as any).quotaUserRef = userRef;
+      (req as any).quotaUserData = u;
+      return next();
+    }
+
     if (role === 'client') {
       // Global daily cap protects the DeepSeek wallet from a free-tier surge
       // (e.g. the site goes viral): it applies to FREE users only. Paying
@@ -1322,7 +1339,27 @@ async function checkDeepSeekBalanceDaily() {
 
 
 // ── Chat (DeepSeek primär, Gemini Fallback) ───────────────────────────────────
-app.post("/api/chat", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
+// IMPORTANT: the Stella chat must NEVER draw from the application-generation
+// quota. It uses its own light daily cap and only counts toward the global
+// wallet budget, so chatting never blocks a user from generating applications.
+app.post("/api/chat", aiLimiter, requireAuth, async (req, res) => {
+  const uid = (req as any).uid as string;
+  try {
+    const { adminDb } = getAdminServices();
+    if (!(await checkGlobalBudget(adminDb))) {
+      return res.status(503).json({ error: 'overloaded' });
+    }
+    const userRef = adminDb.collection('users').doc(uid);
+    const u = (await userRef.get()).data() || {};
+    const today = todayKey();
+    const used = u.chat_today_date === today ? (u.chat_today || 0) : 0;
+    const CHAT_DAILY_CAP = Number(process.env.CHAT_DAILY_CAP) || 40;
+    if (used >= CHAT_DAILY_CAP) {
+      return res.status(429).json({ error: 'Das Chat-Tageslimit ist erreicht. Morgen geht es weiter.' });
+    }
+    userRef.set({ chat_today: used + 1, chat_today_date: today }, { merge: true }).catch(() => {});
+  } catch { /* if the guard itself fails, do not block the chat */ }
+
   const { messages, userContent, systemInstruction, model } = req.body;
   try {
     const { text, provider } = await generateText({
@@ -1333,7 +1370,8 @@ app.post("/api/chat", aiLimiter, requireAuth, enforceAIQuota, async (req, res) =
       maxOutputTokens: MAX_OUTPUT_TOKENS,
       preferredGeminiModel: model,
     });
-    await recordAIUsage(req);
+    // Wallet protection only — NOT the application-generation quota.
+    try { const { adminDb } = getAdminServices(); await incrementGlobalBudget(adminDb); } catch { /* ignore */ }
     res.json({ text, provider });
   } catch (error: any) {
     console.error("[CHAT ERROR]", error.message);

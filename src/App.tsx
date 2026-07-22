@@ -447,7 +447,7 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { 
         'You have seen how well Stella writes. Get Pro and create as many applications as you need.');
   const benefits = language === 'FR' ? ['30 générations IA par mois', 'Tous les designs standard', 'Import par lien et réutilisation du CV', 'Export PDF et Word']
     : language === 'IT' ? ['30 generazioni IA al mese', 'Tutti i design standard', 'Import da link e riuso del CV', 'Esportazione PDF e Word']
-    : language === 'EN' ? ['50 AI generations per month', 'All standard designs', 'Link import and CV reuse', 'PDF and Word export']
+    : language === 'EN' ? ['30 AI generations per month', 'All standard designs', 'Link import and CV reuse', 'PDF and Word export']
     : ['30 KI-Generierungen pro Monat', 'Alle Standard-Designs', 'Stelle per Link laden und Lebenslauf nutzen', 'PDF- und Word-Export'];
   return (
     <div className="fixed inset-0 z-[1200] flex items-center justify-center p-5">
@@ -4032,11 +4032,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     const searchUses = user?.searchUses || 0;
     
     // Limits must match server QUOTA (api/index.ts) and the pricing copy.
-    // Generierungen pro Monat: Free 3 lifetime · Pro 50 · Karriere+ 150.
+    // Generierungen pro Monat: Free 3 lifetime · Pro 30 · Karriere+ 100.
     // No daily cap any more — monthly + per-minute fair-use only.
     const isToolLimitReached = (!isPro && toolUses >= 3)
-      || (user?.role === 'pro' && !isUnlimited && toolUses >= 50)
-      || (user?.role === 'unlimited' && toolUses >= 150);
+      || (user?.role === 'pro' && !isUnlimited && toolUses >= 30)
+      || (user?.role === 'unlimited' && toolUses >= 100);
 
     if (isToolLimitReached) {
       setToolResult(user?.role === 'pro' ? t.tool_limit_pro : t.tool_limit_free);
@@ -7073,7 +7073,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits reset automatically, daily at midnight, monthly on the 1st.",
       plan_resets_lifetime: "Lifetime limits. Upgrade anytime.",
       plan_free_f1: "3 AI generations to try", plan_free_f2: "Application overview & status", plan_free_f3: "Save & edit applications", plan_free_f4: "PDF export", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
-      plan_pro_f1: "50 AI generations per month", plan_pro_f2: "Tailored applications with AI", plan_pro_f3: "Load job by link & use your CV", plan_pro_f4: "All standard designs", plan_pro_f5: "PDF & Word export",
+      plan_pro_f1: "30 AI generations per month", plan_pro_f2: "Tailored applications with AI", plan_pro_f3: "Load job by link & use your CV", plan_pro_f4: "All standard designs", plan_pro_f5: "PDF & Word export",
       plan_unlim_f1: "Full AI power: 100 generations per month", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Personal email support", plan_unlim_f5: "For frequent applicants and career changers",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella requests",
@@ -7342,7 +7342,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Data protection under Swiss law", desc: "Your data is processed under the Swiss DPA and GDPR, transmitted encrypted and deletable by you at any time.", icon: "Lock" }
       ],
       pricing_free_f: ["3 applications to try", "Application overview & status", "Save & edit", "No credit card required"],
-      pricing_pro_f: ["50 AI generations per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
+      pricing_pro_f: ["30 AI generations per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
       pricing_ultimate_f: ["Everything in Pro, plus:", "Full AI power: 100 generations per month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
@@ -7672,8 +7672,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const toolUses = user?.toolUses || 0;
   const dailyToolUses = user?.dailyToolUses || 0;
   const isToolLimitReached = (!isPro && toolUses >= 3)
-    || (user?.role === 'pro' && !isUnlimited && toolUses >= 50)
-    || (user?.role === 'unlimited' && toolUses >= 150);
+    || (user?.role === 'pro' && !isUnlimited && toolUses >= 30)
+    || (user?.role === 'unlimited' && toolUses >= 100);
   const isDailyLimitReached = false;
 
   /* ── Demo identity for landing/empty-state previews ─────────────────────
@@ -8871,7 +8871,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           actually want to know. Karriere+ gets a counter too
                           (it used to show only a static premium line). */}
                       {stat.label === t.dashboard_stat_plan && (() => {
-                        const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
+                        const limit = (user.role === 'unlimited' || user.role === 'admin') ? 100 : user.role === 'pro' ? 30 : 3;
                         const used = Math.min(user.toolUses || 0, limit);
                         const left = limit - used;
                         const paid = user.role === 'pro' || user.role === 'unlimited' || user.role === 'admin';
@@ -9718,7 +9718,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       plan (Free 3 · Pro 50 · Karriere+ 150). Shows how many
                       generations are LEFT instead of a percent figure. */}
                   {user && (() => {
-                    const limit = (user.role === 'unlimited' || user.role === 'admin') ? 150 : user.role === 'pro' ? 50 : 3;
+                    const limit = (user.role === 'unlimited' || user.role === 'admin') ? 100 : user.role === 'pro' ? 30 : 3;
                     const used = Math.min(user.toolUses || 0, limit);
                     return (
                       <div className="p-6 bg-[#FDFCFB] dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 space-y-6">

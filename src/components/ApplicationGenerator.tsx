@@ -838,7 +838,7 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
 
   /* Mirror handleProcessTool gating: same thresholds, same messages. */
   // Must mirror the server QUOTA in api/index.ts:
-  //   Free: 3 lifetime · Pro: 50/month · Karriere+ (role 'unlimited'): 150/month
+  //   Free: 3 lifetime · Pro: 30/month · Karriere+ (role 'unlimited'): 100/month
   // No daily cap any more. only the monthly limit + per-minute fair-use guard.
   const quotaInfo = (() => {
     if (!usage) return null;
@@ -847,7 +847,7 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
       const done = used >= 3;
       return { label: s.quota_free.replace('{used}', String(used)), done, doneLabel: s.quota_free_done };
     }
-    const cap = usage.isUnlimited ? 150 : 50;
+    const cap = usage.isUnlimited ? 100 : 30;
     const used = usage.toolUses;
     const done = used >= cap;
     const label = s.quota_pro_month.replace('{used}', String(used)).replace('{cap}', String(cap));
