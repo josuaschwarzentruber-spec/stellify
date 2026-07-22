@@ -12588,7 +12588,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                                           result.toolType === 'pro' ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' :
                                           'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                                         }`}>
-                                          {result.toolType === 'gratis' ? 'Free' : result.toolType === 'pro' ? 'Pro' : 'Ultimate'}
+                                          {result.toolType === 'gratis' ? 'Gratis' : result.toolType === 'pro' ? 'Pro' : 'Karriere+'}
                                         </span>
                                       )}
                                       {isSelected && (

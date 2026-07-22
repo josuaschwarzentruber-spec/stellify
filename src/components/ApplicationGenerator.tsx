@@ -1285,7 +1285,7 @@ ${bodyText}
                     <div className="flex items-center justify-between mt-2.5 px-0.5 gap-1.5">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[#1A1A18] dark:text-[#FAFAF8] truncate flex items-center gap-1.5">
                         {designName(d)}
-                        {d.premium && <span className="text-[8px] font-bold uppercase tracking-widest px-1 py-0.5 bg-[#004225] text-white">Ultimate</span>}
+                        {d.premium && <span className="text-[8px] font-bold uppercase tracking-widest px-1 py-0.5 bg-[#004225] text-white">Karriere+</span>}
                       </span>
                       {design.id === d.id && <Check size={13} className="text-[#004225] dark:text-[#00A854] shrink-0" />}
                     </div>
