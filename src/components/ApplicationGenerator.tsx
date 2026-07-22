@@ -772,15 +772,22 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
     }
   };
 
-  // Prefill ONLY the first name and e-mail the user explicitly gave at sign-up.
-  // We deliberately do NOT guess the last name (e.g. from the e-mail address) —
-  // inventing a surname a customer never entered is surprising and must never
-  // happen. Only fills empty fields, so it never overwrites the user's edits.
+  // Prefill name + e-mail from the account. The account name is always the
+  // user's OWN data — what they entered at sign-up, or their Google account
+  // display name — never derived from anything else (we removed the old
+  // guess-the-surname-from-the-e-mail heuristic). If the account name has two
+  // parts (e.g. a Google display name "Josua Schwarzentruber") we split it into
+  // first + last name. Only fills empty fields, never overwrites edits.
   useEffect(() => {
     if (!profile) return;
     setForm(prev => {
       const next = { ...prev };
-      if (!next.firstName && profile.firstName) next.firstName = profile.firstName;
+      const full = (profile.firstName || '').trim();
+      if (full) {
+        const toks = full.split(/\s+/);
+        if (!next.firstName) next.firstName = toks[0];
+        if (!next.lastName && toks.length > 1) next.lastName = toks.slice(1).join(' ');
+      }
       if (!next.email && profile.email) next.email = profile.email;
       return next;
     });
