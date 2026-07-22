@@ -55,7 +55,7 @@ export type ApplicationForm = {
 const EMPTY_FORM: ApplicationForm = {
   firstName: '', lastName: '', address: '', phone: '', email: '',
   currentRole: '', targetCompany: '', targetPosition: '', jobDescription: '',
-  experience: '', education: '', skills: '', motivation: '', tone: '',
+  experience: '', education: '', skills: '', motivation: '', tone: 'professional',
   photo: '',
 };
 
@@ -79,7 +79,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-Serif', font_mix: 'Kombiniert',
     layout_classic: 'Klassisch zentriert', layout_sidebar: 'Seitenleiste', layout_minimal: 'Minimal', layout_elegant: 'Elegant', layout_block: 'Farbblock', layout_executive: 'Executive',
     save_design: 'Design speichern', cancel: 'Abbrechen', delete: 'Löschen',
-    sec_person: 'Persönliche Angaben', sec_job: 'Zielstelle', sec_profile: 'Dein Profil',
+    sec_person: 'Persönliche Angaben', sec_job: 'Zielstelle', sec_profile: 'Dein Profil', photo_here: 'Foto',
     f_firstName: 'Vorname', f_lastName: 'Nachname', f_address: 'Adresse', f_phone: 'Telefon', f_email: 'E-Mail',
     f_currentRole: 'Beruf / aktuelle Rolle', f_targetCompany: 'Zielfirma', f_targetPosition: 'Stelle',
     f_jobDescription: 'Stellenbeschreibung', f_experience: 'Berufserfahrung', f_education: 'Ausbildung',
@@ -106,7 +106,7 @@ const STR: Record<string, Record<string, string>> = {
     edit_letter: 'Text bearbeiten', done_editing: 'Fertig',
     click_to_edit: 'Klicke auf den Brief, um den Text zu bearbeiten', edit_hint: 'Bearbeite den Brieftext. Die Vorschau oben aktualisiert sich sofort.',
     extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
-    export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…',
+    export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…', word_pro_hint: 'Word-Export ist in Pro und Karriere+ enthalten. Das PDF ist gratis.',
     interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
     quota_free: '{used}/3 Gratis-Versuche', quota_pro_month: '{used}/{cap} diesen Monat', quota_pro_day: '{used}/20 heute',
     quota_free_done: 'Gratis-Versuche aufgebraucht', quota_pro_month_done: 'Monatslimit erreicht', quota_pro_day_done: 'Tageslimit erreicht',
@@ -129,7 +129,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combiné',
     layout_classic: 'Classique centré', layout_sidebar: 'Barre latérale', layout_minimal: 'Minimal', layout_elegant: 'Élégant', layout_block: 'Bloc de couleur', layout_executive: 'Executive',
     save_design: 'Enregistrer le design', cancel: 'Annuler', delete: 'Supprimer',
-    sec_person: 'Données personnelles', sec_job: 'Poste visé', sec_profile: 'Ton profil',
+    sec_person: 'Données personnelles', sec_job: 'Poste visé', sec_profile: 'Ton profil', photo_here: 'Photo',
     f_firstName: 'Prénom', f_lastName: 'Nom', f_address: 'Adresse', f_phone: 'Téléphone', f_email: 'E-mail',
     f_currentRole: 'Profession / rôle actuel', f_targetCompany: 'Entreprise visée', f_targetPosition: 'Poste',
     f_jobDescription: 'Description du poste', f_experience: 'Expérience professionnelle', f_education: 'Formation',
@@ -156,7 +156,7 @@ const STR: Record<string, Record<string, string>> = {
     edit_letter: 'Modifier le texte', done_editing: 'Terminé',
     click_to_edit: 'Clique sur la lettre pour modifier le texte', edit_hint: 'Modifie le texte de la lettre. L\'aperçu ci-dessus se met à jour aussitôt.',
     extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
-    export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…',
+    export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…', word_pro_hint: 'L\'export Word est inclus dans Pro et Karriere+. Le PDF est gratuit.',
     interview_hint: '10 questions possibles avec suggestions de réponses',
     quota_free: '{used}/3 essais gratuits', quota_pro_month: '{used}/{cap} ce mois', quota_pro_day: '{used}/20 aujourd\'hui',
     quota_free_done: 'Essais gratuits épuisés', quota_pro_month_done: 'Limite mensuelle atteinte', quota_pro_day_done: 'Limite journalière atteinte',
@@ -179,7 +179,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combinato',
     layout_classic: 'Classico centrato', layout_sidebar: 'Barra laterale', layout_minimal: 'Minimal', layout_elegant: 'Elegante', layout_block: 'Blocco colore', layout_executive: 'Executive',
     save_design: 'Salva design', cancel: 'Annulla', delete: 'Elimina',
-    sec_person: 'Dati personali', sec_job: 'Posizione desiderata', sec_profile: 'Il tuo profilo',
+    sec_person: 'Dati personali', sec_job: 'Posizione desiderata', sec_profile: 'Il tuo profilo', photo_here: 'Foto',
     f_firstName: 'Nome', f_lastName: 'Cognome', f_address: 'Indirizzo', f_phone: 'Telefono', f_email: 'E-mail',
     f_currentRole: 'Professione / ruolo attuale', f_targetCompany: 'Azienda', f_targetPosition: 'Posizione',
     f_jobDescription: 'Descrizione della posizione', f_experience: 'Esperienza professionale', f_education: 'Formazione',
@@ -206,7 +206,7 @@ const STR: Record<string, Record<string, string>> = {
     edit_letter: 'Modifica il testo', done_editing: 'Fatto',
     click_to_edit: 'Clicca sulla lettera per modificare il testo', edit_hint: 'Modifica il testo della lettera. L\'anteprima qui sopra si aggiorna subito.',
     extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
-    export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…',
+    export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…', word_pro_hint: 'L\'esportazione Word è inclusa in Pro e Karriere+. Il PDF è gratis.',
     interview_hint: '10 possibili domande con suggerimenti di risposta',
     quota_free: '{used}/3 tentativi gratuiti', quota_pro_month: '{used}/{cap} questo mese', quota_pro_day: '{used}/20 oggi',
     quota_free_done: 'Tentativi gratuiti esauriti', quota_pro_month_done: 'Limite mensile raggiunto', quota_pro_day_done: 'Limite giornaliero raggiunto',
@@ -229,7 +229,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combined',
     layout_classic: 'Classic centred', layout_sidebar: 'Sidebar', layout_minimal: 'Minimal', layout_elegant: 'Elegant', layout_block: 'Colour block', layout_executive: 'Executive',
     save_design: 'Save design', cancel: 'Cancel', delete: 'Delete',
-    sec_person: 'Personal details', sec_job: 'Target position', sec_profile: 'Your profile',
+    sec_person: 'Personal details', sec_job: 'Target position', sec_profile: 'Your profile', photo_here: 'Photo',
     f_firstName: 'First name', f_lastName: 'Last name', f_address: 'Address', f_phone: 'Phone', f_email: 'Email',
     f_currentRole: 'Profession / current role', f_targetCompany: 'Target company', f_targetPosition: 'Position',
     f_jobDescription: 'Job description', f_experience: 'Work experience', f_education: 'Education',
@@ -256,7 +256,7 @@ const STR: Record<string, Record<string, string>> = {
     edit_letter: 'Edit text', done_editing: 'Done',
     click_to_edit: 'Click the letter to edit the text', edit_hint: 'Edit the letter text. The preview above updates instantly.',
     extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
-    export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…',
+    export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…', word_pro_hint: 'Word export is included in Pro and Karriere+. PDF is free.',
     interview_hint: '10 possible questions with suggested answers',
     quota_free: '{used}/3 free attempts', quota_pro_month: '{used}/{cap} this month', quota_pro_day: '{used}/20 today',
     quota_free_done: 'Free attempts used up', quota_pro_month_done: 'Monthly limit reached', quota_pro_day_done: 'Daily limit reached',
@@ -300,7 +300,25 @@ export const ApplicationDocument = memo(({ design, form, s, generatedText, edita
       same-origin data: URL, so NO crossOrigin attribute, setting it
       breaks rendering + html2canvas capture in Safari. */
   const Photo = ({ size = 88, rounded = false, border }: { size?: number; rounded?: boolean; border?: string }) => {
-    if (!form.photo) return null;
+    if (!form.photo) {
+      // In the export we keep the clean, photo-less layout. But in the on-screen
+      // preview (editable) we show a dashed placeholder so the user sees exactly
+      // where a photo would go and can add one. It never appears in the PDF/Word.
+      if (!editable) return null;
+      return (
+        <div
+          aria-hidden="true"
+          style={{
+            width: size, height: Math.round(size * 1.25),
+            borderRadius: rounded ? '50%' : 2,
+            border: '1.5px dashed rgba(0,0,0,0.28)',
+            background: '#E8EDEA',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'rgba(0,0,0,0.42)', fontSize: Math.max(7, size * 0.11), textAlign: 'center', lineHeight: 1.25, fontWeight: 600,
+          }}
+        >{s.photo_here || 'Foto'}</div>
+      );
+    }
     return (
       <img
         src={form.photo}
@@ -1569,9 +1587,11 @@ ${bodyText}
                       </button>
                       <button
                         onClick={exportWord}
+                        title={usage && !usage.isPro ? s.word_pro_hint : undefined}
                         className="inline-flex items-center gap-2 px-5 py-2.5 border border-[#004225] dark:border-[#00A854] text-[#004225] dark:text-[#00A854] text-[10px] font-bold uppercase tracking-widest hover:bg-[#004225]/5 transition-all"
                       >
                         <Download size={12} />{s.export_word}
+                        {usage && !usage.isPro && <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[8px] leading-none"><Lock size={8} />Pro</span>}
                       </button>
                     </div>
                   </div>
