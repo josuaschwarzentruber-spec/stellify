@@ -1713,9 +1713,13 @@ function StellifyApp() {
       const saved = localStorage.getItem('language');
       if (saved === 'DE' || saved === 'FR' || saved === 'IT' || saved === 'EN') return saved as any;
       
-      // Browser language detection
+      // Swiss-first: this is a .ch product, so German is the default. Only the
+      // other Swiss national languages auto-switch. An English browser (which is
+      // what Googlebot always is, plus many Swiss users on an English OS) must NOT
+      // flip the whole site to English — that made Google index the English title.
+      // English stays one click away in the menu and is remembered once chosen.
       const browserLang = navigator.language.split('-')[0].toUpperCase();
-      if (['DE', 'FR', 'IT', 'EN'].includes(browserLang)) return browserLang as any;
+      if (browserLang === 'FR' || browserLang === 'IT') return browserLang as any;
     }
     return 'DE';
   });
@@ -8691,7 +8695,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- HERO SECTION / DASHBOARD --- */}
       {(activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && activeView !== 'ratgeber') && ((user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs')) || !user) && (user && (activeView === 'dashboard' || activeView === 'profile' || activeView === 'tracker' || activeView === 'tools' || activeView === 'jobs') ? (
         <section className="px-6 lg:px-12 pt-12 pb-24 bg-[#FDFCFB] dark:bg-[#1A1A18]">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
             {activeView === 'dashboard' && (
               <>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -10147,7 +10151,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </section>
       ) : (
-        <section className="relative px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl mx-auto transition-colors overflow-hidden">
+        <section className="relative px-4 sm:px-6 lg:px-12 py-16 sm:py-20 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-7xl 2xl:max-w-[1500px] mx-auto transition-colors overflow-hidden">
           {/* Premium ambient backdrop — slow aurora + subtle drift, matches splash */}
           <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden" aria-hidden="true">
             <div className="absolute top-[-20%] left-[-10%] w-[60vw] h-[60vw] rounded-full opacity-[0.55] dark:opacity-30"
@@ -10186,7 +10190,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#FDFCFB] animate-pulse" />
               {t.hero_precision}
             </div>
-            <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl xl:text-7xl font-serif leading-[1.05] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] text-balance">
+            <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-serif leading-[1.05] tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] text-balance">
               {t.hero_intro} <br />
               <span className="italic text-[#004225] dark:text-[#FAFAF8]">{t.hero_accent || t.hero_title.split(' ').pop()}</span>
             </h1>
@@ -10481,7 +10485,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            showcase below but flipped so the document preview reads left→right). */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* A4 preview of a finished application — what the generator outputs.
               Real paragraph text (not gray skeleton lines) so visitors can
               actually read what comes out of the tool. Uses the logged-in
@@ -10724,7 +10728,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- TRACKER SHOWCASE --- */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-14 lg:py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#004225]/5 dark:bg-[#00A854]/10 border border-[#004225]/15 dark:border-[#00A854]/25 rounded-full text-[#004225] dark:text-[#00A854] text-[10px] font-bold tracking-widest uppercase mb-4">
               <span className="w-1.5 h-1.5 rounded-full bg-[#004225] dark:bg-[#00A854]" />
@@ -10835,7 +10839,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            multi-tool grid; sits after both showcases as the action step. */}
       {(!user || activeView === 'dashboard') && (
       <section id="tools" className="px-6 lg:px-12 py-14 lg:py-24 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{t.tools_badge}</p>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{t.tools_title}</h2>
@@ -11124,7 +11128,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {/* --- WHY STELLIFY SECTION --- */}
       {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-14 lg:py-24 bg-white dark:bg-[#1A1A18] transition-colors" id="features">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-4 mb-6">
               <div className="h-px w-12 bg-[#004225]/30 dark:bg-[#FAFAF8]/20" />
@@ -11214,7 +11218,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             }
           `}</style>
         </div>
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto relative z-10">
           <div className="text-center mb-12 sm:mb-16">
             {/* Opening: staged reveal — kicker, headline, value promise.
                 Sells before it lists. The old "Live Payment System" badge
@@ -12077,7 +12081,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- FOOTER (always visible — also on legal pages) --- */}
       <footer className="bg-[#1A1A18] text-white/50 px-6 lg:px-12 py-24 border-t border-white/5">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 mb-16 lg:mb-24">
             <div className="sm:col-span-2 lg:col-span-2 space-y-6">
               <a href="#" onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-2xl font-serif tracking-tight text-white inline-flex items-center gap-2.5">
