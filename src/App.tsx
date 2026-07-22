@@ -10737,26 +10737,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {language === 'FR' ? 'Outil principal' : language === 'IT' ? 'Strumento principale' : language === 'EN' ? 'Headline tool' : 'Haupt-Tool'}
             </div>
             <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] mb-4 leading-[1.1]">
-              {language === 'FR' ? 'Ta candidature complète. En quelques minutes.'
-                : language === 'IT' ? 'La tua candidatura completa. In pochi minuti.'
-                : language === 'EN' ? 'A complete application. In minutes.'
-                : 'Deine ganze Bewerbung. In Minuten.'}
+              {language === 'FR' ? 'Ta candidature complète. En moins de 60 secondes.'
+                : language === 'IT' ? 'La tua candidatura completa. In meno di 60 secondi.'
+                : language === 'EN' ? 'A complete application. In under 60 seconds.'
+                : 'Deine ganze Bewerbung. In unter 60 Sekunden.'}
             </h2>
             <p className="text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed mb-6 max-w-lg">
               {language === 'FR'
-                ? 'Choisis un design, colle l\'URL de l\'offre, et notre IA Stella écrit la lettre et le profil assortis. Téléchargeable en PDF et Word.'
+                ? 'Design, lien de l\'offre, et Stella écrit lettre et profil sur mesure. Presque rien à faire : modèles et suggestions, tu ne remplis que les blancs. Le tout pour une fraction du prix des grandes IA.'
                 : language === 'IT'
-                ? 'Scegli un design, incolla l\'URL dell\'annuncio e la nostra IA Stella scrive la lettera e il profilo su misura. Scaricabile in PDF e Word.'
+                ? 'Design, link dell\'annuncio, e Stella scrive lettera e profilo su misura. Quasi nulla da fare: modelli e suggerimenti, riempi solo gli spazi. Il tutto a una frazione del prezzo delle grandi IA.'
                 : language === 'EN'
-                ? 'Pick a design, paste the job URL, and our AI Stella writes the matching cover letter and profile. Export to PDF and Word.'
-                : 'Design wählen, Stellen-URL einfügen, und unsere KI Stella schreibt das passende Anschreiben und Kurzprofil. Als PDF und Word exportierbar.'}
+                ? 'Design, job link, and Stella writes the matching letter and profile. Almost nothing to do: templates and suggestions, you just fill the gaps. All for a fraction of what big AI tools cost.'
+                : 'Design, Stellen-Link, und Stella schreibt Anschreiben und Profil auf dich zugeschnitten. Kaum Aufwand: Vorlagen und Vorschläge, du füllst nur die Lücken. Und das für einen Bruchteil der Kosten grosser KI-Tools.'}
             </p>
             <ul className="space-y-2.5 mb-8">
               {[
-                language === 'FR' ? ['Pas seulement la lettre : profil court, compétences assorties et préparation à l\'entretien avec 10 questions, inclus', '6 designs originaux + ton design personnalisé', 'Import par URL · Yousty, jobs.ch, page carrière', 'Réutilise ton CV téléchargé automatiquement', 'Export PDF et Word, prêt à envoyer']
-                : language === 'IT' ? ['Non solo la lettera: profilo breve, competenze su misura e preparazione al colloquio con 10 domande, inclusi', '6 design originali + il tuo design personalizzato', 'Import via URL · Yousty, jobs.ch, pagina carriere', 'Riusa il tuo CV caricato automaticamente', 'Esporta PDF e Word, pronto da inviare']
-                : language === 'EN' ? ['Not just the letter: short profile, matching skills and interview prep with 10 questions, all included', '6 original designs + your own custom design', 'URL import · Yousty, jobs.ch, careers pages', 'Reuses your uploaded CV automatically', 'PDF & Word export, ready to send']
-                : ['Nicht nur der Brief: Kurzprofil, passende Skills und Interview-Vorbereitung mit 10 Fragen inklusive', '6 originale Designs + dein eigenes Custom-Design', 'URL-Import · Yousty, jobs.ch, Karriereseiten', 'Nutzt deinen hochgeladenen Lebenslauf automatisch', 'PDF- und Word-Export, sofort versandbereit']
+                language === 'FR' ? ['En moins de 60 secondes, prête à envoyer en PDF', 'Pas seulement la lettre : profil court, compétences et 10 questions d\'entretien pour te préparer, inclus', 'Presque rien à faire : modèles et suggestions, tu remplis les blancs', '6 designs originaux + ton propre design', 'Import par lien et ton CV repris automatiquement', 'Une fraction du prix des grandes IA']
+                : language === 'IT' ? ['In meno di 60 secondi, pronta da inviare in PDF', 'Non solo la lettera: profilo breve, competenze e 10 domande da colloquio per prepararti, inclusi', 'Quasi nulla da fare: modelli e suggerimenti, riempi gli spazi', '6 design originali + il tuo design', 'Import da link e il tuo CV ripreso in automatico', 'Una frazione del prezzo delle grandi IA']
+                : language === 'EN' ? ['Ready in under 60 seconds, send-ready as PDF', 'Not just the letter: short profile, skills and 10 interview questions to prepare, all included', 'Almost nothing to do: templates and suggestions, you fill the gaps', '6 original designs + your own custom design', 'Link import and your CV reused automatically', 'A fraction of what big AI tools cost']
+                : ['In unter 60 Sekunden fertig, versandbereit als PDF', 'Nicht nur der Brief: Kurzprofil, Skills und 10 Interview-Fragen zur Vorbereitung inklusive', 'Kaum Aufwand: Vorlagen und Vorschläge, du füllst nur die Lücken', '6 originale Designs + dein eigenes Custom-Design', 'Stellen-Import per Link und dein Lebenslauf automatisch übernommen', 'Ein Bruchteil der Kosten grosser KI-Tools']
               ][0].map((b, i) => (
                 <li key={i} className="flex gap-2.5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light">
                   <CheckCircle2 size={16} className="shrink-0 text-[#004225] dark:text-[#00A854] mt-0.5" />
