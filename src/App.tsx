@@ -810,6 +810,30 @@ const capFirst = (s: string) => {
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
 };
 
+// Gentle desktop hint — mobile only. Stellify works fully on the phone; on a
+// computer the form and the live preview simply sit side by side, which is a
+// genuinely useful thing to know. Positive wording, no nag.
+const DesktopTip = ({ language, className = '' }: { language: string; className?: string }) => (
+  <div className={`lg:hidden ${className}`}>
+    <div className="flex items-start gap-3.5 p-4 rounded-2xl border border-[#004225]/12 dark:border-[#00A854]/20 bg-gradient-to-br from-[#004225]/[0.06] via-[#004225]/[0.03] to-[#00A854]/[0.02]">
+      <div className="w-9 h-9 rounded-xl bg-white dark:bg-[#1A1A18] shadow-sm border border-[#004225]/10 dark:border-[#00A854]/20 flex items-center justify-center text-[#004225] dark:text-[#00A854] shrink-0">
+        <Monitor size={16} strokeWidth={1.75} />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[9px] font-bold uppercase tracking-[0.28em] text-[#004225] dark:text-[#00A854] mb-1">
+          {language === 'FR' ? 'Astuce' : language === 'IT' ? 'Suggerimento' : language === 'EN' ? 'Tip' : 'Tipp'}
+        </p>
+        <p className="text-[12.5px] text-[#4A4A45] dark:text-[#9A9A94] font-light leading-relaxed">
+          {language === 'FR' ? "Sur un ordinateur, tu vois le formulaire et l'aperçu de ta candidature côte à côte, c'est encore plus confortable."
+            : language === 'IT' ? "Sul computer vedi il modulo e l'anteprima della candidatura fianco a fianco, ancora più comodo."
+            : language === 'EN' ? 'On a computer you see the form and the live preview of your application side by side, even more comfortable.'
+            : 'Auf dem Computer siehst du das Formular und die Vorschau deiner Bewerbung direkt nebeneinander, das arbeitet sich noch angenehmer.'}
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
 const Avatar = ({ name, color, src }: { name: string, color: string, src?: string }) => (
   <div className={`w-12 h-12 rounded-full ${color} flex items-center justify-center text-white font-serif text-lg shadow-inner overflow-hidden`}>
     {src ? (
@@ -8755,6 +8779,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   </p>
                 </header>
 
+                <DesktopTip language={language} className="mb-2" />
 
                 {/* Quick access: the two tools, front and centre. The
                     dashboard's job is orientation — open a tool in one
@@ -10938,6 +10963,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
           </div>
 
+          <DesktopTip language={language} className="max-w-md mx-auto mb-8" />
 
           <div className="grid lg:grid-cols-2 gap-8 items-stretch">
             {tools.map((tool: any) => (
