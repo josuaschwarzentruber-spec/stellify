@@ -79,7 +79,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-Serif', font_mix: 'Kombiniert',
     layout_classic: 'Klassisch zentriert', layout_sidebar: 'Seitenleiste', layout_minimal: 'Minimal', layout_elegant: 'Elegant', layout_block: 'Farbblock', layout_executive: 'Executive',
     save_design: 'Design speichern', cancel: 'Abbrechen', delete: 'Löschen',
-    sec_person: 'Persönliche Angaben', sec_job: 'Zielstelle', sec_profile: 'Dein Profil', photo_here: 'Foto',
+    sec_person: 'Persönliche Angaben', sec_job: 'Zielstelle', sec_profile: 'Dein Profil', photo_here: 'Foto', photo_change: 'Foto ändern', photo_add: 'Foto hinzufügen',
     f_firstName: 'Vorname', f_lastName: 'Nachname', f_address: 'Adresse', f_phone: 'Telefon', f_email: 'E-Mail',
     f_currentRole: 'Beruf / aktuelle Rolle', f_targetCompany: 'Zielfirma', f_targetPosition: 'Stelle',
     f_jobDescription: 'Stellenbeschreibung', f_experience: 'Berufserfahrung', f_education: 'Ausbildung',
@@ -129,7 +129,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combiné',
     layout_classic: 'Classique centré', layout_sidebar: 'Barre latérale', layout_minimal: 'Minimal', layout_elegant: 'Élégant', layout_block: 'Bloc de couleur', layout_executive: 'Executive',
     save_design: 'Enregistrer le design', cancel: 'Annuler', delete: 'Supprimer',
-    sec_person: 'Données personnelles', sec_job: 'Poste visé', sec_profile: 'Ton profil', photo_here: 'Photo',
+    sec_person: 'Données personnelles', sec_job: 'Poste visé', sec_profile: 'Ton profil', photo_here: 'Photo', photo_change: 'Changer la photo', photo_add: 'Ajouter une photo',
     f_firstName: 'Prénom', f_lastName: 'Nom', f_address: 'Adresse', f_phone: 'Téléphone', f_email: 'E-mail',
     f_currentRole: 'Profession / rôle actuel', f_targetCompany: 'Entreprise visée', f_targetPosition: 'Poste',
     f_jobDescription: 'Description du poste', f_experience: 'Expérience professionnelle', f_education: 'Formation',
@@ -179,7 +179,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combinato',
     layout_classic: 'Classico centrato', layout_sidebar: 'Barra laterale', layout_minimal: 'Minimal', layout_elegant: 'Elegante', layout_block: 'Blocco colore', layout_executive: 'Executive',
     save_design: 'Salva design', cancel: 'Annulla', delete: 'Elimina',
-    sec_person: 'Dati personali', sec_job: 'Posizione desiderata', sec_profile: 'Il tuo profilo', photo_here: 'Foto',
+    sec_person: 'Dati personali', sec_job: 'Posizione desiderata', sec_profile: 'Il tuo profilo', photo_here: 'Foto', photo_change: 'Cambia foto', photo_add: 'Aggiungi foto',
     f_firstName: 'Nome', f_lastName: 'Cognome', f_address: 'Indirizzo', f_phone: 'Telefono', f_email: 'E-mail',
     f_currentRole: 'Professione / ruolo attuale', f_targetCompany: 'Azienda', f_targetPosition: 'Posizione',
     f_jobDescription: 'Descrizione della posizione', f_experience: 'Esperienza professionale', f_education: 'Formazione',
@@ -229,7 +229,7 @@ const STR: Record<string, Record<string, string>> = {
     font_serif: 'Serif', font_sans: 'Sans-serif', font_mix: 'Combined',
     layout_classic: 'Classic centred', layout_sidebar: 'Sidebar', layout_minimal: 'Minimal', layout_elegant: 'Elegant', layout_block: 'Colour block', layout_executive: 'Executive',
     save_design: 'Save design', cancel: 'Cancel', delete: 'Delete',
-    sec_person: 'Personal details', sec_job: 'Target position', sec_profile: 'Your profile', photo_here: 'Photo',
+    sec_person: 'Personal details', sec_job: 'Target position', sec_profile: 'Your profile', photo_here: 'Photo', photo_change: 'Change photo', photo_add: 'Add photo',
     f_firstName: 'First name', f_lastName: 'Last name', f_address: 'Address', f_phone: 'Phone', f_email: 'Email',
     f_currentRole: 'Profession / current role', f_targetCompany: 'Target company', f_targetPosition: 'Position',
     f_jobDescription: 'Job description', f_experience: 'Work experience', f_education: 'Education',
@@ -377,9 +377,9 @@ export const ApplicationDocument = memo(({ design, form, s, generatedText, edita
       <div style={{ display: 'flex', minHeight: '100%', background: '#fff' }}>
         <div style={{ width: '32%', background: a, color: '#fff', padding: '28px 18px' }}>
           {form.photo && <div style={{ marginBottom: 14 }}><Photo size={110} border="1px solid rgba(255,255,255,.2)" /></div>}
-          <p style={{ fontFamily: headFont, fontSize: 17, fontWeight: 700, lineHeight: 1.2, marginBottom: 4, overflowWrap: 'break-word', hyphens: 'auto' }}>{fullName}</p>
-          {form.currentRole && <p style={{ fontSize: 8.5, opacity: 0.75, marginBottom: 16 }}>{form.currentRole}</p>}
-          <div style={{ borderTop: '1px solid rgba(255,255,255,.25)', paddingTop: 12, fontSize: 8.5, lineHeight: 1.8, opacity: 0.92 }}>
+          <p style={{ fontFamily: headFont, fontSize: 17, fontWeight: 700, lineHeight: 1.2, marginBottom: 6, overflowWrap: 'break-word', hyphens: 'auto' }}>{fullName}</p>
+          {form.currentRole && <p style={{ fontSize: 8.5, opacity: 0.75, marginBottom: 6 }}>{form.currentRole}</p>}
+          <div style={{ marginTop: 16, borderTop: '1px solid rgba(255,255,255,.25)', paddingTop: 12, fontSize: 8.5, lineHeight: 1.8, opacity: 0.92 }}>
             {contactBits.map((b, i) => <p key={i}>{b}</p>)}
           </div>
           <div style={{ marginTop: 20, opacity: 0.92 }}><SideMeta /></div>
@@ -875,7 +875,7 @@ TONALITÄT: ${toneLabel(form.tone)}
 
 AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
-  "coverLetter": "Ein vollständiges, professionelles Bewerbungsanschreiben nach Schweizer Standard, 450-540 Wörter in 5 bis 6 gut ausgebauten Absätzen, sodass eine A4-Seite sauber gefüllt ist und unten kaum Leerraum bleibt. AUFBAU: (1) Starker Einstieg mit konkretem Bezug zu Firma und Stelle, warum genau hier. (2) Beruflicher Hintergrund: aktuelle Situation, relevante Erfahrung und Ausbildung. (3) Konkrete Fähigkeiten und Stärken, fachliche UND persönliche Kompetenzen, verbunden mit den Anforderungen der Stelle, wenn möglich mit einem greifbaren Beispiel oder Ergebnis. (4) Passung und Mehrwert: was der Bewerber konkret beiträgt. (5) Ehrliche Motivation für genau diese Firma. (6) Selbstbewusster Abschluss mit Freude auf ein persönliches Gespräch. WICHTIG: Nutze ausschliesslich die gegebenen Angaben aus Lebenslauf, Erfahrung und Fähigkeiten. Erfinde KEINE konkreten Fakten wie Firmennamen, Zahlen, Titel oder Zertifikate, die nicht vorkommen; fehlen Details, formuliere professionell etwas allgemeiner statt zu erfinden. Schreibe in derselben Sprache wie die Stellen- und Lebenslauf-Angaben. Ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross). Absätze mit \\n\\n getrennt",
+  "coverLetter": "Ein professionelles Bewerbungsanschreiben nach Schweizer Standard, 320-400 Wörter in 4 bis 5 prägnanten Absätzen, ohne Füllsätze und Wiederholungen. Es soll die Seite ordentlich wirken lassen, aber niemals überladen sein. AUFBAU: (1) Starker Einstieg mit konkretem Bezug zu Firma und Stelle, warum genau hier. (2) Beruflicher Hintergrund: aktuelle Situation, relevante Erfahrung und Ausbildung. (3) Konkrete Fähigkeiten und Stärken, fachliche UND persönliche Kompetenzen, verbunden mit den Anforderungen der Stelle, wenn möglich mit einem greifbaren Beispiel oder Ergebnis. (4) Passung und Mehrwert: was der Bewerber konkret beiträgt. (5) Ehrliche Motivation für genau diese Firma. (6) Selbstbewusster Abschluss mit Freude auf ein persönliches Gespräch. WICHTIG: Nutze ausschliesslich die gegebenen Angaben aus Lebenslauf, Erfahrung und Fähigkeiten. Erfinde KEINE konkreten Fakten wie Firmennamen, Zahlen, Titel oder Zertifikate, die nicht vorkommen; fehlen Details, formuliere professionell etwas allgemeiner statt zu erfinden. Schreibe in derselben Sprache wie die Stellen- und Lebenslauf-Angaben. Ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross). Absätze mit \\n\\n getrennt",
   "cvSummary": "Optimiertes, überzeugendes Kurzprofil für den Lebenslauf, 3-4 Sätze, das die wichtigsten Stärken auf den Punkt bringt",
   "skills": ["6-8 passende, konkrete Fähigkeiten (Mischung aus fachlichen und persönlichen) als kurze Stichworte"],
   "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
@@ -1617,14 +1617,22 @@ ${bodyText}
 
                   {/* Export + edit row */}
                   <div className="mx-auto max-w-[560px] mt-4 flex items-center justify-between gap-2 flex-wrap">
-                    <button
-                      onClick={focusLetter}
-                      disabled={!gen?.coverLetter}
-                      title={s.click_to_edit}
-                      className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${gen?.coverLetter ? 'border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5' : 'border-black/5 text-[#C5C5C0] cursor-not-allowed'}`}
-                    >
-                      <Pencil size={12} />{s.edit_letter}
-                    </button>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <button
+                        onClick={focusLetter}
+                        disabled={!gen?.coverLetter}
+                        title={s.click_to_edit}
+                        className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${gen?.coverLetter ? 'border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5' : 'border-black/5 text-[#C5C5C0] cursor-not-allowed'}`}
+                      >
+                        <Pencil size={12} />{s.edit_letter}
+                      </button>
+                      <button
+                        onClick={openPhotoFilePicker}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                      >
+                        <UserSquare size={12} />{form.photo ? s.photo_change : s.photo_add}
+                      </button>
+                    </div>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={exportPdf}
