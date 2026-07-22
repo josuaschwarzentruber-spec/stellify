@@ -423,17 +423,24 @@ interface UserData {
 // A convincing, premium modal shown when a free user runs out of tries
 // ('quota') or the daily free ceiling is reached ('daily'). Turns a hard
 // stop into a warm invitation to upgrade, with the value and the plans.
-const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { reason: 'quota' | 'daily'; language: string; onClose: () => void; onPricing: () => void; subOverride?: string }) => {
+const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { reason: 'quota' | 'daily' | 'feature'; language: string; onClose: () => void; onPricing: () => void; subOverride?: string }) => {
   const L = (de: string, fr: string, it: string, en: string) =>
     language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
   const headline = reason === 'daily'
     ? L('Heute besonders gefragt', 'Très demandé aujourd\'hui', 'Molto richiesto oggi', 'In high demand today')
+    : reason === 'feature'
+    ? L('Word-Export ist eine Pro-Funktion', 'L\'export Word est une fonction Pro', 'L\'esportazione Word è una funzione Pro', 'Word export is a Pro feature')
     : L('Deine 3 Gratis-Bewerbungen sind erstellt', 'Tes 3 candidatures gratuites sont créées', 'Le tue 3 candidature gratuite sono create', 'Your 3 free applications are done');
   const sub = subOverride ? subOverride : reason === 'daily'
     ? L('Die kostenlosen Generierungen sind für heute ausgeschöpft. Mit Pro geht es sofort weiter, ganz ohne Wartezeit.',
         'Les générations gratuites sont épuisées pour aujourd\'hui. Avec Pro, tu continues tout de suite, sans attendre.',
         'Le generazioni gratuite sono esaurite per oggi. Con Pro continui subito, senza attese.',
         'Today\'s free generations are used up. With Pro you continue right away, no waiting.')
+    : reason === 'feature'
+    ? L('Als PDF geht es gratis. Mit Pro lädst du deine Bewerbung zusätzlich als Word-Datei herunter und schaltest alle Designs frei. Deine Gratis-Generierungen bleiben dir erhalten.',
+        'En PDF, c\'est gratuit. Avec Pro, tu télécharges aussi ta candidature en Word et débloques tous les designs. Tes générations gratuites restent disponibles.',
+        'In PDF è gratis. Con Pro scarichi la candidatura anche in Word e sblocchi tutti i design. Le tue generazioni gratuite restano disponibili.',
+        'PDF is free. With Pro you also download your application as Word and unlock all designs. Your free generations stay untouched.')
     : L('Du hast gesehen, wie gut Stella schreibt. Hol dir Pro und erstelle so viele Bewerbungen, wie du brauchst.',
         'Tu as vu comme Stella écrit bien. Passe à Pro et crée autant de candidatures que nécessaire.',
         'Hai visto quanto bene scrive Stella. Passa a Pro e crea tutte le candidature che ti servono.',
@@ -2139,7 +2146,7 @@ function StellifyApp() {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   // Convincing upgrade modal: 'quota' = free tries used up, 'daily' = daily cap hit.
-  const [upgradePrompt, setUpgradePrompt] = useState<{ reason: 'quota' | 'daily'; message?: string } | null>(null);
+  const [upgradePrompt, setUpgradePrompt] = useState<{ reason: 'quota' | 'daily' | 'feature'; message?: string } | null>(null);
   const [expiryBanner, setExpiryBanner] = useState<{ daysLeft: number; interval: 'monthly' | 'annual' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error' = 'success') => {
@@ -12906,7 +12913,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         }}
                         cvContext={cvContext}
                         locked={isToolLocked}
-                        onUpgrade={(reason?: 'quota' | 'daily', message?: string) => setUpgradePrompt({ reason: reason || 'quota', message })}
+                        onUpgrade={(reason?: 'quota' | 'daily' | 'feature', message?: string) => setUpgradePrompt({ reason: reason || 'quota', message })}
                         showToast={showToast}
                         authFetch={authFetch}
                         onUploadCv={processFile}
