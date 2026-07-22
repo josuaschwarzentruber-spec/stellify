@@ -11546,6 +11546,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ))}
           </motion.div>
 
+          {/* Friendly support line — reassures at the buying moment without
+              planting doubt: a confident "we are here for you", never a warning
+              that errors can happen. */}
+          <p className="text-center text-white/45 text-xs -mt-10 mb-14">
+            {language === 'FR' ? 'Des questions ou un souci ? Nous sommes vite là pour toi : '
+              : language === 'IT' ? 'Domande o problemi? Siamo subito qui per te: '
+              : language === 'EN' ? "Questions or problems? We're here for you fast: "
+              : 'Fragen oder Probleme? Wir sind schnell für dich da: '}
+            <a href="mailto:support.stellify@gmail.com" className="underline hover:text-white/70 transition-colors">support.stellify@gmail.com</a>
+          </p>
+
           {/* VALUE BOX */}
           <div className="max-w-5xl mx-auto mb-16">
             <h3 className="text-2xl lg:text-3xl font-serif text-center text-white mb-10 tracking-tight">{t.value_title}</h3>
