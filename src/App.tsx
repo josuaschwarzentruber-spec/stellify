@@ -10661,10 +10661,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
             <ul className="space-y-2.5 mb-8">
               {[
-                language === 'FR' ? ['6 designs originaux + ton design personnalisé', 'Import par URL · Yousty, jobs.ch, page carrière', 'Réutilise ton CV téléchargé automatiquement', 'Export PDF et Word, prêt à envoyer']
-                : language === 'IT' ? ['6 design originali + il tuo design personalizzato', 'Import via URL · Yousty, jobs.ch, pagina carriere', 'Riusa il tuo CV caricato automaticamente', 'Esporta PDF e Word, pronto da inviare']
-                : language === 'EN' ? ['6 original designs + your own custom design', 'URL import · Yousty, jobs.ch, careers pages', 'Reuses your uploaded CV automatically', 'PDF & Word export, ready to send']
-                : ['6 originale Designs + dein eigenes Custom-Design', 'URL-Import · Yousty, jobs.ch, Karriereseiten', 'Nutzt deinen hochgeladenen Lebenslauf automatisch', 'PDF- und Word-Export, sofort versandbereit']
+                language === 'FR' ? ['Pas seulement la lettre : profil court, compétences assorties et préparation à l\'entretien avec 10 questions, inclus', '6 designs originaux + ton design personnalisé', 'Import par URL · Yousty, jobs.ch, page carrière', 'Réutilise ton CV téléchargé automatiquement', 'Export PDF et Word, prêt à envoyer']
+                : language === 'IT' ? ['Non solo la lettera: profilo breve, competenze su misura e preparazione al colloquio con 10 domande, inclusi', '6 design originali + il tuo design personalizzato', 'Import via URL · Yousty, jobs.ch, pagina carriere', 'Riusa il tuo CV caricato automaticamente', 'Esporta PDF e Word, pronto da inviare']
+                : language === 'EN' ? ['Not just the letter: short profile, matching skills and interview prep with 10 questions, all included', '6 original designs + your own custom design', 'URL import · Yousty, jobs.ch, careers pages', 'Reuses your uploaded CV automatically', 'PDF & Word export, ready to send']
+                : ['Nicht nur der Brief: Kurzprofil, passende Skills und Interview-Vorbereitung mit 10 Fragen inklusive', '6 originale Designs + dein eigenes Custom-Design', 'URL-Import · Yousty, jobs.ch, Karriereseiten', 'Nutzt deinen hochgeladenen Lebenslauf automatisch', 'PDF- und Word-Export, sofort versandbereit']
               ][0].map((b, i) => (
                 <li key={i} className="flex gap-2.5 text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light">
                   <CheckCircle2 size={16} className="shrink-0 text-[#004225] dark:text-[#00A854] mt-0.5" />

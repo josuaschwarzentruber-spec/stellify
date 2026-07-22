@@ -100,6 +100,7 @@ const STR: Record<string, Record<string, string>> = {
     locked_title: 'Pro-Tool', locked_text: 'Der Bewerbungs-Generator ist Teil des Pro-Plans.', locked_cta: 'Pläne ansehen',
     required_hint: 'Vorname, Nachname, Zielfirma und Stelle ausfüllen, um fortzufahren.',
     generate: 'Mit KI generieren', regenerate: 'Neu generieren', generating: 'KI schreibt deine Bewerbung…',
+    empty_preview_hint: 'Fast geschafft. Klicke jetzt auf "Mit KI generieren", dann schreibt die KI in wenigen Sekunden deine vollständige Bewerbung mit Kurzprofil, passenden Skills und Interview-Vorbereitung.',
     gen_error: 'Generierung fehlgeschlagen. Bitte versuche es erneut.',
     edit_letter: 'Text bearbeiten', done_editing: 'Fertig',
     extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
@@ -147,6 +148,7 @@ const STR: Record<string, Record<string, string>> = {
     locked_title: 'Outil Pro', locked_text: 'Le générateur de candidature fait partie du plan Pro.', locked_cta: 'Voir les plans',
     required_hint: 'Remplis prénom, nom, entreprise et poste pour continuer.',
     generate: 'Générer avec l\'IA', regenerate: 'Régénérer', generating: 'L\'IA rédige ta candidature…',
+    empty_preview_hint: 'Presque fini. Clique sur "Générer avec l\'IA" et l\'IA rédige en quelques secondes ta candidature complète, avec profil court, compétences et préparation à l\'entretien.',
     gen_error: 'Échec de la génération. Réessaie.',
     edit_letter: 'Modifier le texte', done_editing: 'Terminé',
     extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
@@ -194,6 +196,7 @@ const STR: Record<string, Record<string, string>> = {
     locked_title: 'Strumento Pro', locked_text: 'Il generatore di candidature fa parte del piano Pro.', locked_cta: 'Vedi i piani',
     required_hint: 'Compila nome, cognome, azienda e posizione per continuare.',
     generate: 'Genera con l\'IA', regenerate: 'Rigenera', generating: 'L\'IA scrive la tua candidatura…',
+    empty_preview_hint: 'Quasi fatto. Clicca su "Genera con l\'IA" e l\'IA scrive in pochi secondi la tua candidatura completa, con profilo breve, competenze e preparazione al colloquio.',
     gen_error: 'Generazione non riuscita. Riprova.',
     edit_letter: 'Modifica il testo', done_editing: 'Fatto',
     extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
@@ -241,6 +244,7 @@ const STR: Record<string, Record<string, string>> = {
     locked_title: 'Pro Tool', locked_text: 'The application generator is part of the Pro plan.', locked_cta: 'See plans',
     required_hint: 'Fill in first name, last name, company and position to continue.',
     generate: 'Generate with AI', regenerate: 'Regenerate', generating: 'The AI is writing your application…',
+    empty_preview_hint: 'Almost there. Click "Generate with AI" and in a few seconds the AI writes your full application, with a short profile, matching skills and interview preparation.',
     gen_error: 'Generation failed. Please try again.',
     edit_letter: 'Edit text', done_editing: 'Done',
     extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
@@ -1347,6 +1351,24 @@ ${bodyText}
                       <div className="absolute inset-0 z-10 bg-white/70 dark:bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3">
                         <div className="w-7 h-7 border-2 border-[#004225] border-t-transparent rounded-full animate-spin" />
                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#004225]">{s.generating}</p>
+                      </div>
+                    )}
+                    {/* Empty preview: the letter is not written until the user
+                        hits Generate. Many visitors did not realise they had to
+                        click the top-right button, so we place a clear, central
+                        call-to-action right on the blank page. */}
+                    {!gen && !isGenerating && !quotaBlocked && (
+                      <div className="absolute inset-0 z-10 bg-white/85 dark:bg-black/60 backdrop-blur-[1px] flex flex-col items-center justify-center gap-4 text-center px-6">
+                        <div className="w-14 h-14 rounded-full bg-[#004225]/10 dark:bg-[#00A854]/15 flex items-center justify-center">
+                          <Sparkles size={26} className="text-[#004225] dark:text-[#00A854]" />
+                        </div>
+                        <p className="text-sm text-[#1A1A18] dark:text-[#FAFAF8] font-light leading-relaxed max-w-[320px]">{s.empty_preview_hint}</p>
+                        <button
+                          onClick={generate}
+                          className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#004225] text-white text-[11px] font-bold uppercase tracking-widest hover:bg-[#00331d] shadow-lg shadow-[#004225]/25 transition-all animate-pulse"
+                        >
+                          <Sparkles size={15} />{s.generate}
+                        </button>
                       </div>
                     )}
                     <div className="aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white">
