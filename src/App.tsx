@@ -3898,12 +3898,15 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
     } catch (e: any) {
       console.error("Subscription error:", e);
       const msg = e.message || '';
-      // Always show the actual error so the user/admin can diagnose it
-      const userMsg = msg.includes('test mode') || msg.includes('live mode')
-        ? 'Stripe-Konfigurationsfehler: Bitte die Preise im richtigen Modus (Test/Live) erstellen.'
-        : msg.includes('No such price') || msg.includes('price')
-        ? 'Ungültige Preis-Konfiguration. Bitte Support kontaktieren.'
-        : msg || 'Checkout konnte nicht gestartet werden.';
+      // The raw error is logged above for us to diagnose. A customer must
+      // never see an internal code or config wording — only a calm, human
+      // message. The one exception is the legitimate "plan already active".
+      const userMsg = msg.includes('bereits aktiv')
+        ? 'Dieser Plan ist bereits aktiv.'
+        : language === 'FR' ? "Le paiement n'est pas possible pour le moment. Merci de réessayer dans quelques minutes."
+        : language === 'IT' ? 'Il pagamento non è possibile al momento. Riprova tra qualche minuto.'
+        : language === 'EN' ? 'Payment is not possible right now. Please try again in a few minutes.'
+        : 'Die Bezahlung ist gerade nicht möglich. Bitte versuche es in ein paar Minuten noch einmal.';
       setSubscriptionError(userMsg);
     } finally {
       setIsSubscribing(false);
@@ -11271,7 +11274,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 <div className="flex items-start gap-3 min-w-0">
                   <span className="text-red-400 mt-0.5 shrink-0 text-base">⚠️</span>
                   <div className="min-w-0">
-                    <p className="text-red-300 text-sm font-semibold">Zahlung konnte nicht verarbeitet werden</p>
+                    <p className="text-red-300 text-sm font-semibold">{language === 'FR' ? "Le paiement n'a pas pu être traité" : language === 'IT' ? 'Il pagamento non è andato a buon fine' : language === 'EN' ? 'Payment could not be processed' : 'Zahlung konnte nicht verarbeitet werden'}</p>
                     <p className="text-red-400/80 text-xs mt-1 break-words">{subscriptionError}</p>
                     <p className="text-red-400/60 text-xs mt-1.5">Hilfe: <a href="https://mail.google.com/mail/?view=cm&fs=1&to=support.stellify@gmail.com&su=Stellify+Support+Anfrage&body=Hallo+Support-Team," target="_blank" rel="noopener noreferrer" className="underline hover:text-red-300">support.stellify@gmail.com</a></p>
                   </div>

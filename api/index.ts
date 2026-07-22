@@ -2080,15 +2080,29 @@ app.post("/api/create-checkout-session", express.json(), requireAuth, async (req
       return;
     }
 
+    // Accept several env-var namings for the same price, so renaming the
+    // variable in Vercel never breaks checkout. Internally the top plan is
+    // called "ultimate"; in the UI it is "Karriere+", so both spellings are
+    // honoured. First non-empty value wins.
+    const pickPrice = (...names: string[]): string | undefined => {
+      for (const n of names) {
+        const v = process.env[n];
+        if (v && v.trim()) return v.trim();
+      }
+      return undefined;
+    };
     const priceId: string | undefined = ({
-      'pro_monthly':      process.env.STRIPE_PRICE_PRO_MONTHLY,
-      'pro_yearly':       process.env.STRIPE_PRICE_PRO_YEARLY,
-      'ultimate_monthly': process.env.STRIPE_PRICE_ULTIMATE_MONTHLY,
-      'ultimate_yearly':  process.env.STRIPE_PRICE_ULTIMATE_YEARLY,
+      'pro_monthly':      pickPrice('STRIPE_PRICE_PRO_MONTHLY', 'STRIPE_PRICE_Pro_MONTHLY'),
+      'pro_yearly':       pickPrice('STRIPE_PRICE_PRO_YEARLY', 'STRIPE_PRICE_Pro_YEARLY'),
+      'ultimate_monthly': pickPrice('STRIPE_PRICE_ULTIMATE_MONTHLY', 'STRIPE_PRICE_Karriereplus_MONTHLY', 'STRIPE_PRICE_KARRIEREPLUS_MONTHLY'),
+      'ultimate_yearly':  pickPrice('STRIPE_PRICE_ULTIMATE_YEARLY', 'STRIPE_PRICE_Karriereplus_YEARLY', 'STRIPE_PRICE_KARRIEREPLUS_YEARLY'),
     } as Record<string, string | undefined>)[`${planId}_${billingCycle}`];
 
     if (!priceId) {
-      res.status(400).json({ error: `Preis-ID für "${planId}_${billingCycle}" nicht in Vercel konfiguriert` });
+      // A customer must never see internal configuration wording. Log the
+      // real cause for us, show a calm, human message to the visitor.
+      console.error(`[STRIPE] missing price id for ${planId}_${billingCycle} — set the matching STRIPE_PRICE_* env var in Vercel and redeploy`);
+      res.status(503).json({ error: 'Die Bezahlung ist gerade nicht möglich. Bitte versuche es in ein paar Minuten noch einmal.' });
       return;
     }
 
