@@ -91,6 +91,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_motivation: 'Warum diese Stelle? Warum diese Firma?…',
     back: 'Zurück', next: 'Weiter', to_preview: 'Zur Vorschau',
     preview_title: 'Deine Bewerbung', preview_sub: 'Live-Vorschau im gewählten Design. Generiere den Text mit KI und exportiere als PDF oder Word.',
+    saved_title: 'Deine gespeicherte Bewerbung', saved_sub: 'Bearbeite den Text mit dem Stift, exportiere als PDF oder Word, oder generiere bei Bedarf neu.',
     save_application: 'Bewerbung speichern', saved: 'Gespeichert', saving: 'Speichern…',
     load_saved: 'Gespeicherte Bewerbungen', load: 'Öffnen', no_saved: 'Noch keine gespeicherten Bewerbungen.',
     subject: 'Bewerbung als', attachment_note: 'Beilagen: Lebenslauf, Zeugnisse',
@@ -139,6 +140,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_motivation: 'Pourquoi ce poste ? Pourquoi cette entreprise ?…',
     back: 'Retour', next: 'Continuer', to_preview: 'Voir l\'aperçu',
     preview_title: 'Ta candidature', preview_sub: 'Aperçu en direct dans le design choisi. Génère le texte avec l\'IA et exporte en PDF ou Word.',
+    saved_title: 'Ta candidature enregistrée', saved_sub: 'Modifie le texte avec le crayon, exporte en PDF ou Word, ou régénère si besoin.',
     save_application: 'Enregistrer la candidature', saved: 'Enregistré', saving: 'Enregistrement…',
     load_saved: 'Candidatures enregistrées', load: 'Ouvrir', no_saved: 'Aucune candidature enregistrée.',
     subject: 'Candidature au poste de', attachment_note: 'Annexes : CV, certificats',
@@ -187,6 +189,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_motivation: 'Perché questa posizione? Perché questa azienda?…',
     back: 'Indietro', next: 'Avanti', to_preview: 'Vai all\'anteprima',
     preview_title: 'La tua candidatura', preview_sub: 'Anteprima live nel design scelto. Genera il testo con l\'IA ed esporta in PDF o Word.',
+    saved_title: 'La tua candidatura salvata', saved_sub: 'Modifica il testo con la matita, esporta in PDF o Word, o rigenera se necessario.',
     save_application: 'Salva candidatura', saved: 'Salvato', saving: 'Salvataggio…',
     load_saved: 'Candidature salvate', load: 'Apri', no_saved: 'Nessuna candidatura salvata.',
     subject: 'Candidatura come', attachment_note: 'Allegati: CV, certificati',
@@ -235,6 +238,7 @@ const STR: Record<string, Record<string, string>> = {
     ph_motivation: 'Why this role? Why this company?…',
     back: 'Back', next: 'Next', to_preview: 'See preview',
     preview_title: 'Your application', preview_sub: 'Live preview in your chosen design. Generate the text with AI and export as PDF or Word.',
+    saved_title: 'Your saved application', saved_sub: 'Edit the text with the pencil, export as PDF or Word, or regenerate if needed.',
     save_application: 'Save application', saved: 'Saved', saving: 'Saving…',
     load_saved: 'Saved applications', load: 'Open', no_saved: 'No saved applications yet.',
     subject: 'Application for the position of', attachment_note: 'Enclosures: CV, references',
@@ -1318,8 +1322,8 @@ ${bodyText}
             <motion.div key="preview" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
               <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
                 <div>
-                  <h3 className="font-serif text-2xl text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{s.preview_title}</h3>
-                  <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light">{s.preview_sub}</p>
+                  <h3 className="font-serif text-2xl text-[#1A1A18] dark:text-[#FAFAF8] mb-1">{loadedDocId && gen ? s.saved_title : s.preview_title}</h3>
+                  <p className="text-xs text-[#6B6B66] dark:text-[#9A9A94] font-light">{loadedDocId && gen ? s.saved_sub : s.preview_sub}</p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <button onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#6B6B66] dark:text-[#9A9A94] border border-black/10 dark:border-white/10 hover:bg-black/5 dark:hover:bg-white/5 transition-all">
