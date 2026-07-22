@@ -1104,13 +1104,14 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
           upgrade: true,
         });
       }
-      // IP soft-limit: stop free-quota farming via many e-mail accounts from
-      // the same network. We store ONLY a salted SHA-256 hash of the IP (never
-      // the raw address) and allow a few free accounts per network, so families,
-      // offices and mobile users who legitimately share one public IP are not
-      // locked out. Tunable via FREE_ACCOUNTS_PER_IP (default 3). A ledger read
-      // failure must never block a request, so it is caught and ignored.
+      // IP watch (alert-only): a real customer must NEVER be turned away, so
+      // this does not block. It only counts distinct free accounts per network
+      // (storing ONLY a salted SHA-256 hash of the IP, never the raw address)
+      // and, if one network spawns many free accounts, sends the owner a heads-
+      // up so it can be looked at by hand. Set FREE_IP_HARD_BLOCK=1 in Vercel to
+      // turn the count into an actual block instead. A ledger failure is ignored.
       const FREE_ACCOUNTS_PER_IP = Number(process.env.FREE_ACCOUNTS_PER_IP) || 3;
+      const IP_HARD_BLOCK = process.env.FREE_IP_HARD_BLOCK === '1';
       try {
         const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
         const ip = fwd || (req.socket && req.socket.remoteAddress) || '';
@@ -1120,19 +1121,28 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
           const ipData = (await ipRef.get()).data() || {};
           const accounts: string[] = Array.isArray(ipData.accounts) ? ipData.accounts : [];
           if (!accounts.includes(uid)) {
-            if (accounts.length >= FREE_ACCOUNTS_PER_IP) {
+            const total = accounts.length + 1;
+            if (IP_HARD_BLOCK && accounts.length >= FREE_ACCOUNTS_PER_IP) {
               return res.status(402).json({
                 error: 'Von diesem Netzwerk wurden bereits mehrere Gratis-Konten genutzt. Bitte melde dich mit deinem bestehenden Konto an oder hol dir Pro fuer unbegrenzten Zugang.',
                 upgrade: true,
                 remaining: 0,
               });
             }
-            // First free generation of a new account on this network: register it.
             await ipRef.set({
-              accounts: [...accounts, uid].slice(-20),
+              accounts: [...accounts, uid].slice(-40),
               count: (ipData.count || accounts.length) + 1,
               updated_at: new Date().toISOString(),
             }, { merge: true });
+            // Heads-up only (never blocks): many free accounts from one network.
+            if (!IP_HARD_BLOCK && total >= FREE_ACCOUNTS_PER_IP) {
+              alertOwnerOncePerDay(
+                `free_ip_${ipHash.slice(0, 12)}`,
+                '🟠 Stellify: viele Gratis-Konten aus einem Netzwerk',
+                `<p>Von einem Netzwerk wurden bereits <b>${total}</b> Gratis-Konten genutzt.</p>
+                 <p>Das kann harmlos sein (Familie, Büro, Mobilnetz) oder ein Hinweis auf Missbrauch. Es wird niemand blockiert. Wenn du hart blockieren willst, setze in Vercel <code>FREE_IP_HARD_BLOCK=1</code>.</p>`
+              ).catch(() => {});
+            }
           }
         }
       } catch (e: any) {

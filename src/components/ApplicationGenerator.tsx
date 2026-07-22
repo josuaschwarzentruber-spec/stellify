@@ -312,18 +312,18 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
   };
 
   const Body = () => (
-    <div style={{ fontFamily: bodyFont, fontSize: 10.5, lineHeight: 1.75, color: '#26261F' }}>
-      <p style={{ marginBottom: 10, color: '#6B6B66' }}>{today}</p>
-      <p style={{ fontWeight: 700, marginBottom: 14, color: a, fontSize: 11 }}>
+    <div style={{ fontFamily: bodyFont, fontSize: 11, lineHeight: 1.9, color: '#26261F' }}>
+      <p style={{ marginBottom: 12, color: '#6B6B66' }}>{today}</p>
+      <p style={{ fontWeight: 700, marginBottom: 16, color: a, fontSize: 11.5 }}>
         {s.subject} {form.targetPosition || '…'}{form.targetCompany ? ` · ${form.targetCompany}` : ''}
       </p>
-      <p style={{ marginBottom: 10 }}>{s.greeting}</p>
-      <p style={{ whiteSpace: 'pre-wrap', marginBottom: 14, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
+      <p style={{ marginBottom: 12 }}>{s.greeting}</p>
+      <p style={{ whiteSpace: 'pre-wrap', marginBottom: 16, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
         {bodyText}
       </p>
       <p style={{ marginBottom: 4 }}>{s.closing}</p>
       <p style={{ fontWeight: 600 }}>{fullName}</p>
-      <p style={{ marginTop: 14, fontSize: 8.5, color: '#9A9A94' }}>{s.attachment_note}</p>
+      <p style={{ marginTop: 16, fontSize: 9, color: '#9A9A94' }}>{s.attachment_note}</p>
     </div>
   );
 
@@ -793,7 +793,7 @@ TONALITÄT: ${toneLabel(form.tone)}
 
 AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
-  "coverLetter": "Vollständiges Bewerbungsanschreiben, 250-350 Wörter, ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross), Absätze mit \\n\\n getrennt",
+  "coverLetter": "Vollständiges Bewerbungsanschreiben, 340-430 Wörter (4 bis 5 gehaltvolle Absätze, damit die Seite gut gefüllt ist), ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross), Absätze mit \\n\\n getrennt",
   "cvSummary": "Optimiertes Kurzprofil für den Lebenslauf, 3-4 Sätze",
   "skills": ["6-8 passende Skills als kurze Stichworte"],
   "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
