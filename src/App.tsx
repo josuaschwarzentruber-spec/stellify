@@ -2650,7 +2650,10 @@ function StellifyApp() {
   const [showExitIntent, setShowExitIntent] = useState(false);
   useEffect(() => {
     if (activeView !== 'pricing') return;
-    if (user && user.role !== 'client') return;
+    // Only logged-OUT visitors: the popup invites you to "register for 3 free
+    // applications, no credit card". Showing that to someone already registered
+    // (especially one who has used their free quota) is contradictory.
+    if (user) return;
     try { if (sessionStorage.getItem('stellify_exit_intent') === '1') return; } catch { /* ignore */ }
     const onOut = (e: MouseEvent) => {
       if (e.relatedTarget || e.clientY > 0) return;
