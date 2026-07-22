@@ -1092,6 +1092,41 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
           upgrade: true,
         });
       }
+      // IP soft-limit: stop free-quota farming via many e-mail accounts from
+      // the same network. We store ONLY a salted SHA-256 hash of the IP (never
+      // the raw address) and allow a few free accounts per network, so families,
+      // offices and mobile users who legitimately share one public IP are not
+      // locked out. Tunable via FREE_ACCOUNTS_PER_IP (default 3). A ledger read
+      // failure must never block a request, so it is caught and ignored.
+      const FREE_ACCOUNTS_PER_IP = Number(process.env.FREE_ACCOUNTS_PER_IP) || 3;
+      try {
+        const fwd = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+        const ip = fwd || (req.socket && req.socket.remoteAddress) || '';
+        if (ip) {
+          const ipHash = createHash('sha256').update(ip + (process.env.IP_HASH_SALT || 'stellify')).digest('hex');
+          const ipRef = adminDb.collection('free_ip_ledger').doc(ipHash);
+          const ipData = (await ipRef.get()).data() || {};
+          const accounts: string[] = Array.isArray(ipData.accounts) ? ipData.accounts : [];
+          if (!accounts.includes(uid)) {
+            if (accounts.length >= FREE_ACCOUNTS_PER_IP) {
+              return res.status(402).json({
+                error: 'Von diesem Netzwerk wurden bereits mehrere Gratis-Konten genutzt. Bitte melde dich mit deinem bestehenden Konto an oder hol dir Pro fuer unbegrenzten Zugang.',
+                upgrade: true,
+                remaining: 0,
+              });
+            }
+            // First free generation of a new account on this network: register it.
+            await ipRef.set({
+              accounts: [...accounts, uid].slice(-20),
+              count: (ipData.count || accounts.length) + 1,
+              updated_at: new Date().toISOString(),
+            }, { merge: true });
+          }
+        }
+      } catch (e: any) {
+        console.error('[QUOTA] ip ledger failed:', e.message);
+      }
+
       let used = u.ai_calls_lifetime || 0;
       // The free lifetime quota survives account deletion: a ledger keyed by
       // the e-mail fingerprint remembers consumed free calls, so

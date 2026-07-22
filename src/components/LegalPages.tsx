@@ -79,7 +79,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Lebenslauf-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur KI-Verarbeitung, nicht dauerhaft gespeichert)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Nutzungsdaten:</strong> Anzahl Tool-Nutzungen, Chat-Anfragen, Datum des letzten Resets</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zahlungsdaten:</strong> Werden ausschliesslich durch Stripe Inc. verarbeitet.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal gespeichert)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal gespeichert) sowie ein verschlüsselter Prüfwert (Hash) deiner IP-Adresse, ausschliesslich zur Missbrauchsabwehr beim kostenlosen Kontingent. Die IP-Adresse selbst wird nicht im Klartext gespeichert.</li>
                 </ul>
               </Section>
               <Section title="3. Zweck der Datenbearbeitung">
@@ -131,7 +131,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Contenu du CV :</strong> texte de votre CV (traitement IA uniquement, non stocké de façon permanente)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données d'utilisation :</strong> nombre d'utilisations des outils, requêtes chat</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données de paiement :</strong> traitées exclusivement par Stripe Inc.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données techniques :</strong> paramètres de langue, préférence de thème (stockage local)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données techniques :</strong> paramètres de langue, préférence de thème (stockage local) ainsi qu'une empreinte chiffrée (hash) de ton adresse IP, uniquement pour prévenir les abus du quota gratuit. L'adresse IP elle-même n'est jamais stockée en clair.</li>
                 </ul>
               </Section>
               <Section title="3. Finalités du traitement">
@@ -178,7 +178,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Contenuto del CV:</strong> testo del CV (solo per elaborazione IA, non memorizzato permanentemente)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati di utilizzo:</strong> numero di utilizzi degli strumenti, richieste chat</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati di pagamento:</strong> elaborati esclusivamente da Stripe Inc.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati tecnici:</strong> impostazioni lingua, preferenza tema (memorizzati localmente)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati tecnici:</strong> impostazioni lingua, preferenza tema (memorizzati localmente) e un valore cifrato (hash) del tuo indirizzo IP, esclusivamente per prevenire abusi del contingente gratuito. L'indirizzo IP stesso non viene mai memorizzato in chiaro.</li>
                 </ul>
               </Section>
               <Section title="3. Finalità del trattamento">
@@ -225,7 +225,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV content:</strong> Text of your uploaded resume (used for AI processing only, not permanently stored on our servers)</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Usage data:</strong> Number of tool uses, chat requests, date of last reset</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Payment data:</strong> Processed exclusively by Stripe Inc. We do not receive full credit card data.</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technical data:</strong> Language settings, theme preference (stored locally in browser)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technical data:</strong> Language settings, theme preference (stored locally in browser) and an encrypted checksum (hash) of your IP address, used solely to prevent abuse of the free quota. The IP address itself is never stored in clear text.</li>
                 </ul>
               </Section>
               <Section title="3. Purposes of Processing">
