@@ -7697,19 +7697,12 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   const previewIdentity = (() => {
     const firstName = user?.firstName?.trim();
     if (!firstName) return { name: 'Anna Müller', emailMask: 'anna.mueller@…' };
-    let lastName = '';
-    const local = (user?.email || '').split('@')[0] || '';
-    const parts = local.split(/[._-]/).filter(Boolean);
-    if (parts.length >= 2 && parts[0].toLowerCase() === firstName.toLowerCase()) {
-      const guess = parts[1];
-      if (/^[a-zà-öø-ÿ]{2,}$/i.test(guess)) {
-        lastName = guess.charAt(0).toUpperCase() + guess.slice(1).toLowerCase();
-      }
-    }
-    const fullName = lastName ? `${firstName} ${lastName}` : firstName;
+    // Personalise the preview with the first name the user gave — but NEVER
+    // guess a surname from the e-mail. Inventing a name a customer did not
+    // enter is not acceptable.
     const email = user?.email || '';
     const emailMask = email.length > 26 ? email.slice(0, 23) + '…' : email;
-    return { name: fullName, emailMask };
+    return { name: firstName, emailMask };
   })();
   // Illustrated portrait for the example documents: the user's own avatar if
   // it is one of the face presets, otherwise a fixed sample face. Never a

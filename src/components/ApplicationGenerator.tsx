@@ -772,31 +772,16 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
     }
   };
 
-  // Prefill the applicant's name + email from the account once, on mount.
-  // Only fills empty fields so it never overwrites the user's own edits.
+  // Prefill ONLY the first name and e-mail the user explicitly gave at sign-up.
+  // We deliberately do NOT guess the last name (e.g. from the e-mail address) —
+  // inventing a surname a customer never entered is surprising and must never
+  // happen. Only fills empty fields, so it never overwrites the user's edits.
   useEffect(() => {
     if (!profile) return;
     setForm(prev => {
       const next = { ...prev };
       if (!next.firstName && profile.firstName) next.firstName = profile.firstName;
       if (!next.email && profile.email) next.email = profile.email;
-      // Derive a last name from the email ONLY when it's clearly safe.
-      // Safe = the local part is `firstname.lastname` (or _ / -) AND the
-      // first token matches the user's known firstName. That covers the
-      // common 'josua.schwarzentruber@…' case without ever guessing on
-      // handles like 'jschwarz@…' or 'cool.dude@…'.
-      const fn = (next.firstName || profile.firstName || '').trim().toLowerCase();
-      if (!next.lastName && fn && profile.email) {
-        const local = profile.email.split('@')[0] || '';
-        const parts = local.split(/[._-]/).filter(Boolean);
-        if (parts.length >= 2 && parts[0].toLowerCase() === fn) {
-          const guess = parts.slice(1)
-            .filter(p => /^[a-zà-öø-ÿ]{2,}$/i.test(p))
-            .map(p => p.charAt(0).toUpperCase() + p.slice(1).toLowerCase())
-            .join(' ');
-          if (guess) next.lastName = guess;
-        }
-      }
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
