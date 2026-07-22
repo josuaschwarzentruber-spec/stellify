@@ -9714,7 +9714,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   })()}
 
                   {/* Detailed Usage in Settings — one dynamic block for every
-                      plan (Free 3 · Pro 50 · Karriere+ 150). Shows how many
+                      plan (Free 3 · Pro 30 · Karriere+ 100). Shows how many
                       generations are LEFT instead of a percent figure. */}
                   {user && (() => {
                     const limit = (user.role === 'unlimited' || user.role === 'admin') ? 100 : user.role === 'pro' ? 30 : 3;
@@ -13163,9 +13163,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                             <div className="w-1.5 h-1.5 bg-[#004225] rounded-full animate-pulse shadow-[0_0_8px_rgba(0,66,37,0.4)]" />
                             <span className="text-[9px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94]">
                               {(user.role === 'unlimited' || user.role === 'admin')
-                                ? `${Math.max(0, 150 - (user.toolUses || 0))} ${t.remaining}`
+                                ? `${Math.max(0, 100 - (user.toolUses || 0))} ${t.remaining}`
                                 : user.role === 'pro'
-                                ? `${Math.max(0, 50 - (user.toolUses || 0))} ${t.remaining}`
+                                ? `${Math.max(0, 30 - (user.toolUses || 0))} ${t.remaining}`
                                 : `${Math.max(0, 3 - (user.toolUses || 0))} ${t.remaining}`
                               }
                             </span>
