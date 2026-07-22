@@ -553,7 +553,7 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
           const localeMap: Record<Lang, string> = { DE: 'de-CH', FR: 'fr-CH', IT: 'it-CH', EN: 'en-GB' };
           const dateStr = expiresAt.toLocaleDateString(localeMap[userLang] || 'de-CH', { day: 'numeric', month: 'long', year: 'numeric' });
           const firstName = existingUser.first_name || (userLang === 'DE' ? 'Nutzer' : userLang === 'FR' ? 'utilisateur' : userLang === 'IT' ? 'utente' : 'there');
-          const genCount = planId === 'ultimate' ? '150' : '50';
+          const genCount = planId === 'ultimate' ? '100' : '30';
           const planPerks: Record<Lang, string> = {
             DE: planId === 'ultimate'
               ? `Dir stehen jetzt <strong>${genCount} Generierungen pro Monat</strong>, alle exklusiven Premium-Designs und der persönliche E-Mail-Support offen.`
@@ -985,8 +985,8 @@ async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts 
 // "X Generierungen pro Monat" messaging), perMin is abuse protection only.
 const QUOTA = {
   client:    { lifetime: 3 },
-  pro:       { perMin: 15, perDay: 50,  perMonth: 50 },
-  unlimited: { perMin: 30, perDay: 150, perMonth: 150 },
+  pro:       { perMin: 15, perDay: 30,  perMonth: 30 },
+  unlimited: { perMin: 30, perDay: 100, perMonth: 100 },
 } as const;
 
 // Hard daily ceiling on ALL AI calls combined (across every user) — the
@@ -1767,10 +1767,10 @@ function onboardingCopy(day: 1 | 3 | 7, name: string, lang: Lang) {
       EN: { subject: 'See what Stellify makes of an application', title: 'Your example is waiting', lines: [`Hello ${n},`, 'not had time yet? In the generator, the <strong>"Try with example"</strong> button shows you a complete Swiss application with photo in one click, formatted as PDF and Word. No personal data needed.', 'And the free <strong>guides</strong> cover everything from the CV to salary negotiation.'], cta: 'See the example', url: site + '/tools' },
     },
     7: {
-      DE: { subject: 'Deine 3 Gratis-Bewerbungen waren erst der Anfang', title: 'Bereit für mehr?', lines: [`Hallo ${n},`, 'eine Woche Stellify! Wenn du gerade aktiv am Bewerben bist: Mit <strong>Pro</strong> bekommst du 50 Generierungen pro Monat, den Stellen-Import per Link und alle Standard-Designs, für <strong>CHF 19.90 pro Monat</strong>.', 'Der Bewerbungs-Tracker bleibt für dich sowieso für immer gratis.', 'Das war die letzte Mail unserer kleinen Starthilfe. Danach hörst du von uns nur noch bei wichtigen Konto-Themen.'], cta: 'Pläne ansehen', url: site + '/pricing' },
-      FR: { subject: 'Tes 3 candidatures gratuites n\'étaient que le début', title: 'Prêt pour la suite ?', lines: [`Bonjour ${n},`, 'une semaine avec Stellify ! Si tu postules activement : avec <strong>Pro</strong>, tu obtiens 50 générations par mois, l\'import d\'annonces par lien et tous les designs standard, pour <strong>CHF 19.90 par mois</strong>.', 'Le tracker de candidatures reste gratuit pour toujours.', 'C\'était le dernier e-mail de notre petit coup de pouce. Ensuite, tu n\'entendras parler de nous que pour des sujets importants liés à ton compte.'], cta: 'Voir les plans', url: site + '/pricing' },
-      IT: { subject: 'Le tue 3 candidature gratuite erano solo l\'inizio', title: 'Pronto per di più?', lines: [`Ciao ${n},`, 'una settimana con Stellify! Se ti stai candidando attivamente: con <strong>Pro</strong> ottieni 50 generazioni al mese, l\'import degli annunci da link e tutti i design standard, per <strong>CHF 19.90 al mese</strong>.', 'Il tracker delle candidature resta gratuito per sempre.', 'Questa era l\'ultima e-mail del nostro piccolo aiuto iniziale. Poi ci sentirai solo per temi importanti del tuo account.'], cta: 'Vedi i piani', url: site + '/pricing' },
-      EN: { subject: 'Your 3 free applications were just the start', title: 'Ready for more?', lines: [`Hello ${n},`, 'one week with Stellify! If you are actively applying: <strong>Pro</strong> gives you 50 generations per month, job-ad import by link and every standard design, for <strong>CHF 19.90 per month</strong>.', 'The application tracker stays free for you forever.', 'This was the last mail of our little starter series. After this you will only hear from us about important account matters.'], cta: 'See plans', url: site + '/pricing' },
+      DE: { subject: 'Deine 3 Gratis-Bewerbungen waren erst der Anfang', title: 'Bereit für mehr?', lines: [`Hallo ${n},`, 'eine Woche Stellify! Wenn du gerade aktiv am Bewerben bist: Mit <strong>Pro</strong> bekommst du 30 Generierungen pro Monat, den Stellen-Import per Link und alle Standard-Designs, für <strong>CHF 9.90 pro Monat</strong>.', 'Der Bewerbungs-Tracker bleibt für dich sowieso für immer gratis.', 'Das war die letzte Mail unserer kleinen Starthilfe. Danach hörst du von uns nur noch bei wichtigen Konto-Themen.'], cta: 'Pläne ansehen', url: site + '/pricing' },
+      FR: { subject: 'Tes 3 candidatures gratuites n\'étaient que le début', title: 'Prêt pour la suite ?', lines: [`Bonjour ${n},`, 'une semaine avec Stellify ! Si tu postules activement : avec <strong>Pro</strong>, tu obtiens 30 générations par mois, l\'import d\'annonces par lien et tous les designs standard, pour <strong>CHF 9.90 par mois</strong>.', 'Le tracker de candidatures reste gratuit pour toujours.', 'C\'était le dernier e-mail de notre petit coup de pouce. Ensuite, tu n\'entendras parler de nous que pour des sujets importants liés à ton compte.'], cta: 'Voir les plans', url: site + '/pricing' },
+      IT: { subject: 'Le tue 3 candidature gratuite erano solo l\'inizio', title: 'Pronto per di più?', lines: [`Ciao ${n},`, 'una settimana con Stellify! Se ti stai candidando attivamente: con <strong>Pro</strong> ottieni 30 generazioni al mese, l\'import degli annunci da link e tutti i design standard, per <strong>CHF 9.90 al mese</strong>.', 'Il tracker delle candidature resta gratuito per sempre.', 'Questa era l\'ultima e-mail del nostro piccolo aiuto iniziale. Poi ci sentirai solo per temi importanti del tuo account.'], cta: 'Vedi i piani', url: site + '/pricing' },
+      EN: { subject: 'Your 3 free applications were just the start', title: 'Ready for more?', lines: [`Hello ${n},`, 'one week with Stellify! If you are actively applying: <strong>Pro</strong> gives you 30 generations per month, job-ad import by link and every standard design, for <strong>CHF 9.90 per month</strong>.', 'The application tracker stays free for you forever.', 'This was the last mail of our little starter series. After this you will only hear from us about important account matters.'], cta: 'See plans', url: site + '/pricing' },
     },
   };
   return C[day][lang] || C[day].DE;

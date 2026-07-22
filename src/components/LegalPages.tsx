@@ -333,7 +333,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3 Bewerbungs-Generierungen','Bewerbungs-Tracker (dauerhaft gratis)','PDF- & Word-Export','Schweizer Bewerbungs-Standards']],['Pro-Plan (CHF 19.90/Mo. · CHF 190.–/Jahr)', ['50 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 39.90/Mo. · CHF 349.–/Jahr)', ['Alles aus Pro','150 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3 Bewerbungs-Generierungen','Bewerbungs-Tracker (dauerhaft gratis)','PDF- & Word-Export','Schweizer Bewerbungs-Standards']],['Pro-Plan (CHF 9.90/Mo. · CHF 89.–/Jahr)', ['30 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 19.90/Mo. · CHF 179.–/Jahr)', ['Alles aus Pro','100 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -354,8 +354,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p className="mt-2">Zum Zeitpunkt der aktuellen Fassung gelten:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Gratis-Plan:</strong> 3 Generierungen lebenslang (Tool-Nutzungen)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro-Plan:</strong> 50 Generierungen pro Monat, max. 15 pro Minute</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 Generierungen pro Monat, max. 30 pro Minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro-Plan:</strong> 30 Generierungen pro Monat, max. 15 pro Minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 100 Generierungen pro Monat, max. 30 pro Minute</li>
                 </ul>
                 <p className="mt-2">Bei Monatsabos wird das Kontingent zu Beginn jeder Abrechnungsperiode zurückgesetzt, also am jeweiligen Kauf-Stichtag (Beispiel: Kauf am 12. → Reset am 12. jedes Monats). Bei Jahresabos wird das monatliche Kontingent jeweils am 1. des Kalendermonats aufgefrischt. Die Minuten-Limits dienen ausschliesslich dem Schutz vor Missbrauch und automatisierter Massennutzung.</p>
                 <p className="mt-2">Eine <em>Erhöhung</em> der Kontingente ist jederzeit möglich und gilt automatisch zugunsten des Nutzers. Eine <em>Senkung</em> würde nur für nach der Änderung neu abgeschlossene Abonnements wirksam und vorab mit 30 Tagen Frist angekündigt.</p>
@@ -386,7 +386,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3 générations de candidatures','Suivi des candidatures (gratuit pour toujours)','Export PDF & Word','Standards de candidature suisses']],['Plan Pro (CHF 19.90/mois · CHF 190.–/an)', ['50 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 39.90/mois · CHF 349.–/an)', ['Tout de Pro','150 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3 générations de candidatures','Suivi des candidatures (gratuit pour toujours)','Export PDF & Word','Standards de candidature suisses']],['Plan Pro (CHF 9.90/mois · CHF 89.–/an)', ['30 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 19.90/mois · CHF 179.–/an)', ['Tout de Pro','100 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -407,8 +407,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p className="mt-2">À la date de la version actuelle, les limites sont :</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Gratuit :</strong> 3 générations à vie (utilisations d'outils)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Pro :</strong> 50 générations par mois, max. 15 par minute</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ :</strong> 150 générations par mois, max. 30 par minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Plan Pro :</strong> 30 générations par mois, max. 15 par minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+ :</strong> 100 générations par mois, max. 30 par minute</li>
                 </ul>
                 <p className="mt-2">Pour les abonnements mensuels, le quota est réinitialisé au début de chaque période de facturation, c'est-à-dire à la date d'achat (exemple : achat le 12 → réinitialisation le 12 de chaque mois). Pour les abonnements annuels, le quota mensuel est renouvelé le 1er de chaque mois civil. Les limites par minute servent exclusivement à prévenir les abus et l'utilisation automatisée de masse.</p>
                 <p className="mt-2">Une <em>augmentation</em> des quotas est possible à tout moment et s'applique automatiquement en faveur de l'utilisateur. Une <em>diminution</em> ne s'appliquerait qu'aux abonnements souscrits après la modification et serait annoncée 30 jours à l'avance.</p>
@@ -439,7 +439,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3 generazioni di candidature','Tracker candidature (gratuito per sempre)','Esportazione PDF & Word','Standard di candidatura svizzeri']],['Piano Pro (CHF 19.90/mese · CHF 190.–/anno)', ['50 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 39.90/mese · CHF 349.–/anno)', ['Tutto di Pro','150 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3 generazioni di candidature','Tracker candidature (gratuito per sempre)','Esportazione PDF & Word','Standard di candidatura svizzeri']],['Piano Pro (CHF 9.90/mese · CHF 89.–/anno)', ['30 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 19.90/mese · CHF 179.–/anno)', ['Tutto di Pro','100 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -460,8 +460,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p className="mt-2">Alla data della versione attuale valgono:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Gratuito:</strong> 3 generazioni a vita (utilizzi di strumenti)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Pro:</strong> 50 generazioni al mese, max. 15 al minuto</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 generazioni al mese, max. 30 al minuto</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Piano Pro:</strong> 30 generazioni al mese, max. 15 al minuto</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 100 generazioni al mese, max. 30 al minuto</li>
                 </ul>
                 <p className="mt-2">Per gli abbonamenti mensili il contingente viene azzerato all'inizio di ogni periodo di fatturazione, cioè nella data di acquisto (esempio: acquisto il 12 → azzeramento il 12 di ogni mese). Per gli abbonamenti annuali il contingente mensile viene rinnovato il 1° di ogni mese di calendario. I limiti al minuto servono esclusivamente a prevenire abusi e utilizzo automatizzato di massa.</p>
                 <p className="mt-2">Un <em>aumento</em> dei limiti è possibile in qualsiasi momento e si applica automaticamente a favore dell'utente. Una <em>riduzione</em> si applicherebbe solo agli abbonamenti sottoscritti dopo la modifica e verrebbe annunciata con 30 giorni di preavviso.</p>
@@ -492,7 +492,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3 application generations','Application Tracker (free forever)','PDF & Word export','Swiss application standards']],['Pro Plan (CHF 19.90/mo · CHF 190.–/yr)', ['50 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 39.90/mo · CHF 349.–/yr)', ['Everything in Pro','150 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3 application generations','Application Tracker (free forever)','PDF & Word export','Swiss application standards']],['Pro Plan (CHF 9.90/mo · CHF 89.–/yr)', ['30 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 19.90/mo · CHF 179.–/yr)', ['Everything in Pro','100 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -513,8 +513,8 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p className="mt-2">As of the current version the limits are:</p>
                 <ul className="list-disc pl-5 space-y-1 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Free Plan:</strong> 3 lifetime generations (tool uses)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro Plan:</strong> 50 generations per month, max. 15 per minute</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 150 generations per month, max. 30 per minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Pro Plan:</strong> 30 generations per month, max. 15 per minute</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Karriere+:</strong> 100 generations per month, max. 30 per minute</li>
                 </ul>
                 <p className="mt-2">For monthly subscriptions the quota resets at the start of each billing period, i.e. on the purchase date (example: bought on the 12th → resets on the 12th each month). For annual subscriptions the monthly quota refreshes on the 1st of each calendar month. The per-minute limits serve solely to prevent abuse and automated mass use.</p>
                 <p className="mt-2">An <em>increase</em> of quotas is possible at any time and applies automatically in favour of the user. A <em>decrease</em> would only apply to subscriptions taken out after the change and would be announced 30 days in advance.</p>

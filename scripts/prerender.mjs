@@ -22,7 +22,7 @@ const ROUTES = [
   {
     path: 'pricing',
     title: 'Preise | Stellify',
-    desc: 'Gratis starten mit 3 Bewerbungen. Pro ab CHF 19.90 pro Monat: 50 Generierungen, Stellen-Import per Link, alle Designs. Karriere+ ab CHF 39.90. Jederzeit im Konto verwaltbar.',
+    desc: 'Gratis starten mit 3 Bewerbungen. Pro ab CHF 9.90 pro Monat: 30 Generierungen, Stellen-Import per Link, alle Designs. Karriere+ ab CHF 19.90. Jederzeit im Konto verwaltbar.',
   },
   {
     path: 'about',

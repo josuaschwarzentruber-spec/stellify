@@ -438,10 +438,10 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { 
         'Tu as vu comme Stella écrit bien. Passe à Pro et crée autant de candidatures que nécessaire.',
         'Hai visto quanto bene scrive Stella. Passa a Pro e crea tutte le candidature che ti servono.',
         'You have seen how well Stella writes. Get Pro and create as many applications as you need.');
-  const benefits = language === 'FR' ? ['50 générations IA par mois', 'Tous les designs standard', 'Import par lien et réutilisation du CV', 'Export PDF et Word']
-    : language === 'IT' ? ['50 generazioni IA al mese', 'Tutti i design standard', 'Import da link e riuso del CV', 'Esportazione PDF e Word']
+  const benefits = language === 'FR' ? ['30 générations IA par mois', 'Tous les designs standard', 'Import par lien et réutilisation du CV', 'Export PDF et Word']
+    : language === 'IT' ? ['30 generazioni IA al mese', 'Tutti i design standard', 'Import da link e riuso del CV', 'Esportazione PDF e Word']
     : language === 'EN' ? ['50 AI generations per month', 'All standard designs', 'Link import and CV reuse', 'PDF and Word export']
-    : ['50 KI-Generierungen pro Monat', 'Alle Standard-Designs', 'Stelle per Link laden und Lebenslauf nutzen', 'PDF- und Word-Export'];
+    : ['30 KI-Generierungen pro Monat', 'Alle Standard-Designs', 'Stelle per Link laden und Lebenslauf nutzen', 'PDF- und Word-Export'];
   return (
     <div className="fixed inset-0 z-[1200] flex items-center justify-center p-5">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-black/55 backdrop-blur-sm" />
@@ -479,7 +479,7 @@ const UpgradePrompt = ({ reason, language, onClose, onPricing, subOverride }: { 
           {/* Price anchor */}
           <div className="flex items-center justify-center gap-2 mb-6">
             <span className="text-[11px] text-[#9A9A94] uppercase tracking-widest font-bold">Pro</span>
-            <span className="font-serif text-2xl text-[#004225] dark:text-[#00A854]">CHF 19.90</span>
+            <span className="font-serif text-2xl text-[#004225] dark:text-[#00A854]">CHF 9.90</span>
             <span className="text-[11px] text-[#9A9A94]">{L('/Monat', '/mois', '/mese', '/month')}</span>
           </div>
           <button
@@ -4996,13 +4996,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
   // Pricing model: monthly shows the per-month price; yearly shows the ANNUAL
   // TOTAL as the headline (legally cleaner under Swiss PBV than a /mo figure
   // you don't actually charge monthly). Stripe products must match these:
-  //   Pro: CHF 19.90/mo · CHF 190/yr   |   Karriere+: CHF 39.90/mo · CHF 349/yr
+  //   Pro: CHF 9.90/mo · CHF 89/yr   |   Karriere+: CHF 19.90/mo · CHF 179/yr
   const planPricing = {
-    // Round amounts shown without cents (Pro yearly 190, Karriere+ yearly 349);
-    // the small monthly prices (19.90 / 39.90) keep their rappen.
-    // Savings vs. monthly: 190 / (19.90×12) = 20.4% → 20%, 349 / (39.90×12) = 27.1% → 27%.
-    pro:      { monthly: '19.90', yearly: '190', save: '20%' },
-    ultimate: { monthly: '39.90', yearly: '349', save: '27%' },
+    // Round amounts shown without cents (Pro yearly 89, Karriere+ yearly 179);
+    // the small monthly prices (9.90 / 19.90) keep their rappen.
+    // Savings vs. monthly: 89 / (9.90×12) ≈ 25%, 179 / (19.90×12) ≈ 25%.
+    pro:      { monthly: '9.90', yearly: '89', save: '25%' },
+    ultimate: { monthly: '19.90', yearly: '179', save: '25%' },
   };
   const prices = billingCycle === 'yearly'
     ? { gratis: '0', pro: planPricing.pro.yearly, ultimate: planPricing.ultimate.yearly }
@@ -5109,7 +5109,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Erinnerungen fürs Nachfassen zur richtigen Zeit",
       tools_tracker_f3: "Statistiken, die zeigen, was funktioniert",
       tools_cta_title: "Überzeug dich selbst. Die ersten 3 Bewerbungen aus dem Generator sind geschenkt.",
-      tools_cta_sub: "Der Bewerbungs-Tracker ist komplett kostenlos, für immer. Zum Ausprobieren brauchst du kein Abo. Danach ab CHF 19.90 pro Monat.",
+      tools_cta_sub: "Der Bewerbungs-Tracker ist komplett kostenlos, für immer. Zum Ausprobieren brauchst du kein Abo. Danach ab CHF 9.90 pro Monat.",
       tools_cta_btn: "Jetzt gratis testen",
       tools_cta_btn2: "Pläne ansehen",
       tools_badge: "Karriere-Tools",
@@ -5189,7 +5189,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Wie funktioniert das Abonnement bei Stellify?",
       faq_2_a: "Du wählst einen monatlichen oder jährlichen Plan und erhältst sofort vollen Zugriff. Das Abo verlängert sich automatisch, damit dein Zugang nie unterbrochen wird. Du kannst es aber jederzeit mit einem Klick kündigen: in den Kontoeinstellungen unter Abo verwalten. Nach der Kündigung behältst du den vollen Zugriff bis zum Ende der bezahlten Laufzeit, danach wechselt dein Konto automatisch zum Gratis-Plan. Ein Upgrade, etwa von Pro auf Karriere+, ist jederzeit sofort möglich.",
       faq_3_q: "Wie viele Nutzungen sind in meinem Plan enthalten?",
-      faq_3_a: "Eine Generierung entspricht einer erstellten Bewerbung mit KI. Der Gratis-Plan beinhaltet 3 Generierungen, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 50 Generierungen pro Monat, den Stellen-Import per Link und alle Standard-Designs. Karriere+ erweitert das auf 150 Generierungen pro Monat und schaltet zusätzlich die exklusiven Premium-Designs frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
+      faq_3_a: "Eine Generierung entspricht einer erstellten Bewerbung mit KI. Der Gratis-Plan beinhaltet 3 Generierungen, ideal zum unverbindlichen Kennenlernen. Der Pro-Plan bietet 30 Generierungen pro Monat, den Stellen-Import per Link und alle Standard-Designs. Karriere+ erweitert das auf 100 Generierungen pro Monat und schaltet zusätzlich die exklusiven Premium-Designs frei. Die genauen Limits sind transparent auf der Preisseite und in den AGB aufgeführt.",
       faq_4_q: "Funktioniert Stellify für alle Branchen?",
       faq_4_a: "Ja, unsere KI wurde auf dem gesamten Schweizer Arbeitsmarkt trainiert.",
       faq_5_q: "Welche Sprachen werden unterstützt?",
@@ -5200,7 +5200,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Einstellungen",
       nav_logout: "Abmelden",
       nav_login: "Anmelden",
-      tool_limit_pro: "Du hast deine 50 Generierungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Karriere+ für 150 Generierungen pro Monat plus Premium-Funktionen.",
+      tool_limit_pro: "Du hast deine 30 Generierungen für diesen Monat aufgebraucht. Am 1. des nächsten Monats hast du wieder neue Versuche frei. Upgrade auf Karriere+ für 100 Generierungen pro Monat plus Premium-Funktionen.",
       tool_limit_free: "Dieses Experten-Tool erfordert ein Pro- oder Karriere+-Abo.",
       onboarding_welcome_title: "Willkommen bei Stellify",
       onboarding_welcome_desc: "Dein KI-Copilot für die Schweizer Karriere. Wir helfen dir, das Beste aus deinem Potenzial herauszuholen.",
@@ -5223,7 +5223,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Willkommen zurück,",
       dashboard_stat_plan: "Dein Plan",
       dashboard_usage_limit: "{used} von {total} Nutzungen",
-      dashboard_usage_unlimited: "Premium-Nutzung mit 150 Generierungen pro Monat",
+      dashboard_usage_unlimited: "Premium-Nutzung mit 100 Generierungen pro Monat",
       plan_overview_title: "Dein Plan im Überblick",
       plan_what_included: "In deinem Plan enthalten",
       plan_what_upgrade: "Mit Upgrade bekommst du",
@@ -5231,8 +5231,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limits werden automatisch zurückgesetzt, täglich um 0 Uhr, monatlich am 1.",
       plan_resets_lifetime: "Limits bleiben bestehen. Upgrade jederzeit möglich.",
       plan_free_f1: "3 KI-Generierungen zum Ausprobieren", plan_free_f2: "Bewerbungs-Übersicht & Status", plan_free_f3: "Bewerbungen speichern & bearbeiten", plan_free_f4: "PDF-Export", plan_free_f5: "Mehrsprachig (DE/FR/IT/EN)",
-      plan_pro_f1: "50 KI-Generierungen pro Monat", plan_pro_f2: "Massgeschneiderte Bewerbungen mit KI", plan_pro_f3: "Stelle per Link laden & Lebenslauf nutzen", plan_pro_f4: "Alle Standard-Designs", plan_pro_f5: "PDF- & Word-Export",
-      plan_unlim_f1: "Volle KI-Power: 150 Generierungen pro Monat", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Persönlicher E-Mail-Support", plan_unlim_f5: "Für Vielbewerber und Berufswechsel",
+      plan_pro_f1: "30 KI-Generierungen pro Monat", plan_pro_f2: "Massgeschneiderte Bewerbungen mit KI", plan_pro_f3: "Stelle per Link laden & Lebenslauf nutzen", plan_pro_f4: "Alle Standard-Designs", plan_pro_f5: "PDF- & Word-Export",
+      plan_unlim_f1: "Volle KI-Power: 100 Generierungen pro Monat", plan_unlim_f2: "Alle exklusiven Premium-Designs", plan_unlim_f3: "Alle Vorteile aus Pro", plan_unlim_f4: "Persönlicher E-Mail-Support", plan_unlim_f5: "Für Vielbewerber und Berufswechsel",
       dashboard_usage_desc: "Tool-Nutzung",
       dashboard_chat_usage: "Stella Anfragen",
       dashboard_daily_usage: "Tageslimit",
@@ -5321,8 +5321,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Keine Massenbewerbungen oder Automatisierung gegen unsere AGB",
       tr_limits_title: "Konkrete KI-Limits pro Plan",
       tr_lim_free_label: "Gratis", tr_lim_free_v: "3 Generierungen lebenslang · alle Tools zum Testen",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 Generierungen pro Monat · alle Kern-Tools · Dokumentenspeicherung",
-      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 Generierungen pro Monat · ATS Premium · erweiterter Interview Coach · Premium-Vorlagen",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "30 Generierungen pro Monat · alle Kern-Tools · Dokumentenspeicherung",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "100 Generierungen pro Monat · ATS Premium · erweiterter Interview Coach · Premium-Vorlagen",
       tr_reset_info: "Die monatlichen Generierungs-Limits werden jeweils am 1. des Monats zurückgesetzt (Europe/Zurich).",
       tr_fair_use: "Stellify nutzt einen Fair-Use-Schutz von max. 15 (Pro) bzw. 30 (Karriere+) Anfragen pro Minute, um Missbrauch zu verhindern.",
       quick_tools: "Quick Tools",
@@ -5500,8 +5500,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Datenschutz nach Schweizer Recht", desc: "Deine Daten werden nach Schweizer Datenschutzgesetz und DSGVO verarbeitet, verschlüsselt übertragen und sind jederzeit von dir löschbar.", icon: "Lock" }
       ],
       pricing_free_f: ["3 Bewerbungen zum Ausprobieren", "Bewerbungs-Übersicht & Status", "Speichern & bearbeiten", "Keine Kreditkarte nötig"],
-      pricing_pro_f: ["50 KI-Generierungen pro Monat", "Massgeschneiderte Bewerbungen mit KI", "Stelle per Link laden & Lebenslauf nutzen", "Alle Standard-Designs", "PDF- & Word-Export"],
-      pricing_ultimate_f: ["Alles aus Pro, plus:", "Volle KI-Power: 150 Generierungen pro Monat", "Alle exklusiven Premium-Designs", "Persönlicher E-Mail-Support", "Für Vielbewerber und Berufswechsel"],
+      pricing_pro_f: ["30 KI-Generierungen pro Monat", "Massgeschneiderte Bewerbungen mit KI", "Stelle per Link laden & Lebenslauf nutzen", "Alle Standard-Designs", "PDF- & Word-Export"],
+      pricing_ultimate_f: ["Alles aus Pro, plus:", "Volle KI-Power: 100 Generierungen pro Monat", "Alle exklusiven Premium-Designs", "Persönlicher E-Mail-Support", "Für Vielbewerber und Berufswechsel"],
       pricing_cta_free: "Kostenlos starten",
       pricing_cta_pro: "Pro werden",
       pricing_cta_ultimate: "Karriere+ wählen",
@@ -5772,7 +5772,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Rappels de relance au bon moment",
       tools_tracker_f3: "Des statistiques qui montrent ce qui marche",
       tools_cta_title: "Convaincs-toi. Les 3 premières candidatures du générateur sont offertes.",
-      tools_cta_sub: "Le suivi des candidatures est entièrement gratuit, pour toujours. Aucun abonnement pour essayer. Ensuite dès CHF 19.90 par mois.",
+      tools_cta_sub: "Le suivi des candidatures est entièrement gratuit, pour toujours. Aucun abonnement pour essayer. Ensuite dès CHF 9.90 par mois.",
       tools_cta_btn: "Essayer gratuitement",
       tools_cta_btn2: "Voir les plans",
       tools_badge: "Outils de carrière",
@@ -5852,7 +5852,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Comment fonctionne l'abonnement Stellify ?",
       faq_2_a: "Vous choisissez un plan mensuel ou annuel et bénéficiez immédiatement d'un accès complet. L'abonnement se renouvelle automatiquement pour que votre accès ne soit jamais interrompu. Vous pouvez toutefois le résilier à tout moment en un clic, dans les paramètres du compte sous Gérer l'abonnement. Après la résiliation, vous conservez l'accès complet jusqu'à la fin de la période payée, puis votre compte passe automatiquement au plan gratuit. Un upgrade, par exemple de Pro à Karriere+, est possible immédiatement à tout moment.",
       faq_3_q: "Combien d'utilisations sont incluses dans mon plan ?",
-      faq_3_a: "Une génération correspond à une candidature créée avec l'IA. Le plan Gratuit comprend 3 générations, idéal pour découvrir sans engagement. Le plan Pro offre 50 générations par mois, l'import d'offres par lien et tous les designs standard. Karriere+ étend cela à 150 générations par mois et débloque en plus les designs Premium exclusifs. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
+      faq_3_a: "Une génération correspond à une candidature créée avec l'IA. Le plan Gratuit comprend 3 générations, idéal pour découvrir sans engagement. Le plan Pro offre 30 générations par mois, l'import d'offres par lien et tous les designs standard. Karriere+ étend cela à 100 générations par mois et débloque en plus les designs Premium exclusifs. Les limites exactes figurent sur la page Tarifs et dans nos CGV.",
       faq_4_q: "Stellify fonctionne-t-il pour tous les secteurs ?",
       faq_4_a: "Oui, notre IA a été formée sur l'ensemble du marché du travail suisse.",
       faq_5_q: "Quelles langues sont prises en charge ?",
@@ -5863,7 +5863,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Paramètres",
       nav_logout: "Déconnexion",
       nav_login: "Connexion",
-      tool_limit_pro: "Tu as utilisé tes 50 générations ce mois-ci. De nouvelles seront disponibles le 1er du mois prochain. Passe à Karriere+ pour 150 générations par mois plus des fonctions Premium.",
+      tool_limit_pro: "Tu as utilisé tes 30 générations ce mois-ci. De nouvelles seront disponibles le 1er du mois prochain. Passe à Karriere+ pour 100 générations par mois plus des fonctions Premium.",
       tool_limit_free: "Cet outil expert nécessite un abonnement Pro ou Karriere+.",
       onboarding_welcome_title: "Bienvenue sur Stellify",
       onboarding_welcome_desc: "Votre copilote IA pour votre carrière en Suisse. Nous vous aidons à tirer le meilleur parti de votre potentiel.",
@@ -5886,7 +5886,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Bon retour,",
       dashboard_stat_plan: "Votre Plan",
       dashboard_usage_limit: "{used} sur {total} utilisations",
-      dashboard_usage_unlimited: "Utilisation Premium avec 150 générations par mois",
+      dashboard_usage_unlimited: "Utilisation Premium avec 100 générations par mois",
       plan_overview_title: "Aperçu de ton plan",
       plan_what_included: "Inclus dans ton plan",
       plan_what_upgrade: "Avec un upgrade, tu obtiens",
@@ -5894,8 +5894,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limites réinitialisées automatiquement, chaque jour à 0h, chaque mois le 1er.",
       plan_resets_lifetime: "Limites à vie. Upgrade possible à tout moment.",
       plan_free_f1: "3 générations IA pour essayer", plan_free_f2: "Aperçu & statut des candidatures", plan_free_f3: "Enregistrer & modifier les candidatures", plan_free_f4: "Export PDF", plan_free_f5: "Multilingue (DE/FR/IT/EN)",
-      plan_pro_f1: "50 générations IA par mois", plan_pro_f2: "Candidatures sur mesure avec l'IA", plan_pro_f3: "Charger l'offre par lien & utiliser le CV", plan_pro_f4: "Tous les designs standard", plan_pro_f5: "Export PDF & Word",
-      plan_unlim_f1: "Pleine puissance IA : 150 générations par mois", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support e-mail personnel", plan_unlim_f5: "Pour candidatures fréquentes et reconversions",
+      plan_pro_f1: "30 générations IA par mois", plan_pro_f2: "Candidatures sur mesure avec l'IA", plan_pro_f3: "Charger l'offre par lien & utiliser le CV", plan_pro_f4: "Tous les designs standard", plan_pro_f5: "Export PDF & Word",
+      plan_unlim_f1: "Pleine puissance IA : 100 générations par mois", plan_unlim_f2: "Tous les designs Premium exclusifs", plan_unlim_f3: "Tous les avantages de Pro", plan_unlim_f4: "Support e-mail personnel", plan_unlim_f5: "Pour candidatures fréquentes et reconversions",
       dashboard_usage_desc: "Utilisation des outils",
       dashboard_chat_usage: "Requêtes Stella",
       dashboard_daily_usage: "Limite quotidienne",
@@ -5984,8 +5984,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Pas de candidatures de masse ni d'automatisation contre nos CGV",
       tr_limits_title: "Limites IA concrètes par plan",
       tr_lim_free_label: "Gratuit", tr_lim_free_v: "3 générations à vie · tous les outils à essayer",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 générations par mois · tous les outils essentiels · stockage des documents",
-      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 générations par mois · ATS Premium · coach d'entretien avancé · modèles Premium",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "30 générations par mois · tous les outils essentiels · stockage des documents",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "100 générations par mois · ATS Premium · coach d'entretien avancé · modèles Premium",
       tr_reset_info: "Les limites mensuelles de générations sont réinitialisées le 1er du mois (Europe/Zurich).",
       tr_fair_use: "Stellify applique une protection 'fair use' de max. 15 (Pro) ou 30 (Karriere+) requêtes par minute pour éviter les abus.",
       quick_tools: "Outils rapides",
@@ -6163,8 +6163,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Protection des données selon le droit suisse", desc: "Vos données sont traitées selon la LPD suisse et le RGPD, transmises de manière chiffrée et supprimables par vous à tout moment.", icon: "Lock" }
       ],
       pricing_free_f: ["3 candidatures à essayer", "Aperçu & statut des candidatures", "Enregistrer & modifier", "Sans carte de crédit"],
-      pricing_pro_f: ["50 générations IA par mois", "Candidatures sur mesure avec l'IA", "Charger l'offre par lien & utiliser le CV", "Tous les designs standard", "Export PDF & Word"],
-      pricing_ultimate_f: ["Tout de Pro, plus :", "Pleine puissance IA : 150 générations par mois", "Tous les designs Premium exclusifs", "Support e-mail personnel", "Pour candidatures fréquentes et reconversions"],
+      pricing_pro_f: ["30 générations IA par mois", "Candidatures sur mesure avec l'IA", "Charger l'offre par lien & utiliser le CV", "Tous les designs standard", "Export PDF & Word"],
+      pricing_ultimate_f: ["Tout de Pro, plus :", "Pleine puissance IA : 100 générations par mois", "Tous les designs Premium exclusifs", "Support e-mail personnel", "Pour candidatures fréquentes et reconversions"],
       pricing_cta_free: "Démarrer gratuitement",
       pricing_cta_pro: "Devenir Pro",
       pricing_cta_ultimate: "Choisir Karriere+",
@@ -6329,7 +6329,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Promemoria per il follow-up al momento giusto",
       tools_tracker_f3: "Statistiche che mostrano cosa funziona",
       tools_cta_title: "Convinciti. Le prime 3 candidature del generatore sono in regalo.",
-      tools_cta_sub: "Il tracker delle candidature è completamente gratuito, per sempre. Nessun abbonamento per provare. Poi da CHF 19.90 al mese.",
+      tools_cta_sub: "Il tracker delle candidature è completamente gratuito, per sempre. Nessun abbonamento per provare. Poi da CHF 9.90 al mese.",
       tools_cta_btn: "Prova gratis",
       tools_cta_btn2: "Vedi i piani",
       tools_badge: "Strumenti di carriera",
@@ -6409,7 +6409,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "Come funziona l'abbonamento Stellify?",
       faq_2_a: "Scegli un piano mensile o annuale e ottieni subito l'accesso completo. L'abbonamento si rinnova automaticamente, così il tuo accesso non si interrompe mai. Puoi però disdirlo in qualsiasi momento con un clic, nelle impostazioni del conto sotto Gestisci abbonamento. Dopo la disdetta mantieni l'accesso completo fino alla fine del periodo pagato, poi il tuo account passa automaticamente al piano gratuito. Un upgrade, ad esempio da Pro a Karriere+, è possibile subito in qualsiasi momento.",
       faq_3_q: "Quante utilizzazioni sono incluse nel mio piano?",
-      faq_3_a: "Una generazione corrisponde a una candidatura creata con l'IA. Il piano Gratuito include 3 generazioni, ideale per provare senza impegno. Il piano Pro offre 50 generazioni al mese, l'import di annunci da link e tutti i design standard. Karriere+ estende a 150 generazioni al mese e sblocca inoltre i design Premium esclusivi. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
+      faq_3_a: "Una generazione corrisponde a una candidatura creata con l'IA. Il piano Gratuito include 3 generazioni, ideale per provare senza impegno. Il piano Pro offre 30 generazioni al mese, l'import di annunci da link e tutti i design standard. Karriere+ estende a 100 generazioni al mese e sblocca inoltre i design Premium esclusivi. I limiti esatti sono indicati sulla pagina Prezzi e nelle nostre Condizioni.",
       faq_4_q: "Stellify funziona per tutti i settori?",
       faq_4_a: "Sì, la nostra IA è stata addestrata su tutto il mercato del lavoro svizzero.",
       faq_5_q: "Quali lingue sono supportate?",
@@ -6420,7 +6420,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Impostazioni",
       nav_logout: "Disconnetti",
       nav_login: "Accedi",
-      tool_limit_pro: "Hai utilizzato le tue 50 generazioni per questo mese. Il 1° del prossimo mese avrai nuovi tentativi. Passa a Karriere+ per 150 generazioni al mese più funzioni Premium.",
+      tool_limit_pro: "Hai utilizzato le tue 30 generazioni per questo mese. Il 1° del prossimo mese avrai nuovi tentativi. Passa a Karriere+ per 100 generazioni al mese più funzioni Premium.",
       tool_limit_free: "Questo strumento esperto richiede un abbonamento Pro o Karriere+.",
       onboarding_welcome_title: "Benvenuti su Stellify",
       onboarding_welcome_desc: "Il tuo copilota AI per la tua carriera in Svizzera. Ti aiutiamo a sfruttare al meglio il tuo potenziale.",
@@ -6443,7 +6443,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Bentornato,",
       dashboard_stat_plan: "Il tuo Piano",
       dashboard_usage_limit: "{used} di {total} utilizzi",
-      dashboard_usage_unlimited: "Utilizzo Premium con 150 generazioni al mese",
+      dashboard_usage_unlimited: "Utilizzo Premium con 100 generazioni al mese",
       plan_overview_title: "Il tuo piano in sintesi",
       plan_what_included: "Incluso nel tuo piano",
       plan_what_upgrade: "Con un upgrade ottieni",
@@ -6451,8 +6451,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_reset_info: "Limiti reimpostati automaticamente, ogni giorno alle 0:00, ogni mese il 1°.",
       plan_resets_lifetime: "Limiti a vita. Upgrade possibile in qualsiasi momento.",
       plan_free_f1: "3 generazioni IA da provare", plan_free_f2: "Panoramica & stato delle candidature", plan_free_f3: "Salva & modifica le candidature", plan_free_f4: "Esportazione PDF", plan_free_f5: "Multilingua (DE/FR/IT/EN)",
-      plan_pro_f1: "50 generazioni IA al mese", plan_pro_f2: "Candidature su misura con l'IA", plan_pro_f3: "Carica l'annuncio da link & usa il CV", plan_pro_f4: "Tutti i design standard", plan_pro_f5: "Esportazione PDF & Word",
-      plan_unlim_f1: "Piena potenza IA: 150 generazioni al mese", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto e-mail personale", plan_unlim_f5: "Per chi si candida spesso o cambia carriera",
+      plan_pro_f1: "30 generazioni IA al mese", plan_pro_f2: "Candidature su misura con l'IA", plan_pro_f3: "Carica l'annuncio da link & usa il CV", plan_pro_f4: "Tutti i design standard", plan_pro_f5: "Esportazione PDF & Word",
+      plan_unlim_f1: "Piena potenza IA: 100 generazioni al mese", plan_unlim_f2: "Tutti i design Premium esclusivi", plan_unlim_f3: "Tutti i vantaggi di Pro", plan_unlim_f4: "Supporto e-mail personale", plan_unlim_f5: "Per chi si candida spesso o cambia carriera",
       dashboard_usage_desc: "Utilizzo strumenti",
       dashboard_chat_usage: "Richieste Stella",
       dashboard_daily_usage: "Limite giornaliero",
@@ -6541,8 +6541,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "Nessuna candidatura di massa o automazione contro le nostre condizioni",
       tr_limits_title: "Limiti IA concreti per piano",
       tr_lim_free_label: "Gratuito", tr_lim_free_v: "3 generazioni a vita · tutti gli strumenti da provare",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 generazioni al mese · tutti gli strumenti essenziali · archiviazione documenti",
-      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 generazioni al mese · ATS Premium · coach colloqui avanzato · modelli Premium",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "30 generazioni al mese · tutti gli strumenti essenziali · archiviazione documenti",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "100 generazioni al mese · ATS Premium · coach colloqui avanzato · modelli Premium",
       tr_reset_info: "I limiti mensili di generazioni vengono reimpostati il 1° del mese (Europe/Zurich).",
       tr_fair_use: "Stellify applica una protezione 'fair use' di max. 15 (Pro) o 30 (Karriere+) richieste al minuto per evitare abusi.",
       quick_tools: "Strumenti rapidi",
@@ -6720,8 +6720,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         { title: "Protezione dei dati secondo il diritto svizzero", desc: "I tuoi dati sono trattati secondo la LPD svizzera e il GDPR, trasmessi in modo crittografato ed eliminabili da te in qualsiasi momento.", icon: "Lock" }
       ],
       pricing_free_f: ["3 candidature da provare", "Panoramica & stato delle candidature", "Salva & modifica", "Nessuna carta di credito"],
-      pricing_pro_f: ["50 generazioni IA al mese", "Candidature su misura con l'IA", "Carica l'annuncio da link & usa il CV", "Tutti i design standard", "Esportazione PDF & Word"],
-      pricing_ultimate_f: ["Tutto di Pro, più:", "Piena potenza IA: 150 generazioni al mese", "Tutti i design Premium esclusivi", "Supporto e-mail personale", "Per chi si candida spesso o cambia carriera"],
+      pricing_pro_f: ["30 generazioni IA al mese", "Candidature su misura con l'IA", "Carica l'annuncio da link & usa il CV", "Tutti i design standard", "Esportazione PDF & Word"],
+      pricing_ultimate_f: ["Tutto di Pro, più:", "Piena potenza IA: 100 generazioni al mese", "Tutti i design Premium esclusivi", "Supporto e-mail personale", "Per chi si candida spesso o cambia carriera"],
       pricing_cta_free: "Inizia gratuitamente",
       pricing_cta_pro: "Diventa Pro",
       pricing_cta_ultimate: "Scegli Karriere+",
@@ -6886,7 +6886,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tools_tracker_f2: "Follow-up reminders at the right moment",
       tools_tracker_f3: "Statistics that show what works",
       tools_cta_title: "See for yourself. Your first 3 generator applications are on us.",
-      tools_cta_sub: "The application tracker is completely free, forever. No subscription needed to try. Then from CHF 19.90 per month.",
+      tools_cta_sub: "The application tracker is completely free, forever. No subscription needed to try. Then from CHF 9.90 per month.",
       tools_cta_btn: "Try for free",
       tools_cta_btn2: "See plans",
       tools_badge: "Career Tools",
@@ -6966,7 +6966,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       faq_2_q: "How does the Stellify subscription work?",
       faq_2_a: "You choose a monthly or annual plan and get full access immediately. The subscription renews automatically so your access is never interrupted. You can cancel at any time with one click, in your account settings under Manage subscription. After cancelling you keep full access until the end of the paid period, then your account switches to the Free plan automatically. An upgrade, for example from Pro to Karriere+, is possible immediately at any time.",
       faq_3_q: "How many uses are included in my plan?",
-      faq_3_a: "One generation equals one application created with AI. The Free plan includes 3 generations, ideal to explore with no commitment. The Pro plan offers 50 generations per month, job import by link and all standard designs. Karriere+ extends this to 150 generations per month and additionally unlocks the exclusive Premium designs. The exact limits are shown transparently on the Pricing page and in our Terms.",
+      faq_3_a: "One generation equals one application created with AI. The Free plan includes 3 generations, ideal to explore with no commitment. The Pro plan offers 30 generations per month, job import by link and all standard designs. Karriere+ extends this to 100 generations per month and additionally unlocks the exclusive Premium designs. The exact limits are shown transparently on the Pricing page and in our Terms.",
       faq_4_q: "Does Stellify work for all industries?",
       faq_4_a: "Yes, our AI has been trained on the entire Swiss job market.",
       faq_5_q: "Which languages are supported?",
@@ -6977,7 +6977,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       nav_settings: "Settings",
       nav_logout: "Logout",
       nav_login: "Login",
-      tool_limit_pro: "You've used your 50 generations for this month. New ones arrive on the 1st of next month. Upgrade to Karriere+ for 150 generations per month plus Premium features.",
+      tool_limit_pro: "You've used your 30 generations for this month. New ones arrive on the 1st of next month. Upgrade to Karriere+ for 100 generations per month plus Premium features.",
       tool_limit_free: "This expert tool requires a Pro or Karriere+ subscription.",
       onboarding_welcome_title: "Welcome to Stellify",
       onboarding_welcome_desc: "Your AI copilot for your Swiss career. We help you make the most of your potential.",
@@ -7000,7 +7000,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       dashboard_welcome: "Welcome back,",
       dashboard_stat_plan: "Your Plan",
       dashboard_usage_limit: "{used} of {total} uses",
-      dashboard_usage_unlimited: "Premium usage with 150 generations per month",
+      dashboard_usage_unlimited: "Premium usage with 100 generations per month",
       plan_overview_title: "Your plan at a glance",
       plan_what_included: "Included in your plan",
       plan_what_upgrade: "Upgrade and unlock",
@@ -7009,7 +7009,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       plan_resets_lifetime: "Lifetime limits. Upgrade anytime.",
       plan_free_f1: "3 AI generations to try", plan_free_f2: "Application overview & status", plan_free_f3: "Save & edit applications", plan_free_f4: "PDF export", plan_free_f5: "Multilingual (DE/FR/IT/EN)",
       plan_pro_f1: "50 AI generations per month", plan_pro_f2: "Tailored applications with AI", plan_pro_f3: "Load job by link & use your CV", plan_pro_f4: "All standard designs", plan_pro_f5: "PDF & Word export",
-      plan_unlim_f1: "Full AI power: 150 generations per month", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Personal email support", plan_unlim_f5: "For frequent applicants and career changers",
+      plan_unlim_f1: "Full AI power: 100 generations per month", plan_unlim_f2: "All exclusive Premium designs", plan_unlim_f3: "Everything in Pro", plan_unlim_f4: "Personal email support", plan_unlim_f5: "For frequent applicants and career changers",
       dashboard_usage_desc: "Tool Usage",
       dashboard_chat_usage: "Stella requests",
       dashboard_daily_usage: "Daily Limit",
@@ -7098,8 +7098,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       tr_cannot_4: "No mass applications or automation against our terms",
       tr_limits_title: "Concrete AI limits by plan",
       tr_lim_free_label: "Free", tr_lim_free_v: "3 lifetime generations · all tools to try",
-      tr_lim_pro_label: "Pro", tr_lim_pro_v: "50 generations per month · all core tools · document storage",
-      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "150 generations per month · ATS Premium · advanced Interview Coach · Premium templates",
+      tr_lim_pro_label: "Pro", tr_lim_pro_v: "30 generations per month · all core tools · document storage",
+      tr_lim_unlim_label: "Karriere+", tr_lim_unlim_v: "100 generations per month · ATS Premium · advanced Interview Coach · Premium templates",
       tr_reset_info: "The monthly generation limits reset on the 1st of each month (Europe/Zurich).",
       tr_fair_use: "Stellify applies a fair-use limit of max. 15 (Pro) or 30 (Karriere+) requests per minute to prevent abuse.",
       quick_tools: "Quick Tools",
@@ -7278,7 +7278,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       ],
       pricing_free_f: ["3 applications to try", "Application overview & status", "Save & edit", "No credit card required"],
       pricing_pro_f: ["50 AI generations per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
-      pricing_ultimate_f: ["Everything in Pro, plus:", "Full AI power: 150 generations per month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
+      pricing_ultimate_f: ["Everything in Pro, plus:", "Full AI power: 100 generations per month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
       pricing_cta_free: "Start for free",
       pricing_cta_pro: "Go Pro",
       pricing_cta_ultimate: "Choose Karriere+",
@@ -9006,7 +9006,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Pro</p>
                           <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.plan_pro_f1}</p>
                         </div>
-                        <p className="font-serif text-lg text-[#004225] dark:text-[#00A854] whitespace-nowrap">CHF 19.90<span className="text-[10px] text-[#9A9A94]">/Mo.</span></p>
+                        <p className="font-serif text-lg text-[#004225] dark:text-[#00A854] whitespace-nowrap">CHF 9.90<span className="text-[10px] text-[#9A9A94]">/Mo.</span></p>
                       </div>
                       <div className="h-px bg-black/5 dark:bg-white/5" />
                       <div className="flex items-baseline justify-between gap-3">
@@ -9014,7 +9014,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                           <p className="text-sm font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">Karriere+</p>
                           <p className="text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">{t.plan_unlim_f2}</p>
                         </div>
-                        <p className="font-serif text-lg text-[#004225] dark:text-[#00A854] whitespace-nowrap">CHF 39.90<span className="text-[10px] text-[#9A9A94]">/Mo.</span></p>
+                        <p className="font-serif text-lg text-[#004225] dark:text-[#00A854] whitespace-nowrap">CHF 19.90<span className="text-[10px] text-[#9A9A94]">/Mo.</span></p>
                       </div>
                     </div>
                     <button
@@ -9793,17 +9793,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         {
                           n: 'Warum Pro sich lohnt',
                           s: 'Deine nächste Bewerbung in 60 Sekunden, so oft du willst',
-                          m: 'Hallo\n\nDeine 3 Gratis-Bewerbungen haben dir gezeigt, wie Stellify arbeitet. Mit Pro machst du daraus deinen Standard: 50 Generierungen pro Monat, der Stellen-Import per Link und alle Designs, für CHF 19.90 pro Monat.\n\nWenn du gerade aktiv auf Stellensuche bist, ist das der günstigste Karriere-Beschleuniger, den du finden wirst.',
+                          m: 'Hallo\n\nDeine 3 Gratis-Bewerbungen haben dir gezeigt, wie Stellify arbeitet. Mit Pro machst du daraus deinen Standard: 30 Generierungen pro Monat, der Stellen-Import per Link und alle Designs, für CHF 9.90 pro Monat.\n\nWenn du gerade aktiv auf Stellensuche bist, ist das der günstigste Karriere-Beschleuniger, den du finden wirst.',
                         },
                         {
                           n: 'Tipp + sanfter Hinweis',
                           s: 'Der Trick mit dem Stellen-Link',
-                          m: 'Hallo\n\nKennst du schon den schnellsten Weg zur fertigen Bewerbung? Kopiere einfach den Link eines Stelleninserats in den Generator, Stellify liest die Stelle und schreibt die Bewerbung passgenau darauf.\n\nMit dem Pro-Plan nutzt du das bis zu 50 Mal pro Monat.',
+                          m: 'Hallo\n\nKennst du schon den schnellsten Weg zur fertigen Bewerbung? Kopiere einfach den Link eines Stelleninserats in den Generator, Stellify liest die Stelle und schreibt die Bewerbung passgenau darauf.\n\nMit dem Pro-Plan nutzt du das bis zu 30 Mal pro Monat.',
                         },
                         {
                           n: 'Karriere+ für Vielbewerber',
                           s: 'Für alle, die es ernst meinen: Karriere+',
-                          m: 'Hallo\n\nWenn du dich gerade auf mehrere Stellen gleichzeitig bewirbst, ist Karriere+ für dich gebaut: 150 Generierungen pro Monat, alle exklusiven Premium-Designs und persönlicher E-Mail-Support.\n\nDein Bewerbungs-Tracker bleibt wie immer gratis dazu.',
+                          m: 'Hallo\n\nWenn du dich gerade auf mehrere Stellen gleichzeitig bewirbst, ist Karriere+ für dich gebaut: 100 Generierungen pro Monat, alle exklusiven Premium-Designs und persönlicher E-Mail-Support.\n\nDein Bewerbungs-Tracker bleibt wie immer gratis dazu.',
                         },
                       ].map((tpl) => (
                         <button
@@ -10330,7 +10330,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </button>
                 <span className="w-px h-3 bg-black/10 dark:bg-white/10" />
                 <button onClick={() => navigate('pricing')} className="hover:text-[#004225] dark:hover:text-[#00A854] transition-colors font-medium">
-                  {language === 'FR' ? 'Dès CHF 19.90/mois, voir les plans →' : language === 'IT' ? 'Da CHF 19.90/mese, vedi i piani →' : language === 'EN' ? 'From CHF 19.90/mo, see plans →' : 'Ab CHF 19.90/Mo, Pläne ansehen →'}
+                  {language === 'FR' ? 'Dès CHF 9.90/mois, voir les plans →' : language === 'IT' ? 'Da CHF 9.90/mese, vedi i piani →' : language === 'EN' ? 'From CHF 9.90/mo, see plans →' : 'Ab CHF 9.90/Mo, Pläne ansehen →'}
                 </button>
               </div>
             </div>
@@ -11281,7 +11281,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 >
                   {t.pricing_yearly}
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${billingCycle === 'yearly' ? 'bg-black/10 text-black' : 'bg-white/15 text-white'}`}>
-                    {language === 'FR' ? "jusqu'à −27%" : language === 'IT' ? 'fino a −27%' : language === 'EN' ? 'up to −27%' : 'bis −27%'}
+                    {language === 'FR' ? "jusqu'à −25%" : language === 'IT' ? 'fino a −25%' : language === 'EN' ? 'up to −25%' : 'bis −25%'}
                   </span>
                 </button>
               </div>
