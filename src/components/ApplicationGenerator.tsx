@@ -104,6 +104,7 @@ const STR: Record<string, Record<string, string>> = {
     empty_preview_hint: 'Fast geschafft. Klicke jetzt auf "Mit KI generieren", dann schreibt die KI in wenigen Sekunden deine vollständige Bewerbung mit Kurzprofil, passenden Skills und Interview-Vorbereitung.',
     gen_error: 'Generierung fehlgeschlagen. Bitte versuche es erneut.',
     edit_letter: 'Text bearbeiten', done_editing: 'Fertig',
+    click_to_edit: 'Klicke auf den Brief, um den Text zu bearbeiten', edit_hint: 'Bearbeite den Brieftext. Die Vorschau oben aktualisiert sich sofort.',
     extras_summary: 'CV-Kurzprofil', extras_skills: 'Passende Skills', extras_interview: 'Interview-Vorbereitung',
     export_pdf: 'PDF herunterladen', export_word: 'Word herunterladen', exporting: 'Exportiere…',
     interview_hint: '10 mögliche Fragen mit Antwortvorschlägen',
@@ -153,6 +154,7 @@ const STR: Record<string, Record<string, string>> = {
     empty_preview_hint: 'Presque fini. Clique sur "Générer avec l\'IA" et l\'IA rédige en quelques secondes ta candidature complète, avec profil court, compétences et préparation à l\'entretien.',
     gen_error: 'Échec de la génération. Réessaie.',
     edit_letter: 'Modifier le texte', done_editing: 'Terminé',
+    click_to_edit: 'Clique sur la lettre pour modifier le texte', edit_hint: 'Modifie le texte de la lettre. L\'aperçu ci-dessus se met à jour aussitôt.',
     extras_summary: 'Profil CV', extras_skills: 'Compétences adaptées', extras_interview: 'Préparation à l\'entretien',
     export_pdf: 'Télécharger le PDF', export_word: 'Télécharger Word', exporting: 'Export en cours…',
     interview_hint: '10 questions possibles avec suggestions de réponses',
@@ -202,6 +204,7 @@ const STR: Record<string, Record<string, string>> = {
     empty_preview_hint: 'Quasi fatto. Clicca su "Genera con l\'IA" e l\'IA scrive in pochi secondi la tua candidatura completa, con profilo breve, competenze e preparazione al colloquio.',
     gen_error: 'Generazione non riuscita. Riprova.',
     edit_letter: 'Modifica il testo', done_editing: 'Fatto',
+    click_to_edit: 'Clicca sulla lettera per modificare il testo', edit_hint: 'Modifica il testo della lettera. L\'anteprima qui sopra si aggiorna subito.',
     extras_summary: 'Profilo CV', extras_skills: 'Competenze adatte', extras_interview: 'Preparazione al colloquio',
     export_pdf: 'Scarica PDF', export_word: 'Scarica Word', exporting: 'Esportazione…',
     interview_hint: '10 possibili domande con suggerimenti di risposta',
@@ -251,6 +254,7 @@ const STR: Record<string, Record<string, string>> = {
     empty_preview_hint: 'Almost there. Click "Generate with AI" and in a few seconds the AI writes your full application, with a short profile, matching skills and interview preparation.',
     gen_error: 'Generation failed. Please try again.',
     edit_letter: 'Edit text', done_editing: 'Done',
+    click_to_edit: 'Click the letter to edit the text', edit_hint: 'Edit the letter text. The preview above updates instantly.',
     extras_summary: 'CV profile', extras_skills: 'Matching skills', extras_interview: 'Interview prep',
     export_pdf: 'Download PDF', export_word: 'Download Word', exporting: 'Exporting…',
     interview_hint: '10 possible questions with suggested answers',
@@ -517,6 +521,19 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   const [gen, setGen] = useState<GeneratedContent | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [editingLetter, setEditingLetter] = useState(false);
+  const letterEditRef = useRef<HTMLTextAreaElement>(null);
+  // Enter edit mode from a click on the letter itself, then focus the editor —
+  // an in-document editable field is not viable here (the document remounts on
+  // every render and would drop the cursor), so this gives the same "click the
+  // text to edit it" feel with a robust textarea whose live changes flow back
+  // into the preview above.
+  const startLetterEdit = () => {
+    setEditingLetter(true);
+    setTimeout(() => {
+      letterEditRef.current?.focus();
+      letterEditRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 60);
+  };
   const [isExporting, setIsExporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -858,12 +875,22 @@ Das interview-Array enthält genau 10 Einträge, zugeschnitten auf die Stelle.`;
       // Encode ONCE — re-encoding the full canvas per page wasted CPU/memory
       // on long documents for identical bytes.
       const imgData = canvas.toDataURL('image/jpeg', 0.92);
-      let rendered = 0, page = 0;
-      while (rendered < imgH) {
-        if (page > 0) pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, -rendered, pageW, imgH);
-        rendered += pageH; page++;
-        if (page >= 12) break; // safety net far above any real dossier
+      if (imgH <= pageH * 1.12) {
+        // Fits on (or only just over) one page. A short letter must never spill
+        // a few millimetres onto a near-empty second page, so shrink the whole
+        // page proportionally to fit exactly one A4 and centre it horizontally.
+        const scale = Math.min(1, pageH / imgH);
+        const w = pageW * scale, h = imgH * scale;
+        pdf.addImage(imgData, 'JPEG', (pageW - w) / 2, 0, w, h);
+      } else {
+        // Genuinely multi-page dossier: slice the tall image across A4 pages.
+        let rendered = 0, page = 0;
+        while (rendered < imgH) {
+          if (page > 0) pdf.addPage();
+          pdf.addImage(imgData, 'JPEG', 0, -rendered, pageW, imgH);
+          rendered += pageH; page++;
+          if (page >= 12) break; // safety net far above any real dossier
+        }
       }
       pdf.save(`bewerbung-${(form.targetCompany || 'stellify').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.pdf`);
     } catch (e: any) {
@@ -1404,7 +1431,11 @@ ${bodyText}
                         </button>
                       </div>
                     )}
-                    <div className="aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white">
+                    <div
+                      className={`aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white ${gen?.coverLetter && !editingLetter ? 'cursor-text' : ''}`}
+                      onClick={() => { if (gen?.coverLetter && !editingLetter) startLetterEdit(); }}
+                      title={gen?.coverLetter && !editingLetter ? s.click_to_edit : undefined}
+                    >
                       <ApplicationDocument design={design} form={form} s={s} generatedText={gen?.coverLetter || null} />
                     </div>
                   </div>
@@ -1466,10 +1497,13 @@ ${bodyText}
                   <AnimatePresence>
                     {editingLetter && gen && (
                       <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mx-auto max-w-[560px] overflow-hidden">
+                        <p className="mt-3 mb-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">{s.edit_hint}</p>
                         <textarea
+                          ref={letterEditRef}
                           value={gen.coverLetter}
                           onChange={e => setGen(g => g ? { ...g, coverLetter: e.target.value } : g)}
-                          className="mt-3 w-full min-h-[220px] px-4 py-3 bg-white dark:bg-[#2A2A26] border border-[#004225]/30 dark:border-[#00A854]/30 text-sm leading-relaxed text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          className="w-full min-h-[320px] px-5 py-4 bg-white dark:bg-[#2A2A26] border border-[#004225]/30 dark:border-[#00A854]/30 text-[15px] leading-[1.75] font-serif text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
+                          style={{ fontFamily: design.font === 'serif' ? "Georgia, 'Times New Roman', serif" : undefined }}
                         />
                       </motion.div>
                     )}

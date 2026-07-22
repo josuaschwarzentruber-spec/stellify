@@ -1055,6 +1055,18 @@ const enforceAIQuota = async (req: Request, res: Response, next: NextFunction) =
     const u = userSnap.data() || {};
     let role = (u.role as string) || 'client';
 
+    // Owner / test-account bypass: e-mail addresses listed in
+    // QUOTA_EXEMPT_EMAILS (comma-separated, in Vercel) skip ALL free-tier
+    // limits — global cap, per-e-mail lifetime ledger and the IP soft-limit —
+    // so the owner can test and demo the free flow repeatedly from one
+    // network without being blocked by the very abuse protection meant for
+    // strangers. Real customers are unaffected.
+    const exemptEmails = (process.env.QUOTA_EXEMPT_EMAILS || '')
+      .split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    if (exemptEmails.includes(String(u.email || '').trim().toLowerCase())) {
+      return next();
+    }
+
     // Authoritative expiry check on EVERY AI request. Webhooks can be
     // missed (and the plan-change guard in subscription.deleted can skip a
     // legitimate downgrade), so the server must never honour a paid role
