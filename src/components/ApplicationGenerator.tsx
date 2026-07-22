@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Check, ChevronLeft, ChevronRight, Plus, Save, Trash2,
@@ -275,8 +275,14 @@ const STR: Record<string, Record<string, string>> = {
    One renderer for every design. Pure HTML/CSS so the same markup can be
    printed to PDF in phase 2. Dimensions are A4-proportional (1:1.414). */
 
-export const ApplicationDocument = ({ design, form, s, generatedText }: {
+export const ApplicationDocument = memo(({ design, form, s, generatedText, editable, onBodyChange }: {
   design: DesignConfig; form: ApplicationForm; s: Record<string, string>; generatedText?: string | null;
+  /** When true the cover-letter body can be edited directly in the document.
+      Only the on-screen preview passes this; the export render never does. */
+  editable?: boolean;
+  /** Called on blur with the edited letter text. Kept stable (useCallback) by
+      the parent so memo keeps the document mounted while typing (no cursor jump). */
+  onBodyChange?: (text: string) => void;
 }) => {
   const serif = "Georgia, 'Times New Roman', serif";
   const sans = "'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif";
@@ -318,9 +324,21 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
         {s.subject} {form.targetPosition || '…'}{form.targetCompany ? ` · ${form.targetCompany}` : ''}
       </p>
       <p style={{ marginBottom: 12 }}>{s.greeting}</p>
-      <p style={{ whiteSpace: 'pre-wrap', marginBottom: 16, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
-        {bodyText}
-      </p>
+      {editable && generatedText ? (
+        <p
+          contentEditable
+          suppressContentEditableWarning
+          onBlur={(e) => onBodyChange?.((e.currentTarget as HTMLElement).innerText)}
+          className="stellify-letter-edit"
+          style={{ whiteSpace: 'pre-wrap', marginBottom: 16, outline: 'none', cursor: 'text', borderRadius: 3, padding: '3px 5px', margin: '0 -5px 16px' }}
+        >
+          {bodyText}
+        </p>
+      ) : (
+        <p style={{ whiteSpace: 'pre-wrap', marginBottom: 16, opacity: generatedText || form.motivation ? 1 : 0.45, fontStyle: generatedText || form.motivation ? 'normal' : 'italic' }}>
+          {bodyText}
+        </p>
+      )}
       <p style={{ marginBottom: 4 }}>{s.closing}</p>
       <p style={{ fontWeight: 600 }}>{fullName}</p>
       <p style={{ marginTop: 16, fontSize: 9, color: '#9A9A94' }}>{s.attachment_note}</p>
@@ -430,7 +448,7 @@ export const ApplicationDocument = ({ design, form, s, generatedText }: {
       <Body />
     </div>
   );
-};
+});
 
 /* ── Mini preview used on the design cards ──────────────────────────────── */
 const DesignThumb = ({ design }: { design: DesignConfig }) => {
@@ -520,19 +538,28 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   const [loadedDocId, setLoadedDocId] = useState<string | null>(null);
   const [gen, setGen] = useState<GeneratedContent | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [editingLetter, setEditingLetter] = useState(false);
-  const letterEditRef = useRef<HTMLTextAreaElement>(null);
-  // Enter edit mode from a click on the letter itself, then focus the editor —
-  // an in-document editable field is not viable here (the document remounts on
-  // every render and would drop the cursor), so this gives the same "click the
-  // text to edit it" feel with a robust textarea whose live changes flow back
-  // into the preview above.
-  const startLetterEdit = () => {
-    setEditingLetter(true);
+  // The letter is edited IN the document itself (contentEditable). Syncing only
+  // on blur (not on every keystroke) keeps the memoised document mounted while
+  // typing, so the cursor never jumps. Stable identity via useCallback so memo
+  // holds during typing.
+  const onLetterChange = useCallback((text: string) => {
+    setGen(g => g ? { ...g, coverLetter: text } : g);
+  }, []);
+  // Place the caret into the letter and scroll it into view (from the pencil
+  // button or a click on the document).
+  const focusLetter = () => {
     setTimeout(() => {
-      letterEditRef.current?.focus();
-      letterEditRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 60);
+      const el = document.querySelector('.stellify-letter-edit') as HTMLElement | null;
+      if (!el) return;
+      el.focus();
+      const range = document.createRange();
+      range.selectNodeContents(el);
+      range.collapse(false);
+      const sel = window.getSelection();
+      sel?.removeAllRanges();
+      sel?.addRange(range);
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 40);
   };
   const [isExporting, setIsExporting] = useState(false);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -1086,15 +1113,26 @@ ${bodyText}
       <div className="sticky top-0 z-10 bg-[#FDFCFB]/95 dark:bg-[#1A1A18]/95 backdrop-blur-sm border-b border-black/5 dark:border-white/5 px-4 sm:px-8 py-3.5 flex items-center gap-2">
         {steps.map((label, i) => (
           <div key={label} className="flex items-center gap-2 min-w-0">
+            {(() => {
+              // A step is navigable if it is at or behind the current one, or if
+              // the application is already far enough along: once the required
+              // fields are filled (canProceed) or a letter exists (gen), every
+              // step can be jumped to directly from the top — no forced "Weiter".
+              const navigable = i <= step || canProceed || !!gen;
+              const doneBehind = i < step;
+              return (
             <button
-              onClick={() => { if (i < step || (i === 2 && canProceed) || i <= step) setStep(i as 0 | 1 | 2); }}
-              className={`flex items-center gap-2 px-2.5 py-1.5 transition-all ${i === step ? 'text-[#004225] dark:text-[#00A854]' : i < step ? 'text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-70' : 'text-[#9A9A94] cursor-default'}`}
+              onClick={() => { if (navigable) setStep(i as 0 | 1 | 2); }}
+              disabled={!navigable}
+              className={`flex items-center gap-2 px-2.5 py-1.5 transition-all ${i === step ? 'text-[#004225] dark:text-[#00A854]' : navigable ? 'text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-70 cursor-pointer' : 'text-[#9A9A94] cursor-default'}`}
             >
-              <span className={`w-5 h-5 shrink-0 flex items-center justify-center text-[10px] font-bold rounded-full ${i === step ? 'bg-[#004225] dark:bg-[#00A854] text-white' : i < step ? 'bg-[#004225]/15 dark:bg-[#00A854]/20 text-[#004225] dark:text-[#00A854]' : 'bg-black/8 dark:bg-white/10'}`}>
-                {i < step ? <Check size={11} /> : i + 1}
+              <span className={`w-5 h-5 shrink-0 flex items-center justify-center text-[10px] font-bold rounded-full ${i === step ? 'bg-[#004225] dark:bg-[#00A854] text-white' : doneBehind ? 'bg-[#004225]/15 dark:bg-[#00A854]/20 text-[#004225] dark:text-[#00A854]' : navigable ? 'bg-[#004225]/10 dark:bg-[#00A854]/15 text-[#004225] dark:text-[#00A854]' : 'bg-black/8 dark:bg-white/10'}`}>
+                {doneBehind ? <Check size={11} /> : i + 1}
               </span>
               <span className="text-[11px] font-bold uppercase tracking-widest hidden sm:inline truncate">{label}</span>
             </button>
+              );
+            })()}
             {i < 2 && <div className="w-6 sm:w-10 h-px bg-black/10 dark:bg-white/10 shrink-0" />}
           </div>
         ))}
@@ -1431,23 +1469,22 @@ ${bodyText}
                         </button>
                       </div>
                     )}
-                    <div
-                      className={`aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white ${gen?.coverLetter && !editingLetter ? 'cursor-text' : ''}`}
-                      onClick={() => { if (gen?.coverLetter && !editingLetter) startLetterEdit(); }}
-                      title={gen?.coverLetter && !editingLetter ? s.click_to_edit : undefined}
-                    >
-                      <ApplicationDocument design={design} form={form} s={s} generatedText={gen?.coverLetter || null} />
+                    {/* Editable letter: a subtle hover/focus tint marks it. */}
+                    <style>{`.stellify-letter-edit:hover{background:rgba(0,66,37,0.05)}.stellify-letter-edit:focus{background:rgba(0,66,37,0.07);box-shadow:0 0 0 1px rgba(0,66,37,0.2)}`}</style>
+                    <div className="aspect-[1/1.414] overflow-y-auto custom-scrollbar bg-white" title={gen?.coverLetter ? s.click_to_edit : undefined}>
+                      <ApplicationDocument design={design} form={form} s={s} generatedText={gen?.coverLetter || null} editable={!!gen?.coverLetter} onBodyChange={onLetterChange} />
                     </div>
                   </div>
 
                   {/* Export + edit row */}
                   <div className="mx-auto max-w-[560px] mt-4 flex items-center justify-between gap-2 flex-wrap">
                     <button
-                      onClick={() => setEditingLetter(v => !v)}
+                      onClick={focusLetter}
                       disabled={!gen?.coverLetter}
+                      title={s.click_to_edit}
                       className={`inline-flex items-center gap-1.5 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${gen?.coverLetter ? 'border-black/10 dark:border-white/10 text-[#6B6B66] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5' : 'border-black/5 text-[#C5C5C0] cursor-not-allowed'}`}
                     >
-                      <Pencil size={12} />{editingLetter ? s.done_editing : s.edit_letter}
+                      <Pencil size={12} />{s.edit_letter}
                     </button>
                     <div className="flex items-center gap-2">
                       <button
@@ -1493,21 +1530,6 @@ ${bodyText}
                     </div>
                   )}
 
-                  {/* Inline letter editor */}
-                  <AnimatePresence>
-                    {editingLetter && gen && (
-                      <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mx-auto max-w-[560px] overflow-hidden">
-                        <p className="mt-3 mb-1.5 text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">{s.edit_hint}</p>
-                        <textarea
-                          ref={letterEditRef}
-                          value={gen.coverLetter}
-                          onChange={e => setGen(g => g ? { ...g, coverLetter: e.target.value } : g)}
-                          className="w-full min-h-[320px] px-5 py-4 bg-white dark:bg-[#2A2A26] border border-[#004225]/30 dark:border-[#00A854]/30 text-[15px] leading-[1.75] font-serif text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all"
-                          style={{ fontFamily: design.font === 'serif' ? "Georgia, 'Times New Roman', serif" : undefined }}
-                        />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
                 {/* Extras: CV summary, skills, interview prep */}
