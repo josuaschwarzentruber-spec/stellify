@@ -1669,7 +1669,19 @@ function StellifyApp() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  // Remember the billing cycle across the Stripe round-trip (checkout is a full
+  // redirect, so React state would otherwise reset to 'monthly'). Now a visitor
+  // who picked yearly, went to Stripe and came back lands on yearly again.
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('stellify_billing_cycle');
+      if (saved === 'yearly' || saved === 'monthly') return saved;
+    }
+    return 'monthly';
+  });
+  useEffect(() => {
+    try { localStorage.setItem('stellify_billing_cycle', billingCycle); } catch { /* ignore */ }
+  }, [billingCycle]);
   // Stella chat is hidden from the UI (kept in code, reversible). Set to true
   // to re-enable the launcher entry points across the app.
   const STELLA_CHAT_ENABLED = false;
