@@ -1816,34 +1816,26 @@ function StellifyApp() {
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber') => {
     const prev = activeView;
-    // Direct round trips (A to B and back to A) return to the EXACT spot the
-    // visitor left A from — footer browsers land back at the footer, guide
-    // readers back at the teaser. Any other route scrolls fresh.
-    let returnY: number | null = null;
+    // Remember where we left the previous view, but ONLY so the browser BACK
+    // button can return there (handled in the popstate listener). A forward
+    // click on a nav/footer link must always open the new page at the top —
+    // landing at the footer of a fresh page (e.g. clicking "Über uns" from the
+    // footer) is disorienting.
     try {
-      const raw = sessionStorage.getItem('stellify_return_spot');
-      if (raw) {
-        const spot = JSON.parse(raw) as { view?: string; y?: number };
-        if (spot.view === view && typeof spot.y === 'number') returnY = spot.y;
-      }
       sessionStorage.setItem('stellify_return_spot', JSON.stringify({ view: prev, y: window.scrollY }));
     } catch { /* ignore */ }
     setActiveView(view);
     setActiveTool(null);
     setGuideSlug(null);
     window.history.pushState({ view }, '', `/${view === 'dashboard' ? '' : view}`);
-    if (returnY !== null) {
-      const y = returnY;
-      setTimeout(() => window.scrollTo({ top: y }), 60);
-    } else if (view === 'pricing') {
-      // Wait one tick for the section to mount, then smooth-scroll
+    if (view === 'pricing') {
+      // Show the plans right away — the one intentional exception to top.
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
-    } else if (view === 'about' || view === 'datenschutz' || view === 'impressum' || view === 'agb' || view === 'ratgeber') {
-      // Full-page views: jump straight to the top. Smooth-scrolling while
-      // the lazy chunk was still mounting read as a glitch.
-      window.scrollTo(0, 0);
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Jump to the top now and again after the (possibly lazy) page mounts,
+      // so the scroll reliably sticks instead of keeping the old position.
+      window.scrollTo(0, 0);
+      setTimeout(() => window.scrollTo(0, 0), 60);
     }
   };
 
@@ -1866,6 +1858,10 @@ function StellifyApp() {
   }, []);
 
   useEffect(() => {
+    // We control scroll ourselves (top on forward navigation, saved spot on
+    // back). Tell the browser not to also try to restore scroll, or the two
+    // fight and the page can land in the wrong place.
+    try { if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual'; } catch { /* ignore */ }
     type RouteView = 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber';
     const validViews: RouteView[] = ['dashboard', 'profile', 'tracker', 'tools', 'jobs', 'pricing', 'datenschutz', 'impressum', 'agb', 'about', 'ratgeber'];
     const viewFromPath = (path: string): RouteView | null => {
