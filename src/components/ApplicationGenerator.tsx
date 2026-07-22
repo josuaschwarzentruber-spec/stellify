@@ -1151,6 +1151,34 @@ ${bodyText}
   const set = (key: keyof ApplicationForm) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm(prev => ({ ...prev, [key]: e.target.value }));
 
+  // Quick helpers for the "lazy" path: click a common skill to add it, or drop
+  // a fill-in structure into a field. Templates use [Platzhalter], never fake
+  // facts, so nothing untrue ever lands in a real application.
+  const addSkill = (skill: string) => setForm(prev => {
+    const parts = prev.skills.split(/·|,|\n/).map(x => x.trim().toLowerCase());
+    if (parts.includes(skill.toLowerCase())) return prev;
+    return { ...prev, skills: prev.skills.trim() ? `${prev.skills.trim()} · ${skill}` : skill };
+  });
+  const fillTemplate = (key: 'experience' | 'motivation') => setForm(prev => {
+    if (prev[key].trim()) return prev; // never overwrite what the user wrote
+    const T = {
+      experience: language === 'FR' ? 'Entreprise, période : mes tâches principales et un résultat concret.\nPoste précédent, période : tâches et réussite.'
+        : language === 'IT' ? 'Azienda, periodo: i miei compiti principali e un risultato concreto.\nPosizione precedente, periodo: compiti e successo.'
+        : language === 'EN' ? 'Company, period: my main tasks and a concrete result.\nPrevious role, period: tasks and achievement.'
+        : 'Firma, Zeitraum: meine wichtigsten Aufgaben und ein konkretes Ergebnis.\nFrühere Station, Zeitraum: Aufgaben und Erfolg.',
+      motivation: language === 'FR' ? 'Je postule dans cette entreprise parce que ... Ce qui m\'attire particulièrement, c\'est ... J\'apporte ...'
+        : language === 'IT' ? 'Mi candido in questa azienda perché ... Ciò che mi attrae in particolare è ... Porto con me ...'
+        : language === 'EN' ? 'I am applying to this company because ... What particularly draws me is ... I bring ...'
+        : 'Ich bewerbe mich bei dieser Firma, weil ... Besonders reizt mich ... Ich bringe ... mit.',
+    } as const;
+    return { ...prev, [key]: T[key] };
+  });
+  const commonSkills = language === 'FR' ? ['Travail d\'équipe', 'Fiabilité', 'Communication', 'Autonomie', 'MS Office', 'Flexibilité', 'Orientation client', 'Anglais']
+    : language === 'IT' ? ['Lavoro di squadra', 'Affidabilità', 'Comunicazione', 'Autonomia', 'MS Office', 'Flessibilità', 'Orientamento al cliente', 'Inglese']
+    : language === 'EN' ? ['Teamwork', 'Reliability', 'Communication', 'Independence', 'MS Office', 'Flexibility', 'Customer focus', 'English']
+    : ['Teamarbeit', 'Zuverlässigkeit', 'Kommunikationsstärke', 'Selbstständigkeit', 'MS Office', 'Flexibilität', 'Kundenorientierung', 'Englisch'];
+  const insertTemplateLabel = language === 'FR' ? 'Insérer un modèle' : language === 'IT' ? 'Inserisci modello' : language === 'EN' ? 'Insert template' : 'Vorlage einfügen';
+
   const inputCls = "w-full px-3.5 py-2.5 bg-white dark:bg-[#2A2A26] border border-black/8 dark:border-white/8 text-sm text-[#1A1A18] dark:text-[#FAFAF8] focus:border-[#004225] dark:focus:border-[#00A854] outline-none transition-all placeholder:text-[#9A9A94]/60";
   const labelCls = "text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]";
 
@@ -1433,10 +1461,30 @@ ${bodyText}
                 <section>
                   <p className={`${labelCls} mb-3 pb-2 border-b border-black/8 dark:border-white/8`}>{s.sec_profile}</p>
                   <div className="grid grid-cols-1 gap-4">
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_experience}</label><textarea className={`${inputCls} min-h-[80px]`} placeholder={s.ph_experience} value={form.experience} onChange={set('experience')} /></div>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <label className={labelCls}>{s.f_experience}</label>
+                        <button type="button" onClick={() => fillTemplate('experience')} className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline">+ {insertTemplateLabel}</button>
+                      </div>
+                      <textarea className={`${inputCls} min-h-[80px]`} placeholder={s.ph_experience} value={form.experience} onChange={set('experience')} />
+                    </div>
                     <div className="space-y-1.5"><label className={labelCls}>{s.f_education}</label><textarea className={`${inputCls} min-h-[70px]`} placeholder={s.ph_education} value={form.education} onChange={set('education')} /></div>
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_skills}</label><textarea className={`${inputCls} min-h-[70px]`} placeholder={s.ph_skills} value={form.skills} onChange={set('skills')} /></div>
-                    <div className="space-y-1.5"><label className={labelCls}>{s.f_motivation}</label><textarea className={`${inputCls} min-h-[100px]`} placeholder={s.ph_motivation} value={form.motivation} onChange={set('motivation')} /></div>
+                    <div className="space-y-1.5">
+                      <label className={labelCls}>{s.f_skills}</label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {commonSkills.map(sk => (
+                          <button key={sk} type="button" onClick={() => addSkill(sk)} className="px-2.5 py-1 text-[11px] rounded-full border border-[#004225]/25 dark:border-[#00A854]/30 text-[#004225] dark:text-[#00A854] hover:bg-[#004225]/8 dark:hover:bg-[#00A854]/10 transition-colors">+ {sk}</button>
+                        ))}
+                      </div>
+                      <textarea className={`${inputCls} min-h-[70px]`} placeholder={s.ph_skills} value={form.skills} onChange={set('skills')} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <label className={labelCls}>{s.f_motivation}</label>
+                        <button type="button" onClick={() => fillTemplate('motivation')} className="text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] hover:underline">+ {insertTemplateLabel}</button>
+                      </div>
+                      <textarea className={`${inputCls} min-h-[100px]`} placeholder={s.ph_motivation} value={form.motivation} onChange={set('motivation')} />
+                    </div>
                     <div className="space-y-1.5">
                       <label className={labelCls}>{s.f_tone}</label>
                       <select className={inputCls} value={form.tone} onChange={set('tone')}>
