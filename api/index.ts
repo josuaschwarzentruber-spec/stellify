@@ -1936,7 +1936,7 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
     res.json({ ok: true, sent });
   } catch (e: any) {
     console.error('[NEWSLETTER]', e.message);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'Newsletter-Versand fehlgeschlagen.' });
   }
 });
 
@@ -2037,7 +2037,7 @@ app.get("/api/cron/onboarding", async (req, res) => {
     res.json({ ok: true, sent, reminders });
   } catch (e: any) {
     console.error('[CRON ONBOARDING]', e.message);
-    res.status(500).json({ error: e.message });
+    res.status(500).json({ error: 'Cron fehlgeschlagen.' });
   }
 });
 
@@ -2145,7 +2145,7 @@ async function handleTestEmail(to: string, language: string, res: any) {
     res.json({ ok: true, sentTo: to, provider: process.env.RESEND_API_KEY ? 'resend' : 'gmail', language });
   } catch (err: any) {
     console.error('[EMAIL] Test email failed:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Test-E-Mail fehlgeschlagen.' });
   }
 }
 app.get("/api/send-test-email", async (req, res) => {
