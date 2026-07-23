@@ -2224,6 +2224,9 @@ function StellifyApp() {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [authError, setAuthError] = useState('');
+  // Registration consent: AGB + Datenschutz + Einwilligung in die KI-Verarbeitung
+  // (Übermittlung der Angaben an DeepSeek). Pflicht, matcht die Datenschutzerklärung.
+  const [agreedTerms, setAgreedTerms] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -2977,6 +2980,16 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
         justLoggedIn.current = true;
         await signInWithEmailAndPassword(auth, email, password);
       } else {
+        if (!agreedTerms) {
+          setAuthError(
+            language === 'FR' ? 'Merci d\'accepter les CGV et de confirmer la politique de confidentialité.' :
+            language === 'IT' ? 'Accetta le CGV e conferma l\'informativa sulla privacy.' :
+            language === 'EN' ? 'Please accept the Terms and confirm the Privacy Policy.' :
+            'Bitte akzeptiere die AGB und die Datenschutzerklärung.'
+          );
+          setIsAuthLoading(false);
+          return;
+        }
         if (password.length < 6) {
           setAuthError(
             language === 'DE' ? 'Das Passwort muss mindestens 6 Zeichen haben.' :
@@ -5596,8 +5609,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_f: ["30 KI-Generierungen pro Monat", "Massgeschneiderte Bewerbungen mit KI", "Stelle per Link laden & Lebenslauf nutzen", "Alle Standard-Designs", "PDF- & Word-Export"],
       pricing_ultimate_f: ["Alles aus Pro, plus:", "Volle KI-Power: 100 Generierungen pro Monat", "Alle exklusiven Premium-Designs", "Persönlicher E-Mail-Support", "Für Vielbewerber und Berufswechsel"],
       pricing_cta_free: "Kostenlos starten",
-      pricing_cta_pro: "Pro werden",
-      pricing_cta_ultimate: "Karriere+ wählen",
+      pricing_cta_pro: "Zahlungspflichtig abonnieren",
+      pricing_cta_ultimate: "Zahlungspflichtig abonnieren",
       pricing_recommended: "Empfohlen",
       pricing_popular: "Beliebteste Wahl",
       value_title: "Was Stellify dir spart",
@@ -6259,8 +6272,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_f: ["30 générations IA par mois", "Candidatures sur mesure avec l'IA", "Charger l'offre par lien & utiliser le CV", "Tous les designs standard", "Export PDF & Word"],
       pricing_ultimate_f: ["Tout de Pro, plus :", "Pleine puissance IA : 100 générations par mois", "Tous les designs Premium exclusifs", "Support e-mail personnel", "Pour candidatures fréquentes et reconversions"],
       pricing_cta_free: "Démarrer gratuitement",
-      pricing_cta_pro: "Devenir Pro",
-      pricing_cta_ultimate: "Choisir Karriere+",
+      pricing_cta_pro: "S'abonner (payant)",
+      pricing_cta_ultimate: "S'abonner (payant)",
       pricing_recommended: "Recommandé",
       pricing_popular: "Choix le plus populaire",
       value_title: "Ce que Stellify te fait économiser",
@@ -6816,8 +6829,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_f: ["30 generazioni IA al mese", "Candidature su misura con l'IA", "Carica l'annuncio da link & usa il CV", "Tutti i design standard", "Esportazione PDF & Word"],
       pricing_ultimate_f: ["Tutto di Pro, più:", "Piena potenza IA: 100 generazioni al mese", "Tutti i design Premium esclusivi", "Supporto e-mail personale", "Per chi si candida spesso o cambia carriera"],
       pricing_cta_free: "Inizia gratuitamente",
-      pricing_cta_pro: "Diventa Pro",
-      pricing_cta_ultimate: "Scegli Karriere+",
+      pricing_cta_pro: "Abbonati (a pagamento)",
+      pricing_cta_ultimate: "Abbonati (a pagamento)",
       pricing_recommended: "Consigliato",
       pricing_popular: "Scelta più popolare",
       value_title: "Cosa ti fa risparmiare Stellify",
@@ -7373,8 +7386,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       pricing_pro_f: ["30 AI generations per month", "Tailored applications with AI", "Load job by link & use your CV", "All standard designs", "PDF & Word export"],
       pricing_ultimate_f: ["Everything in Pro, plus:", "Full AI power: 100 generations per month", "All exclusive Premium designs", "Personal email support", "For frequent applicants and career changers"],
       pricing_cta_free: "Start for free",
-      pricing_cta_pro: "Go Pro",
-      pricing_cta_ultimate: "Choose Karriere+",
+      pricing_cta_pro: "Subscribe (paid)",
+      pricing_cta_ultimate: "Subscribe (paid)",
       pricing_recommended: "Recommended",
       pricing_popular: "Most Popular",
       value_title: "What Stellify saves you",
@@ -8537,27 +8550,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               
               <AnimatePresence>
                 {isLangDropdownOpen && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute top-full right-0 mt-2 w-32 bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-xl z-50 overflow-hidden"
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.97 }}
+                    transition={{ duration: 0.16, ease: [0.22, 0.61, 0.36, 1] }}
+                    className="absolute top-full right-0 mt-2 w-40 p-1.5 bg-white dark:bg-[#1F1F1C] border border-black/8 dark:border-white/10 rounded-2xl shadow-[0_14px_44px_-10px_rgba(0,0,0,0.3)] z-50 origin-top-right"
                   >
                     {['DE', 'EN', 'FR', 'IT'].map((lang) => (
-                      <button 
+                      <button
                         key={lang}
                         onClick={() => {
                           setLanguage(lang as any);
                           setIsLangDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors flex items-center justify-between ${
-                          language === lang 
-                            ? 'bg-[#004225] text-white' 
-                            : 'text-[#5C5C58] dark:text-[#9A9A94] hover:bg-black/5 dark:hover:bg-white/5'
+                        className={`w-full text-left px-3 py-2 text-[11px] font-bold uppercase tracking-widest rounded-xl transition-colors flex items-center justify-between gap-2 ${
+                          language === lang
+                            ? 'bg-[#004225] dark:bg-[#00A854] text-white'
+                            : 'text-[#5C5C58] dark:text-[#9A9A94] hover:bg-[#004225]/8 dark:hover:bg-white/8 hover:text-[#1A1A18] dark:hover:text-[#FAFAF8]'
                         }`}
                       >
                         {lang === 'DE' ? 'Deutsch' : lang === 'EN' ? 'English' : lang === 'FR' ? 'Français' : 'Italiano'}
-                        {language === lang && <CheckCircle2 size={10} />}
+                        {language === lang && <CheckCircle2 size={11} />}
                       </button>
                     ))}
                   </motion.div>
@@ -11539,6 +11553,13 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </motion.div>
           </motion.div>
 
+          <p className="text-center text-[11px] text-white/45 font-light max-w-xl mx-auto mt-6 leading-relaxed">
+            {language === 'FR' ? 'Abonnement payant. En cliquant, tu es redirigé vers le paiement sécurisé (Stripe). Les CGV s\'appliquent. Résiliable à tout moment dans ton compte, avec effet à la fin de la période payée.'
+              : language === 'IT' ? 'Abbonamento a pagamento. Cliccando vieni reindirizzato al pagamento sicuro (Stripe). Si applicano le CGV. Disdicibile in qualsiasi momento nel tuo account, con effetto alla fine del periodo pagato.'
+              : language === 'EN' ? 'Paid subscription. Clicking takes you to secure payment (Stripe). The Terms apply. Cancel anytime in your account, effective at the end of the paid period.'
+              : 'Kostenpflichtiges Abonnement. Mit dem Klick gelangst du zur sicheren Zahlung (Stripe). Es gelten die AGB. Jederzeit im Konto kündbar, wirksam zum Ende der bezahlten Periode.'}
+          </p>
+
           {/* TRUST BAR — directly under the plan cards, where the buying
               decision happens. Answers the last doubts at the moment they
               come up. */}
@@ -13960,6 +13981,23 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       </div>
                     )}
                   </div>
+                )}
+
+                {authTab === 'register' && (
+                  <label className="flex items-start gap-2.5 mt-1 mb-3 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={agreedTerms}
+                      onChange={(e) => setAgreedTerms(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-[#004225] cursor-pointer"
+                    />
+                    <span className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed">
+                      {language === 'FR' ? <>J'accepte les <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('agb'); }} className="underline text-[#004225] dark:text-[#00A854]">CGV</button> et j'ai lu la <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('datenschutz'); }} className="underline text-[#004225] dark:text-[#00A854]">politique de confidentialité</button>. Je consens à ce que mes informations soient transmises au service IA (DeepSeek) pour créer ma candidature.</>
+                        : language === 'IT' ? <>Accetto le <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('agb'); }} className="underline text-[#004225] dark:text-[#00A854]">CGV</button> e ho letto l'<button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('datenschutz'); }} className="underline text-[#004225] dark:text-[#00A854]">informativa sulla privacy</button>. Acconsento alla trasmissione dei miei dati al servizio IA (DeepSeek) per creare la candidatura.</>
+                        : language === 'EN' ? <>I accept the <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('agb'); }} className="underline text-[#004225] dark:text-[#00A854]">Terms</button> and have read the <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('datenschutz'); }} className="underline text-[#004225] dark:text-[#00A854]">Privacy Policy</button>. I consent to my details being sent to the AI service (DeepSeek) to create my application.</>
+                        : <>Ich akzeptiere die <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('agb'); }} className="underline text-[#004225] dark:text-[#00A854]">AGB</button> und habe die <button type="button" onClick={() => { setIsAuthModalOpen(false); navigate('datenschutz'); }} className="underline text-[#004225] dark:text-[#00A854]">Datenschutzerklärung</button> gelesen. Ich willige ein, dass meine Angaben zur Erstellung der Bewerbung an den KI-Dienst (DeepSeek) übermittelt werden.</>}
+                    </span>
+                  </label>
                 )}
 
                 <button

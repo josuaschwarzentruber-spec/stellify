@@ -1598,6 +1598,12 @@ ${bodyText}
                         >
                           <Sparkles size={15} />{s.generate}
                         </button>
+                        <p className="text-[10px] text-[#5C5C58] dark:text-[#9A9A94] font-light leading-relaxed max-w-[340px]">
+                          {language === 'FR' ? "Stellify utilise l'IA. Les textes générés peuvent contenir des erreurs. Vérifie toutes les informations avant d'envoyer. Aucune garantie d'entretien ou d'embauche."
+                            : language === 'IT' ? "Stellify usa l'IA. I testi generati possono contenere errori. Controlla tutte le informazioni prima di inviare. Nessuna garanzia di colloquio o assunzione."
+                            : language === 'EN' ? 'Stellify uses AI. Generated text can contain errors. Please check all details before sending. No guarantee of an interview or job offer.'
+                            : 'Stellify nutzt KI. Generierte Texte können Fehler enthalten. Bitte prüfe alle Angaben, bevor du deine Bewerbung versendest. Keine Garantie auf Einladung oder Anstellung.'}
+                        </p>
                       </div>
                     )}
                     {/* Editable letter: a subtle hover/focus tint marks it. */}
