@@ -876,11 +876,15 @@ const HowItWorks = ({ language, embedded = false }: { language: string; embedded
                 )}
                 {step === 2 && (
                   <div className="space-y-4">
-                    <div className="bg-[#F7F6F3] dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-lg p-4 space-y-2.5">
-                      <div className="h-2 w-1/2 rounded bg-[#004225]/70 dark:bg-[#00A854]/70" />
-                      <div className="h-1.5 w-full rounded bg-black/10 dark:bg-white/12" />
-                      <div className="h-1.5 w-11/12 rounded bg-black/10 dark:bg-white/12" />
-                      <div className="h-1.5 w-4/5 rounded bg-black/10 dark:bg-white/12" />
+                    <div className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-lg overflow-hidden shadow-sm">
+                      <div className="bg-[#004225] px-3.5 py-2 flex items-center justify-between gap-2">
+                        <span className="text-white text-[11px] font-serif font-semibold truncate">Anna Müller</span>
+                        <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
+                      </div>
+                      <div className="p-3.5 space-y-1.5">
+                        <p className="text-[9.5px] font-bold text-[#004225] dark:text-[#00A854]">{L('Bewerbung als Marketing Manager · UBS', 'Candidature : Marketing Manager · UBS', 'Candidatura: Marketing Manager · UBS', 'Application: Marketing Manager · UBS')}</p>
+                        <p className="text-[10px] text-[#26261F] dark:text-[#D5D5CF] leading-[1.6]">{L('Sehr geehrte Damen und Herren, mit grossem Interesse bewerbe ich mich als Marketing Manager bei der UBS. Seit drei Jahren führe ich die Markenstrategie eines Schweizer Finanzdienstleisters und stärke die Kundenbindung messbar.', "Madame, Monsieur, c'est avec grand intérêt que je postule au poste de Marketing Manager chez UBS. Depuis trois ans, je dirige la stratégie de marque d'un prestataire financier suisse.", 'Gentili Signore e Signori, con grande interesse mi candido come Marketing Manager presso UBS. Da tre anni guido la strategia di marca di un fornitore svizzero di servizi finanziari.', 'Dear Sir or Madam, I am applying with great interest for the Marketing Manager position at UBS. For three years I have led the brand strategy of a Swiss financial services provider.')}</p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1 rounded"><Download size={11} />PDF</span>

@@ -823,7 +823,7 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
   // user's OWN data — what they entered at sign-up, or their Google account
   // display name — never derived from anything else (we removed the old
   // guess-the-surname-from-the-e-mail heuristic). If the account name has two
-  // parts (e.g. a Google display name "Josua Schwarzentruber") we split it into
+  // parts (e.g. a Google display name "Anna Muster") we split it into
   // first + last name. Only fills empty fields, never overwrites edits.
   useEffect(() => {
     if (!profile) return;
