@@ -10338,26 +10338,26 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </p>
             {/* The real four-step journey, identical in every language —
                 the hero must only promise what V1 actually delivers. */}
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            <div className="flex flex-nowrap items-center gap-x-2 sm:gap-x-2.5 overflow-x-auto">
               {((language === 'FR' ? [
                 ['1', 'CV'],
-                ['2', "Lien de l'annonce"],
-                ['3', 'Candidature en 60 s'],
+                ['2', 'Annonce'],
+                ['3', 'Candidature'],
                 ['4', 'Tracker'],
               ] : language === 'IT' ? [
                 ['1', 'CV'],
-                ['2', 'Link annuncio'],
-                ['3', 'Candidatura in 60 s'],
+                ['2', 'Annuncio'],
+                ['3', 'Candidatura'],
                 ['4', 'Tracker'],
               ] : language === 'EN' ? [
                 ['1', 'CV'],
-                ['2', 'Job-ad link'],
-                ['3', 'Application in 60 s'],
+                ['2', 'Job link'],
+                ['3', 'Application'],
                 ['4', 'Tracker'],
               ] : [
                 ['1', 'Lebenslauf'],
-                ['2', 'Inserat-Link'],
-                ['3', 'Bewerbung in 60 Sek.'],
+                ['2', 'Inserat'],
+                ['3', 'Bewerbung'],
                 ['4', 'Tracker'],
               ]) as [string, string][]).map(([num, label], i, arr) => (
                 <React.Fragment key={num}>
