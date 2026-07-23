@@ -2320,11 +2320,11 @@ function StellifyApp() {
             setDoc(userRef, newData).then(() => {
               const isOAuth = firebaseUser.providerData.some(p => p.providerId !== 'password');
               if (isOAuth) {
-                fetch('/api/send-welcome-email', {
+                firebaseUser.getIdToken().then(token => fetch('/api/send-welcome-email', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email: firebaseUser.email, firstName: formattedName, language }),
-                }).then(null, console.error);
+                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                  body: JSON.stringify({ firstName: formattedName, language }),
+                })).then(null, console.error);
               }
             }).catch(console.error);
             processUserData(newData, firebaseUser);
@@ -2995,11 +2995,11 @@ Antworte NUR mit einem validen JSON-Objekt ohne Markdown-Codeblock, mit exakt di
           language,
           theme,
         });
-        fetch('/api/send-welcome-email', {
+        userCredential.user.getIdToken().then(token => fetch('/api/send-welcome-email', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: userCredential.user.email, firstName: formattedName, language }),
-        }).then(null, console.error);
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ firstName: formattedName, language }),
+        })).then(null, console.error);
       }
       setIsAuthModalOpen(false);
       setEmail('');

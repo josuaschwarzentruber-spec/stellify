@@ -61,7 +61,10 @@ async function saveToStorage(adminStorage: ReturnType<typeof getStorage>, path: 
     try {
       const file = adminStorage.bucket(name).file(path);
       await file.save(buffer, { contentType });
-      const [url] = await file.getSignedUrl({ action: 'read', expires: '01-01-2100' });
+      // Short-lived read URL. The client uses it only right after upload; the
+      // server always re-reads the CV from cv_file_path via the Admin SDK, so a
+      // long-lived link would just be a leak risk if it ever escaped.
+      const [url] = await file.getSignedUrl({ action: 'read', expires: Date.now() + 60 * 60 * 1000 });
       resolvedStorageBucket = name;
       return { url, bucket: name };
     } catch (err: any) {
@@ -183,6 +186,15 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
 // EMAIL_REPLY_TO (default support.stellify@gmail.com) — where replies should land.
 // Falls back to nodemailer + EMAIL_USER / EMAIL_PASS for legacy Gmail setups.
 const REPLY_TO_DEFAULT = 'support.stellify@gmail.com';
+
+// Never write a full customer email address to the logs. Keeps enough to debug
+// (first char + domain) without storing personal data in log output.
+function maskEmail(addr: string): string {
+  if (typeof addr !== 'string' || !addr.includes('@')) return '***';
+  const [local, domain] = addr.split('@');
+  return `${local.slice(0, 1)}***@${domain}`;
+}
+
 let resendClient: Resend | null = null;
 async function sendEmail(opts: { to: string; subject: string; html: string; text?: string; replyTo?: string }) {
   const resendKey = process.env.RESEND_API_KEY;
@@ -203,7 +215,7 @@ async function sendEmail(opts: { to: string; subject: string; html: string; text
         console.error('[EMAIL] Resend error:', (r as any).error);
         // Fall through to Gmail fallback
       } else {
-        console.log(`[EMAIL] Sent via Resend to ${opts.to} (id: ${(r as any).data?.id || 'unknown'})`);
+        console.log(`[EMAIL] Sent via Resend to ${maskEmail(opts.to)} (id: ${(r as any).data?.id || 'unknown'})`);
         return true;
       }
     } catch (err) {
@@ -229,7 +241,7 @@ async function sendEmail(opts: { to: string; subject: string; html: string; text
       text: opts.text || opts.html.replace(/<[^>]+>/g, ''),
       html: opts.html,
     });
-    console.log(`[EMAIL] Sent via Gmail to ${opts.to}`);
+    console.log(`[EMAIL] Sent via Gmail to ${maskEmail(opts.to)}`);
     return true;
   } catch (err) {
     console.error('[EMAIL] Gmail send failed:', err);
@@ -1985,7 +1997,7 @@ app.post("/api/admin/send-newsletter", express.json(), requireAuth, async (req, 
         subject: subject.trim(),
         html: buildEmailHtml(subject.trim(), [...lines, `<span style="font-size:12px;color:#8a8a85">${optOut[lang]}</span>`], 'Zu Stellify', site + '/', lang),
         text: message.trim() + '\n\n' + optOut[lang].replace(/<[^>]+>/g, ''),
-      }).catch((e) => console.error('[NEWSLETTER] send failed for', u.email, e.message));
+      }).catch((e) => console.error('[NEWSLETTER] send failed for', maskEmail(u.email), e.message));
       sent++;
     }
     console.log(`[NEWSLETTER] "${subject.trim()}" sent to ${sent} free-plan recipients`);
@@ -2098,8 +2110,11 @@ app.get("/api/cron/onboarding", async (req, res) => {
 });
 
 // ── Welcome Email ─────────────────────────────────────────────────────────────
-app.post("/api/send-welcome-email", emailLimiter, async (req, res) => {
-  const { email, firstName, language } = req.body;
+app.post("/api/send-welcome-email", emailLimiter, requireAuth, async (req, res) => {
+  const { firstName, language } = req.body;
+  // Send only to the signed-in user's own verified address (from the token),
+  // never to a caller-supplied recipient — otherwise this is a branded-spam relay.
+  const email = (req as any).userEmail as string | undefined;
   if (!email) return res.status(400).json({ error: 'Email required' });
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
   const name = firstName || '';

@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Firebase Storage is written and read ONLY by the server (Admin SDK), which
+// bypasses these rules. The browser client never uploads or downloads directly:
+// CVs go through POST /api/upload-cv and are served via short-lived signed URLs.
+// So the safe rule is to deny every direct client request. This prevents anyone
+// from listing, reading or uploading files straight into the bucket.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
