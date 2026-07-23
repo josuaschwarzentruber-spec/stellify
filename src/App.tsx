@@ -10521,10 +10521,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               {/* Reassure that nothing is required — a cold visitor should not
                   feel they must have a CV or a job link ready to begin. */}
               <p className="-mt-2 text-[11px] text-[#6B6B66] dark:text-[#9A9A94] font-light">
-                {language === 'FR' ? "Optionnel : ça marche aussi sans CV et sans lien d'annonce, tu peux tout saisir à la main."
-                  : language === 'IT' ? "Facoltativo: funziona anche senza CV e senza link dell'annuncio, puoi inserire tutto a mano."
-                  : language === 'EN' ? 'Optional: it also works without a CV and without a job link, you can enter everything by hand.'
-                  : 'Optional: geht auch ganz ohne Lebenslauf und ohne Inserat-Link, du kannst alles auch von Hand eingeben.'}
+                {language === 'FR' ? "Optionnel : ça marche aussi sans CV et sans lien d'annonce, tu peux tout saisir manuellement."
+                  : language === 'IT' ? "Facoltativo: funziona anche senza CV e senza link dell'annuncio, puoi inserire tutto manualmente."
+                  : language === 'EN' ? 'Optional: it also works without a CV and without a job link, you can enter everything manually.'
+                  : 'Optional: geht auch ganz ohne Lebenslauf und ohne Inserat-Link, du kannst alles auch manuell eingeben.'}
               </p>
 
               {/* Primary CTA — Premium glow */}

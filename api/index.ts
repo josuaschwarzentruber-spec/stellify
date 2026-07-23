@@ -140,10 +140,9 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
       .email-muted  { color:#9A9A94 !important; }
       .email-link   { color:#4E9E74 !important; }
       .email-footer { border-color:#3A3A35 !important; }
-      /* Dark mail clients: a BRIGHT green button with near-black text keeps
-         high contrast even when the client re-tints colours (white text on a
-         mid-green button was rendering nearly unreadable). */
-      .email-cta    { background:#00C766 !important; background-image:none !important; color:#00251A !important; }
+      /* Keep the button on-brand in dark clients too: Stellify forest green with
+         white text, exactly like the header (which renders cleanly in dark mail). */
+      .email-cta    { background:#004225 !important; background-image:none !important; color:#ffffff !important; }
     }
   </style>
 </head>
@@ -164,7 +163,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
             <h1 class="email-title" style="margin:0 0 20px;font-size:22px;font-weight:600;color:#1A1A18;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
             ${bodyLines.map(l => `<p class="email-body" style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.65;">${l}</p>`).join('')}
             <div style="margin:32px 0 8px;">
-              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;">${ctaText}</a>
+              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:14px 30px;letter-spacing:0.4px;text-transform:uppercase;border-radius:2px;white-space:nowrap;">${ctaText}</a>
             </div>
             <p class="email-muted" style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">${shell.contact} <a href="mailto:${supportAddr}" class="email-link" style="color:#004225;">${supportAddr}</a></p>
           </td>
@@ -1699,25 +1698,25 @@ app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
       subject: 'Stellify, Passwort zurücksetzen',
       title: 'Passwort zurücksetzen',
       lines: ['Hallo,', 'du hast eine Anfrage gestellt, dein Passwort bei Stellify zurückzusetzen.', 'Klicke auf den Button unten um ein neues Passwort festzulegen. Der Link ist <strong>1 Stunde gültig</strong>.', 'Wenn du diese Anfrage nicht gestellt hast, kannst du diese E-Mail einfach ignorieren.'],
-      cta: 'Passwort jetzt zurücksetzen',
+      cta: 'Passwort zurücksetzen',
     },
     FR: {
       subject: 'Stellify, réinitialiser votre mot de passe',
       title: 'Réinitialiser votre mot de passe',
       lines: ['Bonjour,', 'vous avez demandé la réinitialisation de votre mot de passe Stellify.', 'Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe. Le lien est valable <strong>1 heure</strong>.', 'Si vous n\'avez pas fait cette demande, ignorez simplement cet e-mail.'],
-      cta: 'Réinitialiser maintenant',
+      cta: 'Réinitialiser',
     },
     IT: {
       subject: 'Stellify, reimposta la tua password',
       title: 'Reimposta la password',
       lines: ['Ciao,', 'hai richiesto il reset della password di Stellify.', 'Clicca sul pulsante qui sotto per impostare una nuova password. Il link è valido per <strong>1 ora</strong>.', 'Se non hai fatto questa richiesta, ignora semplicemente questa email.'],
-      cta: 'Reimposta ora',
+      cta: 'Reimposta password',
     },
     EN: {
       subject: 'Stellify, reset your password',
       title: 'Reset your password',
       lines: ['Hello,', 'you requested a password reset for your Stellify account.', 'Click the button below to set a new password. The link is valid for <strong>1 hour</strong>.', 'If you did not request this, you can safely ignore this email.'],
-      cta: 'Reset password now',
+      cta: 'Reset password',
     },
   };
   const copy = resetCopy[lang] || resetCopy['DE'];
