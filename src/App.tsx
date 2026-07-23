@@ -5,7 +5,7 @@
 
 /// <reference types="vite/client" />
 
-import React, { useState, useEffect, useRef, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, lazy, Suspense } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import { track as vaTrack } from '@vercel/analytics';
 import { useDropzone } from 'react-dropzone';
@@ -1998,6 +1998,20 @@ function StellifyApp() {
     html.style.scrollBehavior = prev;
   };
 
+  // Set true right before a back/forward (popstate) restore so the layout effect
+  // below does NOT override the restored scroll position with a jump to the top.
+  const suppressTopScrollRef = useRef(false);
+  // Jump to the top BEFORE the browser paints the new view. useLayoutEffect runs
+  // after React swaps the DOM but before paint, so a page opened from a
+  // scrolled-down position (e.g. Preise → Ratgeber/Über uns) never flashes the
+  // old dark footer at the bottom first — it simply starts at the top.
+  useLayoutEffect(() => {
+    if (suppressTopScrollRef.current) { suppressTopScrollRef.current = false; return; }
+    if (activeView === 'pricing') return; // pricing scrolls to its own section
+    scrollTopInstant();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeView, guideSlug]);
+
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber') => {
     const prev = activeView;
@@ -2016,16 +2030,10 @@ function StellifyApp() {
     if (view === 'pricing') {
       // Show the plans right away — the one intentional exception to top.
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
-    } else {
-      // Scroll to the top only AFTER the view has swapped. Scrolling immediately
-      // would move the OLD (often tall, scrolled-down) page up for a frame before
-      // React swaps in the new one — that flash read as "jumping back and forth".
-      // rAF fires post-commit; the follow-up timeout covers a lazily mounted page.
-      requestAnimationFrame(() => {
-        scrollTopInstant();
-        setTimeout(scrollTopInstant, 60);
-      });
     }
+    // Non-pricing views are scrolled to the top by the useLayoutEffect above,
+    // which runs before paint — so the new page never flashes at the old scroll
+    // position (the footer) first.
   };
 
   // Open a single guide article under its own URL (/ratgeber/<slug>) —
@@ -2093,6 +2101,9 @@ function StellifyApp() {
     const onPop = (e: PopStateEvent) => {
       const view = (e.state?.view as RouteView | undefined) ?? viewFromPath(window.location.pathname);
       if (view) {
+        // popstate restores its own scroll position below — tell the layout
+        // effect not to override it with a jump to the top.
+        suppressTopScrollRef.current = true;
         setActiveView(view);
         setActiveTool(null);
         setGuideSlug((e.state?.guideSlug as string | undefined) ?? guideSlugFromPath(window.location.pathname));
