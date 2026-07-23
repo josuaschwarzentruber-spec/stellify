@@ -2,6 +2,16 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Defense-in-depth against storage abuse: reject documents that stuff an
+    // unreasonable number of top-level fields into a single write. Real writes
+    // use ~10 keys; Firestore already caps each document at 1 MiB natively, so
+    // together this bounds how much a scripted client can store per document.
+    // (Volume abuse — many documents — is handled by App Check + a Firebase
+    // billing budget alert on the owner side.)
+    function sanePayload() {
+      return request.resource.data.keys().size() <= 40;
+    }
+
     // ── Users ────────────────────────────────────────────────────────────────
     // A user reads/edits only their own document — but the fields that decide
     // PAID ACCESS and the AI QUOTA (role, subscription_*, stripe_customer_id,
@@ -41,7 +51,8 @@ service cloud.firestore {
       allow read: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
       allow update, delete: if false;
     }
 
@@ -50,7 +61,8 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
     }
 
     // ── CV Analyses ──────────────────────────────────────────────────────────
@@ -58,7 +70,8 @@ service cloud.firestore {
       allow read: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
       allow update, delete: if false;
     }
 
@@ -67,7 +80,8 @@ service cloud.firestore {
       allow read: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
       allow update, delete: if false;
     }
 
@@ -76,7 +90,8 @@ service cloud.firestore {
       allow read: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
       allow update, delete: if false;
     }
 
@@ -85,7 +100,8 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
     }
 
     // ── Generated Applications (Bewerbungs-Generator documents) ─────────────
@@ -93,7 +109,8 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null
         && resource.data.user_id == request.auth.uid;
       allow create: if request.auth != null
-        && request.resource.data.user_id == request.auth.uid;
+        && request.resource.data.user_id == request.auth.uid
+        && sanePayload();
     }
 
     // Deny everything else

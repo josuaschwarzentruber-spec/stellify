@@ -10,6 +10,7 @@ import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import { createHash } from "crypto";
+import { lookup as dnsLookup } from "dns/promises";
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getAuth as getAdminAuth } from "firebase-admin/auth";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
@@ -1448,20 +1449,66 @@ app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req
 // fetches it server-side (browsers can't, CORS), strips it to readable text and
 // asks DeepSeek to extract structured fields. Pure DeepSeek — no Gemini needed.
 // SSRF-guarded: only public http/https hosts, no localhost / private ranges.
-function isPrivateHost(host: string): boolean {
-  const h = host.toLowerCase();
-  if (h === 'localhost' || h.endsWith('.local') || h.endsWith('.internal')) return true;
-  // IPv4 private / loopback / link-local ranges
-  const m = h.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+// Is this a resolved IP address inside a private / loopback / link-local /
+// reserved range? Used to block SSRF to internal services and cloud metadata
+// (169.254.169.254). Covers IPv4, IPv6 and IPv4-mapped IPv6.
+function isPrivateIp(ip: string): boolean {
+  const s = ip.toLowerCase().replace(/^\[|\]$/g, '');
+  const m = s.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
   if (m) {
-    const [a, b] = [parseInt(m[1]), parseInt(m[2])];
+    const a = parseInt(m[1]), b = parseInt(m[2]);
     if (a === 10 || a === 127 || a === 0) return true;
-    if (a === 169 && b === 254) return true;
+    if (a === 169 && b === 254) return true;          // link-local + AWS/GCP metadata
     if (a === 172 && b >= 16 && b <= 31) return true;
     if (a === 192 && b === 168) return true;
+    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
+    if (a >= 224) return true;                          // multicast / reserved
+    return false;
   }
-  if (h === '::1' || h.startsWith('fe80:') || h.startsWith('fc') || h.startsWith('fd')) return true;
+  if (s === '::1' || s === '::') return true;
+  if (s.startsWith('fe80:') || s.startsWith('fc') || s.startsWith('fd')) return true;
+  const mapped = s.match(/^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/);
+  if (mapped) return isPrivateIp(mapped[1]);
   return false;
+}
+
+// Resolve the hostname and confirm EVERY address it maps to is public. A string
+// match on the hostname is not enough: a public name can point at a private IP,
+// and decimal/octal/hex IP encodings (http://2130706433/) bypass a dotted-quad
+// regex — DNS resolution normalises all of those.
+async function assertPublicUrl(u: URL): Promise<boolean> {
+  const host = u.hostname.toLowerCase().replace(/^\[|\]$/g, '');
+  if (!host || host === 'localhost' || host.endsWith('.local') || host.endsWith('.internal')) return false;
+  if (isPrivateIp(host)) return false;
+  try {
+    const addrs = await dnsLookup(host, { all: true });
+    if (!addrs.length) return false;
+    return addrs.every(a => !isPrivateIp(a.address));
+  } catch {
+    return false; // cannot resolve -> refuse
+  }
+}
+
+// Fetch that re-validates the target on EVERY redirect hop. With redirect:'follow'
+// a public URL could 302 to http://169.254.169.254/ and leak cloud metadata; here
+// each Location is re-checked against assertPublicUrl before we follow it.
+async function ssrfSafeFetch(startUrl: URL, init: RequestInit, maxHops = 4): Promise<globalThis.Response> {
+  let current = startUrl;
+  for (let hop = 0; hop < maxHops; hop++) {
+    if (!(await assertPublicUrl(current))) throw new Error('blocked-host');
+    const r = await fetch(current.toString(), { ...init, redirect: 'manual' });
+    if (r.status >= 300 && r.status < 400) {
+      const loc = r.headers.get('location');
+      if (!loc) return r;
+      let next: URL;
+      try { next = new URL(loc, current); } catch { throw new Error('bad-redirect'); }
+      if (!/^https?:$/.test(next.protocol)) throw new Error('blocked-proto');
+      current = next;
+      continue;
+    }
+    return r;
+  }
+  throw new Error('too-many-redirects');
 }
 
 function htmlToText(html: string): string {
@@ -1489,7 +1536,7 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   let parsed: URL;
   try { parsed = new URL(url.trim()); } catch { return res.status(400).json({ error: 'Ungültige URL' }); }
   if (!/^https?:$/.test(parsed.protocol)) return res.status(400).json({ error: 'Nur http/https erlaubt' });
-  if (isPrivateHost(parsed.hostname)) return res.status(400).json({ error: 'Diese Adresse ist nicht erlaubt' });
+  if (!(await assertPublicUrl(parsed))) return res.status(400).json({ error: 'Diese Adresse ist nicht erlaubt' });
 
   // LinkedIn serves a login wall to non-authenticated server-side fetches
   // (HTTP 999 or an empty shell). We still try — sometimes the public
@@ -1532,9 +1579,8 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), 12_000);
       try {
-        const r = await fetch(parsed.toString(), {
+        const r = await ssrfSafeFetch(parsed, {
           signal: ctrl.signal,
-          redirect: 'follow',
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -2513,83 +2559,11 @@ app.get("/api/auth/linkedin/callback", async (req, res) => {
 });
 
 // ── HR Job Application Email ─────────────────────────────────────────────────
-app.post("/api/send-job-email", emailLimiter, requireAuth, async (req, res) => {
-  const { to, subject, body, fromName, language } = req.body;
-  if (!to || !subject || !body) return res.status(400).json({ error: 'to, subject und body sind erforderlich' });
-
-  const lang = ((language || 'DE') as string).toUpperCase() as Lang;
-  const jobCopy: Record<Lang, { badge: string; tagline: string; defaultFromName: string; htmlLang: string }> = {
-    DE: { badge: 'Bewerbung', tagline: 'Erstellt mit',                defaultFromName: 'Stellify Bewerbung',   htmlLang: 'de' },
-    FR: { badge: 'Candidature', tagline: 'Créé avec',                  defaultFromName: 'Stellify Candidature',  htmlLang: 'fr' },
-    IT: { badge: 'Candidatura', tagline: 'Creato con',                 defaultFromName: 'Stellify Candidatura',  htmlLang: 'it' },
-    EN: { badge: 'Application', tagline: 'Created with',               defaultFromName: 'Stellify Application',  htmlLang: 'en' },
-  };
-  const taglineSuffix: Record<Lang, string> = {
-    DE: '· Schweizer KI-Karriere-Plattform',
-    FR: '· la plateforme suisse de carrière par IA',
-    IT: '· la piattaforma svizzera di carriera AI',
-    EN: '· the Swiss AI career platform',
-  };
-  const copy = jobCopy[lang] || jobCopy.DE;
-  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
-  const htmlBody = body
-    .split('\n')
-    .map((line: string) => line.trim() ? `<p style="margin:0 0 14px;font-size:15px;color:#1A1A18;line-height:1.7;">${line.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : '<br/>')
-    .join('');
-
-  const html = `<!DOCTYPE html>
-<html lang="${copy.htmlLang}">
-<head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <meta name="supported-color-schemes" content="light dark">
-  <style>
-    @media (prefers-color-scheme: dark) {
-      .jm-bg     { background:#1A1A18 !important; }
-      .jm-card   { background:#23231F !important; border-color:#3A3A35 !important; }
-      .jm-text   { color:#FAFAF8 !important; }
-      .jm-muted  { color:#9A9A94 !important; }
-      .jm-footer { border-color:#3A3A35 !important; }
-      .jm-link   { color:#6FCF97 !important; }
-    }
-  </style>
-</head>
-<body class="jm-bg" style="margin:0;padding:0;background:#F5F4F0;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" class="jm-bg" style="background:#F5F4F0;padding:40px 0;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" class="jm-card" style="background:#FDFCFB;border:1px solid #E8E6E0;max-width:600px;width:100%;">
-        <tr><td style="background:#004225;padding:24px 40px;">
-          <span style="font-family:Georgia,serif;font-size:22px;color:#FDFCFB;letter-spacing:-0.5px;">Stell<span style="color:#6FCF97;">ify</span></span>
-          <span style="font-size:11px;color:#6FCF97;margin-left:16px;font-family:Helvetica,Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;">${copy.badge}</span>
-        </td></tr>
-        <tr><td class="jm-text" style="padding:40px 40px 32px;color:#1A1A18;">
-          ${htmlBody}
-        </td></tr>
-        <tr><td class="jm-footer" style="padding:16px 40px 28px;border-top:1px solid #E8E6E0;">
-          <p class="jm-muted" style="margin:0;font-size:11px;color:#9A9A94;">${copy.tagline} <a href="${siteUrl}" class="jm-link" style="color:#004225;text-decoration:none;">Stellify</a> ${taglineSuffix[lang]}</p>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-
-  try {
-    const fromAddress = process.env.EMAIL_FROM || process.env.EMAIL_USER || 'noreply@stellify.ch';
-    const ok = await sendEmail({
-      to,
-      subject,
-      html,
-      text: body,
-    });
-    if (!ok) return res.status(500).json({ error: 'No email provider configured' });
-    console.log(`[JOB EMAIL] Sent to ${to} (from=${fromName || copy.defaultFromName}, via=${fromAddress})`);
-    res.json({ ok: true });
-  } catch (err: any) {
-    console.error('[JOB EMAIL ERROR]', err.message);
-    res.status(500).json({ error: err.message });
-  }
-});
+// NOTE: /api/send-job-email was removed. It let any authenticated user send an
+// arbitrary email (to/subject/body) from the branded stellify.ch domain — an open
+// relay / phishing vector — and the client never used it. If a "mail my
+// application" feature is ever added, it must send only to the signed-in user's
+// own verified address, never to a caller-supplied recipient.
 
 // ── Global error handler ──────────────────────────────────────────────────────
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
