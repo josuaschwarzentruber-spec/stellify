@@ -10509,7 +10509,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="pt-8 border-t border-black/5 dark:border-white/5 flex gap-12">
               <div>
                 <span className="block text-3xl font-serif text-[#004225] dark:text-[#00A854]">CH</span>
-                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">Swiss Made</span>
+                <span className="text-xs text-[#6B6B66] dark:text-[#9A9A94] uppercase tracking-wider">{language === 'FR' ? 'Développé en Suisse' : language === 'IT' ? 'Sviluppato in Svizzera' : language === 'EN' ? 'Developed in Switzerland' : 'In der Schweiz entwickelt'}</span>
               </div>
               <div>
                 <span className="block text-3xl font-serif text-[#1A1A18] dark:text-[#FAFAF8]"><CountUp to={4} duration={1000} /></span>
@@ -11244,24 +11244,28 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   'CV et photo enregistrés une fois, repris dans chaque candidature',
                   'Suisse d\'office : orthographe, ton et normes correctes',
                   'Document fini en 60 secondes : design au choix, PDF et Word',
+                  'Préparation à l\'entretien incluse : questions probables et idées de réponses',
                   'Tracker gratuit inclus : pipeline, rappels et statistiques',
                 ] : language === 'IT' ? [
                   'Incolla il link dell\'annuncio, Stellify lo legge automaticamente',
                   'CV e foto salvati una volta, ripresi in ogni candidatura',
                   'Svizzero di serie: ortografia, tono e standard corretti',
                   'Documento finito in 60 secondi: design a scelta, PDF e Word',
+                  'Preparazione al colloquio inclusa: domande probabili e idee di risposta',
                   'Tracker gratuito incluso: pipeline, promemoria e statistiche',
                 ] : language === 'EN' ? [
                   'Paste the job-ad link, Stellify reads the posting automatically',
                   'CV and photo saved once, applied to every application',
                   'Swiss by default: correct spelling, tone and standards',
                   'Finished document in 60 seconds: your design, PDF and Word',
+                  'Interview prep included: likely questions and answer ideas',
                   'Free tracker included: pipeline, reminders and statistics',
                 ] : [
                   'Link vom Inserat einfügen, Stellify liest die Stelle automatisch',
                   'Lebenslauf und Foto einmal hinterlegt, in jeder Bewerbung drin',
                   'Schweizer Standard ab Werk: Rechtschreibung, Ton und Normen',
                   'Fertiges Dokument in 60 Sekunden: Wunschdesign, PDF und Word',
+                  'Interview-Vorbereitung inklusive: passende Fragen und Antwort-Ideen fürs Gespräch',
                   'Gratis Tracker inklusive: Pipeline, Erinnerungen und Statistiken',
                 ]).map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm font-light leading-relaxed">
@@ -11279,10 +11283,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             </div>
           </div>
           <p className="mt-8 text-center text-sm text-[#9A9A94] font-light max-w-2xl mx-auto">
-            {language === 'FR' ? 'D\'ailleurs : Stellify utilise elle-même l\'IA la plus moderne. La différence, c\'est tout ce qu\'il y a autour.'
-              : language === 'IT' ? 'Tra l\'altro: anche Stellify usa l\'IA più moderna. La differenza è tutto ciò che c\'è intorno.'
-              : language === 'EN' ? 'By the way: Stellify runs on state-of-the-art AI itself. The difference is everything around it.'
-              : 'Übrigens: Stellify nutzt selbst modernste KI. Der Unterschied ist alles rundherum.'}
+            {language === 'FR' ? 'D\'ailleurs : Stellify utilise elle-même l\'IA la plus moderne, à un prix équitable. Essaie gratuitement, passe à Pro seulement si tu en as besoin.'
+              : language === 'IT' ? 'Tra l\'altro: anche Stellify usa l\'IA più moderna, a un prezzo equo. Prova gratis, passa a Pro solo se ti serve.'
+              : language === 'EN' ? 'By the way: Stellify runs on state-of-the-art AI itself, at a fair price. Try it free, upgrade to Pro only if you need to.'
+              : 'Übrigens: Stellify nutzt selbst modernste KI, zu einem fairen Preis. Gratis testen, Pro nur wenn du mehr brauchst.'}
           </p>
         </div>
       </section>
@@ -12012,16 +12016,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
           <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
             <p className="text-[10px] text-white/30 font-bold uppercase tracking-widest">
-              © {new Date().getFullYear()} Stellify AI. {t.footer_rights}
+              © {new Date().getFullYear()} Stellify. {t.footer_rights}
             </p>
             <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#004225]" />
-                Swiss Made
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6FCF97]">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#6FCF97]" />
+                {language === 'FR' ? 'Développé en Suisse' : language === 'IT' ? 'Sviluppato in Svizzera' : language === 'EN' ? 'Developed in Switzerland' : 'In der Schweiz entwickelt'}
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#004225]">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#004225]" />
-                Secure Data
+              <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6FCF97]">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#6FCF97]" />
+                {language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione cifrata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung'}
               </div>
             </div>
           </div>

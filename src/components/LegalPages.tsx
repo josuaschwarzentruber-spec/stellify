@@ -341,7 +341,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="2. Vertragsschluss und Kontoregistrierung">
                 <p>Der Vertrag kommt durch die Nutzung der Plattform oder den Abschluss eines Abonnements zustande. Mit der Registrierung oder dem Abschluss eines Abonnements gilt die Zustimmung zu diesen AGB und der Datenschutzrichtlinie als erteilt.</p>
-                <p className="mt-2">Die Nutzung ist ab einem Mindestalter von <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 Jahren</strong> gestattet. Personen unter 18 Jahren benötigen für den Abschluss eines kostenpflichtigen Abonnements die Zustimmung eines Erziehungsberechtigten. (Rechtliche Grundlage: OR Art. 19; das Mindestalter von 14 Jahren entspricht dem typischen Eintrittsalter für Berufslehren in der Schweiz.)</p>
+                <p className="mt-2">Für den Abschluss eines kostenpflichtigen Abonnements musst du volljährig sein. Minderjährige benötigen dafür die Zustimmung ihrer gesetzlichen Vertretung (OR Art. 19).</p>
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
@@ -394,7 +394,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="1. Objet et champ d'application"><p>Les présentes CGV régissent tous les contrats d'utilisation entre le fournisseur JTSP, exploitant de la plateforme Stellify (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de candidature assistée par IA avec deux outils : le Générateur de candidatures, qui crée à partir d'une annonce une lettre de motivation et un profil court adaptés, et le Suivi des candidatures gratuit.</p></Section>
               <Section title="2. Conclusion du contrat">
                 <p>Le contrat est conclu par l'utilisation de la plateforme ou la souscription d'un abonnement. En s'inscrivant ou en souscrivant un abonnement, l'utilisateur accepte implicitement les présentes CGV et la politique de confidentialité.</p>
-                <p className="mt-2">L'utilisation est autorisée dès l'âge de <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 ans</strong>. Les personnes mineures (moins de 18 ans) doivent obtenir le consentement d'un représentant légal pour souscrire un abonnement payant.</p>
+                <p className="mt-2">Pour souscrire un abonnement payant, tu dois être majeur. Les personnes mineures ont besoin du consentement de leur représentant légal (CO art. 19).</p>
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
@@ -447,7 +447,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="1. Oggetto e ambito di applicazione"><p>Le presenti CGU disciplinano tutti i contratti d'uso tra il fornitore JTSP, gestore della piattaforma Stellify (di seguito «Stellify») e gli utenti registrati della piattaforma stellify.ch. Stellify offre una piattaforma di candidatura assistita da IA con due strumenti: il Generatore di candidature, che da un annuncio crea una lettera di motivazione e un profilo breve su misura, e il Tracker candidature gratuito.</p></Section>
               <Section title="2. Conclusione del contratto">
                 <p>Il contratto si conclude con l'utilizzo della piattaforma o la sottoscrizione di un abbonamento. Registrandosi o sottoscrivendo un abbonamento, l'utente accetta implicitamente le presenti CGU e l'informativa sulla privacy.</p>
-                <p className="mt-2">L'utilizzo è consentito a partire dai <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 anni</strong>. I minorenni (sotto i 18 anni) necessitano del consenso di un rappresentante legale per sottoscrivere un abbonamento a pagamento.</p>
+                <p className="mt-2">Per sottoscrivere un abbonamento a pagamento devi essere maggiorenne. I minorenni necessitano del consenso del loro rappresentante legale (CO art. 19).</p>
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
@@ -500,7 +500,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="1. Subject Matter and Scope"><p>These Terms govern all usage agreements between the provider JTSP, operator of the Stellify platform (hereinafter "Stellify") and registered users of stellify.ch. Stellify offers an AI-powered application platform with two tools: the Application Generator, which turns a job ad into a tailored cover letter and short profile, and the free Application Tracker.</p></Section>
               <Section title="2. Contract Formation">
                 <p>The contract is formed upon using the platform or subscribing to a plan. By registering or subscribing, users implicitly accept these Terms and the Privacy Policy.</p>
-                <p className="mt-2">Use is permitted from the age of <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 years</strong>. Users under 18 require parental or guardian consent to subscribe to a paid plan. (Legal basis: Swiss CO Art. 19; the minimum age of 14 reflects typical apprenticeship entry age in Switzerland.)</p>
+                <p className="mt-2">To take out a paid subscription you must be of legal age. Minors require the consent of their legal guardian (Swiss CO Art. 19).</p>
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
