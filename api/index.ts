@@ -1691,7 +1691,7 @@ app.post("/api/extract-image", aiLimiter, requireAuth, enforceAIQuota, async (re
     res.json({ text: response.text });
   } catch (error: any) {
     console.error("[IMAGE EXTRACT ERROR]", error.message);
-    res.status(500).json({ error: error.message || 'Bildanalyse fehlgeschlagen' });
+    res.status(500).json({ error: 'Bildanalyse fehlgeschlagen. Bitte versuch es später erneut.' });
   }
 });
 
@@ -1752,7 +1752,8 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
     if (jsonMatch) return res.json({ jobs: JSON.parse(jsonMatch[0]), live: true, source: 'gemini' });
     return res.json({ jobs: [], live: true, source: 'gemini' });
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    console.error('[JOB SEARCH ERROR]', error?.message);
+    return res.status(500).json({ error: 'Die Jobsuche ist gerade nicht verfügbar. Bitte versuch es später erneut.' });
   }
 });
 
@@ -1760,10 +1761,12 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
 app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
   const { email, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
   const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
-  if (!emailUser || !emailPass) return res.status(500).json({ error: 'Email not configured' });
+  // Accept EITHER mail provider. Previously this required Gmail (EMAIL_USER/
+  // EMAIL_PASS) and returned "Email not configured" even when Resend was set up,
+  // which silently blocked every password-reset mail on a Resend-only setup.
+  const hasMailProvider = !!process.env.RESEND_API_KEY || !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+  if (!hasMailProvider) return res.status(500).json({ error: 'Der Versand ist momentan nicht möglich. Bitte versuch es später erneut.' });
 
   const lang = language || 'DE';
   const resetCopy: Record<string, { subject: string; title: string; lines: string[]; cta: string }> = {
@@ -1805,16 +1808,20 @@ app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
       }
       throw linkError;
     }
-    await sendEmail({
+    const sent = await sendEmail({
       to: email,
       subject: copy.subject,
       html: buildEmailHtml(copy.title, copy.lines, copy.cta, resetLink, lang),
       text: copy.lines.join('\n\n').replace(/<[^>]+>/g, '') + `\n\n${copy.cta}: ${resetLink}\n\nDas Stellify-Team`,
     });
+    if (!sent) {
+      console.error('[AUTH] Password reset email not sent — no provider accepted it');
+      return res.status(500).json({ error: 'Der Link konnte nicht gesendet werden. Bitte versuch es später erneut.' });
+    }
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[AUTH] Password reset failed:', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Der Link konnte nicht gesendet werden. Bitte versuch es später erneut.' });
   }
 });
 
@@ -1915,7 +1922,7 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
     res.json({ ok: true });
   } catch (err: any) {
     console.error('[DELETE ACCOUNT]', err.message);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Das Konto konnte nicht gelöscht werden. Bitte versuch es später erneut.' });
   }
 });
 
@@ -2346,7 +2353,7 @@ app.post("/api/create-checkout-session", express.json(), requireAuth, async (req
     res.json({ success: true, url: session.url });
   } catch (err: any) {
     console.error(`[STRIPE ERROR] mode=${mode} type=${err.type} code=${err.code} msg=${err.message}`);
-    res.status(500).json({ success: false, error: `[${mode}] ${err.message || 'Unbekannter Stripe-Fehler'}` });
+    res.status(500).json({ success: false, error: 'Die Zahlung konnte nicht gestartet werden. Bitte versuch es später erneut.' });
   }
 });
 
@@ -2414,7 +2421,7 @@ CV: ${String(text).substring(0, 2000)}`;
     res.json({ success: true, metadata });
   } catch (error: any) {
     console.error("[ANALYZE CV ERROR]", error.message);
-    res.status(500).json({ error: error.message || 'CV-Analyse fehlgeschlagen' });
+    res.status(500).json({ error: 'CV-Analyse fehlgeschlagen. Bitte versuch es später erneut.' });
   }
 });
 

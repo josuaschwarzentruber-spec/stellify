@@ -11598,10 +11598,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
-      {/* --- RATGEBER TEASER --- Free Swiss career guides. Kept on the logged-in
-           dashboard; on the public landing the Ratgeber lives in the top nav
-           instead, to keep the landing focused on the sign-up path. */}
-      {(user && activeView === 'dashboard') && (
+      {/* --- RATGEBER TEASER --- Free Swiss career guides, kept on the landing
+           (after pricing) for SEO and to spark interest, and also linked from
+           the top nav. Shown on landing and on the logged-in dashboard. */}
+      {(!user || activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
