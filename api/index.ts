@@ -1761,7 +1761,12 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
 app.post("/api/send-password-reset", emailLimiter, async (req, res) => {
   const { email, language } = req.body;
   if (!email) return res.status(400).json({ error: 'Email required' });
-  const siteUrl = process.env.SITE_URL || 'https://stellify.ch';
+  // Normalise SITE_URL to a valid absolute URL. If it is set without a protocol
+  // (e.g. "stellify.ch"), Firebase rejects the reset link with "The continue URL
+  // must be a valid URL string" and no mail is sent.
+  let siteUrl = (process.env.SITE_URL || 'https://stellify.ch').trim();
+  if (!/^https?:\/\//i.test(siteUrl)) siteUrl = 'https://' + siteUrl;
+  siteUrl = siteUrl.replace(/\/+$/, '');
   // Accept EITHER mail provider. Previously this required Gmail (EMAIL_USER/
   // EMAIL_PASS) and returned "Email not configured" even when Resend was set up,
   // which silently blocked every password-reset mail on a Resend-only setup.
