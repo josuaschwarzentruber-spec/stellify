@@ -302,6 +302,17 @@ const GuidePages = ({ onBack, onOpenTool, language, slug, onOpenArticle, onBackT
     if (active) document.title = `Stellify - ${active.title}`;
   }, [active]);
 
+  // Always open at the top. As a lazy chunk, the parent's scroll-to-top can run
+  // before this mounts, so force it here (without the global smooth animation)
+  // whenever the view or the opened article changes.
+  useEffect(() => {
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    html.style.scrollBehavior = prev;
+  }, [slug]);
+
   return (
     <section className="px-6 lg:px-12 py-16 bg-[#FDFCFB] dark:bg-[#1A1A18] min-h-screen">
       <style>{`

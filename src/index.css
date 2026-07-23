@@ -23,6 +23,12 @@
 /* Kill the grey/blue tap flash on iOS/Android — feels cheap. */
 html { -webkit-tap-highlight-color: transparent; }
 
+/* Hide the browser's OWN password reveal/clear button (Edge/IE add one via
+   ::-ms-reveal). We already provide a single eye toggle, so the native one
+   would show a confusing SECOND eye next to ours. */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear { display: none; }
+
 /* Smooth in-page anchor scrolling (nav → #tools/#pricing), unless the
    user prefers reduced motion. */
 html { scroll-behavior: smooth; }

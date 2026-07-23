@@ -3,10 +3,22 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBack: () => void; language: string }) => {
+  // Always open at the top. This page loads as a lazy chunk, so the parent's
+  // scroll-to-top can fire before the content mounts; forcing it here (without
+  // the global smooth animation) guarantees we never land mid-page or at the
+  // footer when arriving from a scrolled-down landing.
+  useEffect(() => {
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    html.style.scrollBehavior = prev;
+  }, [activeView]);
+
   const today = new Date().toLocaleDateString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric' });
   const isDE = language === 'DE';
   const isFR = language === 'FR';

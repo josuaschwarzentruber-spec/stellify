@@ -141,7 +141,10 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
       .email-muted  { color:#9A9A94 !important; }
       .email-link   { color:#4E9E74 !important; }
       .email-footer { border-color:#3A3A35 !important; }
-      .email-cta    { background:#0a5233 !important; color:#FDFCFB !important; }
+      /* Dark mail clients: a BRIGHT green button with near-black text keeps
+         high contrast even when the client re-tints colours (white text on a
+         mid-green button was rendering nearly unreadable). */
+      .email-cta    { background:#00C766 !important; background-image:none !important; color:#00251A !important; }
     }
   </style>
 </head>
@@ -162,7 +165,7 @@ function buildEmailHtml(title: string, bodyLines: string[], ctaText: string, cta
             <h1 class="email-title" style="margin:0 0 20px;font-size:22px;font-weight:600;color:#1A1A18;line-height:1.3;font-family:Georgia,'Times New Roman',serif;">${title}</h1>
             ${bodyLines.map(l => `<p class="email-body" style="margin:0 0 16px;font-size:15px;color:#4A4A45;line-height:1.65;">${l}</p>`).join('')}
             <div style="margin:32px 0 8px;">
-              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;background-image:linear-gradient(135deg,#00331d 0%,#004225 55%,#0a5233 100%);color:#FDFCFB;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;">${ctaText}</a>
+              <a href="${ctaUrl}" class="email-cta" style="display:inline-block;background:#004225;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:14px 28px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;">${ctaText}</a>
             </div>
             <p class="email-muted" style="margin:24px 0 0;font-size:13px;color:#9A9A94;line-height:1.6;">${shell.contact} <a href="mailto:${supportAddr}" class="email-link" style="color:#004225;">${supportAddr}</a></p>
           </td>
