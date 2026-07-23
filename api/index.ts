@@ -1774,6 +1774,7 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
     }
     // Stop billing first: deleting the account must never leave a running
     // subscription silently charging a card nobody can manage anymore.
+    let subCancelFailed = false;
     if (customerId) {
       try {
         const subs = await getStripe().subscriptions.list({ customer: customerId, status: 'all', limit: 20 });
@@ -1783,21 +1784,40 @@ app.post("/api/delete-account", requireAuth, async (req, res) => {
           }
         }
       } catch (e: any) {
-        // Deletion still proceeds — but leave a loud trace for follow-up.
+        subCancelFailed = true;
         console.error('[DELETE ACCOUNT] Stripe cancel failed for', customerId, e.message);
       }
     }
-    // The tracker entries are personal data (companies, salaries) and fall
-    // under the right to erasure — they go with the account.
-    try {
-      const apps = await adminDb.collection('applications').where('user_id', '==', uid).get();
-      if (!apps.empty) {
-        const batch = adminDb.batch();
-        apps.docs.forEach((d) => batch.delete(d.ref));
-        await batch.commit();
+    // If billing could NOT be stopped, abort the deletion. Otherwise the account
+    // would be gone while the subscription keeps charging a card the user can no
+    // longer manage — and the confirmation e-mail would falsely claim billing
+    // has stopped. Nothing has been deleted yet at this point, so it is safe to
+    // return and let the user retry or contact support.
+    if (subCancelFailed) {
+      return res.status(503).json({
+        error: 'Dein Abo konnte gerade nicht gekündigt werden. Bitte versuch es in einem Moment erneut oder schreib uns an support.stellify@gmail.com, damit wir die Abbuchung sicher stoppen, bevor dein Konto gelöscht wird.',
+      });
+    }
+    // ALL user-scoped documents are personal data and fall under the right to
+    // erasure — every collection keyed by user_id goes with the account, not
+    // just the tracker. Batches are chunked (Firestore caps a batch at 500 ops).
+    const userCollections = [
+      'applications', 'cv_analyses', 'generated_applications',
+      'application_designs', 'tool_results', 'salary_calculations', 'messages',
+    ];
+    for (const coll of userCollections) {
+      try {
+        const q = await adminDb.collection(coll).where('user_id', '==', uid).get();
+        if (q.empty) continue;
+        const docs = q.docs;
+        for (let i = 0; i < docs.length; i += 450) {
+          const batch = adminDb.batch();
+          docs.slice(i, i + 450).forEach((d) => batch.delete(d.ref));
+          await batch.commit();
+        }
+      } catch (e: any) {
+        console.error(`[DELETE ACCOUNT] ${coll} cleanup failed:`, e.message);
       }
-    } catch (e: any) {
-      console.error('[DELETE ACCOUNT] applications cleanup failed:', e.message);
     }
     // Uploaded files (CV, legacy avatars) are erased too — both for the
     // right to erasure and so deleted accounts never leave storage behind.
