@@ -12021,11 +12021,11 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6FCF97]">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#6FCF97]" />
-                {language === 'FR' ? 'Développé en Suisse' : language === 'IT' ? 'Sviluppato in Svizzera' : language === 'EN' ? 'Developed in Switzerland' : 'In der Schweiz entwickelt'}
+                Developed in Switzerland
               </div>
               <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-[#6FCF97]">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#6FCF97]" />
-                {language === 'FR' ? 'Transmission chiffrée' : language === 'IT' ? 'Trasmissione cifrata' : language === 'EN' ? 'Encrypted transfer' : 'Verschlüsselte Übertragung'}
+                Encrypted
               </div>
             </div>
           </div>
