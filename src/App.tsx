@@ -1866,12 +1866,35 @@ function StellifyApp() {
     requestAnimationFrame(() => { scrollTopInstant(); setTimeout(scrollTopInstant, 60); });
   };
 
-  // Preload the legal/about chunk once the app is idle so the first click
-  // on Über uns / AGB / Datenschutz opens instantly instead of flashing a
-  // blank frame while the module downloads.
+  // Preload the legal/about + guide chunks so clicking Über uns / Ratgeber
+  // opens INSTANTLY instead of stalling ~1s on the chunk download. We preload
+  // on the visitor's first interaction (a mouse move or scroll happens almost
+  // immediately), with an idle fallback if they never interact.
   useEffect(() => {
-    const id = window.setTimeout(() => { import('./components/LegalPages').catch(() => {}); import('./components/GuidePages').catch(() => {}); }, 2500);
-    return () => window.clearTimeout(id);
+    let done = false;
+    const preload = () => {
+      if (done) return;
+      done = true;
+      import('./components/LegalPages').catch(() => {});
+      import('./components/GuidePages').catch(() => {});
+      window.removeEventListener('pointermove', preload);
+      window.removeEventListener('pointerdown', preload);
+      window.removeEventListener('scroll', preload);
+      window.removeEventListener('keydown', preload);
+    };
+    const opts = { passive: true } as AddEventListenerOptions;
+    window.addEventListener('pointermove', preload, opts);
+    window.addEventListener('pointerdown', preload, opts);
+    window.addEventListener('scroll', preload, opts);
+    window.addEventListener('keydown', preload, opts);
+    const id = window.setTimeout(preload, 1500);
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener('pointermove', preload);
+      window.removeEventListener('pointerdown', preload);
+      window.removeEventListener('scroll', preload);
+      window.removeEventListener('keydown', preload);
+    };
   }, []);
 
   useEffect(() => {
@@ -8515,10 +8538,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     {/* Ratgeber is its own indexable page, not a landing anchor —
                         it moved out of the landing into the header to keep the
                         landing focused on the sign-up path. */}
-                    <button onClick={() => navigate('ratgeber')} className={goToAnchor('ratgeber')}>
+                    <button onMouseEnter={() => import('./components/GuidePages').catch(() => {})} onClick={() => navigate('ratgeber')} className={goToAnchor('ratgeber')}>
                       {language === 'FR' ? 'Guides' : language === 'IT' ? 'Guide' : language === 'EN' ? 'Guides' : 'Ratgeber'}
                     </button>
-                    <button onClick={() => navigate('about')} className={goToAnchor('about')}>
+                    <button onMouseEnter={() => import('./components/LegalPages').catch(() => {})} onClick={() => navigate('about')} className={goToAnchor('about')}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
                     </button>
                   </>;
