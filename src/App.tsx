@@ -812,7 +812,7 @@ const capFirst = (s: string) => {
 
 // ── How it works — a calm, auto-playing 3-step animation for the landing.
 // Loops on its own (no interaction needed); the step chips are also clickable.
-const HowItWorks = ({ language }: { language: string }) => {
+const HowItWorks = ({ language, embedded = false }: { language: string; embedded?: boolean }) => {
   const L = (de: string, fr: string, it: string, en: string) => language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
   const [step, setStep] = useState(0);
   useEffect(() => {
@@ -834,15 +834,8 @@ const HowItWorks = ({ language }: { language: string }) => {
     L('Skills', 'Compétences', 'Competenze', 'Skills'),
   ];
 
-  return (
-    <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors overflow-hidden">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{L('So funktioniert es', 'Comment ça marche', 'Come funziona', 'How it works')}</p>
-          <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{L('In drei Schritten zur fertigen Bewerbung', 'Votre candidature en trois étapes', 'La tua candidatura in tre passi', 'Your application in three steps')}</h2>
-          <p className="mt-4 text-[#5C5C58] dark:text-[#9A9A94] font-light">{L('Kein Prompt, kein Formatieren. Du gibst die Stelle vor, Stellify macht den Rest.', 'Aucun prompt, aucun formatage. Tu donnes le poste, Stellify fait le reste.', 'Nessun prompt, nessuna formattazione. Tu indichi il posto, Stellify fa il resto.', 'No prompt, no formatting. You give the job, Stellify does the rest.')}</p>
-        </div>
-
+  const body = (
+    <>
         <div className="mx-auto max-w-xl rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/10 dark:shadow-black/40 bg-white dark:bg-[#1F1F1C]">
           <div className="flex items-center gap-1.5 px-4 py-3 bg-[#F4F3F0] dark:bg-[#26261F] border-b border-black/6 dark:border-white/6">
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
@@ -917,6 +910,21 @@ const HowItWorks = ({ language }: { language: string }) => {
              "Nessun CV o link dell'annuncio a portata di mano? Puoi anche inserire tutti i dati da solo, l'IA crea comunque la tua candidatura.",
              'No CV or job link at hand? You can also enter everything yourself, the AI creates your application just the same.')}
         </p>
+    </>
+  );
+
+  // Embedded (hero right column): just the animated mockup, no section heading.
+  if (embedded) return <div className="w-full">{body}</div>;
+
+  return (
+    <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors overflow-hidden">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{L('So funktioniert es', 'Comment ça marche', 'Come funziona', 'How it works')}</p>
+          <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{L('In drei Schritten zur fertigen Bewerbung', 'Votre candidature en trois étapes', 'La tua candidatura in tre passi', 'Your application in three steps')}</h2>
+          <p className="mt-4 text-[#5C5C58] dark:text-[#9A9A94] font-light">{L('Kein Prompt, kein Formatieren. Du gibst die Stelle vor, Stellify macht den Rest.', 'Aucun prompt, aucun formatage. Tu donnes le poste, Stellify fait le reste.', 'Nessun prompt, nessuna formattazione. Tu indichi il posto, Stellify fa il resto.', 'No prompt, no formatting. You give the job, Stellify does the rest.')}</p>
+        </div>
+        {body}
       </div>
     </section>
   );
@@ -10641,12 +10649,14 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
-            className="relative hidden lg:block"
+            className="relative"
           >
-            {/* Application document preview — the core product in action.
-                Hidden on mobile: the big showcase right below carries the
-                proof there, and three letter mocks on one phone screen
-                overwhelmed the page. */}
+            {/* The hero visual is now the live "how it works" animation — it
+                shows the whole flow (link → CV → finished application) instead of
+                a single static screenshot. The old static preview below is kept
+                in code but hidden. */}
+            <div className="relative z-10"><HowItWorks language={language} embedded /></div>
+            <div className="hidden" aria-hidden="true">
             <div className="bg-white dark:bg-[#1A1A18] border border-black/5 dark:border-white/5 shadow-2xl relative z-10 transition-colors overflow-hidden">
               {/* Branded header band */}
               <div className="bg-[#004225] px-6 py-3.5 flex items-center justify-between">
@@ -10742,6 +10752,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                 </div>
               </div>
             </div>
+            </div>
             {/* Decorative elements */}
             <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
             <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
@@ -10755,9 +10766,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            stats and pipeline, without the marketing site repeating below.
            Hidden on profile / tools / jobs and on legal + about pages. */}
       {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && activeView !== 'ratgeber' && <>
-
-      {/* --- HOW IT WORKS (auto-playing 3-step animation) --- */}
-      {(!user || activeView === 'dashboard') && <HowItWorks language={language} />}
 
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right).
