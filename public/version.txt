@@ -1,0 +1,3 @@
+stellify deploy marker
+build: df18eb6+ (navigation before-paint scroll, hero animation, deletion fixes, impressum)
+note: open https://stellify.ch/version.txt to confirm the latest deploy is live
