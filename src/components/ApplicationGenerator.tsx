@@ -611,6 +611,53 @@ const ApplicationGenerator = ({ language, user, profile, cvContext, locked, onUp
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Auto-fill the form from the uploaded CV. Runs once per distinct CV and only
+  // fills fields the user hasn't already written, so it never overwrites edits.
+  const lastParsedCvRef = useRef<string>('');
+  const [cvParsing, setCvParsing] = useState(false);
+  useEffect(() => {
+    const cv = (cvContext || '').trim();
+    if (cv.length < 30) return;
+    if (lastParsedCvRef.current === cv) return;                 // already parsed this CV
+    if (form.experience || form.education || form.skills) { lastParsedCvRef.current = cv; return; }
+    lastParsedCvRef.current = cv;
+    (async () => {
+      setCvParsing(true);
+      try {
+        const res = await authFetch('/api/parse-cv', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: cv.substring(0, 6000) }),
+        });
+        if (!res.ok) return;
+        const d = await res.json();
+        setForm(prev => ({
+          ...prev,
+          firstName: prev.firstName || d.firstName || '',
+          lastName: prev.lastName || d.lastName || '',
+          email: prev.email || d.email || '',
+          phone: prev.phone || d.phone || '',
+          address: prev.address || d.address || '',
+          currentRole: prev.currentRole || d.currentRole || '',
+          experience: prev.experience || d.experience || '',
+          education: prev.education || d.education || '',
+          skills: prev.skills || d.skills || '',
+        }));
+        if (d.experience || d.education || d.skills) {
+          showToast(
+            language === 'FR' ? 'CV lu, champs remplis. Vérifie et ajuste.'
+              : language === 'IT' ? 'CV letto, campi compilati. Controlla e adatta.'
+              : language === 'EN' ? 'CV read, fields filled in. Please check and adjust.'
+              : 'Lebenslauf gelesen, Felder ausgefüllt. Bitte kurz prüfen und anpassen.',
+            'success'
+          );
+        }
+      } catch { /* ignore — the user can still fill the fields by hand */ }
+      finally { setCvParsing(false); }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cvContext]);
+
   const handleCvFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = '';
@@ -867,7 +914,7 @@ TONALITÄT: ${toneLabel(form.tone)}
 
 AUFGABE. antworte AUSSCHLIESSLICH mit validem JSON, ohne Markdown-Codeblock, exakt in dieser Struktur:
 {
-  "coverLetter": "Ein professionelles Bewerbungsanschreiben nach Schweizer Standard, 320-400 Wörter in 4 bis 5 prägnanten Absätzen, ohne Füllsätze und Wiederholungen. Es soll die Seite ordentlich wirken lassen, aber niemals überladen sein. AUFBAU: (1) Starker Einstieg mit konkretem Bezug zu Firma und Stelle, warum genau hier. (2) Beruflicher Hintergrund: aktuelle Situation, relevante Erfahrung und Ausbildung. (3) Konkrete Fähigkeiten und Stärken, fachliche UND persönliche Kompetenzen, verbunden mit den Anforderungen der Stelle, wenn möglich mit einem greifbaren Beispiel oder Ergebnis. (4) Passung und Mehrwert: was der Bewerber konkret beiträgt. (5) Ehrliche Motivation für genau diese Firma. (6) Selbstbewusster Abschluss mit Freude auf ein persönliches Gespräch. WICHTIG: Nutze ausschliesslich die gegebenen Angaben aus Lebenslauf, Erfahrung und Fähigkeiten. Erfinde KEINE konkreten Fakten wie Firmennamen, Zahlen, Titel oder Zertifikate, die nicht vorkommen; fehlen Details, formuliere professionell etwas allgemeiner statt zu erfinden. Schreibe in derselben Sprache wie die Stellen- und Lebenslauf-Angaben. Ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross). Absätze mit \\n\\n getrennt",
+  "coverLetter": "Ein professionelles Bewerbungsanschreiben nach Schweizer Standard, 320-400 Wörter in 4 bis 5 prägnanten Absätzen, ohne Füllsätze und Wiederholungen. SPRACHE ZWINGEND KLAR UND VERSTÄNDLICH: kurze, aktive Sätze; ein Gedanke pro Satz; keine verschachtelten Schachtelsätze, keine gestelzten Amtsfloskeln, keine unnötigen Fremdwörter oder aufgeblähten Wörter. Jeder Satz muss beim ersten Lesen sofort verständlich sein und natürlich klingen, so wie ein kompetenter Mensch spricht. Lieber einfach und konkret als kompliziert und abstrakt. Es soll die Seite ordentlich wirken lassen, aber niemals überladen sein. AUFBAU: (1) Starker Einstieg mit konkretem Bezug zu Firma und Stelle, warum genau hier. (2) Beruflicher Hintergrund: aktuelle Situation, relevante Erfahrung und Ausbildung. (3) Konkrete Fähigkeiten und Stärken, fachliche UND persönliche Kompetenzen, verbunden mit den Anforderungen der Stelle, wenn möglich mit einem greifbaren Beispiel oder Ergebnis. (4) Passung und Mehrwert: was der Bewerber konkret beiträgt. (5) Ehrliche Motivation für genau diese Firma. (6) Selbstbewusster Abschluss mit Freude auf ein persönliches Gespräch. WICHTIG: Nutze ausschliesslich die gegebenen Angaben aus Lebenslauf, Erfahrung und Fähigkeiten. Erfinde KEINE konkreten Fakten wie Firmennamen, Zahlen, Titel oder Zertifikate, die nicht vorkommen; fehlen Details, formuliere professionell etwas allgemeiner statt zu erfinden. Schreibe in derselben Sprache wie die Stellen- und Lebenslauf-Angaben. Ohne Anrede und ohne Grussformel (werden separat ergänzt, die Anrede endet mit Komma: auf Deutsch und Italienisch beginnt das erste Wort daher klein, auf Französisch und Englisch gross). Absätze mit \\n\\n getrennt",
   "cvSummary": "Optimiertes, überzeugendes Kurzprofil für den Lebenslauf, 3-4 Sätze, das die wichtigsten Stärken auf den Punkt bringt",
   "skills": ["6-8 passende, konkrete Fähigkeiten (Mischung aus fachlichen und persönlichen) als kurze Stichworte"],
   "interview": [{"q": "Frage", "a": "Antwortvorschlag in 2-4 Sätzen"}]
@@ -1382,7 +1429,14 @@ ${bodyText}
                     </button>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-semibold text-[#1A1A18] dark:text-[#FAFAF8]">{s.use_cv_label}</p>
-                      <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{cvContext ? s.use_cv_hint : s.no_cv_hint}</p>
+                      {cvParsing ? (
+                        <p className="text-[11px] text-[#004225] dark:text-[#00A854] font-medium mt-0.5 inline-flex items-center gap-1.5">
+                          <RefreshCw size={11} className="animate-spin" />
+                          {language === 'FR' ? 'Lecture du CV, remplissage des champs…' : language === 'IT' ? 'Lettura del CV, compilazione dei campi…' : language === 'EN' ? 'Reading your CV, filling the fields…' : 'Lebenslauf wird gelesen, Felder werden ausgefüllt…'}
+                        </p>
+                      ) : (
+                        <p className="text-[11px] text-[#5C5C58] dark:text-[#9A9A94] font-light mt-0.5">{cvContext ? s.use_cv_hint : s.no_cv_hint}</p>
+                      )}
                     </div>
                   </div>
                   {!cvContext && (
