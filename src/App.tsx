@@ -8484,15 +8484,21 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   const handleAnchor = (id: string) => (e: React.MouseEvent) => {
                     e.preventDefault();
                     if (onLegal) {
+                      // Coming from a separate page (about/ratgeber/legal): switch
+                      // to the landing first, then scroll to the section. The delay
+                      // must clear navigate()'s own scroll-to-top (~60ms) so the two
+                      // do not fight and dump us back at the very top.
                       navigate('dashboard');
-                      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 80);
+                      setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 180);
                     } else {
                       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
                     }
                   };
                   return <>
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
-                    <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
+                    {/* Preise uses navigate('pricing') (not a raw anchor): it reliably
+                        opens the pricing section and gives it a shareable /pricing URL. */}
+                    <button onClick={() => navigate('pricing')} className={goToAnchor('pricing')}>{t.pricing}</button>
                     {/* Ratgeber is its own indexable page, not a landing anchor —
                         it moved out of the landing into the header to keep the
                         landing focused on the sign-up path. */}
@@ -8696,7 +8702,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                       if (id === 'pricing') { navigate('pricing'); return; }
                       if (!onLanding) {
                         navigate('dashboard');
-                        setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 80);
+                        setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 180);
                       } else {
                         document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
                       }
