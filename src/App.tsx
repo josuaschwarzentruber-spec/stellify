@@ -6,6 +6,12 @@
 /// <reference types="vite/client" />
 
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, lazy, Suspense } from 'react';
+// Legal + guide pages are imported directly (NOT lazy): switching to them from a
+// scrolled-down page (e.g. Preise → Ratgeber/Über uns) must mount synchronously
+// so there is no loading step and the useLayoutEffect scroll-to-top lands the
+// page cleanly at the top with no footer flash.
+import LegalPages from './components/LegalPages';
+import GuidePages from './components/GuidePages';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import { track as vaTrack } from '@vercel/analytics';
 import { useDropzone } from 'react-dropzone';
@@ -378,8 +384,6 @@ const ApplicationGenerator = lazy(() => import('./components/ApplicationGenerato
 // --- LAZY-LOADED HEAVY COMPONENTS ---
 const PromoVideoModal = lazy(() => import('./components/PromoVideoModal'));
 const PromoSequence = lazy(() => import('./components/PromoSequence'));
-const LegalPages = lazy(() => import('./components/LegalPages'));
-const GuidePages = lazy(() => import('./components/GuidePages'));
 
 declare global {
   interface Window {
@@ -836,7 +840,7 @@ const HowItWorks = ({ language, embedded = false }: { language: string; embedded
 
   const body = (
     <>
-        <div className={`${embedded ? 'w-full max-w-md mx-auto lg:max-w-none' : 'mx-auto max-w-xl'} rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/50 bg-white dark:bg-[#1F1F1C]`}>
+        <div className={`${embedded ? 'w-full' : 'mx-auto max-w-xl'} rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/50 bg-white dark:bg-[#1F1F1C]`}>
           <div className="flex items-center gap-1.5 px-4 py-3.5 bg-[#F4F3F0] dark:bg-[#26261F] border-b border-black/6 dark:border-white/6">
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
@@ -10771,9 +10775,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
               </div>
             </div>
             </div>
-            {/* Decorative elements */}
-            <div className="absolute -top-6 -right-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
-            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-[#004225]/5 dark:bg-[#FDFCFB]/5 -z-10" />
           </motion.div>
         </section>
       ))}
