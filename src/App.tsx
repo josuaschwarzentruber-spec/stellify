@@ -1832,10 +1832,14 @@ function StellifyApp() {
       // Show the plans right away — the one intentional exception to top.
       setTimeout(() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' }), 50);
     } else {
-      // Jump to the top now and again after the (possibly lazy) page mounts,
-      // so the scroll reliably sticks instead of keeping the old position.
-      window.scrollTo(0, 0);
-      setTimeout(() => window.scrollTo(0, 0), 60);
+      // Scroll to the top only AFTER the view has swapped. Scrolling immediately
+      // would move the OLD (often tall, scrolled-down) page up for a frame before
+      // React swaps in the new one — that flash read as "jumping back and forth".
+      // rAF fires post-commit; the follow-up timeout covers a lazily mounted page.
+      requestAnimationFrame(() => {
+        window.scrollTo(0, 0);
+        setTimeout(() => window.scrollTo(0, 0), 60);
+      });
     }
   };
 
@@ -1846,7 +1850,7 @@ function StellifyApp() {
     setActiveTool(null);
     setGuideSlug(slug);
     window.history.pushState({ view: 'ratgeber', guideSlug: slug }, '', `/ratgeber/${slug}`);
-    window.scrollTo(0, 0);
+    requestAnimationFrame(() => { window.scrollTo(0, 0); setTimeout(() => window.scrollTo(0, 0), 60); });
   };
 
   // Preload the legal/about chunk once the app is idle so the first click
@@ -8398,9 +8402,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         <div className="flex items-center gap-4 sm:gap-8 min-w-0">
           <button
             onClick={() => {
-              const onLegal = activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about';
-              if (user) navigate('dashboard');
-              else if (onLegal) navigate('dashboard');
+              // From ANY sub-page (about, ratgeber, pricing, legal, profile …)
+              // the logo returns cleanly to the start/dashboard. Only when we are
+              // already there does it simply scroll back to the top.
+              if (activeView !== 'dashboard') navigate('dashboard');
               else window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
             className="text-lg sm:text-2xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8] hover:opacity-80 transition-opacity shrink-0 inline-flex items-center gap-1.5 sm:gap-2 min-w-0"
