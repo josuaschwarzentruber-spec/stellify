@@ -1813,6 +1813,19 @@ function StellifyApp() {
     if (activeView === 'pricing') setSubscriptionError('');
   }, [activeView]);
 
+  // Jump to the very top with NO smooth animation. The page sets
+  // scroll-behavior:smooth globally for nice in-page anchor links, but on a
+  // VIEW change that would animate a long scroll from the old position up to
+  // the top — visibly stuttering while the new (often lazy) page mounts. An
+  // inline scroll-behavior:auto beats the stylesheet, so this jump is instant.
+  const scrollTopInstant = () => {
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    html.style.scrollBehavior = prev;
+  };
+
   // Browser history (back/forward button support)
   const navigate = (view: 'dashboard' | 'profile' | 'tracker' | 'tools' | 'jobs' | 'pricing' | 'datenschutz' | 'impressum' | 'agb' | 'about' | 'ratgeber') => {
     const prev = activeView;
@@ -1837,8 +1850,8 @@ function StellifyApp() {
       // React swaps in the new one — that flash read as "jumping back and forth".
       // rAF fires post-commit; the follow-up timeout covers a lazily mounted page.
       requestAnimationFrame(() => {
-        window.scrollTo(0, 0);
-        setTimeout(() => window.scrollTo(0, 0), 60);
+        scrollTopInstant();
+        setTimeout(scrollTopInstant, 60);
       });
     }
   };
@@ -1850,7 +1863,7 @@ function StellifyApp() {
     setActiveTool(null);
     setGuideSlug(slug);
     window.history.pushState({ view: 'ratgeber', guideSlug: slug }, '', `/ratgeber/${slug}`);
-    requestAnimationFrame(() => { window.scrollTo(0, 0); setTimeout(() => window.scrollTo(0, 0), 60); });
+    requestAnimationFrame(() => { scrollTopInstant(); setTimeout(scrollTopInstant, 60); });
   };
 
   // Preload the legal/about chunk once the app is idle so the first click
