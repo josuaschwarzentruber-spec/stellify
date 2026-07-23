@@ -916,6 +916,40 @@ const HowItWorks = ({ language }: { language: string }) => {
   );
 };
 
+// ── Trust band — sits right before pricing to remove the last doubts at the
+// buying moment. Every claim here is technically true of the product.
+const TrustControl = ({ language }: { language: string }) => {
+  const L = (de: string, fr: string, it: string, en: string) => language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
+  const items = [
+    { icon: <Edit2 size={18} />, t: L('Jeder Text bearbeitbar', 'Chaque texte modifiable', 'Ogni testo modificabile', 'Every text editable') },
+    { icon: <ShieldCheck size={18} />, t: L('Keine automatische Bewerbung', 'Aucune candidature automatique', 'Nessuna candidatura automatica', 'No automatic applying') },
+    { icon: <Trash2 size={18} />, t: L('Jederzeit löschbar', 'Supprimable à tout moment', 'Cancellabile in ogni momento', 'Delete anytime') },
+    { icon: <Eye size={18} />, t: L('Du prüfst und entscheidest', 'Tu vérifies et décides', 'Controlli e decidi tu', 'You check and decide') },
+  ];
+  return (
+    <section className="px-6 lg:px-12 py-12 lg:py-16 bg-white dark:bg-[#1A1A18] transition-colors">
+      <div className="max-w-4xl mx-auto text-center">
+        <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{L('Fair und transparent', 'Équitable et transparent', 'Equo e trasparente', 'Fair and transparent')}</p>
+        <h2 className="text-2xl lg:text-4xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{L('Deine Bewerbung bleibt unter deiner Kontrolle', 'Ta candidature reste sous ton contrôle', 'La tua candidatura resta sotto il tuo controllo', 'Your application stays under your control')}</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8 mt-10">
+          {items.map((it, i) => (
+            <div key={i} className="flex flex-col items-center gap-3">
+              <span className="w-12 h-12 rounded-full bg-[#004225]/8 dark:bg-[#00A854]/12 text-[#004225] dark:text-[#00A854] flex items-center justify-center">{it.icon}</span>
+              <p className="text-[13px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] leading-snug max-w-[140px]">{it.t}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-9 text-[11px] text-[#9A9A94] font-light max-w-xl mx-auto leading-relaxed">
+          {L('Alle Texte werden von KI erstellt und sollten vor dem Versenden geprüft werden. Stellify garantiert keine Einladung oder Anstellung.',
+             "Tous les textes sont générés par IA et devraient être vérifiés avant l'envoi. Stellify ne garantit ni entretien ni embauche.",
+             "Tutti i testi sono generati dall'IA e andrebbero verificati prima dell'invio. Stellify non garantisce colloqui o assunzioni.",
+             'All texts are AI-generated and should be checked before sending. Stellify does not guarantee an interview or job offer.')}
+        </p>
+      </div>
+    </section>
+  );
+};
+
 // Gentle desktop hint — mobile only. Stellify works fully on the phone; on a
 // computer the form and the live preview simply sit side by side, which is a
 // genuinely useful thing to know. Positive wording, no nag.
@@ -11400,6 +11434,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
+      {/* --- TRUST BAND (right before pricing) --- */}
+      {(!user || activeView === 'dashboard') && <TrustControl language={language} />}
       {/* --- PRICING SECTION --- */}
       <section id="pricing" className="px-6 lg:px-12 py-12 lg:py-20 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
