@@ -810,6 +810,112 @@ const capFirst = (s: string) => {
   return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
 };
 
+// ── How it works — a calm, auto-playing 3-step animation for the landing.
+// Loops on its own (no interaction needed); the step chips are also clickable.
+const HowItWorks = ({ language }: { language: string }) => {
+  const L = (de: string, fr: string, it: string, en: string) => language === 'FR' ? fr : language === 'IT' ? it : language === 'EN' ? en : de;
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setStep(s => (s + 1) % 3), 3200);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const steps = [
+    { n: '1', title: L('Inserat-Link einfügen', "Coller le lien de l'annonce", "Incolla il link dell'annuncio", 'Paste the job-ad link'),
+      sub: L('Stellify liest die Stelle automatisch.', "Stellify lit l'offre automatiquement.", "Stellify legge l'annuncio in automatico.", 'Stellify reads the posting automatically.') },
+    { n: '2', title: L('Lebenslauf wird erkannt', 'Ton CV est reconnu', 'Il tuo CV viene letto', 'Your CV is read'),
+      sub: L('Erfahrung, Ausbildung und Skills füllen sich von selbst.', 'Expérience, formation et compétences se remplissent seules.', 'Esperienza, formazione e competenze si compilano da sole.', 'Experience, education and skills fill in by themselves.') },
+    { n: '3', title: L('Fertige Bewerbung', 'Candidature prête', 'Candidatura pronta', 'Application ready'),
+      sub: L('Versandbereit als PDF und Word, in 60 Sekunden.', 'Prête à envoyer en PDF et Word, en 60 secondes.', 'Pronta da inviare in PDF e Word, in 60 secondi.', 'Ready to send as PDF and Word, in 60 seconds.') },
+  ];
+  const fieldLabels = [
+    L('Erfahrung', 'Expérience', 'Esperienza', 'Experience'),
+    L('Ausbildung', 'Formation', 'Formazione', 'Education'),
+    L('Skills', 'Compétences', 'Competenze', 'Skills'),
+  ];
+
+  return (
+    <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors overflow-hidden">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-[#004225] dark:text-[#00A854] mb-3">{L('So funktioniert es', 'Comment ça marche', 'Come funziona', 'How it works')}</p>
+          <h2 className="text-4xl lg:text-5xl font-serif tracking-tight text-[#1A1A18] dark:text-[#FAFAF8]">{L('In drei Schritten zur fertigen Bewerbung', 'Votre candidature en trois étapes', 'La tua candidatura in tre passi', 'Your application in three steps')}</h2>
+          <p className="mt-4 text-[#5C5C58] dark:text-[#9A9A94] font-light">{L('Kein Prompt, kein Formatieren. Du gibst die Stelle vor, Stellify macht den Rest.', 'Aucun prompt, aucun formatage. Tu donnes le poste, Stellify fait le reste.', 'Nessun prompt, nessuna formattazione. Tu indichi il posto, Stellify fa il resto.', 'No prompt, no formatting. You give the job, Stellify does the rest.')}</p>
+        </div>
+
+        <div className="mx-auto max-w-xl rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/10 dark:shadow-black/40 bg-white dark:bg-[#1F1F1C]">
+          <div className="flex items-center gap-1.5 px-4 py-3 bg-[#F4F3F0] dark:bg-[#26261F] border-b border-black/6 dark:border-white/6">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
+            <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">Stellify · {steps[step].title}</span>
+          </div>
+          <div className="p-6 md:p-8 min-h-[220px] flex items-center">
+            <AnimatePresence mode="wait">
+              <motion.div key={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }} className="w-full">
+                {step === 0 && (
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-2 bg-[#F7F6F3] dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-lg px-3.5 py-3">
+                      <Link2 size={14} className="text-[#9A9A94] shrink-0" />
+                      <span className="flex-1 min-w-0 text-[12px] font-medium text-[#5C5C58] dark:text-[#9A9A94] truncate">jobs.ch/stellen/marketing-manager-nestle</span>
+                      <motion.span initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 300 }} className="shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/12 px-2 py-1 rounded">
+                        <CheckCircle2 size={10} />{L('Gelesen', 'Lu', 'Letto', 'Read')}
+                      </motion.span>
+                    </div>
+                    <p className="text-[12.5px] text-[#9A9A94] font-light">{steps[0].sub}</p>
+                  </div>
+                )}
+                {step === 1 && (
+                  <div className="space-y-4">
+                    {fieldLabels.map((lbl, i) => (
+                      <div key={lbl} className="flex items-center gap-3">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] w-20 sm:w-24 shrink-0">{lbl}</span>
+                        <div className="flex-1 h-2 rounded-full bg-black/8 dark:bg-white/10 overflow-hidden">
+                          <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 0.7, delay: 0.15 + i * 0.28, ease: 'easeOut' }} className="h-full rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                        </div>
+                        <motion.span initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.55 + i * 0.28, type: 'spring', stiffness: 300 }} className="text-[#004225] dark:text-[#00A854] shrink-0">
+                          <CheckCircle2 size={14} />
+                        </motion.span>
+                      </div>
+                    ))}
+                    <p className="text-[12.5px] text-[#9A9A94] font-light pt-1">{steps[1].sub}</p>
+                  </div>
+                )}
+                {step === 2 && (
+                  <div className="space-y-4">
+                    <div className="bg-[#F7F6F3] dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-lg p-4 space-y-2.5">
+                      <div className="h-2 w-1/2 rounded bg-[#004225]/70 dark:bg-[#00A854]/70" />
+                      <div className="h-1.5 w-full rounded bg-black/10 dark:bg-white/12" />
+                      <div className="h-1.5 w-11/12 rounded bg-black/10 dark:bg-white/12" />
+                      <div className="h-1.5 w-4/5 rounded bg-black/10 dark:bg-white/12" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1 rounded"><Download size={11} />PDF</span>
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] border border-[#004225]/25 dark:border-[#00A854]/40 px-2.5 py-1 rounded"><Download size={11} />Word</span>
+                      <motion.span initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.4, type: 'spring', stiffness: 300 }} className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#9A9A94]">
+                        <CheckCircle2 size={13} className="text-[#004225] dark:text-[#00A854]" />{L('Fertig', 'Prêt', 'Pronto', 'Ready')}
+                      </motion.span>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 mt-8">
+          {steps.map((st, i) => (
+            <button key={i} onClick={() => setStep(i)} className="group inline-flex items-center gap-2 px-1 py-1" aria-label={st.title}>
+              <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center transition-colors ${step === i ? 'bg-[#004225] dark:bg-[#00A854] text-white' : 'bg-black/10 dark:bg-white/15 text-[#5C5C58] dark:text-[#9A9A94]'}`}>{st.n}</span>
+              <span className={`text-[11px] font-medium transition-colors ${step === i ? 'text-[#1A1A18] dark:text-[#FAFAF8]' : 'text-[#9A9A94]'}`}>{st.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // Gentle desktop hint — mobile only. Stellify works fully on the phone; on a
 // computer the form and the live preview simply sit side by side, which is a
 // genuinely useful thing to know. Positive wording, no nag.
@@ -10640,6 +10746,9 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
            stats and pipeline, without the marketing site repeating below.
            Hidden on profile / tools / jobs and on legal + about pages. */}
       {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && activeView !== 'ratgeber' && <>
+
+      {/* --- HOW IT WORKS (auto-playing 3-step animation) --- */}
+      {(!user || activeView === 'dashboard') && <HowItWorks language={language} />}
 
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
            showcase below but flipped so the document preview reads left→right).
