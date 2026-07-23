@@ -836,14 +836,14 @@ const HowItWorks = ({ language, embedded = false }: { language: string; embedded
 
   const body = (
     <>
-        <div className="mx-auto max-w-xl rounded-xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/10 dark:shadow-black/40 bg-white dark:bg-[#1F1F1C]">
-          <div className="flex items-center gap-1.5 px-4 py-3 bg-[#F4F3F0] dark:bg-[#26261F] border-b border-black/6 dark:border-white/6">
+        <div className={`${embedded ? 'w-full' : 'mx-auto max-w-xl'} rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/50 bg-white dark:bg-[#1F1F1C]`}>
+          <div className="flex items-center gap-1.5 px-4 py-3.5 bg-[#F4F3F0] dark:bg-[#26261F] border-b border-black/6 dark:border-white/6">
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
             <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">Stellify · {steps[step].title}</span>
           </div>
-          <div className="p-6 md:p-8 min-h-[220px] flex items-center">
+          <div className="p-6 md:p-8 min-h-[280px] flex items-center">
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }} className="w-full">
                 {step === 0 && (
@@ -864,9 +864,9 @@ const HowItWorks = ({ language, embedded = false }: { language: string; embedded
                       <div key={lbl} className="flex items-center gap-3">
                         <span className="text-[10px] font-bold uppercase tracking-widest text-[#5C5C58] dark:text-[#9A9A94] w-20 sm:w-24 shrink-0">{lbl}</span>
                         <div className="flex-1 h-2 rounded-full bg-black/8 dark:bg-white/10 overflow-hidden">
-                          <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 0.7, delay: 0.15 + i * 0.28, ease: 'easeOut' }} className="h-full rounded-full bg-[#004225] dark:bg-[#00A854]" />
+                          <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 0.7, delay: 0.15, ease: 'easeOut' }} className="h-full rounded-full bg-[#004225] dark:bg-[#00A854]" />
                         </div>
-                        <motion.span initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.55 + i * 0.28, type: 'spring', stiffness: 300 }} className="text-[#004225] dark:text-[#00A854] shrink-0">
+                        <motion.span initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.7, type: 'spring', stiffness: 300 }} className="text-[#004225] dark:text-[#00A854] shrink-0">
                           <CheckCircle2 size={14} />
                         </motion.span>
                       </div>
@@ -877,13 +877,24 @@ const HowItWorks = ({ language, embedded = false }: { language: string; embedded
                 {step === 2 && (
                   <div className="space-y-4">
                     <div className="bg-white dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-lg overflow-hidden shadow-sm">
-                      <div className="bg-[#004225] px-3.5 py-2 flex items-center justify-between gap-2">
-                        <span className="text-white text-[11px] font-serif font-semibold truncate">Anna Müller</span>
-                        <span className="text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest shrink-0">Marketing Manager</span>
+                      <div className="bg-[#004225] px-4 py-2.5 flex items-center gap-3">
+                        <span className="w-9 h-11 rounded-sm overflow-hidden shrink-0 border border-white/15 flex items-end justify-center" style={{ backgroundColor: '#DCE9E2' }}>
+                          <PresetAvatar id="aria" className="w-[130%] h-auto -mb-[12%]" />
+                        </span>
+                        <div className="min-w-0">
+                          <span className="block text-white text-[13px] font-serif font-semibold leading-tight truncate">Anna Müller</span>
+                          <span className="block text-[#6FCF97] text-[8px] font-bold uppercase tracking-widest">Marketing Manager · UBS</span>
+                        </div>
                       </div>
-                      <div className="p-3.5 space-y-1.5">
-                        <p className="text-[9.5px] font-bold text-[#004225] dark:text-[#00A854]">{L('Bewerbung als Marketing Manager · UBS', 'Candidature : Marketing Manager · UBS', 'Candidatura: Marketing Manager · UBS', 'Application: Marketing Manager · UBS')}</p>
-                        <p className="text-[10px] text-[#26261F] dark:text-[#D5D5CF] leading-[1.6]">{L('Sehr geehrte Damen und Herren, mit grossem Interesse bewerbe ich mich als Marketing Manager bei der UBS. Seit drei Jahren führe ich die Markenstrategie eines Schweizer Finanzdienstleisters und stärke die Kundenbindung messbar.', "Madame, Monsieur, c'est avec grand intérêt que je postule au poste de Marketing Manager chez UBS. Depuis trois ans, je dirige la stratégie de marque d'un prestataire financier suisse.", 'Gentili Signore e Signori, con grande interesse mi candido come Marketing Manager presso UBS. Da tre anni guido la strategia di marca di un fornitore svizzero di servizi finanziari.', 'Dear Sir or Madam, I am applying with great interest for the Marketing Manager position at UBS. For three years I have led the brand strategy of a Swiss financial services provider.')}</p>
+                      <div className="p-4 space-y-2">
+                        <p className="text-[10px] font-bold text-[#004225] dark:text-[#00A854]">{L('Bewerbung als Marketing Manager · UBS', 'Candidature : Marketing Manager · UBS', 'Candidatura: Marketing Manager · UBS', 'Application: Marketing Manager · UBS')}</p>
+                        <p className="text-[11px] text-[#26261F] dark:text-[#D5D5CF] leading-[1.65]">{L('Sehr geehrte Damen und Herren, mit grossem Interesse bewerbe ich mich als Marketing Manager bei der UBS. Seit drei Jahren führe ich die Markenstrategie eines Schweizer Finanzdienstleisters und stärke die Kundenbindung messbar.', "Madame, Monsieur, c'est avec grand intérêt que je postule au poste de Marketing Manager chez UBS. Depuis trois ans, je dirige la stratégie de marque d'un prestataire financier suisse et renforce la fidélité des clients.", 'Gentili Signore e Signori, con grande interesse mi candido come Marketing Manager presso UBS. Da tre anni guido la strategia di marca di un fornitore svizzero di servizi finanziari.', 'Dear Sir or Madam, I am applying with great interest for the Marketing Manager position at UBS. For three years I have led the brand strategy of a Swiss financial services provider.')}</p>
+                        <div className="space-y-1.5 pt-1 opacity-30">
+                          <div className="h-1.5 w-full rounded bg-black/20 dark:bg-white/20" />
+                          <div className="h-1.5 w-11/12 rounded bg-black/20 dark:bg-white/20" />
+                          <div className="h-1.5 w-2/3 rounded bg-black/20 dark:bg-white/20" />
+                        </div>
+                        <p className="text-[9.5px] text-[#9A9A94] font-medium pt-0.5">{L('… vollständiges Anschreiben, Kurzprofil und 10 Interviewfragen', "… lettre complète, profil court et 10 questions d'entretien", '… lettera completa, profilo breve e 10 domande da colloquio', '… full cover letter, short profile and 10 interview questions')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -8923,27 +8934,16 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- LEGAL PAGES + ABOUT --- */}
       {(activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about') && (
-        <Suspense fallback={
-          /* Branded loading beat instead of a blank frame while the chunk
-             downloads — the blank flash read as a bug when opening Über uns. */
-          <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] dark:bg-[#1A1A18]">
-            <svg width="30" height="30" viewBox="0 0 28 28" className="animate-pulse" aria-hidden="true">
-              <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
-            </svg>
-          </div>
-        }>
+        // fallback=null: chunks are preloaded on first interaction/hover, so no
+        // loading state flashes (the old dark full-screen spinner read as a
+        // "black bar" when coming from the dark pricing page).
+        <Suspense fallback={null}>
           <LegalPages activeView={activeView} onBack={() => navigate(user ? 'dashboard' : 'dashboard')} language={language} />
         </Suspense>
       )}
 
       {activeView === 'ratgeber' && (
-        <Suspense fallback={
-          <div className="min-h-screen flex items-center justify-center bg-[#FDFCFB] dark:bg-[#1A1A18]">
-            <svg width="30" height="30" viewBox="0 0 28 28" className="animate-pulse" aria-hidden="true">
-              <path d="M14 2.5L17 10.5L25.5 14L17 17L14 25.5L11 17L2.5 14L11 10.5Z" fill="#00A854"/>
-            </svg>
-          </div>
-        }>
+        <Suspense fallback={null}>
           <GuidePages
             onBack={() => navigate('dashboard')}
             onOpenTool={() => { if (user) { const tl = tools.find((x: any) => x.id === 'bewerbungs-gen'); if (tl) setActiveTool(tl); } else { setAuthTab('register'); setIsAuthModalOpen(true); } }}
