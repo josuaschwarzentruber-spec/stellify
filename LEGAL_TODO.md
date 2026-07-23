@@ -46,16 +46,13 @@ Bis dahin gilt in der Datenschutzerklaerung: Uebermittlung an DeepSeek (China),
 moegliche Speicherung und Nutzung zur Modellverbesserung, Rechtsgrundlage
 ausdrueckliche Einwilligung des Nutzers.
 
-## 3. Gemini-Entscheidung (MITTEL)
+## 3. Gemini-Entscheidung (ERLEDIGT)
 
-Im Code ist Google Gemini als Ausweich-KI (Fallback) sowie fuer Bildtext-Extraktion
-und Live-Jobsuche eingebunden. Der Projekt-Brief sagt "Gemini nicht verwendet".
-Das ist ein Widerspruch. Bitte entscheiden:
-
-- Variante A: Gemini behalten (dann korrekt in Rechtstexten nennen, ist bereits so).
-- Variante B: Gemini-Funktionen entfernen (dann aus Rechtstexten streichen).
-
-Bis zur Entscheidung bleibt Gemini in den Rechtstexten, weil es tatsaechlich genutzt wird.
+Entscheidung: Gemini wird nicht mehr verwendet. Google Gemini wurde vollstaendig
+aus dem Code entfernt (Generator laeuft ohnehin nur auf DeepSeek) und aus allen
+Rechtstexten gestrichen. Nebenwirkung: Der Lebenslauf-Upload akzeptiert nur noch
+PDF, Word und Text (kein Foto/Screenshot mehr). Die Live-Jobsuche (noch nicht
+gestartet) liefert ohne Gemini vorerst keine Ergebnisse.
 
 ## 4. Abo- und Rueckerstattungsbedingungen (HOCH)
 
