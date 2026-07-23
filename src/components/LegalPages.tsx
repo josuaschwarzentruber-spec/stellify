@@ -82,7 +82,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             {isDE ? <>
               <Section title="1. Verantwortliche Person">
                 <p>Verantwortlich für die Datenbearbeitung im Sinne des Schweizer Datenschutzgesetzes (DSG) und der Europäischen Datenschutz-Grundverordnung (DSGVO) ist:</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Betreiber der Plattform Stellify</p><p>Schweiz</p><p>E-Mail: support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Betreiber der Plattform Stellify (öffentlich als JTSP)</p><p>Ligschwilring 33</p><p>6280 Hochdorf</p><p>Schweiz</p><p>E-Mail: support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Erhobene Personendaten">
                 <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
@@ -135,7 +135,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </> : isFR ? <>
               <Section title="1. Responsable du traitement">
                 <p>Le responsable du traitement des données au sens de la loi suisse sur la protection des données (LPD) et du RGPD est :</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Exploitant de la plateforme Stellify</p><p>Suisse</p><p>E-mail : support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Exploitant de la plateforme Stellify (publiquement JTSP)</p><p>Ligschwilring 33</p><p>6280 Hochdorf</p><p>Suisse</p><p>E-mail : support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Données collectées">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -182,7 +182,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </> : isIT ? <>
               <Section title="1. Titolare del trattamento">
                 <p>Il titolare del trattamento ai sensi della legge svizzera sulla protezione dei dati (LPD) e del GDPR è:</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Gestore della piattaforma Stellify</p><p>Svizzera</p><p>E-mail: support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Gestore della piattaforma Stellify (pubblicamente JTSP)</p><p>Ligschwilring 33</p><p>6280 Hochdorf</p><p>Svizzera</p><p>E-mail: support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Dati raccolti">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -229,7 +229,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             </> : <>
               <Section title="1. Data Controller">
                 <p>The controller responsible for data processing under Swiss data protection law (FADP) and the EU General Data Protection Regulation (GDPR) is:</p>
-                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>JTSP</p><p>Operator of the Stellify platform</p><p>Switzerland</p><p>Email: support.stellify@gmail.com</p></div>
+                <div className="mt-3 p-4 bg-[#F5F4F0] dark:bg-[#2A2A26] font-mono text-xs space-y-1"><p>Josua Schwarzentruber</p><p>Operator of the Stellify platform (publicly JTSP)</p><p>Ligschwilring 33</p><p>6280 Hochdorf</p><p>Switzerland</p><p>Email: support.stellify@gmail.com</p></div>
               </Section>
               <Section title="2. Personal Data Collected">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -293,7 +293,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
             <Section title={isDE ? 'Betreiber und Verantwortlicher' : isFR ? 'Exploitant et responsable' : isIT ? 'Gestore e responsabile' : 'Operator & Controller'}>
               <div className="p-5 bg-[#F5F4F0] dark:bg-[#2A2A26] space-y-2 font-mono text-xs">
                 <p className="text-base font-sans font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Stellify</p>
-                <p>{isDE ? 'Betreiber: JTSP' : isFR ? 'Exploitant : JTSP' : isIT ? 'Gestore: JTSP' : 'Operator: JTSP'}</p>
+                <p>{isDE ? 'Betreiber: Josua Schwarzentruber' : isFR ? 'Exploitant : Josua Schwarzentruber' : isIT ? 'Gestore: Josua Schwarzentruber' : 'Operator: Josua Schwarzentruber'}</p>
+                <p>{isDE ? 'Öffentlicher Auftritt als: JTSP' : isFR ? 'Présence publique sous : JTSP' : isIT ? 'Presenza pubblica come: JTSP' : 'Public presence as: JTSP'}</p>
+                <p>Ligschwilring 33</p>
+                <p>6280 Hochdorf</p>
                 <p>{isDE ? 'Schweiz' : isFR ? 'Suisse' : isIT ? 'Svizzera' : 'Switzerland'}</p>
               </div>
             </Section>
