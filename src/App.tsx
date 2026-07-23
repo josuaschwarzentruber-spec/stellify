@@ -10482,39 +10482,8 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                   : 'Die Bewerbung, die dich zum Interview bringt: in 60 Sekunden fertig, im Schweizer Standard, mit deinem Lebenslauf und Foto.')
                 : t.hero_desc}
             </p>
-            {/* The real four-step journey, identical in every language —
-                the hero must only promise what V1 actually delivers. */}
-            <div className="flex flex-nowrap items-center gap-x-2 sm:gap-x-2.5 overflow-x-auto">
-              {((language === 'FR' ? [
-                ['1', 'CV'],
-                ['2', 'Annonce'],
-                ['3', 'Candidature'],
-                ['4', 'Tracker'],
-              ] : language === 'IT' ? [
-                ['1', 'CV'],
-                ['2', 'Annuncio'],
-                ['3', 'Candidatura'],
-                ['4', 'Tracker'],
-              ] : language === 'EN' ? [
-                ['1', 'CV'],
-                ['2', 'Job link'],
-                ['3', 'Application'],
-                ['4', 'Tracker'],
-              ] : [
-                ['1', 'Lebenslauf'],
-                ['2', 'Inserat'],
-                ['3', 'Bewerbung'],
-                ['4', 'Tracker'],
-              ]) as [string, string][]).map(([num, label], i, arr) => (
-                <React.Fragment key={num}>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className="w-4 h-4 rounded-full bg-[#004225] dark:bg-[#00A854] text-white text-[9px] font-bold flex items-center justify-center flex-shrink-0">{num}</span>
-                    <span className="text-[11px] font-medium text-[#1A1A18] dark:text-[#FAFAF8] whitespace-nowrap">{label}</span>
-                  </div>
-                  {i < arr.length - 1 && <span className="text-[#9A9A94] text-[11px] select-none flex-shrink-0 px-0.5 hidden sm:inline">→</span>}
-                </React.Fragment>
-              ))}
-            </div>
+            {/* The four-step journey lives in the "How it works" animation right
+                below the hero, so it is no longer repeated here. */}
             <div className="flex flex-col gap-5 w-full max-w-md">
               <CVDropzone
                 onFileAccepted={processFile}
