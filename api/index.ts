@@ -1968,7 +1968,9 @@ app.get("/api/cron/onboarding", async (req, res) => {
         const u = d.data() as any;
         if (!u.email || u[st.flag]) continue;
         if (u.newsletter === false) continue;
-        if (st.day === 7 && u.role !== 'client') continue;
+        // Paying customers (Pro / Karriere+) never receive the activation/upsell
+        // onboarding series — only free users get these nudges.
+        if (u.role !== 'client') continue;
         const lang = (String(u.language || 'DE').toUpperCase() as Lang);
         const copy = onboardingCopy(st.day, u.first_name || '', ['DE','FR','IT','EN'].includes(lang) ? lang : 'DE');
         await sendEmail({

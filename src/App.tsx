@@ -911,6 +911,12 @@ const HowItWorks = ({ language }: { language: string }) => {
             </button>
           ))}
         </div>
+        <p className="mt-7 text-center text-[12.5px] text-[#5C5C58] dark:text-[#9A9A94] font-light max-w-xl mx-auto leading-relaxed">
+          {L('Kein Lebenslauf oder Inserat-Link zur Hand? Du kannst alle Angaben auch selbst eintippen, die KI erstellt deine Bewerbung genauso.',
+             "Pas de CV ou de lien d'annonce sous la main ? Tu peux aussi saisir toutes les informations toi-même, l'IA crée ta candidature de la même façon.",
+             "Nessun CV o link dell'annuncio a portata di mano? Puoi anche inserire tutti i dati da solo, l'IA crea comunque la tua candidatura.",
+             'No CV or job link at hand? You can also enter everything yourself, the AI creates your application just the same.')}
+        </p>
       </div>
     </section>
   );
@@ -11434,8 +11440,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         </div>
       </section>
       )}
-      {/* --- TRUST BAND (right before pricing) --- */}
-      {(!user || activeView === 'dashboard') && <TrustControl language={language} />}
+      {/* --- TRUST BAND — only inside the app (logged-in dashboard), not on the
+           public landing: the honest "no guarantee" note belongs where people
+           already use the product, not at the sign-up moment. --- */}
+      {(user && activeView === 'dashboard') && <TrustControl language={language} />}
       {/* --- PRICING SECTION --- */}
       <section id="pricing" className="px-6 lg:px-12 py-12 lg:py-20 bg-[#0a1410] text-white relative overflow-hidden">
         {/* Premium aurora gradient backdrop — slow, subtle, brand-aligned */}
@@ -11976,7 +11984,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
 
       {/* --- UPGRADE PROMPT --- */}
       <AnimatePresence>
-        {upgradePrompt && (
+        {upgradePrompt && !(user?.role === 'unlimited' || user?.role === 'admin') && (
           <UpgradePrompt
             reason={upgradePrompt.reason}
             subOverride={upgradePrompt.message}
