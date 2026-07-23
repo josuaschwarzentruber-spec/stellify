@@ -8471,7 +8471,7 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
             ) : (
               <>
                 {(() => {
-                  const onLegal = activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about';
+                  const onLegal = activeView === 'datenschutz' || activeView === 'impressum' || activeView === 'agb' || activeView === 'about' || activeView === 'ratgeber';
                   const goToAnchor = (id: string) => {
                     const linkClass = "px-2.5 lg:px-3 xl:px-4 py-1.5 text-[12px] xl:text-[13px] font-medium rounded-full text-[#5C5C58] dark:text-[#9A9A94] hover:text-[#1A1A18] dark:hover:text-[#FAFAF8] hover:bg-white/60 dark:hover:bg-white/5 transition-all whitespace-nowrap";
                     return linkClass;
@@ -8486,15 +8486,17 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     }
                   };
                   return <>
-                    <a href="#tools" onClick={handleAnchor('tools')} className={goToAnchor('tools')}>{t.tools}</a>
-                    <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
                     <a href="#features" onClick={handleAnchor('features')} className={goToAnchor('features')}>{t.features}</a>
-                    {/* Über uns scrolls to the story section like every other
-                        header item — consistent one-page flow for visitors.
-                        The full story page stays reachable from the section. */}
-                    <a href="#story" onClick={handleAnchor('story')} className={goToAnchor('story')}>
+                    <a href="#pricing" onClick={handleAnchor('pricing')} className={goToAnchor('pricing')}>{t.pricing}</a>
+                    {/* Ratgeber is its own indexable page, not a landing anchor —
+                        it moved out of the landing into the header to keep the
+                        landing focused on the sign-up path. */}
+                    <button onClick={() => navigate('ratgeber')} className={goToAnchor('ratgeber')}>
+                      {language === 'FR' ? 'Guides' : language === 'IT' ? 'Guide' : language === 'EN' ? 'Guides' : 'Ratgeber'}
+                    </button>
+                    <button onClick={() => navigate('about')} className={goToAnchor('about')}>
                       {language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}
-                    </a>
+                    </button>
                   </>;
                 })()}
               </>
@@ -8696,10 +8698,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                     };
                     const cls = "px-4 py-3 text-base font-medium rounded-full text-[#1A1A18] dark:text-[#FAFAF8] hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left";
                     return <>
-                      <a href="#tools" onClick={goAnchor('tools')} className={cls}>{t.tools}</a>
-                      <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={cls}>{t.pricing}</button>
                       <a href="#features" onClick={goAnchor('features')} className={cls}>{t.features}</a>
-                      <a href="#story" onClick={goAnchor('story')} className={cls}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</a>
+                      <button onClick={() => { navigate('pricing'); setIsMenuOpen(false); }} className={cls}>{t.pricing}</button>
+                      <button onClick={() => { navigate('ratgeber'); setIsMenuOpen(false); }} className={cls}>{language === 'FR' ? 'Guides' : language === 'IT' ? 'Guide' : language === 'EN' ? 'Guides' : 'Ratgeber'}</button>
+                      <button onClick={() => { navigate('about'); setIsMenuOpen(false); }} className={cls}>{language === 'FR' ? 'À propos' : language === 'IT' ? 'Chi siamo' : language === 'EN' ? 'About' : 'Über uns'}</button>
                     </>;
                   })()}
                 </>
@@ -10603,9 +10605,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       {(!user || activeView === 'pricing') && activeView !== 'datenschutz' && activeView !== 'impressum' && activeView !== 'agb' && activeView !== 'about' && activeView !== 'ratgeber' && <>
 
       {/* --- BEWERBUNGS-GENERATOR SHOWCASE (hero feature, mirrors the tracker
-           showcase below but flipped so the document preview reads left→right). */}
+           showcase below but flipped so the document preview reads left→right).
+           Carries id="features" so the header "Funktionen" link lands here. */}
       {(!user || activeView === 'dashboard') && (
-      <section className="px-6 lg:px-12 py-12 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
+      <section id="features" className="px-6 lg:px-12 py-12 lg:py-20 bg-white dark:bg-[#1A1A18] transition-colors">
         <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* A4 preview of a finished application — what the generator outputs.
               Real paragraph text (not gray skeleton lines) so visitors can
@@ -10956,9 +10959,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
       </section>
       )}
       {/* --- TOOLS QUICK START --- Two large product cards, each with a big
-           readable example inside a mini app window. Replaces the old thin
-           multi-tool grid; sits after both showcases as the action step. */}
-      {(!user || activeView === 'dashboard') && (
+           readable example inside a mini app window. Shown only on the logged-in
+           dashboard as the tool launcher; the public landing already showcases
+           both tools individually above, so it is not repeated there. */}
+      {(user && activeView === 'dashboard') && (
       <section id="tools" className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-7xl 2xl:max-w-[1500px] mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-14">
@@ -11594,9 +11598,10 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
           </div>
         </div>
       </section>
-      {/* --- RATGEBER TEASER --- Free Swiss career guides, surfaced on the
-           landing page so the knowledge section actually gets found. */}
-      {(!user || activeView === 'dashboard') && (
+      {/* --- RATGEBER TEASER --- Free Swiss career guides. Kept on the logged-in
+           dashboard; on the public landing the Ratgeber lives in the top nav
+           instead, to keep the landing focused on the sign-up path. */}
+      {(user && activeView === 'dashboard') && (
       <section className="px-6 lg:px-12 py-12 lg:py-20 bg-[#FDFCFB] dark:bg-[#2A2A26] transition-colors">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10">
