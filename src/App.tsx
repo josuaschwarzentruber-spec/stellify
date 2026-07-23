@@ -2227,9 +2227,7 @@ function StellifyApp() {
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const linkedinImageInputRef = useRef<HTMLInputElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
-  const [isExtractingImage, setIsExtractingImage] = useState(false);
 
   const isTransientFirestoreError = (error: unknown) => {
     const code = (error as { code?: string } | null)?.code || '';
@@ -2799,28 +2797,6 @@ function StellifyApp() {
     const result = await mammoth.extractRawText({ arrayBuffer });
     setUploadProgress(100);
     return result.value;
-  };
-
-  const extractTextFromImage = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const base64 = (e.target?.result as string).split(',')[1];
-          const mimeType = file.type || 'image/jpeg';
-          const idToken = await getAuthToken();
-          const r = await fetch('/api/extract-image', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', ...(idToken ? { Authorization: `Bearer ${idToken}` } : {}) },
-            body: JSON.stringify({ base64, mimeType }),
-          });
-          if (!r.ok) throw new Error('Bildanalyse fehlgeschlagen');
-          const data = await r.json();
-          resolve(data.text || '');
-        } catch (err) { reject(err); }
-      };
-      reader.readAsDataURL(file);
-    });
   };
 
   const analyzeCV = async (text: string) => {
@@ -12792,16 +12768,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
                         <div className="flex justify-between items-center mb-2">
                           <label className="block text-[10px] font-bold uppercase tracking-widest text-[#4A4A45] dark:text-[#9A9A94]">{input.label}</label>
                           <div className="flex items-center gap-3">
-                            {input.key === 'linkedinProfile' && (
-                              <button
-                                onClick={() => linkedinImageInputRef.current?.click()}
-                                disabled={isExtractingImage}
-                                className="text-[10px] font-bold text-[#0A66C2] flex items-center gap-1 hover:underline disabled:opacity-50"
-                              >
-                                {isExtractingImage ? <RefreshCw size={10} className="animate-spin" /> : <ImageIcon size={10} />}
-                                {isExtractingImage ? 'Wird analysiert...' : 'Screenshot'}
-                              </button>
-                            )}
                             {input.type === 'textarea' && (
                               <button
                                 onClick={() => fileInputRef.current?.click()}
@@ -14204,26 +14170,6 @@ ${(salaryData.insights || []).map((i: string) => `- ${i}`).join('\n')}
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) processFile(file);
-        }}
-      />
-      <input
-        type="file"
-        ref={linkedinImageInputRef}
-        className="hidden"
-        accept="image/*"
-        onChange={async (e) => {
-          const file = e.target.files?.[0];
-          if (!file) return;
-          e.target.value = '';
-          setIsExtractingImage(true);
-          try {
-            const extracted = await extractTextFromImage(file);
-            setToolInput((prev: any) => ({ ...prev, linkedinProfile: extracted }));
-          } catch {
-            alert(language === 'FR' ? 'La capture d\'écran n\'a pas pu être analysée. Veuillez saisir le texte manuellement.' : language === 'IT' ? 'Lo screenshot non ha potuto essere analizzato. Inserisci il testo manualmente.' : language === 'EN' ? 'Screenshot could not be analysed. Please enter text manually.' : 'Screenshot konnte nicht analysiert werden. Bitte Text manuell einfügen.');
-          } finally {
-            setIsExtractingImage(false);
-          }
         }}
       />
     </div>

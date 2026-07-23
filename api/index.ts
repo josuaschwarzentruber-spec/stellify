@@ -6,7 +6,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import Stripe from "stripe";
-import { GoogleGenAI } from "@google/genai";
 import nodemailer from "nodemailer";
 import { Resend } from "resend";
 import { createHash } from "crypto";
@@ -815,14 +814,8 @@ app.post("/api/webhook", express.raw({ type: "application/json" }), async (req, 
 // ~4.5 MB anyway, so 4.5mb is the practical ceiling, not a DoS risk.
 app.use(express.json({ limit: '4.5mb' }));
 
-// ── Gemini retry helper ───────────────────────────────────────────────────────
-// Order matters: models with the highest FREE-tier quota come first so the app
-// stays reliable without a paid key. gemini-2.0-flash = 1500 req/day free;
-// 2.5-pro/2.5-flash have very low free limits and are kept as last resort.
-const PRO_MODEL = 'gemini-2.0-flash';
-const FALLBACK_MODELS = ['gemini-2.0-flash', 'gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.5-pro'];
 const MAX_INPUT_CHARS = 32000;   // ~8k tokens
-const MAX_OUTPUT_TOKENS = 2000;  // soft cap (Gemini config)
+const MAX_OUTPUT_TOKENS = 2000;  // soft cap
 
 // ── DeepSeek (OpenAI-kompatibel) ──────────────────────────────────────────────
 const DEEPSEEK_API_URL = (process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com').replace(/\/$/, '') + '/chat/completions';
@@ -876,14 +869,10 @@ async function deepseekChat(opts: {
       const body = await r.text().catch(() => '');
       // Out of credits → privately alert the owner to top up (once/day).
       if (r.status === 402 || /insufficient\s*balance/i.test(body)) {
-        const fallbackOn = process.env.GEMINI_TEXT_FALLBACK === '1' || process.env.GEMINI_TEXT_FALLBACK === 'true';
         alertOwnerOncePerDay(
           'empty_balance',
           '🔴 Stellify: DeepSeek-Guthaben leer, Kunden können nicht generieren',
-          fallbackOn
-            ? `<p>Dein DeepSeek-Guthaben ist <b>leer</b>. Die KI läuft gerade über die Ersatz-Lösung (Google Gemini) weiter, aber bitte lade bald auf:</p>
-               <p><a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
-            : `<p><b>Dringend:</b> Dein DeepSeek-Guthaben ist <b>leer</b> und es gibt kein Ersatz-System (Gemini ist ausgeschaltet). <b>Kunden können gerade keine Bewerbungen erstellen.</b></p>
+          `<p><b>Dringend:</b> Dein DeepSeek-Guthaben ist <b>leer</b>. <b>Kunden können gerade keine Bewerbungen erstellen.</b></p>
                <p>Bitte sofort aufladen: <a href="https://platform.deepseek.com/top_up">platform.deepseek.com/top_up</a></p>`
         ).catch(() => {});
       }
@@ -898,102 +887,24 @@ async function deepseekChat(opts: {
   }
 }
 
-// DeepSeek is the only text generator. The Gemini fallback is OFF by default
-// (per product decision) and re-armed instantly by setting the Vercel env
-// GEMINI_TEXT_FALLBACK=1 — no code change needed. With the fallback off, a
-// DeepSeek failure surfaces as a clear error to the user and (on an empty
-// balance) an immediate owner alert, so top-ups happen fast.
-// (Bild-/Vision- und Google-Search-Endpoints umgehen diesen Helper bewusst.)
-const GEMINI_TEXT_FALLBACK = process.env.GEMINI_TEXT_FALLBACK === '1' || process.env.GEMINI_TEXT_FALLBACK === 'true';
+// DeepSeek is the ONLY text generator. Gemini has been removed entirely (product
+// decision). A DeepSeek failure surfaces as a clear error to the user and, on an
+// empty balance, an immediate owner alert (see deepseekChat), so top-ups are fast.
 async function generateText(opts: {
   systemInstruction?: string;
   history?: ChatHistoryMsg[];
   userContent: string;
   temperature?: number;
   maxOutputTokens?: number;
-  preferredGeminiModel?: string;
-}): Promise<{ text: string; provider: 'deepseek' | 'gemini' }> {
-  if (process.env.DEEPSEEK_API_KEY) {
-    try {
-      const text = await deepseekChat(opts);
-      return { text, provider: 'deepseek' };
-    } catch (err: any) {
-      // Fallback disabled → let the caller handle the error (clear message
-      // to the user); the empty-balance owner alert already fired in deepseekChat.
-      if (!GEMINI_TEXT_FALLBACK) throw err;
-      console.warn('[DEEPSEEK→GEMINI fallback]', (err?.message || err).toString().slice(0, 200));
-    }
-  } else if (!GEMINI_TEXT_FALLBACK) {
-    throw new Error('DEEPSEEK_API_KEY fehlt und der Gemini-Fallback ist deaktiviert');
-  }
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) throw new Error('Weder DEEPSEEK_API_KEY noch GEMINI_API_KEY ist gesetzt');
-  const ai = new GoogleGenAI({ apiKey });
-  const userText = clampInput(opts.userContent);
-  const contents = (opts.history?.length)
-    ? [...opts.history, { role: 'user', parts: [{ text: userText }] }]
-    : [{ role: 'user', parts: [{ text: userText }] }];
-  const response = await geminiWithRetry((mdl) =>
-    ai.models.generateContent({
-      model: mdl,
-      contents,
-      config: {
-        systemInstruction: opts.systemInstruction,
-        temperature: opts.temperature ?? 0.7,
-        maxOutputTokens: opts.maxOutputTokens ?? MAX_OUTPUT_TOKENS,
-      },
-    })
-  , 3, opts.preferredGeminiModel);
-  return { text: response.text ?? '', provider: 'gemini' };
+  preferredGeminiModel?: string; // ignored — kept so existing call sites still compile
+}): Promise<{ text: string; provider: 'deepseek' }> {
+  if (!process.env.DEEPSEEK_API_KEY) throw new Error('DEEPSEEK_API_KEY fehlt');
+  const text = await deepseekChat(opts);
+  return { text, provider: 'deepseek' };
 }
 
 function clampInput(text: string): string {
   return text.length > MAX_INPUT_CHARS ? text.slice(0, MAX_INPUT_CHARS) : text;
-}
-
-function safeGetText(result: any): string | null {
-  if (!result) return null;
-  try {
-    const txt = result.text;
-    if (typeof txt === 'string') return txt;
-    const parts = result.candidates?.[0]?.content?.parts;
-    if (Array.isArray(parts)) {
-      return parts.filter((p: any) => p.text).map((p: any) => p.text).join('') || null;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-async function geminiWithRetry(fn: (model: string) => Promise<any>, maxAttempts = 4, preferredModel?: string): Promise<any> {
-  const modelsToTry = preferredModel
-    ? [preferredModel, ...FALLBACK_MODELS.filter(m => m !== preferredModel)]
-    : FALLBACK_MODELS;
-  const attempts = Math.min(maxAttempts, modelsToTry.length);
-  let lastError: any;
-  for (let i = 0; i < attempts; i++) {
-    const model = modelsToTry[i];
-    try {
-      const result = await fn(model);
-      const text = safeGetText(result);
-      if (text === null || text === undefined) throw new Error('EMPTY_RESPONSE');
-      return { ...result, text };
-    } catch (err: any) {
-      lastError = err;
-      const msg = (err.message || '') + (err.status ? ` [${err.status}]` : '');
-      console.warn(`[GEMINI] model=${model} attempt=${i + 1} error=${msg.slice(0, 200)}`);
-      if (i < attempts - 1) {
-        const isRetryable = msg.includes('503') || msg.includes('UNAVAILABLE') || msg.includes('high demand')
-          || msg.includes('INTERNAL') || msg.includes('EMPTY_RESPONSE') || msg.includes('429')
-          || msg.includes('quota') || msg.includes('overload') || msg.includes('Resource exhausted')
-          || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('timeout') || msg.includes('network');
-        if (isRetryable) await new Promise(r => setTimeout(r, (i + 1) * 2000));
-        else await new Promise(r => setTimeout(r, 500));
-      }
-    }
-  }
-  throw lastError;
 }
 
 // ── AI Quota / Rate-Limit Enforcement ────────────────────────────────────────
@@ -1420,26 +1331,9 @@ app.post("/api/process-tool", aiLimiter, requireAuth, enforceAIQuota, async (req
   const systemInstruction = (langInstructions[language] || langInstructions.DE) + (langEnforce[language] || '');
 
   try {
-    // Mit Google-Suche → Gemini ist Pflicht (DeepSeek hat kein Grounding)
-    if (useSearch) {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
-      const ai = new GoogleGenAI({ apiKey });
-      const userText = clampInput(typeof prompt === 'string' ? prompt : '');
-      const response = await geminiWithRetry((mdl) =>
-        ai.models.generateContent({
-          model: mdl,
-          contents: userText,
-          config: { systemInstruction, temperature: 0.4, maxOutputTokens: MAX_OUTPUT_TOKENS, tools: [{ googleSearch: {} }] }
-        })
-      , 3, model);
-      const chunks = (response as any).candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      const sources: string[] = chunks.filter((c: any) => c.web?.uri).map((c: any) => `[${c.web.title || c.web.uri}](${c.web.uri})`);
-      await recordAIUsage(req);
-      return res.json({ text: response.text, sources, provider: 'gemini' });
-    }
-
-    // Sonst: DeepSeek primär, Gemini Fallback
+    // All tools run on DeepSeek. (Live web grounding was Gemini-only and has
+    // been removed together with Gemini; useSearch is accepted but ignored.)
+    void useSearch;
     const { text, provider } = await generateText({
       systemInstruction,
       userContent: typeof prompt === 'string' ? prompt : '',
@@ -1668,34 +1562,12 @@ app.post("/api/fetch-job", aiLimiter, requireAuth, async (req, res) => {
   }
 });
 
-// ── LinkedIn Screenshot / Image Text Extraction ───────────────────────────────
-app.post("/api/extract-image", aiLimiter, requireAuth, enforceAIQuota, async (req, res) => {
-  const { base64, mimeType } = req.body;
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY fehlt" });
-  if (!base64) return res.status(400).json({ error: "base64 fehlt" });
-
-  try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await geminiWithRetry((mdl) =>
-      ai.models.generateContent({
-        model: mdl,
-        contents: [{
-          role: 'user',
-          parts: [
-            { inlineData: { mimeType: mimeType || 'image/jpeg', data: base64 } },
-            { text: 'Extrahiere alle sichtbaren Textinformationen aus diesem LinkedIn-Profil-Screenshot. Gib Name, Berufsbezeichnung, Unternehmen, Ausbildung, Fähigkeiten und alle anderen relevanten Karriereinformationen als strukturierten Text zurück. Nur den extrahierten Text, keine Erklärungen.' }
-          ]
-        }],
-        config: { temperature: 0.1, maxOutputTokens: 1500 }
-      })
-    , 3, PRO_MODEL);
-    await recordAIUsage(req);
-    res.json({ text: response.text });
-  } catch (error: any) {
-    console.error("[IMAGE EXTRACT ERROR]", error.message);
-    res.status(500).json({ error: 'Bildanalyse fehlgeschlagen. Bitte versuch es später erneut.' });
-  }
+// ── Image Text Extraction — REMOVED ───────────────────────────────────────────
+// Image/screenshot CV upload relied on Gemini vision, which has been removed.
+// The client now only accepts PDF, Word and text CVs. This stub stays so any
+// old client build gets a clear message instead of a 404.
+app.post("/api/extract-image", requireAuth, async (_req, res) => {
+  res.status(415).json({ error: 'Bild-Upload wird nicht mehr unterstützt. Bitte lade deinen Lebenslauf als PDF oder Word hoch.' });
 });
 
 // ── Live Job Search ───────────────────────────────────────────────────────────
@@ -1742,22 +1614,9 @@ app.get("/api/jobs", requireAuth, async (req, res) => {
     }
   }
 
-  const geminiKey = process.env.GEMINI_API_KEY;
-  if (!geminiKey) return res.json({ jobs: [], live: false, source: 'none' });
-  try {
-    const ai = new GoogleGenAI({ apiKey: geminiKey });
-    const prompt = `Suche nach aktuellen Stellenangeboten in der Schweiz. Suchbegriff: ${keyword || 'alle Berufe'}, Branche: ${category || 'alle'}, Ort: ${location || 'ganze Schweiz'}. Gib exakt 10 echte aktuelle Stellenangebote zurück als reines JSON-Array ohne Markdown. Felder: id, title, company, location, category, description (2 Sätze), url (echter Link), ats_keywords (3 strings).`;
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', contents: prompt,
-      config: { tools: [{ googleSearch: {} }], temperature: 0.2 },
-    });
-    const jsonMatch = (response.text || '').match(/\[[\s\S]*\]/);
-    if (jsonMatch) return res.json({ jobs: JSON.parse(jsonMatch[0]), live: true, source: 'gemini' });
-    return res.json({ jobs: [], live: true, source: 'gemini' });
-  } catch (error: any) {
-    console.error('[JOB SEARCH ERROR]', error?.message);
-    return res.status(500).json({ error: 'Die Jobsuche ist gerade nicht verfügbar. Bitte versuch es später erneut.' });
-  }
+  // No Adzuna result and no Gemini fallback anymore (Gemini removed). The live
+  // job board is not launched yet, so return an empty, non-live result.
+  return res.json({ jobs: [], live: false, source: 'none' });
 });
 
 // ── Password Reset (custom branded email) ────────────────────────────────────
