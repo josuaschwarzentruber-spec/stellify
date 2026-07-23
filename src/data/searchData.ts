@@ -24,7 +24,7 @@ export const searchData: SearchItem[] = [
     title: 'Marketing Manager',
     category: 'Marketing',
     location: 'Genf',
-    content: 'Verantwortung für die digitale Strategie im Schweizer Markt. Fließend Deutsch und Französisch erforderlich.',
+    content: 'Verantwortung für die digitale Strategie im Schweizer Markt. Fliessend Deutsch und Französisch erforderlich.',
     link: '#jobs/j2'
   },
   {

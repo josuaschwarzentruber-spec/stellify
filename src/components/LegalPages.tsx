@@ -76,7 +76,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 <p>Wir erheben und bearbeiten folgende Kategorien von Personendaten:</p>
                 <ul className="list-disc pl-5 space-y-2 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Kontodaten:</strong> Vorname, E-Mail-Adresse (bei Registrierung)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Lebenslauf-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs (nur zur KI-Verarbeitung, nicht dauerhaft gespeichert)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Lebenslauf-Inhalt:</strong> Text deines hochgeladenen Lebenslaufs, gespeichert, damit du ihn für weitere Bewerbungen wiederverwenden kannst. Jederzeit selbst löschbar.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Nutzungsdaten:</strong> Anzahl Tool-Nutzungen, Chat-Anfragen, Datum des letzten Resets</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Zahlungsdaten:</strong> Werden ausschliesslich durch Stripe Inc. verarbeitet.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technische Daten:</strong> Spracheinstellungen, Theme-Präferenz (lokal gespeichert) sowie ein verschlüsselter Prüfwert (Hash) deiner IP-Adresse, ausschliesslich zur Missbrauchsabwehr beim kostenlosen Kontingent. Die IP-Adresse selbst wird nicht im Klartext gespeichert.</li>
@@ -106,10 +106,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="6. Cookies und lokale Speicherung">
                 <div className="mt-3 space-y-3">
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Notwendige Cookies (immer aktiv)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session: Authentifizierung</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optionale Analyse-Cookies (nur mit Einwilligung)</p><p className="text-xs mt-1">Derzeit keine Analyse-Dienste von Drittanbietern aktiv.</p></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Reichweitenmessung</p><p className="text-xs mt-1">Wir nutzen Vercel Analytics zur anonymen, cookielosen Reichweitenmessung. Es werden keine personenbezogenen Profile gebildet und keine Daten zu Werbezwecken weitergegeben.</p></div>
                 </div>
               </Section>
-              <Section title="7. Speicherdauer"><ul className="list-disc pl-5 space-y-2"><li>Kontodaten: bis zur Kontolöschung</li><li>Lebenslauf-Text: nicht dauerhaft gespeichert</li><li>Zahlungsbelege: 10 Jahre (OR Art. 958f)</li><li>Nutzungsstatistiken: monatlich zurückgesetzt</li></ul></Section>
+              <Section title="7. Speicherdauer"><ul className="list-disc pl-5 space-y-2"><li>Kontodaten: bis zur Kontolöschung</li><li>Lebenslauf-Text: bis zur Kontolöschung oder bis du ihn selbst löschst</li><li>Zahlungsbelege: 10 Jahre (OR Art. 958f)</li><li>Nutzungsstatistiken: monatlich zurückgesetzt</li></ul></Section>
               <Section title="8. Deine Rechte">
                 <p>Du hast nach Schweizer DSG und DSGVO folgende Rechte:</p>
                 <ul className="list-disc pl-5 space-y-2 mt-2">
@@ -128,7 +128,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="2. Données collectées">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données de compte :</strong> prénom, adresse e-mail</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Contenu du CV :</strong> texte de votre CV (traitement IA uniquement, non stocké de façon permanente)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Contenu du CV :</strong> texte de votre CV, conservé pour que vous puissiez le réutiliser dans d'autres candidatures. Supprimable à tout moment.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données d'utilisation :</strong> nombre d'utilisations des outils, requêtes chat</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données de paiement :</strong> traitées exclusivement par Stripe Inc.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Données techniques :</strong> paramètres de langue, préférence de thème (stockage local) ainsi qu'une empreinte chiffrée (hash) de ton adresse IP, uniquement pour prévenir les abus du quota gratuit. L'adresse IP elle-même n'est jamais stockée en clair.</li>
@@ -157,10 +157,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="6. Cookies et stockage local">
                 <div className="mt-3 space-y-3">
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies nécessaires (toujours actifs)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Session Firebase Auth : authentification</li><li>localStorage : <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookies d'analyse optionnels (avec consentement uniquement)</p><p className="text-xs mt-1">Aucun service d'analyse tiers actuellement actif.</p></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Mesure d'audience</p><p className="text-xs mt-1">Nous utilisons Vercel Analytics pour une mesure d'audience anonyme et sans cookies. Aucun profil personnel n'est créé et aucune donnée n'est utilisée à des fins publicitaires.</p></div>
                 </div>
               </Section>
-              <Section title="7. Durée de conservation"><ul className="list-disc pl-5 space-y-2"><li>Données de compte : jusqu'à la suppression du compte</li><li>Contenu du CV : non stocké de façon permanente</li><li>Pièces comptables : 10 ans (droit suisse)</li><li>Statistiques d'utilisation : réinitialisées mensuellement</li></ul></Section>
+              <Section title="7. Durée de conservation"><ul className="list-disc pl-5 space-y-2"><li>Données de compte : jusqu'à la suppression du compte</li><li>Contenu du CV : jusqu'à la suppression du compte ou jusqu'à ce que vous le supprimiez</li><li>Pièces comptables : 10 ans (droit suisse)</li><li>Statistiques d'utilisation : réinitialisées mensuellement</li></ul></Section>
               <Section title="8. Vos droits">
                 <p>Vous disposez des droits suivants selon la LPD et le RGPD : accès, rectification, suppression, portabilité, opposition, retrait du consentement, réclamation auprès du PFPDT (edoeb.admin.ch).</p>
                 <p className="mt-4">Contact : <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
@@ -175,7 +175,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="2. Dati raccolti">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati account:</strong> nome, indirizzo e-mail</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Contenuto del CV:</strong> testo del CV (solo per elaborazione IA, non memorizzato permanentemente)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Contenuto del CV:</strong> testo del CV, conservato per poterlo riutilizzare in altre candidature. Cancellabile in qualsiasi momento.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati di utilizzo:</strong> numero di utilizzi degli strumenti, richieste chat</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati di pagamento:</strong> elaborati esclusivamente da Stripe Inc.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Dati tecnici:</strong> impostazioni lingua, preferenza tema (memorizzati localmente) e un valore cifrato (hash) del tuo indirizzo IP, esclusivamente per prevenire abusi del contingente gratuito. L'indirizzo IP stesso non viene mai memorizzato in chiaro.</li>
@@ -204,10 +204,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="6. Cookie e memorizzazione locale">
                 <div className="mt-3 space-y-3">
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie necessari (sempre attivi)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Sessione Firebase Auth: autenticazione</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code></li></ul></div>
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Cookie analitici opzionali (solo con consenso)</p><p className="text-xs mt-1">Nessun servizio di analisi di terze parti attualmente attivo.</p></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Misurazione del traffico</p><p className="text-xs mt-1">Utilizziamo Vercel Analytics per una misurazione anonima e senza cookie. Non vengono creati profili personali e nessun dato è usato a scopi pubblicitari.</p></div>
                 </div>
               </Section>
-              <Section title="7. Durata della conservazione"><ul className="list-disc pl-5 space-y-2"><li>Dati account: fino alla cancellazione dell'account</li><li>CV: non memorizzato permanentemente</li><li>Documenti contabili: 10 anni (diritto svizzero)</li><li>Statistiche di utilizzo: reimpostate mensilmente</li></ul></Section>
+              <Section title="7. Durata della conservazione"><ul className="list-disc pl-5 space-y-2"><li>Dati account: fino alla cancellazione dell'account</li><li>CV: fino alla cancellazione dell'account o finché non lo elimini</li><li>Documenti contabili: 10 anni (diritto svizzero)</li><li>Statistiche di utilizzo: reimpostate mensilmente</li></ul></Section>
               <Section title="8. I tuoi diritti">
                 <p>Hai i seguenti diritti ai sensi della LPD e del GDPR: accesso, rettifica, cancellazione, portabilità, opposizione, revoca del consenso, reclamo all'IFPDT (edoeb.admin.ch).</p>
                 <p className="mt-4">Contatto: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
@@ -222,7 +222,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="2. Personal Data Collected">
                 <ul className="list-disc pl-5 space-y-2 mt-2">
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Account data:</strong> First name, email address (upon registration)</li>
-                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV content:</strong> Text of your uploaded resume (used for AI processing only, not permanently stored on our servers)</li>
+                  <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">CV content:</strong> Text of your uploaded CV, stored so you can reuse it across applications. You can delete it at any time.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Usage data:</strong> Number of tool uses, chat requests, date of last reset</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Payment data:</strong> Processed exclusively by Stripe Inc. We do not receive full credit card data.</li>
                   <li><strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Technical data:</strong> Language settings, theme preference (stored locally in browser) and an encrypted checksum (hash) of your IP address, used solely to prevent abuse of the free quota. The IP address itself is never stored in clear text.</li>
@@ -251,10 +251,10 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="6. Cookies and Local Storage">
                 <div className="mt-3 space-y-3">
                   <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Necessary cookies (always active)</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4"><li>Firebase Auth Session: authentication</li><li>localStorage: <code className="bg-black/10 px-1">language</code>, <code className="bg-black/10 px-1">theme</code>, <code className="bg-black/10 px-1">cookieConsent</code>: user preferences</li></ul></div>
-                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Optional analytics cookies (consent required)</p><p className="text-xs mt-1">No third-party analytics services are currently active.</p></div>
+                  <div className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">Traffic measurement</p><p className="text-xs mt-1">We use Vercel Analytics for anonymous, cookieless traffic measurement. No personal profiles are created and no data is used for advertising.</p></div>
                 </div>
               </Section>
-              <Section title="7. Retention Periods"><ul className="list-disc pl-5 space-y-2"><li>Account data: until account deletion</li><li>CV text: not permanently stored</li><li>Payment records: 10 years (Swiss accounting law)</li><li>Usage statistics: reset monthly</li></ul></Section>
+              <Section title="7. Retention Periods"><ul className="list-disc pl-5 space-y-2"><li>Account data: until account deletion</li><li>CV text: until account deletion or until you delete it yourself</li><li>Payment records: 10 years (Swiss accounting law)</li><li>Usage statistics: reset monthly</li></ul></Section>
               <Section title="8. Your Rights">
                 <p>Under Swiss FADP and GDPR, you have the right to: access, rectification, erasure, data portability, objection, withdrawal of consent, and to lodge a complaint with the FDPIC (edoeb.admin.ch).</p>
                 <p className="mt-4">Contact: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a></p>
@@ -315,7 +315,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
                 {isDE ? 'Rechtliches' : isFR ? 'Mentions légales' : isIT ? 'Note legali' : 'Legal'}
               </p>
               <h1 className="text-4xl font-serif text-[#1A1A18] dark:text-[#FAFAF8] mb-4">
-                {isDE ? 'Allgemeine Geschäftsbedingungen (AGB)' : isFR ? 'Conditions générales d\'utilisation (CGU)' : isIT ? 'Condizioni generali di utilizzo (CGU)' : 'Terms and Conditions'}
+                {isDE ? 'Allgemeine Geschäftsbedingungen (AGB)' : isFR ? 'Conditions générales de vente (CGV)' : isIT ? 'Condizioni generali di utilizzo (CGU)' : 'Terms and Conditions'}
               </h1>
               <p className="text-sm text-[#6B6B66] dark:text-[#9A9A94]">
                 {isDE ? `Stand: ${today} · Anbieter: JTSP, Schweiz` : isFR ? `Mis à jour : ${today} · Fournisseur : JTSP, Suisse` : isIT ? `Aggiornato: ${today} · Fornitore: JTSP, Svizzera` : `Last updated: ${today} · Provider: JTSP, Switzerland`}
@@ -333,7 +333,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Leistungsumfang und Tarife">
                 <div className="mt-3 space-y-3">
-                  {[['Gratis-Plan (kostenlos)', ['3 Bewerbungs-Generierungen','Bewerbungs-Tracker (dauerhaft gratis)','PDF- & Word-Export','Schweizer Bewerbungs-Standards']],['Pro-Plan (CHF 9.90/Mo. · CHF 89.–/Jahr)', ['30 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 19.90/Mo. · CHF 179.–/Jahr)', ['Alles aus Pro','100 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
+                  {[['Gratis-Plan (kostenlos)', ['3 Bewerbungs-Generierungen','Bewerbungs-Tracker (dauerhaft gratis)','PDF-Export (Word ab Pro)','Schweizer Bewerbungs-Standards']],['Pro-Plan (CHF 9.90/Mo. · CHF 89.–/Jahr)', ['30 Generierungen pro Monat','Massgeschneiderte Bewerbungen mit KI','Stellen-Import per Link & Lebenslauf-Nutzung','Alle Standard-Designs','PDF- & Word-Export']],['Karriere+ (CHF 19.90/Mo. · CHF 179.–/Jahr)', ['Alles aus Pro','100 Generierungen pro Monat','Exklusive Premium-Designs','Persönlicher E-Mail-Support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -379,14 +379,14 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               <Section title="12. Anwendbares Recht"><p>Ausschliesslich <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">Schweizer Recht</strong>. Gerichtsstand: Luzern, Schweiz.</p></Section>
               <Section title="13. Streitbeilegung"><p>Kontakt: <a href="mailto:support.stellify@gmail.com" className="text-[#004225] underline">support.stellify@gmail.com</a>. EU-Schlichtung: <a href="https://ec.europa.eu/consumers/odr" className="text-[#004225] underline" target="_blank" rel="noopener noreferrer">ec.europa.eu/consumers/odr</a></p></Section>
             </> : isFR ? <>
-              <Section title="1. Objet et champ d'application"><p>Les présentes CGU régissent tous les contrats d'utilisation entre le fournisseur JTSP, exploitant de la plateforme Stellify (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de candidature assistée par IA avec deux outils : le Générateur de candidatures, qui crée à partir d'une annonce une lettre de motivation et un profil court adaptés, et le Suivi des candidatures gratuit.</p></Section>
+              <Section title="1. Objet et champ d'application"><p>Les présentes CGV régissent tous les contrats d'utilisation entre le fournisseur JTSP, exploitant de la plateforme Stellify (ci-après «Stellify») et les utilisateurs inscrits de la plateforme stellify.ch. Stellify propose une plateforme de candidature assistée par IA avec deux outils : le Générateur de candidatures, qui crée à partir d'une annonce une lettre de motivation et un profil court adaptés, et le Suivi des candidatures gratuit.</p></Section>
               <Section title="2. Conclusion du contrat">
-                <p>Le contrat est conclu par l'utilisation de la plateforme ou la souscription d'un abonnement. En s'inscrivant ou en souscrivant un abonnement, l'utilisateur accepte implicitement les présentes CGU et la politique de confidentialité.</p>
+                <p>Le contrat est conclu par l'utilisation de la plateforme ou la souscription d'un abonnement. En s'inscrivant ou en souscrivant un abonnement, l'utilisateur accepte implicitement les présentes CGV et la politique de confidentialité.</p>
                 <p className="mt-2">L'utilisation est autorisée dès l'âge de <strong className="text-[#1A1A18] dark:text-[#FAFAF8] font-medium">14 ans</strong>. Les personnes mineures (moins de 18 ans) doivent obtenir le consentement d'un représentant légal pour souscrire un abonnement payant.</p>
               </Section>
               <Section title="3. Prestations et tarifs">
                 <div className="mt-3 space-y-3">
-                  {[['Plan Gratuit (gratuit)', ['3 générations de candidatures','Suivi des candidatures (gratuit pour toujours)','Export PDF & Word','Standards de candidature suisses']],['Plan Pro (CHF 9.90/mois · CHF 89.–/an)', ['30 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 19.90/mois · CHF 179.–/an)', ['Tout de Pro','100 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
+                  {[['Plan Gratuit (gratuit)', ['3 générations de candidatures','Suivi des candidatures (gratuit pour toujours)','Export PDF (Word dès Pro)','Standards de candidature suisses']],['Plan Pro (CHF 9.90/mois · CHF 89.–/an)', ['30 générations par mois','Candidatures sur mesure avec IA','Import d\'offres par lien & utilisation du CV','Tous les designs standard','Export PDF & Word']],['Karriere+ (CHF 19.90/mois · CHF 179.–/an)', ['Tout de Pro','100 générations par mois','Designs Premium exclusifs','Support e-mail personnel']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -439,7 +439,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Prestazioni e tariffe">
                 <div className="mt-3 space-y-3">
-                  {[['Piano Gratuito (gratuito)', ['3 generazioni di candidature','Tracker candidature (gratuito per sempre)','Esportazione PDF & Word','Standard di candidatura svizzeri']],['Piano Pro (CHF 9.90/mese · CHF 89.–/anno)', ['30 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 19.90/mese · CHF 179.–/anno)', ['Tutto di Pro','100 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
+                  {[['Piano Gratuito (gratuito)', ['3 generazioni di candidature','Tracker candidature (gratuito per sempre)','Esportazione PDF (Word da Pro)','Standard di candidatura svizzeri']],['Piano Pro (CHF 9.90/mese · CHF 89.–/anno)', ['30 generazioni al mese','Candidature su misura con IA','Import di annunci da link & uso del CV','Tutti i design standard','Esportazione PDF & Word']],['Karriere+ (CHF 19.90/mese · CHF 179.–/anno)', ['Tutto di Pro','100 generazioni al mese','Design Premium esclusivi','Supporto e-mail personale']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>
@@ -492,7 +492,7 @@ const LegalPages = ({ activeView, onBack, language }: { activeView: string; onBa
               </Section>
               <Section title="3. Services and Pricing">
                 <div className="mt-3 space-y-3">
-                  {[['Free Plan (no cost)', ['3 application generations','Application Tracker (free forever)','PDF & Word export','Swiss application standards']],['Pro Plan (CHF 9.90/mo · CHF 89.–/yr)', ['30 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 19.90/mo · CHF 179.–/yr)', ['Everything in Pro','100 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
+                  {[['Free Plan (no cost)', ['3 application generations','Application Tracker (free forever)','PDF export (Word from Pro)','Swiss application standards']],['Pro Plan (CHF 9.90/mo · CHF 89.–/yr)', ['30 generations per month','Tailored applications with AI','Job import by link & CV reuse','All standard designs','PDF & Word export']],['Karriere+ (CHF 19.90/mo · CHF 179.–/yr)', ['Everything in Pro','100 generations per month','Exclusive Premium designs','Personal email support']]].map(([name, items]) => (
                     <div key={name as string} className="p-4 bg-[#F5F4F0] dark:bg-[#2A2A26]"><p className="font-medium text-[#1A1A18] dark:text-[#FAFAF8]">{name as string}</p><ul className="text-xs mt-2 space-y-1 list-disc pl-4">{(items as string[]).map(i => <li key={i}>{i}</li>)}</ul></div>
                   ))}
                 </div>

@@ -3,10 +3,35 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ── Users ────────────────────────────────────────────────────────────────
-    // Each user can only read and write their own document
+    // A user reads/edits only their own document — but the fields that decide
+    // PAID ACCESS and the AI QUOTA (role, subscription_*, stripe_customer_id,
+    // ai_calls_*) are SERVER-ONLY. The Stripe webhook and the Admin SDK write
+    // them and bypass these rules; a client must never be able to grant itself
+    // a paid/admin role or reset its own quota. (Without this a user could run
+    // updateDoc(doc(db,'users',uid),{role:'unlimited'}) in the console and get
+    // free unlimited AI — a full payment bypass.)
     match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // New accounts may only be created as a free 'client', with no paid or
+      // Stripe fields pre-set by the client.
+      allow create: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.get('role', 'client') == 'client'
+        && !('subscription_expires_at' in request.resource.data)
+        && !('stripe_customer_id' in request.resource.data)
+        && !('ai_calls_lifetime' in request.resource.data)
+        && !('ai_calls_month' in request.resource.data);
+
+      // On update, every server-trusted field must stay exactly as stored.
+      allow update: if request.auth != null && request.auth.uid == userId
+        && request.resource.data.get('role', 'client') == resource.data.get('role', 'client')
+        && request.resource.data.get('subscription_expires_at', '') == resource.data.get('subscription_expires_at', '')
+        && request.resource.data.get('subscription_interval', '') == resource.data.get('subscription_interval', '')
+        && request.resource.data.get('stripe_customer_id', '') == resource.data.get('stripe_customer_id', '')
+        && request.resource.data.get('ai_calls_lifetime', 0) == resource.data.get('ai_calls_lifetime', 0)
+        && request.resource.data.get('ai_calls_month', 0) == resource.data.get('ai_calls_month', 0)
+        && request.resource.data.get('ai_calls_today', 0) == resource.data.get('ai_calls_today', 0);
+
       // delete is handled server-side via Admin SDK only
       allow delete: if false;
     }
