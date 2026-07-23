@@ -836,21 +836,24 @@ const HowItWorks = ({ language, embedded = false }: { language: string; embedded
 
   const body = (
     <>
-        <div className={`${embedded ? 'w-full' : 'mx-auto max-w-xl'} rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/50 bg-white dark:bg-[#1F1F1C]`}>
+        <div className={`${embedded ? 'w-full max-w-md mx-auto lg:max-w-none' : 'mx-auto max-w-xl'} rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 shadow-2xl shadow-black/15 dark:shadow-black/50 bg-white dark:bg-[#1F1F1C]`}>
           <div className="flex items-center gap-1.5 px-4 py-3.5 bg-[#F4F3F0] dark:bg-[#26261F] border-b border-black/6 dark:border-white/6">
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8837B]" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#E8C57B]" />
             <span className="w-2.5 h-2.5 rounded-full bg-[#7BC98F]" />
             <span className="ml-2 text-[9px] font-bold uppercase tracking-[0.2em] text-[#9A9A94] truncate">Stellify · {steps[step].title}</span>
           </div>
-          <div className="p-6 md:p-8 min-h-[280px] flex items-center">
+          {/* FIXED height (not min-height): the three steps have different content
+              heights; a fixed box keeps the layout stable so cycling never shifts
+              the page below (which caused a jumpy "step up" while scrolling). */}
+          <div className="p-5 md:p-8 h-[330px] flex items-center overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.4, ease: [0.22, 0.61, 0.36, 1] }} className="w-full">
                 {step === 0 && (
                   <div className="space-y-5">
                     <div className="flex items-center gap-2 bg-[#F7F6F3] dark:bg-[#26261F] border border-black/8 dark:border-white/8 rounded-lg px-3.5 py-3">
                       <Link2 size={14} className="text-[#9A9A94] shrink-0" />
-                      <span className="flex-1 min-w-0 text-[12px] font-medium text-[#5C5C58] dark:text-[#9A9A94] truncate">jobs.ch/stellen/marketing-manager-nestle</span>
+                      <span className="flex-1 min-w-0 text-[12px] font-medium text-[#5C5C58] dark:text-[#9A9A94] truncate">jobs.ch/marketing-manager</span>
                       <motion.span initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.5, type: 'spring', stiffness: 300 }} className="shrink-0 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-widest text-[#004225] dark:text-[#00A854] bg-[#004225]/8 dark:bg-[#00A854]/12 px-2 py-1 rounded">
                         <CheckCircle2 size={10} />{L('Gelesen', 'Lu', 'Letto', 'Read')}
                       </motion.span>
